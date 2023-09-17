@@ -9,6 +9,7 @@ import SwiftUI
 
 struct RootView: View {
     @ObservedObject var authManager: AuthManager
+    @State static private var showExperienceModalPreview = false
 
     var body: some View {
         if authManager.user == nil {

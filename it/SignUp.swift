@@ -89,70 +89,65 @@ struct ImagePickerView: View {
     @State private var selectedIcon: String = "user1"
     @State private var showingIconPicker = false
     let defaultImage = UIImage(named: "defaultProfileImage")
+    let icons = ["user1", "user2", "user3"]
+    @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
         NavigationView{
             VStack {
                 HStack{
-                    HStack{
-                        Text("アイコン")
-                            .bold()
-                        Spacer()
-                        Button(action: {
-                            self.showingIconPicker.toggle()
-                        }) {
-                            Image(selectedIcon)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 50, height: 50)
-                        }
-                    }
+                    Text("アバターを選択してください")
+                            .font(.system(size:28))
                 }
-                Text("必須入力では無いです")
-                    .font(.system(size: 18))
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal)
-                    .padding(.top,5)
-                Button(action: {
-                    self.isImagePickerDisplay = true
-                }) {
-                    if let image = userIcon {
-                        Image(uiImage: image)
-                            .resizable()
-                            .frame(width: 100, height: 100)
-                            .scaledToFit()
-                            .clipShape(Circle())
-                    } else {
-                        ZStack {
-                            Circle()
-                                .fill(Color.gray)
-                                .frame(width: 100, height: 100)
-                            Image(systemName: "person.badge.plus")
-                                .foregroundColor(.white)
-                                .font(.system(size: 50))
+                
+                ScrollView {
+                    VStack(spacing: 20) {
+                        ForEach(0..<icons.count) { rowIndex in
+                            HStack(spacing: 20) {
+                                ForEach(0..<3) { colIndex in
+                                    let iconIndex = rowIndex * 3 + colIndex
+                                    if iconIndex < icons.count {
+                                        Button(action: {
+                                            self.selectedIcon = icons[iconIndex]
+                                        }) {
+                                            Image(icons[iconIndex])
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(width: 90, height: 300)
+                                            .padding(10)
+                                                .border(Color.blue, width: selectedIcon == icons[iconIndex] ? 2 : 0)
+                                        }
+                                        .padding(.vertical, 10)
+
+                                    }
+                                }
+                            }
                         }
-                        
                     }
                 }
                 
                 Button("ユーザーを作成") {
-                    let selectedIcon = userIcon ?? defaultImage
-                    authManager.createUser(name: userName, icon: selectedIcon) // 変更
+                    let selectedIconName = selectedIcon
+                    authManager.saveUserToDatabase(userName: userName, userIcon: selectedIconName)
                 }
                 .padding(.vertical,10)
                 .padding(.horizontal,25)
                 .font(.headline)
                 .foregroundColor(.white)
                 .background(RoundedRectangle(cornerRadius: 25)
-                    .fill(Color("green")))
+                    .fill(Color.red))
                 .padding()
             }
         }
-        .sheet(isPresented: $showingIconPicker) {
-            IconPickerView(selectedIcon: $selectedIcon, showingIconPicker: $showingIconPicker)
-        }
+        .navigationBarBackButtonHidden(true)
+        .navigationBarItems(leading: Button(action: {
+            self.presentationMode.wrappedValue.dismiss()
+        }) {
+            Image(systemName: "chevron.left")
+                .foregroundColor(.black)
+            Text("戻る")
+                .foregroundColor(.black)
+        })
     }
 }
 

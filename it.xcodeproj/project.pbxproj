@@ -16,7 +16,6 @@
 		260E44232AB5963A00FBB487 /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260E44222AB5963A00FBB487 /* AuthManager.swift */; };
 		260E44252AB59A7900FBB487 /* QuizView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260E44242AB59A7900FBB487 /* QuizView.swift */; };
 		269D44E22AB60D6800CAA91A /* SignUp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269D44E12AB60D6800CAA91A /* SignUp.swift */; };
-		269D44E42AB6981200CAA91A /* IconPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269D44E32AB6981200CAA91A /* IconPickerView.swift */; };
 		26B5BEF42AB6CFA600056E79 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26B5BEF32AB6CFA600056E79 /* RootView.swift */; };
 		E853D050BCB03C7E80A63918 /* Pods_it.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E16B2CC5D533F92BAD9A8A1F /* Pods_it.framework */; };
 /* End PBXBuildFile section */
@@ -32,7 +31,6 @@
 		260E44222AB5963A00FBB487 /* AuthManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthManager.swift; sourceTree = "<group>"; };
 		260E44242AB59A7900FBB487 /* QuizView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizView.swift; sourceTree = "<group>"; };
 		269D44E12AB60D6800CAA91A /* SignUp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignUp.swift; sourceTree = "<group>"; };
-		269D44E32AB6981200CAA91A /* IconPickerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IconPickerView.swift; sourceTree = "<group>"; };
 		26B5BEF32AB6CFA600056E79 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		B872405D7B916C9F1628DFCC /* Pods-it.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-it.debug.xcconfig"; path = "Target Support Files/Pods-it/Pods-it.debug.xcconfig"; sourceTree = "<group>"; };
 		E16B2CC5D533F92BAD9A8A1F /* Pods_it.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_it.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -79,7 +77,6 @@
 				260000012AB5EEC900342CAE /* QuizList.swift */,
 				260E44222AB5963A00FBB487 /* AuthManager.swift */,
 				269D44E12AB60D6800CAA91A /* SignUp.swift */,
-				269D44E32AB6981200CAA91A /* IconPickerView.swift */,
 				260E44162AB572DE00FBB487 /* Assets.xcassets */,
 				260E44202AB5958300FBB487 /* GoogleService-Info.plist */,
 				260E44182AB572DE00FBB487 /* Preview Content */,
@@ -231,7 +228,6 @@
 				260000022AB5EEC900342CAE /* QuizList.swift in Sources */,
 				269D44E22AB60D6800CAA91A /* SignUp.swift in Sources */,
 				260E44152AB572DC00FBB487 /* ContentView.swift in Sources */,
-				269D44E42AB6981200CAA91A /* IconPickerView.swift in Sources */,
 				260E44252AB59A7900FBB487 /* QuizView.swift in Sources */,
 				260E44232AB5963A00FBB487 /* AuthManager.swift in Sources */,
 				260E44132AB572DC00FBB487 /* itApp.swift in Sources */,

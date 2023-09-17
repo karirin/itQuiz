@@ -26,6 +26,8 @@ struct QuizView: View {
     @State private var remainingSeconds = 30
     @State private var timer: Timer? = nil
     @State private var navigateToContentView = false
+    @ObservedObject var authManager = AuthManager.shared
+    @State private var showModal = false
 
     var currentQuiz: QuizQuestion {
         quizzes[currentQuizIndex]
@@ -119,17 +121,62 @@ struct QuizView: View {
                     NavigationLink("", destination: ContentView().navigationBarBackButtonHidden(true), isActive: $navigateToContentView)
                 }
             }
+            .sheet(isPresented: $showModal) {
+                ExperienceModalView(showModal: $showModal, addedExperience: 10)
+            }
             .onAppear {
                 startTimer() // Viewが表示されたときにタイマーを開始
             }
             .onChange(of: showCompletionMessage) { newValue in
                 if newValue {
-                    navigateToContentView = true
+                    authManager.addExperience(points: 10) // 10ポイント追加
+                    showModal = true
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
+                        showModal = false
+                        navigateToContentView = true
+                    }
                 }
             }
+
         }
     }
 }
+
+struct ExperienceModalView: View {
+    @Binding var showModal: Bool
+    var addedExperience: Int
+
+    var body: some View {
+        ZStack {
+            // 半透明の背景
+            Color.black.opacity(0.4)
+                .edgesIgnoringSafeArea(.all)
+                .onTapGesture {
+                    showModal = false
+                }
+
+            // モーダルの内容
+            VStack(spacing: 20) {
+                Text("経験値獲得!")
+                    .font(.largeTitle)
+
+                Text("+\(addedExperience) 経験値")
+                    .font(.title)
+
+                Button("閉じる") {
+                    showModal = false
+                }
+                .padding()
+            }
+            .frame(width: 300, height: 200) // このサイズを調整して好みの大きさにします
+            .background(Color.white)
+            .cornerRadius(20)
+            .shadow(radius: 10)
+        }
+    }
+}
+
+
 
 struct QuizView_Previews: PreviewProvider {
     static var previews: some View {

@@ -16,6 +16,8 @@ extension AuthManager {
 
 class AuthManager: ObservableObject {
     @Published var user: User?
+    @Published var experience: Int = 0
+    @Published var level: Int = 1
 
     static let shared: AuthManager = {
         let instance = AuthManager()
@@ -43,32 +45,66 @@ class AuthManager: ObservableObject {
            }
        }
     
-    func createUser(name: String, icon: UIImage?) { // bioを追加
-            guard let firebaseUser = Auth.auth().currentUser else { print("user")
-                return }
-            guard let image = icon, let imageData = image.jpegData(compressionQuality: 0.8) else { return }
-            
-            let storageRef = Storage.storage().reference().child("\(firebaseUser.uid).jpg")
-            let metadata = StorageMetadata()
-            metadata.contentType = "image/jpeg"
-            
-            storageRef.putData(imageData, metadata: metadata) { _, error in
-                if let error = error {
-                    print("Errorあ: \(error.localizedDescription)")
-                } else {
-                    storageRef.downloadURL { result in
-                        switch result {
-                        case .success(let url):
-                            // URLの取得に成功した場合の処理
-                            print("Download URL: \(url)")
-                        case .failure(let error):
-                            // エラーが発生した場合の処理
-                            print("Error: \(error.localizedDescription)")
-                        }
-                    }
-                }
+    func saveUserToDatabase(userName: String, userIcon: String) {
+        guard let userId = user?.uid else { return }
+        
+        let userRef = Database.database().reference().child("users").child(userId)
+        let userData: [String: Any] = ["userName": userName, "userIcon": userIcon]
+        
+        userRef.setValue(userData) { (error, ref) in
+            if let error = error {
+                print("Failed to save user to database:", error.localizedDescription)
+                return
+            }
+            print("Successfully saved user to database.")
+        }
+    }
+    
+    func fetchUserInfo(completion: @escaping (String?, String?) -> Void) {
+        guard let userId = user?.uid else {
+            completion(nil, nil)
+            return
+        }
+        
+        let userRef = Database.database().reference().child("users").child(userId)
+        userRef.observeSingleEvent(of: .value) { (snapshot) in
+            if let data = snapshot.value as? [String: Any],
+               let userName = data["userName"] as? String,
+               let userIcon = data["userIcon"] as? String {
+                completion(userName, userIcon)
+            } else {
+                completion(nil, nil)
             }
         }
+    }
+    
+    func addExperience(points: Int) {
+        guard let userId = user?.uid else { return }
+        
+        let userRef = Database.database().reference().child("users").child(userId)
+        experience += points
+        level = calculateLevel(experience: experience)
+        
+        let userData: [String: Any] = ["experience": experience, "level": level]
+        userRef.updateChildValues(userData)
+    }
+    
+    func calculateLevel(experience: Int) -> Int {
+        return experience / 100 + 1
+    }
+
+    func fetchUserExperienceAndLevel() {
+        guard let userId = user?.uid else { return }
+        
+        let userRef = Database.database().reference().child("users").child(userId)
+        userRef.observeSingleEvent(of: .value) { (snapshot) in
+            if let data = snapshot.value as? [String: Any] {
+                self.experience = data["experience"] as? Int ?? 0
+                self.level = data["level"] as? Int ?? 1
+            }
+        }
+    }
+
    }
 
 struct AuthManager1: View {
