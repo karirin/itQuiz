@@ -9,13 +9,19 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundColor(.accentColor)
-            Text("Hello, world!")
+        NavigationView {
+            VStack {
+                NavigationLink(destination: QuizBeginnerList()) {
+                    Text("初級レベルの問題")
+                        .padding()
+                        .background(Color.white)
+                        .foregroundColor(.gray)
+                        .cornerRadius(10)
+                        .shadow(radius: 1)
+                }
+            }
+            .padding()
         }
-        .padding()
     }
 }
 
