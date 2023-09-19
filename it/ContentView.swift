@@ -11,11 +11,20 @@ struct ContentView: View {
     @ObservedObject var authManager = AuthManager.shared
     @State private var userName: String = ""
     @State private var userIcon: String = ""
+    @State private var userMoney: Int = 0
     
     var body: some View {
         NavigationView {
                 VStack {
-                        Image("\(userIcon)")
+                    HStack{
+                        Spacer()
+                        Image(systemName: "bitcoinsign.circle")
+                        Text("+")
+                        Text(" \(userMoney)")
+                    }
+                    .padding()
+                    
+                    Image(userIcon.isEmpty ? "defaultIcon" : userIcon)
                     
                         Text("\(userName)")
                         .font(.system(size: 24))
@@ -23,7 +32,7 @@ struct ContentView: View {
                     Text("レベル: \(authManager.level)")
                                  .font(.system(size: 20))
                              
-                             ProgressBar(value: Float(authManager.experience % 100) / 100.0)
+                    ProgressBar(value: Float(authManager.experience) / Float(authManager.level * 100))
                                  .frame(height: 20)
                                  .padding([.leading, .trailing], 20)
                              
@@ -41,10 +50,12 @@ struct ContentView: View {
                 .frame(maxWidth: .infinity,maxHeight: .infinity)
             }
         .onAppear {
-            authManager.fetchUserInfo { (name, icon) in
+            authManager.fetchUserInfo { (name, icon, money) in
                 self.userName = name ?? ""
                 self.userIcon = icon ?? ""
+                self.userMoney = money ?? 0
             }
+            authManager.fetchUserExperienceAndLevel()
         }
         }
         
