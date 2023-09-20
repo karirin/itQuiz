@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		260000022AB5EEC900342CAE /* QuizList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260000012AB5EEC900342CAE /* QuizList.swift */; };
+		260000022AB5EEC900342CAE /* QuizBeginnerList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260000012AB5EEC900342CAE /* QuizBeginnerList.swift */; };
 		260E44132AB572DC00FBB487 /* itApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260E44122AB572DC00FBB487 /* itApp.swift */; };
 		260E44152AB572DC00FBB487 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260E44142AB572DC00FBB487 /* ContentView.swift */; };
 		260E44172AB572DE00FBB487 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 260E44162AB572DE00FBB487 /* Assets.xcassets */; };
@@ -21,12 +21,14 @@
 		269A878E2AB87CBA00F33C9E /* MemoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269A878D2AB87CBA00F33C9E /* MemoView.swift */; };
 		269D44E22AB60D6800CAA91A /* SignUp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269D44E12AB60D6800CAA91A /* SignUp.swift */; };
 		26A25D4C2AB9613A006B368F /* AVKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26A25D4B2AB9613A006B368F /* AVKit.framework */; };
+		26A25D4E2AB99235006B368F /* QuizIntermediateList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26A25D4D2AB99235006B368F /* QuizIntermediateList.swift */; };
+		26A25D502AB9FB1A006B368F /* TitleListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26A25D4F2AB9FB1A006B368F /* TitleListView.swift */; };
 		26B5BEF42AB6CFA600056E79 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26B5BEF32AB6CFA600056E79 /* RootView.swift */; };
 		E853D050BCB03C7E80A63918 /* Pods_it.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E16B2CC5D533F92BAD9A8A1F /* Pods_it.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		260000012AB5EEC900342CAE /* QuizList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizList.swift; sourceTree = "<group>"; };
+		260000012AB5EEC900342CAE /* QuizBeginnerList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizBeginnerList.swift; sourceTree = "<group>"; };
 		260E440F2AB572DC00FBB487 /* it.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = it.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		260E44122AB572DC00FBB487 /* itApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = itApp.swift; sourceTree = "<group>"; };
 		260E44142AB572DC00FBB487 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -41,6 +43,8 @@
 		269A878D2AB87CBA00F33C9E /* MemoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoView.swift; sourceTree = "<group>"; };
 		269D44E12AB60D6800CAA91A /* SignUp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignUp.swift; sourceTree = "<group>"; };
 		26A25D4B2AB9613A006B368F /* AVKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVKit.framework; path = System/Library/Frameworks/AVKit.framework; sourceTree = SDKROOT; };
+		26A25D4D2AB99235006B368F /* QuizIntermediateList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizIntermediateList.swift; sourceTree = "<group>"; };
+		26A25D4F2AB9FB1A006B368F /* TitleListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleListView.swift; sourceTree = "<group>"; };
 		26B5BEF32AB6CFA600056E79 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		B872405D7B916C9F1628DFCC /* Pods-it.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-it.debug.xcconfig"; path = "Target Support Files/Pods-it/Pods-it.debug.xcconfig"; sourceTree = "<group>"; };
 		E16B2CC5D533F92BAD9A8A1F /* Pods_it.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_it.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -87,8 +91,10 @@
 				260E44242AB59A7900FBB487 /* QuizView.swift */,
 				269A878D2AB87CBA00F33C9E /* MemoView.swift */,
 				269A87872AB7757C00F33C9E /* QuizResultView.swift */,
-				260000012AB5EEC900342CAE /* QuizList.swift */,
+				260000012AB5EEC900342CAE /* QuizBeginnerList.swift */,
+				26A25D4D2AB99235006B368F /* QuizIntermediateList.swift */,
 				260E44222AB5963A00FBB487 /* AuthManager.swift */,
+				26A25D4F2AB9FB1A006B368F /* TitleListView.swift */,
 				269A87892AB86FC900F33C9E /* GachaView.swift */,
 				269A878B2AB873CC00F33C9E /* GachaAnimationView.swift */,
 				269D44E12AB60D6800CAA91A /* SignUp.swift */,
@@ -241,11 +247,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				26B5BEF42AB6CFA600056E79 /* RootView.swift in Sources */,
-				260000022AB5EEC900342CAE /* QuizList.swift in Sources */,
+				260000022AB5EEC900342CAE /* QuizBeginnerList.swift in Sources */,
 				269A87882AB7757C00F33C9E /* QuizResultView.swift in Sources */,
 				269D44E22AB60D6800CAA91A /* SignUp.swift in Sources */,
 				269A878A2AB86FC900F33C9E /* GachaView.swift in Sources */,
+				26A25D4E2AB99235006B368F /* QuizIntermediateList.swift in Sources */,
 				260E44152AB572DC00FBB487 /* ContentView.swift in Sources */,
+				26A25D502AB9FB1A006B368F /* TitleListView.swift in Sources */,
 				260E44252AB59A7900FBB487 /* QuizView.swift in Sources */,
 				260E44232AB5963A00FBB487 /* AuthManager.swift in Sources */,
 				269A878C2AB873CC00F33C9E /* GachaAnimationView.swift in Sources */,

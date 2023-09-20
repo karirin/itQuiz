@@ -15,6 +15,7 @@ struct AVPlayerViewControllerRepresentable: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> AVPlayerViewController {
         let controller = AVPlayerViewController()
         controller.player = player
+        controller.showsPlaybackControls = false
         return controller
     }
 
@@ -23,10 +24,13 @@ struct AVPlayerViewControllerRepresentable: UIViewControllerRepresentable {
     }
 }
 
-
 struct GachaAnimationView: View {
     private var player: AVPlayer {
-        AVPlayer(url: Bundle.main.url(forResource: "test.mp4", withExtension: "mp4")!)
+      let asset = NSDataAsset(name: "test")
+      let videoUrl = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("test.mp4")
+      try? asset?.data.write(to: videoUrl, options: [.atomic])
+      let playerItem = AVPlayerItem(url: videoUrl)
+      return AVPlayer(playerItem: playerItem)
     }
 
     @Binding var isFinished: Bool
@@ -34,10 +38,10 @@ struct GachaAnimationView: View {
     var body: some View {
         AVPlayerViewControllerRepresentable(player: player)
             .onAppear {
-                NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: player.currentItem, queue: .main) { _ in
+                NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: self.player.currentItem, queue: .main) { _ in
                     isFinished = true
                 }
-                player.play()
+                player.play()  // ここで再生を開始
             }
     }
 }

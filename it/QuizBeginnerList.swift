@@ -12,17 +12,6 @@ struct QuizQuestion {
     var choices: [String]
     var correctAnswerIndex: Int
     var explanation: String
-    
-//    init(question: String, choices: [String], correctAnswerIndex: Int, explanation: String) {
-//        self.question = question
-//        var shuffledChoices = choices.shuffled()
-//        self.choices = shuffledChoices
-//        if let correctIndex = shuffledChoices.firstIndex(of: choices[correctAnswerIndex]) {
-//            self.correctAnswerIndex = correctIndex
-//        } else {
-//            self.correctAnswerIndex = correctAnswerIndex
-//        }
-//    }
 }
 
 struct QuizBeginnerList: View {

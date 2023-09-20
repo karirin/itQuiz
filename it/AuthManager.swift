@@ -8,17 +8,19 @@
 import SwiftUI
 import Firebase
 
-extension AuthManager {
-    var currentUserId: String? {
-        return user?.uid
-    }
-}
-
 class AuthManager: ObservableObject {
     @Published var user: User?
     @Published var experience: Int = 0
     @Published var level: Int = 1
-    @Published var money: Int = 0 // 追加: ユーザーの所持金
+    @Published var money: Int = 0
+    @State private var earnedTitles: [Title] = []
+    
+    init() {
+        user = Auth.auth().currentUser
+        if user == nil {
+            anonymousSignIn()
+        }
+    }
 
     static let shared: AuthManager = {
         let instance = AuthManager()
@@ -26,13 +28,10 @@ class AuthManager: ObservableObject {
     }()
 
     var onLoginCompleted: (() -> Void)?
-
-       init() {
-           user = Auth.auth().currentUser
-           if user == nil {
-               anonymousSignIn()
-           }
-       }
+    var currentUserId: String? {
+        print("user?.uid:\(user?.uid)")
+        return user?.uid
+    }
 
        func anonymousSignIn() {
            Auth.auth().signInAnonymously { result, error in
@@ -50,7 +49,7 @@ class AuthManager: ObservableObject {
         guard let userId = user?.uid else { return }
         
         let userRef = Database.database().reference().child("users").child(userId)
-        let userData: [String: Any] = ["userName": userName, "userIcon": userIcon]
+        let userData: [String: Any] = ["userName": userName, "userIcon": userIcon, "avatar": userIcon]
         
         userRef.setValue(userData) { (error, ref) in
             if let error = error {
@@ -86,7 +85,11 @@ class AuthManager: ObservableObject {
         let userRef = Database.database().reference().child("users").child(userId)
         
         // 現在の経験値を取得
-        userRef.observeSingleEvent(of: .value) { (snapshot) in
+        userRef.observeSingleEvent(of: .value) { (snapshot, errorString) in
+            if let errorString = errorString {
+                print("Error: \(errorString)")
+                return
+            }
             if let data = snapshot.value as? [String: Any] {
                 let currentExperience = data["experience"] as? Int ?? 0
                 
@@ -105,11 +108,15 @@ class AuthManager: ObservableObject {
                 
                 // 更新された経験値とレベルをデータベースに保存
                 let userData: [String: Any] = ["experience": self.experience, "level": self.level]
-                userRef.updateChildValues(userData)
+                userRef.updateChildValues(userData) { (error, ref) in
+                    if error == nil {
+                        // 称号の確認と保存
+                        self.saveEarnedTitles()
+                    }
+                }
             }
         }
     }
-
     
     func calculateLevel(experience: Int) -> Int {
         return experience / 100 + 1
@@ -149,8 +156,99 @@ class AuthManager: ObservableObject {
                 }
             }
         }
+    
+    func saveLastClickedDate(userId: String, completion: @escaping (Bool) -> Void) {
+            let ref = Database.database().reference().child("users").child(userId)
+            ref.updateChildValues(["lastClickedDate": "\(Date())"]) { (error, _) in
+                if let error = error {
+                    print("Error saving last clicked date: \(error)")
+                    completion(false)
+                } else {
+                    completion(true)
+                }
+            }
+        }
 
-   }
+    func fetchLastClickedDate(userId: String, completion: @escaping (Date?) -> Void) {
+        let ref = Database.database().reference().child("users").child(userId)
+        ref.child("lastClickedDate").observeSingleEvent(of: .value) { (snapshot) in
+            
+            // DateFormatterのインスタンスを作成
+            let dateFormatter = DateFormatter()
+            
+            // フォーマットを設定
+            dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss Z"
+            
+            // このフォーマッターを使用して、文字列から日付に変換
+            if let dateString = snapshot.value as? String, let date = dateFormatter.date(from: dateString) {
+                print("date:\(date)")
+                completion(date)
+            } else {
+                print("nil")
+                completion(nil)
+            }
+        }
+    }
+
+    func checkForTitles(completion: @escaping ([Title]) -> Void) {
+        guard let userId = user?.uid else {
+            completion([])
+            return
+        }
+        
+        let userRef = Database.database().reference().child("users").child(userId)
+        userRef.observeSingleEvent(of: .value) { (snapshot) in
+            if let data = snapshot.value as? [String: Any], let userLevel = data["level"] as? Int {
+                var earnedTitles: [Title] = []
+
+                print("userLevel:\(userLevel)")
+                if userLevel >= 3 {
+                    earnedTitles.append(Title(name: "レベル３達成", condition: "レベル3に到達", description: "レベル3に到達した証"))
+                }
+                if userLevel >= 10 {
+                    earnedTitles.append(Title(name: "初級レベルクリア", condition: "初級レベルのクイズを全てクリア", description: "初級レベルのクイズを全てクリアした証"))
+                }
+
+                completion(earnedTitles)
+            } else {
+                completion([])
+            }
+        }
+    }
+    
+    func fetchEarnedTitles(completion: @escaping ([Title]) -> Void) {
+        guard let userId = user?.uid else { return }
+        let userRef = Database.database().reference().child("users").child(userId).child("titles")
+        userRef.observeSingleEvent(of: .value) { snapshot in
+            var fetchedTitles: [Title] = []
+            if let titlesData = snapshot.value as? [String] {
+                print("titlesData:\(titlesData)")
+                for titleName in titlesData {
+                    if let title = self.checkForTitles().first(where: { $0.name == titleName }) {
+                        fetchedTitles.append(title)
+                    }
+                }
+                completion(fetchedTitles)
+            } else {
+                completion([])
+            }
+        }
+    }
+
+    
+    private func saveEarnedTitles() {
+        guard let userId = user?.uid else { return }
+        let userRef = Database.database().reference().child("users").child(userId).child("titles")
+        
+        checkForTitles { titles in
+            var titlesData: [String] = []
+            for title in titles {
+                titlesData.append(title.name)
+            }
+            userRef.setValue(titlesData)
+        }
+    }
+}
 
 struct AuthManager1: View {
     @ObservedObject var authManager = AuthManager.shared

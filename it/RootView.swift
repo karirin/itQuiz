@@ -12,10 +12,10 @@ struct RootView: View {
     @State static private var showExperienceModalPreview = false
 
     var body: some View {
-        if authManager.user == nil {
-            SignUp()
-        } else {
-            ContentView()
-        }
+            if authManager.user == nil {
+                SignUp()
+            } else {
+                ContentView()
+            }
     }
 }

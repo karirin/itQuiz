@@ -23,34 +23,53 @@ struct QuizResultView: View {
     @State private var selectedQuestion = ""
 
     var body: some View {
-        ZStack{
-            List(results, id: \.question) { result in
-                VStack(alignment: .leading) {
-                    Text(result.question)
-                    Text("あなたの回答: \(result.userAnswer)")
-                    Text("正解: \(result.correctAnswer)")
-                    Text(result.isCorrect ? "正解!" : "不正解")  // 正解か不正解かを表示
-                        .foregroundColor(result.isCorrect ? .green : .red)  // 正解なら緑色、不正解なら赤色で表示
-                    Text("解説: \(result.explanation)")
-//                    Button("メモする") {
-//                                            selectedQuestion = result.question
-//                                            showMemoView = true
-//                                        }
-//                                        .padding(.top)
-                }
-                .padding()
-                .onAppear {
-                        showModal = true
-                }
-            }
-        if showModal {
-                        ExperienceModalView(showModal: $showModal, addedExperience: 10)
+        NavigationView{
+            ZStack {
+                VStack{
+                    NavigationLink(destination: ContentView().navigationBarBackButtonHidden(true)) {
+                        Text("トップに戻る")
+                            .padding()
+                            .background(Color.white)
+                            .foregroundColor(.gray)
+                            .cornerRadius(10)
+                            .shadow(radius: 1)
                     }
-            if showMemoView {
-                MemoView(memo: $currentMemo, question: selectedQuestion)
+                    ScrollView{
+                        ForEach(results, id: \.question) { result in
+                            VStack(alignment: .leading) {
+                                HStack{
+                                    Image(systemName:result.isCorrect ? "circle" : "xmark")
+                                        .foregroundColor(result.isCorrect ? .red : .blue)
+                                        .opacity(0.7)
+                                    Text(result.isCorrect ? "正解" : "不正解")
+                                }
+                                .font(.system(size:24))
+                                Text(result.question)
+                                Text("あなたの回答: \(result.userAnswer)")
+                                Text("正解: \(result.correctAnswer)")
+                                Text("解説: \(result.explanation)")
+                            }
+                            .frame(maxWidth:.infinity,alignment: .leading)
+                            .padding()
+                            .onAppear {
+                                showModal = true
+                            }
+                            .frame(maxWidth:.infinity)
+                        }
+                        .padding(5)
+                    }
+                }
+                
+                if showModal {
+                    ExperienceModalView(showModal: $showModal, addedExperience: 10)
+                }
+                if showMemoView {
+                    MemoView(memo: $currentMemo, question: selectedQuestion)
+                }
             }
         }
     }
+
 }
 
 struct ExperienceModalView: View {
@@ -129,8 +148,8 @@ struct QuizResultView_Previews: PreviewProvider {
     static var previews: some View {
         // ダミーデータを作成
         let dummyResults = [
-            QuizResult(question: "ダミーの質問1", userAnswer: "あなたの回答1", correctAnswer: "正解1", explanation: "解説1", isCorrect: true),
-            QuizResult(question: "ダミーの質問2", userAnswer: "あなたの回答2", correctAnswer: "正解2", explanation: "解説2", isCorrect: false)
+            QuizResult(question: "情報セキュリティの方針やルールを組織全体に明確に伝えるための文章は？", userAnswer: "SLA", correctAnswer: "情報セキュリティポリシー", explanation: "情報セキュリティの３つの基本的な要素として、機密性、完全性に続くものは「可溶性」といいます。", isCorrect: false),
+            QuizResult(question: "AIを開発するベンチャー企業のA社が，資金調達を目的に，金融商品取引所に初めて上場することになった。このように，企業の未公開の株式を，新たに公開することを表す用語として，最も適切なものはどれか。", userAnswer: "IPO", correctAnswer: "IPO", explanation: "IPO（Initial Public Offering）は、企業が初めて公開市場で株式を発行することを指します。", isCorrect: true)
         ]
         
         // ダミーデータを使用してQuizResultViewを呼び出す

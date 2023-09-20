@@ -29,7 +29,7 @@ struct QuizView: View {
     @ObservedObject var authManager = AuthManager.shared
     @State private var showModal = false
     @State private var quizResults: [QuizResult] = []
-
+    @State private var correctAnswerCount = 0
 
     var currentQuiz: QuizQuestion {
         quizzes[currentQuizIndex]
@@ -65,14 +65,22 @@ struct QuizView: View {
         NavigationView{
             VStack {
                 HStack{
-                    Text("")
+                    Circle()
+                        .stroke(style: StrokeStyle(lineWidth: 10, lineCap: .round, lineJoin: .round))
+                        .opacity(0.3)
+                        .foregroundColor(.gray)
+                        .frame(width: 50, height: 50)
+                        .padding(.leading)
+                        .opacity(0)
                     Spacer()
                     if let selected = selectedAnswerIndex {
                         if selected == currentQuiz.correctAnswerIndex {
-                            Text("正解!")
+                            Text("正解")
+                        .font(.system(size:40))
                                 .foregroundColor(.green)
                         } else {
                             Text("不正解")
+                        .font(.system(size:40))
                                 .foregroundColor(.red)
                         }
                     }
@@ -129,6 +137,9 @@ struct QuizView: View {
                             self.timer?.invalidate() // 回答を選択したらタイマーを止める
                             
                             let isAnswerCorrect = (selectedAnswerIndex == currentQuiz.correctAnswerIndex)
+                            if isAnswerCorrect {
+                                correctAnswerCount += 1 // 正解の場合、正解数をインクリメント
+                            }
                             
                             let result = QuizResult(
                                 question: currentQuiz.question,
@@ -138,7 +149,7 @@ struct QuizView: View {
                                 isCorrect: isAnswerCorrect
                             )
                             quizResults.append(result)
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                                 moveToNextQuiz()
                             }
                         }) {
@@ -154,22 +165,14 @@ struct QuizView: View {
                     .frame(maxWidth: .infinity)
                     .shadow(radius: 1)
                 }
-                Spacer()
+//                Spacer()
                 
                 if showCompletionMessage {
-                    Text("クイズ終了！")
-                        .font(.headline)
-                        .padding()
-//                    
-//                    NavigationLink("", destination: ContentView().navigationBarBackButtonHidden(true), isActive: $navigateToContentView)
-                    
-                    if showCompletionMessage {
                         NavigationLink("", destination: QuizResultView(results: quizResults).navigationBarBackButtonHidden(true), isActive: $navigateToQuizResultView)
-                    }
-
                 }
             }
             .frame(maxWidth: .infinity,maxHeight:.infinity)
+            .padding(.bottom)
             .sheet(isPresented: $showModal) {
                 ExperienceModalView(showModal: $showModal, addedExperience: 10)
             }
@@ -177,13 +180,13 @@ struct QuizView: View {
                 startTimer() // Viewが表示されたときにタイマーを開始
             }
             .onChange(of: showCompletionMessage) { newValue in
-                if newValue {
-                    authManager.addExperience(points: 80) // 10ポイント追加
-                    authManager.addMoney(amount: 50) // 例: 50コイン追加
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                        showModal = false
-                        navigateToQuizResultView = true
-                    }
+                if newValue && correctAnswerCount >= 0 {
+                    authManager.addExperience(points: 80)
+                    authManager.addMoney(amount: 50)
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                    showModal = false
+                    navigateToQuizResultView = true
                 }
             }
 

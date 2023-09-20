@@ -25,6 +25,7 @@ struct itApp: App {
     var body: some Scene {
         WindowGroup {
             RootView(authManager: authManager)
+//            GachaView()
         }
     }
 }
