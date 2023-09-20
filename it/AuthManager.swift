@@ -81,15 +81,9 @@ class AuthManager: ObservableObject {
     
     func addExperience(points: Int) {
         guard let userId = user?.uid else { return }
-        
         let userRef = Database.database().reference().child("users").child(userId)
-        
-        // 現在の経験値を取得
-        userRef.observeSingleEvent(of: .value) { (snapshot, errorString) in
-            if let errorString = errorString {
-                print("Error: \(errorString)")
-                return
-            }
+        userRef.observeSingleEvent(of: .value) { (snapshot) in
+
             if let data = snapshot.value as? [String: Any] {
                 let currentExperience = data["experience"] as? Int ?? 0
                 
@@ -219,16 +213,18 @@ class AuthManager: ObservableObject {
     func fetchEarnedTitles(completion: @escaping ([Title]) -> Void) {
         guard let userId = user?.uid else { return }
         let userRef = Database.database().reference().child("users").child(userId).child("titles")
-        userRef.observeSingleEvent(of: .value) { snapshot in
+        userRef.observeSingleEvent(of: .value) { (snapshot) in
             var fetchedTitles: [Title] = []
             if let titlesData = snapshot.value as? [String] {
                 print("titlesData:\(titlesData)")
-                for titleName in titlesData {
-                    if let title = self.checkForTitles().first(where: { $0.name == titleName }) {
-                        fetchedTitles.append(title)
+                self.checkForTitles { availableTitles in
+                    for titleName in titlesData {
+                        if let title = availableTitles.first(where: { $0.name == titleName }) {
+                            fetchedTitles.append(title)
+                        }
                     }
+                    completion(fetchedTitles)
                 }
-                completion(fetchedTitles)
             } else {
                 completion([])
             }

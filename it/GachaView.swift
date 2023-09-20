@@ -69,12 +69,12 @@ struct GachaView: View {
             }
         }
         .padding()
-        .sheet(isPresented: $showAnimation) {
-            GachaAnimationView(isFinished: $animationFinished)
-                .onDisappear {
-                    self.showAnimation = false
+        .fullScreenCover(isPresented: $showAnimation) { // この行を変更
+                    GachaAnimationView(isFinished: $animationFinished)
+                        .onDisappear {
+                            self.showAnimation = false
+                        }
                 }
-        }
     }
 
     func colorForRarity(_ rarity: GachaManager.Rarity) -> Color {

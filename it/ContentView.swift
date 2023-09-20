@@ -21,6 +21,9 @@ struct ContentView: View {
         NavigationView {
                 VStack {
                     HStack{
+                        Image(systemName: "person.circle")
+                        Text("\(userName)")
+                        Text("レベル: \(authManager.level)")
                         Spacer()
                         Image(systemName: "bitcoinsign.circle")
                         Text("+")
@@ -28,68 +31,45 @@ struct ContentView: View {
                     }
                     .padding()
                     ScrollView{
-                    Image(userIcon.isEmpty ? "defaultIcon" : userIcon)
-                    
-                    Text("\(userName)")
-                        .font(.system(size: 24))
-                    
-                    Text("レベル: \(authManager.level)")
-                        .font(.system(size: 20))
-                    
-                    ProgressBar(value: Float(authManager.experience) / Float(authManager.level * 100))
-                        .frame(height: 20)
-                        .padding([.leading, .trailing], 20)
-                    
-                    Text("\(authManager.experience) / \(authManager.level * 100) 経験値")
-                        .font(.system(size: 16))
-                        NavigationLink(destination: QuizBeginnerList().navigationBarBackButtonHidden(true)) {
-                        Text("初級レベルの問題")
-                            .padding()
-                            .background(Color.white)
-                            .foregroundColor(.gray)
-                            .cornerRadius(10)
-                            .shadow(radius: 1)
-                    }
-                        NavigationLink(destination: QuizIntermediateList().navigationBarBackButtonHidden(true), isActive: $isIntermediateQuizActive) {
-                                        Text("中級レベルの問題")
-                                            .padding()
-                                            .background(authManager.level >= 10 ? Color.white : Color.gray)
-                                            .foregroundColor(.gray)
-                                            .cornerRadius(10)
-                                            .shadow(radius: 1)
-                                            .disabled(authManager.level < 10)
-                                    }
+                        ZStack{
+                            Image("image")
+                                .resizable()
+                                .frame(width: .infinity,height:150)
+                                .padding(.top,50)
+                                .opacity(0.5)
+                            Image(userIcon.isEmpty ? "defaultIcon" : userIcon)
+                                .resizable()
+                                .frame(width: 150,height:150)
+                        }
+                                
+                                    .font(.system(size: 24))
+                                
+                        HStack{
+                            Text("経験値")
+                            ProgressBar(value: Float(authManager.experience) / Float(authManager.level * 100))
+                                .frame(height: 20)
+                            Text("\(authManager.experience) / \(authManager.level * 100)")
+                        }.padding()
                         
-                        Button(action: {
-                                            if isButtonEnabled {
-                                                if let userId = authManager.currentUserId {
-                                                    authManager.saveLastClickedDate(userId: userId) { success in
-                                                        lastClickedDate = Date()
-                                                        isButtonEnabled = false
-                                                    }
-                                                }
-                                            }
-                                            // 画面遷移のトリガーをオンにする
-                                            self.isPresentingQuizBeginnerList = true
-                                        }) {
-                                            Text("初級レベルの問題 - デイリーチャレンジ")
-                                                .padding()
-                                                .background(isButtonEnabled ? Color.red : Color.gray)
-                                                .foregroundColor(.gray)
-                                                .cornerRadius(10)
-                                                .shadow(radius: 1)
-                                        }
-                    .onTapGesture {
-                                if isButtonEnabled {
-                                    if let userId = authManager.currentUserId {
-                                        authManager.saveLastClickedDate(userId: userId) { success in
-                                            lastClickedDate = Date()
-                                            isButtonEnabled = false
-                                        }
-                                    }
-                                }
+                        NavigationLink(destination: QuizManagerView()) {
+                            HStack{
+                                Image("quiz")
+                                    .resizable()
+                                    .frame(width: 50,height:50)
+                                .foregroundColor(.gray)
+                                Text("問題を解く")
+                                    .font(.system(size:24))
+                                    .foregroundColor(.gray)
                             }
-                        NavigationLink("", destination: QuizBeginnerList().navigationBarBackButtonHidden(true), isActive: $isPresentingQuizBeginnerList)
+                            .padding()
+                                    }
+                        .background(Color("purple"))
+                        .frame(maxWidth: .infinity)
+                        .shadow(radius: 1)
+                        .cornerRadius(30)
+                        .padding()
+
+                        
                         NavigationLink(destination: GachaView()) {
                                         Text("ガチャを回す")
                                             .padding()
@@ -99,8 +79,8 @@ struct ContentView: View {
                                     }
                     }
                 }
-                .frame(maxWidth: .infinity,maxHeight: .infinity)
-            }
+               
+            } .frame(maxWidth: .infinity,maxHeight: .infinity)
         .onAppear {
             authManager.fetchUserInfo { (name, icon, money) in
                 self.userName = name ?? ""
@@ -108,22 +88,22 @@ struct ContentView: View {
                 self.userMoney = money ?? 0
             }
             authManager.fetchUserExperienceAndLevel()
-            if let userId = authManager.currentUserId {
-                authManager.fetchLastClickedDate(userId: userId) { date in
-                    lastClickedDate = date
-                    let calendar = Calendar.current
-                    print(calendar)
-                    if let lastDate = lastClickedDate {
-                        print("test:\(calendar.isDateInToday(lastDate))")
-                        if calendar.isDateInToday(lastDate) {
-                            isButtonEnabled = false
-                        }
-                    } else {
-                        print("lastClickedDate is nil")
-                    }
-                }
-            }
-            isIntermediateQuizActive = authManager.level >= 10
+//            if let userId = authManager.currentUserId {
+//                authManager.fetchLastClickedDate(userId: userId) { date in
+//                    lastClickedDate = date
+//                    let calendar = Calendar.current
+//                    print(calendar)
+//                    if let lastDate = lastClickedDate {
+//                        print("test:\(calendar.isDateInToday(lastDate))")
+//                        if calendar.isDateInToday(lastDate) {
+//                            isButtonEnabled = false
+//                        }
+//                    } else {
+//                        print("lastClickedDate is nil")
+//                    }
+//                }
+//            }
+//            isIntermediateQuizActive = authManager.level >= 10
         }
             .background(Color("purple2").opacity(0.6))  // ここで背景色を設定
             .edgesIgnoringSafeArea(.all)  // 画面の端まで背景色を伸ばす
