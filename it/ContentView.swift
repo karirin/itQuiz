@@ -51,6 +51,7 @@ struct ContentView: View {
                             Text("\(authManager.experience) / \(authManager.level * 100)")
                         }.padding()
                         
+                    NavigationLink("", destination: QuizBeginnerList().navigationBarBackButtonHidden(true), isActive: $isPresentingQuizBeginnerList)
                         Button(action: {
                                             if isButtonEnabled {
                                                 if let userId = authManager.currentUserId {
@@ -78,10 +79,10 @@ struct ContentView: View {
                                         }
                                         .frame(maxWidth: .infinity)
                             .background(isButtonEnabled ? Color("lightRed") : Color("lightGray"))
-                                .shadow(radius: 1)
                                 .foregroundColor(.gray)
                                 .cornerRadius(20)
                     .padding(.horizontal)
+                    .shadow(radius: 1)
                     .onTapGesture {
                                 if isButtonEnabled {
                                     if let userId = authManager.currentUserId {
@@ -92,7 +93,6 @@ struct ContentView: View {
                                     }
                                 }
                             }
-                        NavigationLink("", destination: QuizBeginnerList().navigationBarBackButtonHidden(true), isActive: $isPresentingQuizBeginnerList)
                         
                         NavigationLink(destination: QuizManagerView()) {
                             HStack{

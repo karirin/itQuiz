@@ -75,7 +75,7 @@ struct GachaView: View {
                }
            }
            .fullScreenCover(isPresented: $showAnimation) {
-               GachaAnimationView(isFinished: $animationFinished)
+               GachaAnimationView()
            }
        }
 

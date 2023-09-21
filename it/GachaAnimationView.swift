@@ -29,25 +29,36 @@ struct AVPlayerViewControllerRepresentable: UIViewControllerRepresentable {
     }
 }
 
-struct GachaAnimationView: View {
-    private var player: AVPlayer {
-      let asset = NSDataAsset(name: "test")
-      let videoUrl = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("test.mp4")
-      try? asset?.data.write(to: videoUrl, options: [.atomic])
-      let playerItem = AVPlayerItem(url: videoUrl)
-      return AVPlayer(playerItem: playerItem)
+class GachaAnimationViewModel: ObservableObject {
+    @Published var isFinished: Bool = false
+    @Published var isPlaying: Bool = true
+
+    var player: AVPlayer {
+        let asset = NSDataAsset(name: "test")
+        let videoUrl = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("test.mp4")
+        try? asset?.data.write(to: videoUrl, options: [.atomic])
+        let playerItem = AVPlayerItem(url: videoUrl)
+        return AVPlayer(playerItem: playerItem)
     }
 
-    @State private var isPlaying = true  // 再生の状態を管理するためのプロパティ
-    @Binding var isFinished: Bool
+    init() {
+        NotificationCenter.default.addObserver(self, selector: #selector(playerItemDidReachEnd(notification:)), name: .AVPlayerItemDidPlayToEndTime, object: self.player.currentItem)
+    }
+
+    @objc func playerItemDidReachEnd(notification: Notification) {
+        isFinished = true
+        isPlaying = false
+    }
+}
+
+struct GachaAnimationView: View {
+    @ObservedObject private var viewModel = GachaAnimationViewModel()
 
     var body: some View {
-        AVPlayerViewControllerRepresentable(player: player, isPlaying: $isPlaying)
-            .onAppear {
-                NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: self.player.currentItem, queue: .main) { _ in
-                    isFinished = true
-                    isPlaying = false  // 再生が終了したら、再生の状態をfalseに設定
-                }
+        AVPlayerViewControllerRepresentable(player: viewModel.player, isPlaying: $viewModel.isPlaying)
+            .onDisappear {
+                NotificationCenter.default.removeObserver(self.viewModel, name: .AVPlayerItemDidPlayToEndTime, object: self.viewModel.player.currentItem)
             }
     }
 }
+
