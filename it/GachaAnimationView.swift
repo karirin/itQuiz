@@ -10,8 +10,8 @@ import AVKit
 import AVFoundation
 
 struct AVPlayerViewControllerRepresentable: UIViewControllerRepresentable {
-    var player: AVPlayer
-    @Binding var isPlaying: Bool  // 再生の状態を監視するためのプロパティ
+    @Binding var player: AVPlayer?
+    @Binding var showAnimation: Bool
 
     func makeUIViewController(context: Context) -> AVPlayerViewController {
         let controller = AVPlayerViewController()
@@ -21,25 +21,22 @@ struct AVPlayerViewControllerRepresentable: UIViewControllerRepresentable {
     }
 
     func updateUIViewController(_ uiViewController: AVPlayerViewController, context: Context) {
-        if isPlaying {
-            player.play()
+        if uiViewController.player == nil {
+          uiViewController.player = player
+        }
+        if showAnimation {
+          uiViewController.player?.play()
         } else {
-            player.pause()
+          uiViewController.player?.pause()
         }
     }
 }
 
-class GachaAnimationViewModel: ObservableObject {
-    @Published var isFinished: Bool = false {
-        didSet {
-            onIsFinishedChanged?(isFinished)
-        }
-    }
-    @Published var isPlaying: Bool = true
-
-    var onIsFinishedChanged: ((Bool) -> Void)?  // この行を追加
-
-    var player: AVPlayer {
+struct GachaAnimationView: View {
+    @State private var player: AVPlayer?
+    @Binding var showAnimation: Bool
+  
+    private func createPlayer() -> AVPlayer {
         let asset = NSDataAsset(name: "test")
         let videoUrl = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("test.mp4")
         try? asset?.data.write(to: videoUrl, options: [.atomic])
@@ -47,31 +44,13 @@ class GachaAnimationViewModel: ObservableObject {
         return AVPlayer(playerItem: playerItem)
     }
 
-    init() {
-        NotificationCenter.default.addObserver(self, selector: #selector(playerItemDidReachEnd(notification:)), name: .AVPlayerItemDidPlayToEndTime, object: self.player.currentItem)
-    }
-
-    @objc func playerItemDidReachEnd(notification: Notification) {
-        isFinished = true
-        isPlaying = false
-    }
-}
-
-struct GachaAnimationView: View {
-    @ObservedObject private var viewModel = GachaAnimationViewModel()
-    @Binding var isFinished: Bool
-
     var body: some View {
-        AVPlayerViewControllerRepresentable(player: viewModel.player, isPlaying: $viewModel.isPlaying)
+        AVPlayerViewControllerRepresentable(player: $player, showAnimation: $showAnimation)
             .onAppear {
-                // ここでviewModelのisFinishedが変更されたときの処理をセットします。
-                self.viewModel.onIsFinishedChanged = { finished in
-                    self.isFinished = finished
+                self.player = createPlayer()
+                NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: self.player?.currentItem, queue: .main) { _ in
+                  showAnimation.toggle()
                 }
             }
-            .onDisappear {
-                NotificationCenter.default.removeObserver(self.viewModel, name: .AVPlayerItemDidPlayToEndTime, object: self.viewModel.player.currentItem)
-            }
     }
 }
-
