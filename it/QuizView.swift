@@ -18,6 +18,27 @@ struct TimerArc: Shape {
     }
 }
 
+struct ProgressBar3: View {
+    var value: Double
+    var maxValue: Double
+    var color: Color
+
+    var body: some View {
+        GeometryReader { geometry in
+            ZStack(alignment: .leading) {
+                Rectangle()
+                    .opacity(0.3)
+                    .foregroundColor(color)
+                Rectangle()
+                    .frame(width: geometry.size.width * CGFloat(value / maxValue))
+                    .foregroundColor(color)
+            }
+        }
+        .cornerRadius(8.0)
+    }
+}
+
+
 struct QuizView: View {
     let quizzes: [QuizQuestion]
     @State private var selectedAnswerIndex: Int? = nil
@@ -32,6 +53,13 @@ struct QuizView: View {
     @State private var correctAnswerCount = 0
     @State private var countdownValue = 3
     @State private var showCountdown = true
+    @State private var playerHP: Int = 1000
+    @State private var monsterHP: Int = 30
+    @State private var monsterUnderHP: Int = 30
+    @State private var userName: String = ""
+    @State private var userIcon: String = ""
+    @State private var userMoney: Int = 0
+    @State private var monsterType: Int = 1
     
     var currentQuiz: QuizQuestion {
         quizzes[currentQuizIndex]
@@ -65,7 +93,7 @@ struct QuizView: View {
 
     // 次の問題へ移る処理
     func moveToNextQuiz() {
-        if currentQuizIndex + 1 < 3 { // 最大3問まで
+        if currentQuizIndex + 1 < 100 { // 最大3問まで
             currentQuizIndex += 1
             selectedAnswerIndex = nil
             startTimer()
@@ -78,12 +106,6 @@ struct QuizView: View {
     var body: some View {
         NavigationView{
             VStack {
-                if showCountdown {
-                                    Text("\(countdownValue)")
-                                        .font(.system(size: 200))
-                                        .foregroundColor(.gray)
-                                        .transition(.scale)
-                }else{
                     HStack{
                         Circle()
                             .stroke(style: StrokeStyle(lineWidth: 10, lineCap: .round, lineJoin: .round))
@@ -126,6 +148,7 @@ struct QuizView: View {
                     }
                     .padding(.trailing)
                     Spacer()
+                VStack{
                     ZStack {
                         Text(currentQuiz.question)
                             .font(.headline)
@@ -137,7 +160,7 @@ struct QuizView: View {
                                 .stroke(style: StrokeStyle(lineWidth: 10, lineCap: .round, lineJoin: .round))
                                 .opacity(0.7)
                                 .foregroundColor(.red)
-                                .frame(width: 200, height: 200)
+                                .frame(width: 80)
                         }
                         // 不正解の場合の青いバツマーク
                         else if let selected = selectedAnswerIndex, selected != currentQuiz.correctAnswerIndex {
@@ -145,11 +168,62 @@ struct QuizView: View {
                                 .resizable()
                                 .opacity(0.7)
                                 .foregroundColor(.blue)
-                                .frame(width: 200, height: 200)
+                                .frame(width: 80,height:80)
                         }
                     }
+                    ZStack{
+                        Image("background")
+                            .resizable()
+                            .frame(height:150)
+                            .padding(.top)
+                            .opacity(1)
+                        VStack {
+                            ZStack{
+                                if monsterHP == 0 {
+                                    Image("atack2")
+                                        .resizable()
+                                        .frame(width:150,height:150)
+                                }else{
+                                    Image("monster\(monsterType)")
+                                        .resizable()
+                                        .frame(width:80,height:80)
+                                }
+                                if let selected = selectedAnswerIndex {
+                                    if selected == currentQuiz.correctAnswerIndex {
+                                        if monsterHP != 0 {
+                                            Image("atack1")
+                                                .resizable()
+                                                .frame(width:80,height:80)
+                                        }
+                                    }
+                                }
+                            }
+                            HStack{
+                                ProgressBar3(value: Double(monsterHP), maxValue: Double(monsterUnderHP), color: Color("hpMonsterColor"))
+                                    .frame(height: 20)
+                                Text("\(monsterHP)/\(monsterUnderHP)")
+                            }
+                            .padding()
+                        }
+                    }
+                    ZStack{
+                        HStack{
+                            Image(userIcon.isEmpty ? "defaultIcon" : userIcon)
+                                .resizable()
+                                .frame(width: 30,height:30)
+                            ProgressBar3(value: Double(playerHP), maxValue: 1000.0, color: Color("hpUserColor"))
+                                .frame(height: 20)
+                            Text("\(playerHP)/1000")
+                        }.padding()
+                        if let selected = selectedAnswerIndex, selected != currentQuiz.correctAnswerIndex {
+                            Image("monsterAtack")
+                                .resizable()
+                                .frame(width:80,height:80)
+                        }
+                    }
+                }
                     Spacer()
-                    
+                VStack{
                     ForEach(0..<currentQuiz.choices.count, id: \.self) { index in
                         HStack{
                             Button(action: {
@@ -159,6 +233,23 @@ struct QuizView: View {
                                 let isAnswerCorrect = (selectedAnswerIndex == currentQuiz.correctAnswerIndex)
                                 if isAnswerCorrect {
                                     correctAnswerCount += 1 // 正解の場合、正解数をインクリメント
+                                    monsterHP -= 20
+                                } else {
+                                    playerHP -= 20 // 例: プレイヤーのHPを20減少させる
+                                }
+                                
+                                if monsterHP <= 0 {
+                                    // モンスターのHPが0以下になった場合の処理
+                                    monsterType += 1  // 次のモンスターに移行
+                                    monsterHP = 100  // 新しいモンスターのHPをリセット
+                                    if monsterType == 4 {
+                                        showCompletionMessage = true
+                                        timer?.invalidate()
+                                    }
+                                } else if playerHP <= 0 {
+                                    // プレイヤーのHPが0以下になった場合の処理
+                                    showCompletionMessage = true
+                                    timer?.invalidate()
                                 }
                                 
                                 let result = QuizResult(
@@ -200,6 +291,11 @@ struct QuizView: View {
             .onAppear {
                 startTimer() // Viewが表示されたときにタイマーを開始
                 startCountdown()
+                authManager.fetchUserInfo { (name, icon, money) in
+                    self.userName = name ?? ""
+                    self.userIcon = icon ?? ""
+                    self.userMoney = money ?? 0
+                }
             }
             .onChange(of: showCompletionMessage) { newValue in
                 if newValue && correctAnswerCount >= 0 {
@@ -211,7 +307,21 @@ struct QuizView: View {
                     navigateToQuizResultView = true
                 }
             }
-
+            .onChange(of: monsterType) { newMonsterType in
+                switch newMonsterType {
+                case 1:
+                    monsterHP = 30
+                    monsterUnderHP = 30
+                case 2:
+                    monsterHP = 50
+                    monsterUnderHP = 50
+                case 3:
+                    monsterHP = 100
+                    monsterUnderHP = 100
+                default:
+                    monsterHP = 30
+                }
+            }
         }
     }
 }
