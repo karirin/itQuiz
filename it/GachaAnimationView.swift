@@ -30,8 +30,14 @@ struct AVPlayerViewControllerRepresentable: UIViewControllerRepresentable {
 }
 
 class GachaAnimationViewModel: ObservableObject {
-    @Published var isFinished: Bool = false
+    @Published var isFinished: Bool = false {
+        didSet {
+            onIsFinishedChanged?(isFinished)
+        }
+    }
     @Published var isPlaying: Bool = true
+
+    var onIsFinishedChanged: ((Bool) -> Void)?  // この行を追加
 
     var player: AVPlayer {
         let asset = NSDataAsset(name: "test")
@@ -53,9 +59,16 @@ class GachaAnimationViewModel: ObservableObject {
 
 struct GachaAnimationView: View {
     @ObservedObject private var viewModel = GachaAnimationViewModel()
+    @Binding var isFinished: Bool
 
     var body: some View {
         AVPlayerViewControllerRepresentable(player: viewModel.player, isPlaying: $viewModel.isPlaying)
+            .onAppear {
+                // ここでviewModelのisFinishedが変更されたときの処理をセットします。
+                self.viewModel.onIsFinishedChanged = { finished in
+                    self.isFinished = finished
+                }
+            }
             .onDisappear {
                 NotificationCenter.default.removeObserver(self.viewModel, name: .AVPlayerItemDidPlayToEndTime, object: self.viewModel.player.currentItem)
             }
