@@ -11,6 +11,7 @@ import AVFoundation
 
 struct AVPlayerViewControllerRepresentable: UIViewControllerRepresentable {
     var player: AVPlayer
+    @Binding var isPlaying: Bool  // 再生の状態を監視するためのプロパティ
 
     func makeUIViewController(context: Context) -> AVPlayerViewController {
         let controller = AVPlayerViewController()
@@ -20,7 +21,11 @@ struct AVPlayerViewControllerRepresentable: UIViewControllerRepresentable {
     }
 
     func updateUIViewController(_ uiViewController: AVPlayerViewController, context: Context) {
-        // 何もしない
+        if isPlaying {
+            player.play()
+        } else {
+            player.pause()
+        }
     }
 }
 
@@ -33,15 +38,16 @@ struct GachaAnimationView: View {
       return AVPlayer(playerItem: playerItem)
     }
 
+    @State private var isPlaying = true  // 再生の状態を管理するためのプロパティ
     @Binding var isFinished: Bool
 
     var body: some View {
-        AVPlayerViewControllerRepresentable(player: player)
+        AVPlayerViewControllerRepresentable(player: player, isPlaying: $isPlaying)
             .onAppear {
                 NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: self.player.currentItem, queue: .main) { _ in
                     isFinished = true
+                    isPlaying = false  // 再生が終了したら、再生の状態をfalseに設定
                 }
-                player.play()  // ここで再生を開始
             }
     }
 }

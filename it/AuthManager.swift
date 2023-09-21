@@ -49,7 +49,7 @@ class AuthManager: ObservableObject {
         guard let userId = user?.uid else { return }
         
         let userRef = Database.database().reference().child("users").child(userId)
-        let userData: [String: Any] = ["userName": userName, "userIcon": userIcon, "avatar": userIcon]
+        let userData: [String: Any] = ["userName": userName, "userIcon": userIcon, "avatar": userIcon,"userMoney": 0]
         
         userRef.setValue(userData) { (error, ref) in
             if let error = error {
@@ -62,16 +62,19 @@ class AuthManager: ObservableObject {
     
     func fetchUserInfo(completion: @escaping (String?, String?, Int?) -> Void) {
         guard let userId = user?.uid else {
+            print("test1")
             completion(nil, nil, 0)
             return
         }
         
         let userRef = Database.database().reference().child("users").child(userId)
-        userRef.observeSingleEvent(of: .value) { (snapshot, errorString) in
+        userRef.observeSingleEvent(of: .value) { (snapshot) in
+            print(snapshot)
             if let data = snapshot.value as? [String: Any],
                let userName = data["userName"] as? String,
                let userIcon = data["userIcon"] as? String,
-               let userMoney = data["money"] as? Int {
+               let userMoney = data["userMoney"] as? Int {
+                print("test3")
                 completion(userName, userIcon, userMoney)
             } else {
                 completion(nil, nil, nil)

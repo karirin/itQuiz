@@ -30,9 +30,23 @@ struct QuizView: View {
     @State private var showModal = false
     @State private var quizResults: [QuizResult] = []
     @State private var correctAnswerCount = 0
-
+    @State private var countdownValue = 3
+    @State private var showCountdown = true
+    
     var currentQuiz: QuizQuestion {
         quizzes[currentQuizIndex]
+    }
+    
+    func startCountdown() {
+        Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
+            if countdownValue > 1 {
+                countdownValue -= 1
+            } else {
+                timer.invalidate()
+                showCountdown = false
+                startTimer() // カウントダウンが終了したら、クイズのタイマーを開始
+            }
+        }
     }
 
     // タイマーの処理
@@ -64,111 +78,118 @@ struct QuizView: View {
     var body: some View {
         NavigationView{
             VStack {
-                HStack{
-                    Circle()
-                        .stroke(style: StrokeStyle(lineWidth: 10, lineCap: .round, lineJoin: .round))
-                        .opacity(0.3)
-                        .foregroundColor(.gray)
-                        .frame(width: 50, height: 50)
-                        .padding(.leading)
-                        .opacity(0)
-                    Spacer()
-                    if let selected = selectedAnswerIndex {
-                        if selected == currentQuiz.correctAnswerIndex {
-                            Text("正解")
-                        .font(.system(size:40))
-                                .foregroundColor(.green)
-                        } else {
-                            Text("不正解")
-                        .font(.system(size:40))
-                                .foregroundColor(.red)
-                        }
-                    }
-                    Spacer()
-                    ZStack {
-                        // 背景の円
+                if showCountdown {
+                                    Text("\(countdownValue)")
+                                        .font(.system(size: 200))
+                                        .foregroundColor(.gray)
+                                        .transition(.scale)
+                }else{
+                    HStack{
                         Circle()
                             .stroke(style: StrokeStyle(lineWidth: 10, lineCap: .round, lineJoin: .round))
                             .opacity(0.3)
                             .foregroundColor(.gray)
-                        
-                        // アニメーションする円
-                        TimerArc(startAngle: .degrees(-90), endAngle: .degrees(-90 + Double(remainingSeconds) / 30.0 * 360.0))
-                            .stroke(style: StrokeStyle(lineWidth: 10, lineCap: .round, lineJoin: .round))
-                            .foregroundColor(remainingSeconds <= 5 ? Color.red : Color("purple1"))
-                            .rotationEffect(.degrees(-90))
-                        
-                        Text("\(remainingSeconds)秒")
-                            .foregroundColor(remainingSeconds <= 5 ? .red : .black) // 5秒以下で赤色に
-                    }
-                    .frame(width: 50, height: 50)
-                    
-                }
-                .padding(.trailing)
-                Spacer()
-                ZStack {
-                    Text(currentQuiz.question)
-                        .font(.headline)
-                        .padding()
-
-                    // 正解の場合の赤い円
-                    if let selected = selectedAnswerIndex, selected == currentQuiz.correctAnswerIndex {
-                        Circle()
-                            .stroke(style: StrokeStyle(lineWidth: 10, lineCap: .round, lineJoin: .round))
-                            .opacity(0.7)
-                            .foregroundColor(.red)
-                            .frame(width: 200, height: 200)
-                    }
-                    // 不正解の場合の青いバツマーク
-                    else if let selected = selectedAnswerIndex, selected != currentQuiz.correctAnswerIndex {
-                        Image(systemName: "xmark")
-                            .resizable()
-                            .opacity(0.7)
-                            .foregroundColor(.blue)
-                            .frame(width: 200, height: 200)
-                    }
-                }
-                Spacer()
-                
-                ForEach(0..<currentQuiz.choices.count, id: \.self) { index in
-                    HStack{
-                        Button(action: {
-                            self.selectedAnswerIndex = index
-                            self.timer?.invalidate() // 回答を選択したらタイマーを止める
-                            
-                            let isAnswerCorrect = (selectedAnswerIndex == currentQuiz.correctAnswerIndex)
-                            if isAnswerCorrect {
-                                correctAnswerCount += 1 // 正解の場合、正解数をインクリメント
+                            .frame(width: 50, height: 50)
+                            .padding(.leading)
+                            .opacity(0)
+                        Spacer()
+                        if let selected = selectedAnswerIndex {
+                            if selected == currentQuiz.correctAnswerIndex {
+                                Text("正解")
+                                    .font(.system(size:40))
+                                    .foregroundColor(.green)
+                            } else {
+                                Text("不正解")
+                                    .font(.system(size:40))
+                                    .foregroundColor(.red)
                             }
-                            
-                            let result = QuizResult(
-                                question: currentQuiz.question,
-                                userAnswer: currentQuiz.choices[index],
-                                correctAnswer: currentQuiz.choices[currentQuiz.correctAnswerIndex],
-                                explanation: currentQuiz.explanation,
-                                isCorrect: isAnswerCorrect
-                            )
-                            quizResults.append(result)
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                                moveToNextQuiz()
-                            }
-                        }) {
-                            Text(currentQuiz.choices[index])
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color("purple"))
-                                .foregroundColor(.black)
-                                .cornerRadius(8)
                         }
-                        .padding(.horizontal)
+                        Spacer()
+                        ZStack {
+                            // 背景の円
+                            Circle()
+                                .stroke(style: StrokeStyle(lineWidth: 10, lineCap: .round, lineJoin: .round))
+                                .opacity(0.3)
+                                .foregroundColor(.gray)
+                            
+                            // アニメーションする円
+                            TimerArc(startAngle: .degrees(-90), endAngle: .degrees(-90 + Double(remainingSeconds) / 30.0 * 360.0))
+                                .stroke(style: StrokeStyle(lineWidth: 10, lineCap: .round, lineJoin: .round))
+                                .foregroundColor(remainingSeconds <= 5 ? Color.red : Color("purple1"))
+                                .rotationEffect(.degrees(-90))
+                            
+                            Text("\(remainingSeconds)秒")
+                                .foregroundColor(remainingSeconds <= 5 ? .red : .black) // 5秒以下で赤色に
+                        }
+                        .frame(width: 50, height: 50)
+                        
                     }
-                    .frame(maxWidth: .infinity)
-                    .shadow(radius: 1)
-                }
-//                Spacer()
-                
-                if showCompletionMessage {
+                    .padding(.trailing)
+                    Spacer()
+                    ZStack {
+                        Text(currentQuiz.question)
+                            .font(.headline)
+                            .padding()
+                        
+                        // 正解の場合の赤い円
+                        if let selected = selectedAnswerIndex, selected == currentQuiz.correctAnswerIndex {
+                            Circle()
+                                .stroke(style: StrokeStyle(lineWidth: 10, lineCap: .round, lineJoin: .round))
+                                .opacity(0.7)
+                                .foregroundColor(.red)
+                                .frame(width: 200, height: 200)
+                        }
+                        // 不正解の場合の青いバツマーク
+                        else if let selected = selectedAnswerIndex, selected != currentQuiz.correctAnswerIndex {
+                            Image(systemName: "xmark")
+                                .resizable()
+                                .opacity(0.7)
+                                .foregroundColor(.blue)
+                                .frame(width: 200, height: 200)
+                        }
+                    }
+                    Spacer()
+                    
+                    ForEach(0..<currentQuiz.choices.count, id: \.self) { index in
+                        HStack{
+                            Button(action: {
+                                self.selectedAnswerIndex = index
+                                self.timer?.invalidate() // 回答を選択したらタイマーを止める
+                                
+                                let isAnswerCorrect = (selectedAnswerIndex == currentQuiz.correctAnswerIndex)
+                                if isAnswerCorrect {
+                                    correctAnswerCount += 1 // 正解の場合、正解数をインクリメント
+                                }
+                                
+                                let result = QuizResult(
+                                    question: currentQuiz.question,
+                                    userAnswer: currentQuiz.choices[index],
+                                    correctAnswer: currentQuiz.choices[currentQuiz.correctAnswerIndex],
+                                    explanation: currentQuiz.explanation,
+                                    isCorrect: isAnswerCorrect
+                                )
+                                quizResults.append(result)
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                                    moveToNextQuiz()
+                                }
+                            }) {
+                                Text(currentQuiz.choices[index])
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background(Color("purple"))
+                                    .foregroundColor(.black)
+                                    .cornerRadius(8)
+                            }
+                            .padding(.horizontal)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .shadow(radius: 1)
+                    }
+                    //                Spacer()
+                    
+                    if showCompletionMessage {
                         NavigationLink("", destination: QuizResultView(results: quizResults).navigationBarBackButtonHidden(true), isActive: $navigateToQuizResultView)
+                    }
                 }
             }
             .frame(maxWidth: .infinity,maxHeight:.infinity)
@@ -178,6 +199,7 @@ struct QuizView: View {
             }
             .onAppear {
                 startTimer() // Viewが表示されたときにタイマーを開始
+                startCountdown()
             }
             .onChange(of: showCompletionMessage) { newValue in
                 if newValue && correctAnswerCount >= 0 {

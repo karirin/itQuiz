@@ -34,7 +34,7 @@ struct ContentView: View {
                         ZStack{
                             Image("image")
                                 .resizable()
-                                .frame(width: .infinity,height:150)
+                                .frame(height:150)
                                 .padding(.top,50)
                                 .opacity(0.5)
                             Image(userIcon.isEmpty ? "defaultIcon" : userIcon)
@@ -51,6 +51,49 @@ struct ContentView: View {
                             Text("\(authManager.experience) / \(authManager.level * 100)")
                         }.padding()
                         
+                        Button(action: {
+                                            if isButtonEnabled {
+                                                if let userId = authManager.currentUserId {
+                                                    authManager.saveLastClickedDate(userId: userId) { success in
+                                                        lastClickedDate = Date()
+                                                        isButtonEnabled = false
+                                                    }
+                                                }
+                                            }
+                                            // 画面遷移のトリガーをオンにする
+                                            self.isPresentingQuizBeginnerList = true
+                                        }) {
+                                            HStack{
+                                                Image("daily")
+                                                    .resizable()
+                                                    .frame(width: 50,height:50)
+                                                    .foregroundColor(.gray)
+                                                
+                                                Text("デイリーチャレンジ")
+                                                    .font(.system(size:28))
+                                                    
+                                            }
+                                            .padding(.horizontal,5)
+                                            .padding(.vertical)
+                                        }
+                                        .frame(maxWidth: .infinity)
+                            .background(isButtonEnabled ? Color("lightRed") : Color("lightGray"))
+                                .shadow(radius: 1)
+                                .foregroundColor(.gray)
+                                .cornerRadius(20)
+                    .padding(.horizontal)
+                    .onTapGesture {
+                                if isButtonEnabled {
+                                    if let userId = authManager.currentUserId {
+                                        authManager.saveLastClickedDate(userId: userId) { success in
+                                            lastClickedDate = Date()
+                                            isButtonEnabled = false
+                                        }
+                                    }
+                                }
+                            }
+                        NavigationLink("", destination: QuizBeginnerList().navigationBarBackButtonHidden(true), isActive: $isPresentingQuizBeginnerList)
+                        
                         NavigationLink(destination: QuizManagerView()) {
                             HStack{
                                 Image("quiz")
@@ -58,27 +101,38 @@ struct ContentView: View {
                                     .frame(width: 50,height:50)
                                 .foregroundColor(.gray)
                                 Text("問題を解く")
-                                    .font(.system(size:24))
+                                    .font(.system(size:28))
                                     .foregroundColor(.gray)
-                            }
+                            }.frame(maxWidth: .infinity)
                             .padding()
                                     }
-                        .background(Color("purple"))
+                        .background(Color("lightGreen"))
+                        .cornerRadius(20)
                         .frame(maxWidth: .infinity)
                         .shadow(radius: 1)
-                        .cornerRadius(30)
-                        .padding()
+                        .padding(.horizontal)
 
                         
                         NavigationLink(destination: GachaView()) {
-                                        Text("ガチャを回す")
-                                            .padding()
-                                            .foregroundColor(.gray)
-                                            .cornerRadius(10)
-                                            .shadow(radius: 1)
-                                    }
+                                                    HStack{
+                                                        Image("gacha")
+                                                            .resizable()
+                                                            .frame(width: 50,height:50)
+                                                        .foregroundColor(.gray)
+                                                        Text("ガチャをする")
+                                                            .font(.system(size:28))
+                                                            .foregroundColor(.gray)
+                                                    }.frame(maxWidth: .infinity)
+                                                    .padding()
+                                                            }
+                                                .background(Color("purple"))
+                                                .cornerRadius(20)
+                                                .frame(maxWidth: .infinity)
+                                                .shadow(radius: 1)
+                                                .padding(.horizontal)
                     }
                 }
+                        .background(Color("backgroundGray"))
                
             } .frame(maxWidth: .infinity,maxHeight: .infinity)
         .onAppear {

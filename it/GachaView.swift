@@ -49,33 +49,35 @@ struct GachaView: View {
     @State private var showAnimation: Bool = false
 
     var body: some View {
-        VStack(spacing: 20) {
-            // ガチャの結果を表示
-            if let item = obtainedItem {
-                Text("ゲットしたアイテム: \(item.name)")
-                    .foregroundColor(colorForRarity(item.rarity))
-            }
+           VStack(spacing: 20) {
+               // ガチャの結果を表示
+               if animationFinished, let item = obtainedItem {
+                   Text("ゲットしたアイテム: \(item.name)")
+                       .foregroundColor(colorForRarity(item.rarity))
+               }
 
-            // ガチャを引くボタン
-            Button(action: {
-                self.showAnimation = true
-                self.obtainedItem = self.gachaManager.drawGacha()
-            }) {
-                Text("ガチャを引く")
-                    .padding()
-                    .background(Color.blue)
-                    .foregroundColor(.white)
-                    .cornerRadius(8)
-            }
-        }
-        .padding()
-        .fullScreenCover(isPresented: $showAnimation) { // この行を変更
-                    GachaAnimationView(isFinished: $animationFinished)
-                        .onDisappear {
-                            self.showAnimation = false
-                        }
-                }
-    }
+               // ガチャを引くボタン
+               Button(action: {
+                   self.showAnimation = true
+                   self.obtainedItem = self.gachaManager.drawGacha()
+               }) {
+                   Text("ガチャを引く")
+                       .padding()
+                       .background(Color.blue)
+                       .foregroundColor(.white)
+                       .cornerRadius(8)
+               }
+           }
+           .padding()
+           .onChange(of: animationFinished) { finished in  // この行を追加
+               if finished {
+                   self.showAnimation = false
+               }
+           }
+           .fullScreenCover(isPresented: $showAnimation) {
+               GachaAnimationView(isFinished: $animationFinished)
+           }
+       }
 
     func colorForRarity(_ rarity: GachaManager.Rarity) -> Color {
         switch rarity {
