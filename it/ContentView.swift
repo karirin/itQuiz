@@ -6,16 +6,20 @@
 //
 
 import SwiftUI
+import AVFoundation
 
 struct ContentView: View {
     @ObservedObject var authManager = AuthManager.shared
     @State private var userName: String = ""
     @State private var userIcon: String = ""
     @State private var userMoney: Int = 0
+    @State private var userHp: Int = 100
+    @State private var userAttack: Int = 20
     @State private var isButtonEnabled: Bool = true
     @State private var lastClickedDate: Date?
     @State private var isPresentingQuizBeginnerList: Bool = false
     @State private var isIntermediateQuizActive: Bool = false
+    @State private var audioPlayer: AVAudioPlayer?
     
     var body: some View {
         NavigationView {
@@ -61,6 +65,7 @@ struct ContentView: View {
                                                     }
                                                 }
                                             }
+                                            audioPlayer?.play()
                                             // 画面遷移のトリガーをオンにする
                                             self.isPresentingQuizBeginnerList = true
                                         }) {
@@ -100,9 +105,11 @@ struct ContentView: View {
                                     .resizable()
                                     .frame(width: 50,height:50)
                                 .foregroundColor(.gray)
+                                Spacer()
                                 Text("問題を解く")
                                     .font(.system(size:28))
                                     .foregroundColor(.gray)
+                                Spacer()
                             }.frame(maxWidth: .infinity)
                             .padding()
                                     }
@@ -119,9 +126,11 @@ struct ContentView: View {
                                                             .resizable()
                                                             .frame(width: 50,height:50)
                                                         .foregroundColor(.gray)
+                                                        Spacer()
                                                         Text("ガチャをする")
                                                             .font(.system(size:28))
                                                             .foregroundColor(.gray)
+                                                        Spacer()
                                                     }.frame(maxWidth: .infinity)
                                                     .padding()
                                                             }
@@ -132,32 +141,26 @@ struct ContentView: View {
                                                 .padding(.horizontal)
                     }
                 }
-                        .background(Color("backgroundGray"))
+                        .background(Color("backgroudGray"))
                
             } .frame(maxWidth: .infinity,maxHeight: .infinity)
         .onAppear {
-            authManager.fetchUserInfo { (name, icon, money) in
+            authManager.fetchUserInfo { (name, icon, money, hp, attack) in
                 self.userName = name ?? ""
                 self.userIcon = icon ?? ""
                 self.userMoney = money ?? 0
+                self.userHp = hp ?? 100
+                self.userAttack = attack ?? 20
             }
             authManager.fetchUserExperienceAndLevel()
-//            if let userId = authManager.currentUserId {
-//                authManager.fetchLastClickedDate(userId: userId) { date in
-//                    lastClickedDate = date
-//                    let calendar = Calendar.current
-//                    print(calendar)
-//                    if let lastDate = lastClickedDate {
-//                        print("test:\(calendar.isDateInToday(lastDate))")
-//                        if calendar.isDateInToday(lastDate) {
-//                            isButtonEnabled = false
-//                        }
-//                    } else {
-//                        print("lastClickedDate is nil")
-//                    }
-//                }
-//            }
-//            isIntermediateQuizActive = authManager.level >= 10
+            if let soundURL = Bundle.main.url(forResource: "sound", withExtension: "mp3") {
+                do {
+                    print("test")
+                    audioPlayer = try AVAudioPlayer(contentsOf: soundURL)
+                } catch {
+                    print("Failed to initialize audio player: \(error)")
+                }
+            }
         }
             .background(Color("purple2").opacity(0.6))  // ここで背景色を設定
             .edgesIgnoringSafeArea(.all)  // 画面の端まで背景色を伸ばす

@@ -30,7 +30,7 @@ struct QuizManagerView: View {
                     .cornerRadius(10)
                     .shadow(radius: 1)
             }.padding(.horizontal)
-            NavigationLink(destination: QuizIntermediateList().navigationBarBackButtonHidden(true), isActive: $isIntermediateQuizActive) {
+            NavigationLink(destination: QuizIntermediateList().navigationBarBackButtonHidden(true)) {
                 Text("IT基礎知識の問題（中級）")
                     .frame(maxWidth:.infinity)
                     .padding()
@@ -40,7 +40,7 @@ struct QuizManagerView: View {
                     .shadow(radius: 1)
                     .disabled(authManager.level >= 5)
             }.padding(.horizontal)
-            NavigationLink(destination: QuizIntermediateList().navigationBarBackButtonHidden(true), isActive: $isIntermediateQuizActive) {
+            NavigationLink(destination: QuizAdvancedList().navigationBarBackButtonHidden(true)) {
                 Text("IT基礎知識の問題（上級）")
                     .frame(maxWidth:.infinity)
                     .padding()
@@ -50,8 +50,8 @@ struct QuizManagerView: View {
                     .shadow(radius: 1)
                     .disabled(authManager.level >= 10)
             }.padding(.horizontal)
-            NavigationLink(destination: QuizIntermediateList().navigationBarBackButtonHidden(true), isActive: $isIntermediateQuizActive) {
-                Text("上級レベルの問題")
+            NavigationLink(destination: QuizNetworkList().navigationBarBackButtonHidden(true)) {
+                Text("ネットワーク系の問題")
                     .frame(maxWidth:.infinity)
                     .padding()
                     .background(authManager.level >= 10 ? Color.white : Color("lightGray"))
@@ -60,8 +60,8 @@ struct QuizManagerView: View {
                     .shadow(radius: 1)
                     .disabled(authManager.level >= 10)
             }.padding(.horizontal)
-            NavigationLink(destination: QuizIntermediateList().navigationBarBackButtonHidden(true), isActive: $isIntermediateQuizActive) {
-                Text("上級レベルの問題")
+            NavigationLink(destination: QuizIntermediateList().navigationBarBackButtonHidden(true)) {
+                Text("セキュリティ系の問題")
                     .frame(maxWidth:.infinity)
                     .padding()
                     .background(authManager.level >= 10 ? Color.white : Color("lightGray"))
@@ -70,8 +70,8 @@ struct QuizManagerView: View {
                     .shadow(radius: 1)
                     .disabled(authManager.level >= 10)
             }.padding(.horizontal)
-            NavigationLink(destination: QuizIntermediateList().navigationBarBackButtonHidden(true), isActive: $isIntermediateQuizActive) {
-                Text("上級レベルの問題")
+            NavigationLink(destination: QuizIntermediateList().navigationBarBackButtonHidden(true)) {
+                Text("データベース系の問題")
                     .frame(maxWidth:.infinity)
                     .padding()
                     .background(authManager.level >= 10 ? Color.white : Color("lightGray"))

@@ -15,6 +15,8 @@
 		260E44212AB5958300FBB487 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 260E44202AB5958300FBB487 /* GoogleService-Info.plist */; };
 		260E44232AB5963A00FBB487 /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260E44222AB5963A00FBB487 /* AuthManager.swift */; };
 		260E44252AB59A7900FBB487 /* QuizView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260E44242AB59A7900FBB487 /* QuizView.swift */; };
+		268C3B9B2ABCA63300282BEE /* QuizAdvancedList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 268C3B9A2ABCA63200282BEE /* QuizAdvancedList.swift */; };
+		268C3B9D2ABCA95D00282BEE /* QuizNetworkList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 268C3B9C2ABCA95D00282BEE /* QuizNetworkList.swift */; };
 		269A87882AB7757C00F33C9E /* QuizResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269A87872AB7757C00F33C9E /* QuizResultView.swift */; };
 		269A878A2AB86FC900F33C9E /* GachaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269A87892AB86FC900F33C9E /* GachaView.swift */; };
 		269A878C2AB873CC00F33C9E /* GachaAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269A878B2AB873CC00F33C9E /* GachaAnimationView.swift */; };
@@ -38,6 +40,8 @@
 		260E44202AB5958300FBB487 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		260E44222AB5963A00FBB487 /* AuthManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthManager.swift; sourceTree = "<group>"; };
 		260E44242AB59A7900FBB487 /* QuizView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizView.swift; sourceTree = "<group>"; };
+		268C3B9A2ABCA63200282BEE /* QuizAdvancedList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizAdvancedList.swift; sourceTree = "<group>"; };
+		268C3B9C2ABCA95D00282BEE /* QuizNetworkList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizNetworkList.swift; sourceTree = "<group>"; };
 		269A87872AB7757C00F33C9E /* QuizResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizResultView.swift; sourceTree = "<group>"; };
 		269A87892AB86FC900F33C9E /* GachaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GachaView.swift; sourceTree = "<group>"; };
 		269A878B2AB873CC00F33C9E /* GachaAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GachaAnimationView.swift; sourceTree = "<group>"; };
@@ -96,6 +100,8 @@
 				269A87872AB7757C00F33C9E /* QuizResultView.swift */,
 				260000012AB5EEC900342CAE /* QuizBeginnerList.swift */,
 				26A25D4D2AB99235006B368F /* QuizIntermediateList.swift */,
+				268C3B9A2ABCA63200282BEE /* QuizAdvancedList.swift */,
+				268C3B9C2ABCA95D00282BEE /* QuizNetworkList.swift */,
 				260E44222AB5963A00FBB487 /* AuthManager.swift */,
 				26A25D4F2AB9FB1A006B368F /* TitleListView.swift */,
 				269A87892AB86FC900F33C9E /* GachaView.swift */,
@@ -253,6 +259,7 @@
 				260000022AB5EEC900342CAE /* QuizBeginnerList.swift in Sources */,
 				269A87882AB7757C00F33C9E /* QuizResultView.swift in Sources */,
 				269D44E22AB60D6800CAA91A /* SignUp.swift in Sources */,
+				268C3B9B2ABCA63300282BEE /* QuizAdvancedList.swift in Sources */,
 				269A878A2AB86FC900F33C9E /* GachaView.swift in Sources */,
 				26A25D4E2AB99235006B368F /* QuizIntermediateList.swift in Sources */,
 				260E44152AB572DC00FBB487 /* ContentView.swift in Sources */,
@@ -263,6 +270,7 @@
 				269A878C2AB873CC00F33C9E /* GachaAnimationView.swift in Sources */,
 				260E44132AB572DC00FBB487 /* itApp.swift in Sources */,
 				269A878E2AB87CBA00F33C9E /* MemoView.swift in Sources */,
+				268C3B9D2ABCA95D00282BEE /* QuizNetworkList.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

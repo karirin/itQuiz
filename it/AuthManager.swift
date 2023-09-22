@@ -49,7 +49,7 @@ class AuthManager: ObservableObject {
         guard let userId = user?.uid else { return }
         
         let userRef = Database.database().reference().child("users").child(userId)
-        let userData: [String: Any] = ["userName": userName, "userIcon": userIcon, "avatar": userIcon,"userMoney": 0]
+        let userData: [String: Any] = ["userName": userName, "userIcon": userIcon, "avatar": userIcon,"userMoney": 0, "userHp": 100, "userAttack": 20]
         
         userRef.setValue(userData) { (error, ref) in
             if let error = error {
@@ -60,24 +60,24 @@ class AuthManager: ObservableObject {
         }
     }
     
-    func fetchUserInfo(completion: @escaping (String?, String?, Int?) -> Void) {
+    func fetchUserInfo(completion: @escaping (String?, String?, Int?, Int?, Int?) -> Void) {
         guard let userId = user?.uid else {
             print("test1")
-            completion(nil, nil, 0)
+            completion(nil, nil, 0, 0, 0)
             return
         }
         
         let userRef = Database.database().reference().child("users").child(userId)
         userRef.observeSingleEvent(of: .value) { (snapshot) in
-            print(snapshot)
             if let data = snapshot.value as? [String: Any],
                let userName = data["userName"] as? String,
                let userIcon = data["userIcon"] as? String,
-               let userMoney = data["userMoney"] as? Int {
-                print("test3")
-                completion(userName, userIcon, userMoney)
+               let userMoney = data["userMoney"] as? Int,
+               let userHp = data["userHp"] as? Int,
+               let userAttack = data["userAttack"] as? Int{
+                completion(userName, userIcon, userMoney, userHp, userAttack)
             } else {
-                completion(nil, nil, nil)
+                completion(nil, nil, nil, nil, nil)
             }
         }
     }
@@ -97,11 +97,12 @@ class AuthManager: ObservableObject {
                 while newExperience >= self.level * 100 {
                     newExperience -= self.level * 100  // 現在のレベル×100を引いて余りを計算
                     self.level += 1    // レベルを1つ上げる
+                    
+                    // ここで攻撃力とHPを更新
+                    self.updateStatsUponLevelUp()
                 }
                 
                 self.experience = newExperience
-                print("experience:\(self.experience)")
-                print("level:\(self.level)")
                 
                 // 更新された経験値とレベルをデータベースに保存
                 let userData: [String: Any] = ["experience": self.experience, "level": self.level]
@@ -145,7 +146,6 @@ class AuthManager: ObservableObject {
                     let newMoney = currentMoney + amount
                     
                     self.money = newMoney
-                    print("money:\(self.money)")
                     
                     // 更新された所持金をデータベースに保存
                     let userData: [String: Any] = ["money": self.money]
@@ -178,10 +178,8 @@ class AuthManager: ObservableObject {
             
             // このフォーマッターを使用して、文字列から日付に変換
             if let dateString = snapshot.value as? String, let date = dateFormatter.date(from: dateString) {
-                print("date:\(date)")
                 completion(date)
             } else {
-                print("nil")
                 completion(nil)
             }
         }
@@ -219,7 +217,6 @@ class AuthManager: ObservableObject {
         userRef.observeSingleEvent(of: .value) { (snapshot) in
             var fetchedTitles: [Title] = []
             if let titlesData = snapshot.value as? [String] {
-                print("titlesData:\(titlesData)")
                 self.checkForTitles { availableTitles in
                     for titleName in titlesData {
                         if let title = availableTitles.first(where: { $0.name == titleName }) {
@@ -233,7 +230,25 @@ class AuthManager: ObservableObject {
             }
         }
     }
-
+    
+    func updateStatsUponLevelUp() {
+        guard let userId = user?.uid else { return }
+        let userRef = Database.database().reference().child("users").child(userId)
+        
+        // レベルに応じて攻撃力とHPを計算
+        let newAttack = 20 + (level - 1) * 2
+        let newHp = 100 + (level - 1) * 10
+        
+        // データベースに新しい攻撃力とHPを保存
+        let updatedStats: [String: Any] = ["userAttack": newAttack, "userHp": newHp]
+        userRef.updateChildValues(updatedStats) { (error, ref) in
+            if let error = error {
+                print("Failed to update stats:", error.localizedDescription)
+                return
+            }
+            print("Successfully updated stats.")
+        }
+    }
     
     private func saveEarnedTitles() {
         guard let userId = user?.uid else { return }

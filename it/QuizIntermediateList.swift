@@ -326,7 +326,7 @@ struct QuizIntermediateList: View {
     }
 
     var body: some View {
-        QuizView(quizzes: shuffledQuizList)
+        QuizView(quizzes: shuffledQuizList, quizLevel: .intermediate)
     }
 }
 
