@@ -15,30 +15,7 @@ struct QuizQuestion {
 }
 
 struct QuizBeginnerList: View {
-    @EnvironmentObject var soundSettings: SoundSettings
     let quizBeginnerList: [QuizQuestion] = [
-//        QuizQuestion( //長い
-//            question: "AIを開発するベンチャー企業のA社が，資金調達を目的に，金融商品取引所に初めて上場することになった。このように，企業の未公開の株式を，新たに公開することを表す用語として，最も適切なものはどれか。",
-//            choices: [
-//                "IPO",
-//                "LBO",
-//                "TOB",
-//                "VC"
-//            ],
-//            correctAnswerIndex: 0,
-//            explanation: "IPO（Initial Public Offering）は、企業が初めて公開市場で株式を発行することを指します。"
-//            ),
-//        QuizQuestion( //長い
-//            question: "次のうち、ウォーターフォールモデルの特徴として正しいものはどれか？",
-//            choices: [
-//                "各フェーズが終了すると次のフェーズに戻ることはできない。",
-//                "継続的にフィードバックを受け取りながら開発を進める。",
-//                "クライアントとのコミュニケーションは開始と終了のみで十分。",
-//                "開発途中でも頻繁にプロトタイプを作成する。"
-//            ],
-//            correctAnswerIndex: 0,
-//            explanation: "ウォーターフォールモデルは、各フェーズが順番に進行し、一度終了したフェーズには戻らないという特徴があります。"
-//        ),
         QuizQuestion(
             question: "コンピュータウイルスの感染経路として最も一般的なものは？",
             choices: [

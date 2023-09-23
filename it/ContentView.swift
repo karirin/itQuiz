@@ -23,15 +23,11 @@ struct ContentView: View {
     @State private var isPresentingGachaView: Bool = false
     @State private var audioPlayer: AVAudioPlayer?
     @State private var audioPlayerKettei: AVAudioPlayer?
-    @EnvironmentObject var soundSettings: SoundSettings
+    @ObservedObject var audioManager = AudioManager.shared
     
     var body: some View {
         NavigationView {
                 VStack {
-//                    Toggle(isOn: $soundSettings.isSoundOn) {
-//                        Text("音声: \(soundSettings.isSoundOn ? "オン" : "オフ")")
-//                    }
-                    
                     HStack{
                         Image(systemName: "person.circle")
                         Text("\(userName)")
@@ -259,15 +255,6 @@ struct ContentView: View {
     func playSoundKettei() {
         audioPlayerKettei?.play()
     }
-    func adjustVolume() {
-        if soundSettings.isSoundOn {
-            audioPlayer?.volume = 1.0
-            audioPlayerKettei?.volume = 1.0
-        } else {
-            audioPlayer?.volume = 0.0
-            audioPlayerKettei?.volume = 0.0
-        }
-    }
         }
 
 struct ProgressBar: View {
@@ -290,10 +277,8 @@ struct ProgressBar: View {
 
 
 struct ContentView_Previews: PreviewProvider {
-    static var soundSettings = SoundSettings()
     
     static var previews: some View {
         ContentView()
-            .environmentObject(soundSettings)
     }
 }

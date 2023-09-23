@@ -21,7 +21,6 @@ struct QuizResultView: View {
     @State private var showMemoView = false
     @State private var currentMemo = ""
     @State private var selectedQuestion = ""
-    @EnvironmentObject var soundSettings: SoundSettings
 
     var body: some View {
         NavigationView{

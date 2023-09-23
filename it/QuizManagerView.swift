@@ -22,7 +22,6 @@ struct QuizManagerView: View {
     @State private var isPresentingQuizSecurity: Bool = false
     @State private var isPresentingQuizDatabase: Bool = false
     @State private var isSoundOn: Bool = true
-    @EnvironmentObject var soundSettings: SoundSettings
     
     init() {
         _lastClickedDate = State(initialValue: Date())

@@ -82,7 +82,6 @@ struct QuizView: View {
     @State private var showAttackImage = false
     @State private var showMonsterDownImage = false
     @State private var showIncorrectBackground = false
-    @EnvironmentObject var soundSettings: SoundSettings
     @State private var hasAnswered: Bool = false
 
     

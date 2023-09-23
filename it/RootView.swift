@@ -7,15 +7,10 @@
 
 import SwiftUI
 
-class SoundSettings: ObservableObject {
-    @Published var isSoundOn: Bool = true
-}
-
 struct RootView: View {
     @ObservedObject var authManager: AuthManager
     @State static private var showExperienceModalPreview = false
     @State private var isUserExists: Bool? = nil
-//    var soundSettings = SoundSettings()
 
     var body: some View {
         Group {
@@ -26,7 +21,6 @@ struct RootView: View {
                 SignUp()
             } else {
                 ContentView()
-//                    .environmentObject(soundSettings)
             }
         }
         .onAppear {
