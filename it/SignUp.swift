@@ -91,6 +91,7 @@ struct ImagePickerView: View {
     let defaultImage = UIImage(named: "defaultProfileImage")
     let icons = ["user1", "user2", "user3"]
     @Environment(\.presentationMode) var presentationMode
+    @State private var navigateToContentView: Bool = false
 
     var body: some View {
         NavigationView{
@@ -127,27 +128,32 @@ struct ImagePickerView: View {
                 }
                 
                 Button("ユーザーを作成") {
-                    let selectedIconName = selectedIcon
-                    authManager.saveUserToDatabase(userName: userName, userIcon: selectedIconName)
+                        let selectedIconName = selectedIcon
+                        authManager.saveUserToDatabase(userName: userName, userIcon: selectedIconName)
+                        self.navigateToContentView = true // ユーザーをデータベースに保存した後、ContentViewへの遷移をトリガー
+                    }
+                    .padding(.vertical,10)
+                    .padding(.horizontal,25)
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .background(RoundedRectangle(cornerRadius: 25)
+                        .fill(Color.red))
+                    .padding()
                 }
-                .padding(.vertical,10)
-                .padding(.horizontal,25)
-                .font(.headline)
-                .foregroundColor(.white)
-                .background(RoundedRectangle(cornerRadius: 25)
-                    .fill(Color.red))
-                .padding()
-            }
+                .background(
+                    NavigationLink("", destination: ContentView().navigationBarBackButtonHidden(true), isActive: $navigateToContentView)
+                        .hidden() // NavigationLinkを非表示にする
+                )
         }
         .navigationBarBackButtonHidden(true)
-        .navigationBarItems(leading: Button(action: {
-            self.presentationMode.wrappedValue.dismiss()
-        }) {
-            Image(systemName: "chevron.left")
-                .foregroundColor(.black)
-            Text("戻る")
-                .foregroundColor(.black)
-        })
+//        .navigationBarItems(leading: Button(action: {
+//            self.presentationMode.wrappedValue.dismiss()
+//        }) {
+//            Image(systemName: "chevron.left")
+//                .foregroundColor(.black)
+//            Text("戻る")
+//                .foregroundColor(.black)
+//        })
     }
 }
 

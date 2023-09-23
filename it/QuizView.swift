@@ -65,13 +65,13 @@ struct QuizView: View {
     @State private var playerHP: Int = 1000
     @State private var monsterHP: Int = 3000
     @State private var monsterUnderHP: Int = 30
-    @State private var monsterAttack: Int = 20
+    @State private var monsterAttack: Int = 30
     @State private var userName: String = ""
     @State private var userIcon: String = ""
     @State private var monsterBackground: String = ""
     @State private var userMoney: Int = 0
     @State private var userHp: Int = 100
-    @State private var userAttack: Int = 20
+    @State private var userAttack: Int = 30
     @State private var monsterType: Int = 0
     @State private var shakeEffect = false
     @State private var audioPlayerCorrect: AVAudioPlayer?
@@ -80,21 +80,26 @@ struct QuizView: View {
     @State private var audioPlayerMonsterAttack: AVAudioPlayer?
     @State private var audioPlayerCountDown: AVAudioPlayer?
     @State private var showAttackImage = false
+    @State private var showMonsterDownImage = false
     @State private var showIncorrectBackground = false
     @EnvironmentObject var soundSettings: SoundSettings
+    @State private var hasAnswered: Bool = false
+
     
     var currentQuiz: QuizQuestion {
         quizzes[currentQuizIndex]
     }
     
     func startCountdown() {
-        Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
-            if countdownValue > 1 {
-                countdownValue -= 1
-            } else {
-                timer.invalidate()
-                showCountdown = false
-                startTimer() // カウントダウンが終了したら、クイズのタイマーを開始
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
+                if countdownValue > 1 {
+                    countdownValue -= 1
+                } else {
+                    timer.invalidate()
+                    showCountdown = false
+                    startTimer() // カウントダウンが終了したら、クイズのタイマーを開始
+                }
             }
         }
     }
@@ -118,9 +123,9 @@ struct QuizView: View {
     func moveToNextQuiz() {
         if currentQuizIndex + 1 < 100 { // 最大3問まで
             currentQuizIndex += 1
-            print("currentQuizIndex:\(currentQuizIndex)")
             selectedAnswerIndex = nil
             startTimer()
+            hasAnswered = false
         } else {
             showCompletionMessage = true
             timer?.invalidate() // タイマーを止める
@@ -159,7 +164,14 @@ struct QuizView: View {
                             .frame(width: 50, height: 50)
                             .padding(.leading)
                             .opacity(0)
+                        if let selected = selectedAnswerIndex, selected != currentQuiz.correctAnswerIndex {
+                            Text("正解")
+                            Text("\(currentQuiz.choices[currentQuiz.correctAnswerIndex])")
+                        }
                         Spacer()
+                        // 正解の場合の赤い円
+                        if let selected = selectedAnswerIndex, selected == currentQuiz.correctAnswerIndex {
+                        }
                         ZStack {
                             // 背景の円
                             Circle()
@@ -213,18 +225,19 @@ struct QuizView: View {
                             VStack() {
                                 //                            Spacer()
                                 ZStack{
-                                    if monsterHP == 0 {
-                                        Image("attack1")
-                                            .resizable()
-                                            .frame(width:150,height:150)
-                                    }else{
-                                        VStack{
+                                        ZStack{
                                             Image("\(quizLevel)Monster\(monsterType)")
                                                 .resizable()
                                                 .frame(width:100,height:100)
+                                                // 敵キャラを倒した
+                                                if showMonsterDownImage && monsterHP == 0 {
+                                                        Image("倒す")
+                                                            .resizable()
+                                                            .frame(width:150,height:150)
+                                                }
                                         }
-                                    }
                                     
+                                    // 問題に正解して敵キャラにダメージ
                                     if let selected = selectedAnswerIndex {
                                         if selected == currentQuiz.correctAnswerIndex {
                                             if showAttackImage && monsterHP != 0 {
@@ -244,6 +257,7 @@ struct QuizView: View {
                         }
                         .padding(.horizontal)
                         ZStack{
+                            // 味方キャラのHP
                             HStack{
                                 Image(userIcon.isEmpty ? "defaultIcon" : userIcon)
                                     .resizable()
@@ -253,6 +267,8 @@ struct QuizView: View {
                                 Text("\(playerHP)/1000")
                             }
                             .padding(.horizontal)
+                            
+                            // 味方がダメージをくらう
                             if let selected = selectedAnswerIndex, selected != currentQuiz.correctAnswerIndex {
                                 if showAttackImage{
                                     Image("\(quizLevel)MonsterAttack\(monsterType)")
@@ -267,53 +283,59 @@ struct QuizView: View {
                         ForEach(0..<currentQuiz.choices.count, id: \.self) { index in
                             HStack{
                                 Button(action: {
-                                    self.selectedAnswerIndex = index
-                                    self.timer?.invalidate() // 回答を選択したらタイマーを止める
-                                    
-                                    let isAnswerCorrect = (selectedAnswerIndex == currentQuiz.correctAnswerIndex)
-                                    if isAnswerCorrect {
-                                        playCorrectSound()
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                            playAttackSound()
-                                            self.showAttackImage = true
-                                            //                                        }
-                                            correctAnswerCount += 1 // 正解の場合、正解数をインクリメント
-                                            //                                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                                            monsterHP -= userAttack
-                                            if monsterHP <= 0 {
-                                                // モンスターのHPが0以下になった場合の処理
-                                                monsterType += 1  // 次のモンスターに移行
-                                                monsterHP = 100  // 新しいモンスターのHPをリセット
-                                                if monsterType == 4 {
+                                    if !hasAnswered {
+                                        self.selectedAnswerIndex = index
+                                        self.timer?.invalidate() // 回答を選択したらタイマーを止める
+                                        
+                                        let isAnswerCorrect = (selectedAnswerIndex == currentQuiz.correctAnswerIndex)
+                                        if isAnswerCorrect {
+                                            playCorrectSound()
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                                playAttackSound()
+                                                self.showAttackImage = true
+                                                //                                        }
+                                                correctAnswerCount += 1 // 正解の場合、正解数をインクリメント
+                                                //                                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                                                monsterHP -= userAttack
+                                                if monsterHP <= 0 {
+                                                    // モンスターのHPが0以下になった場合の処理
+                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                                                        monsterType += 1  // 次のモンスターに移行
+                                                        monsterHP = 100  // 新しいモンスターのHPをリセット
+                                                        self.showMonsterDownImage = true
+                                                    }
+                                                    if monsterType == 2 {
+                                                        showCompletionMessage = true
+                                                        timer?.invalidate()
+                                                    }
+                                                } else if playerHP <= 0 {
+                                                    // プレイヤーのHPが0以下になった場合の処理
                                                     showCompletionMessage = true
                                                     timer?.invalidate()
                                                 }
-                                            } else if playerHP <= 0 {
-                                                // プレイヤーのHPが0以下になった場合の処理
-                                                showCompletionMessage = true
-                                                timer?.invalidate()
+                                            }
+                                        } else {
+                                            playerUnCorrectSound()
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                                playMonsterAttackSound()
+                                                playerHP -= monsterAttack
+                                                self.showAttackImage = true
                                             }
                                         }
-                                    } else {
-                                        playerUnCorrectSound()
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                            playMonsterAttackSound()
-                                            playerHP -= monsterAttack
-                                            self.showAttackImage = true
+                                        
+                                        let result = QuizResult(
+                                            question: currentQuiz.question,
+                                            userAnswer: currentQuiz.choices[index],
+                                            correctAnswer: currentQuiz.choices[currentQuiz.correctAnswerIndex],
+                                            explanation: currentQuiz.explanation,
+                                            isCorrect: isAnswerCorrect
+                                        )
+                                        quizResults.append(result)
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                                            self.showAttackImage = false
+                                            moveToNextQuiz()
                                         }
-                                    }
-                                    
-                                    let result = QuizResult(
-                                        question: currentQuiz.question,
-                                        userAnswer: currentQuiz.choices[index],
-                                        correctAnswer: currentQuiz.choices[currentQuiz.correctAnswerIndex],
-                                        explanation: currentQuiz.explanation,
-                                        isCorrect: isAnswerCorrect
-                                    )
-                                    quizResults.append(result)
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                                        self.showAttackImage = false
-                                        moveToNextQuiz()
+                                        hasAnswered = true
                                     }
                                 }) {
                                     Text(currentQuiz.choices[index])
@@ -404,7 +426,9 @@ struct QuizView: View {
                     print("Failed to initialize audio player: \(error)")
                 }
             }
-             playerCountDownSound()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                playerCountDownSound()
+            }
         }
         .onChange(of: selectedAnswerIndex) { newValue in
             if let selected = newValue, selected != currentQuiz.correctAnswerIndex {
@@ -420,9 +444,10 @@ struct QuizView: View {
                 authManager.addExperience(points: 80)
                 authManager.addMoney(amount: 50)
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                 showModal = false
                 navigateToQuizResultView = true
+                print("navigateToQuizResultView:\(navigateToQuizResultView)")
             }
         }
         .onChange(of: monsterType) { newMonsterType in
@@ -431,15 +456,15 @@ struct QuizView: View {
                 monsterBackground = "beginnerBackground"
                 switch newMonsterType {
                 case 1:
-                    monsterHP = 30
+                    monsterHP = 20
                     monsterUnderHP = 30
                     monsterAttack = 20
                 case 2:
-                    monsterHP = 40
+                    monsterHP = 20
                     monsterUnderHP = 40
                     monsterAttack = 25
                 case 3:
-                    monsterHP = 50
+                    monsterHP = 20
                     monsterUnderHP = 50
                     monsterAttack = 30
                 default:

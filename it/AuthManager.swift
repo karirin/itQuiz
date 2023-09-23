@@ -62,7 +62,6 @@ class AuthManager: ObservableObject {
     
     func fetchUserInfo(completion: @escaping (String?, String?, Int?, Int?, Int?) -> Void) {
         guard let userId = user?.uid else {
-            print("test1")
             completion(nil, nil, 0, 0, 0)
             return
         }
@@ -260,6 +259,13 @@ class AuthManager: ObservableObject {
                 titlesData.append(title.name)
             }
             userRef.setValue(titlesData)
+        }
+    }
+    
+    func checkIfUserIdExists(userId: String, completion: @escaping (Bool) -> Void) {
+        let userRef = Database.database().reference().child("users").child(userId)
+        userRef.observeSingleEvent(of: .value) { (snapshot) in
+            completion(snapshot.exists())
         }
     }
 }

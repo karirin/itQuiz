@@ -28,9 +28,9 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
                 VStack {
-                    Toggle(isOn: $soundSettings.isSoundOn) {
-                        Text("音声: \(soundSettings.isSoundOn ? "オン" : "オフ")")
-                    }
+//                    Toggle(isOn: $soundSettings.isSoundOn) {
+//                        Text("音声: \(soundSettings.isSoundOn ? "オン" : "オフ")")
+//                    }
                     
                     HStack{
                         Image(systemName: "person.circle")
@@ -121,6 +121,7 @@ struct ContentView: View {
                                         }
                                         .frame(maxWidth: .infinity)
                         .background(isButtonEnabled ? .white : Color("lightGray"))
+                        .disabled(!isButtonEnabled)
                                 .foregroundColor(.gray)
                                 .cornerRadius(20)
                     .padding(.horizontal)
@@ -196,14 +197,33 @@ struct ContentView: View {
                                         playSound()
                                     }
                         
-                        NavigationLink("", destination: GachaView(), isActive: $isPresentingQuizBeginnerList)
+                        NavigationLink("", destination: QuizBeginnerList().navigationBarBackButtonHidden(true), isActive: $isPresentingQuizBeginnerList)
                         NavigationLink("", destination: QuizManagerView(), isActive: $isPresentingQuizList)
+                        NavigationLink("", destination: GachaView(), isActive: $isPresentingGachaView)
                     }
                 }
                         .background(Color("backgroudGray"))
                
             } .frame(maxWidth: .infinity,maxHeight: .infinity)
         .onAppear {
+            // 1. lastClickedDateを取得
+            authManager.fetchLastClickedDate(userId: authManager.currentUserId ?? "") { lastDate in
+                if let lastDate = lastDate {
+                    // 2. 現在の日時との差を計算
+                    let currentDate = Date()
+                    let timeInterval = currentDate.timeIntervalSince(lastDate)
+                    
+                    // 3. 24時間以上経過しているか確認
+                    if timeInterval >= 86400 {  // 86400秒 = 24時間
+                        isButtonEnabled = true
+                    } else {
+                        isButtonEnabled = false
+                    }
+                } else {
+                    isButtonEnabled = true
+                }
+            }
+                
             authManager.fetchUserInfo { (name, icon, money, hp, attack) in
                 self.userName = name ?? ""
                 self.userIcon = icon ?? ""
@@ -227,9 +247,9 @@ struct ContentView: View {
                 }
             }
         }
-        .onReceive(soundSettings.$isSoundOn) { newValue in
-            adjustVolume()
-        }
+//        .onReceive(soundSettings.$isSoundOn) { newValue in
+//            adjustVolume()
+//        }
             .background(Color("purple2").opacity(0.6))  // ここで背景色を設定
             .edgesIgnoringSafeArea(.all)  // 画面の端まで背景色を伸ばす
             }
