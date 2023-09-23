@@ -284,7 +284,7 @@ struct QuizIntermediateList: View {
                correctAnswerIndex: 1,
                explanation: "HTTPSは、暗号技術を使用してデータの改ざんや盗聴を防ぐプロトコルです。"
            ),
-           QuizQuestion(
+           QuizQuestion( //長い
                question: "オブジェクト指向プログラミングにおける「カプセル化」とは何か？",
                choices: [
                    "複数のオブジェクトを一つにまとめること",
