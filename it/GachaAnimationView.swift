@@ -37,8 +37,8 @@ struct GachaAnimationView: View {
     @Binding var showAnimation: Bool
   
     private func createPlayer() -> AVPlayer {
-        let asset = NSDataAsset(name: "test")
-        let videoUrl = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("test.mp4")
+        let asset = NSDataAsset(name: "gacha1")
+        let videoUrl = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("gacha1.mp4")
         try? asset?.data.write(to: videoUrl, options: [.atomic])
         let playerItem = AVPlayerItem(url: videoUrl)
         return AVPlayer(playerItem: playerItem)

@@ -21,7 +21,7 @@ struct ContentView: View {
     @State private var isPresentingQuizList: Bool = false
     @State private var isIntermediateQuizActive: Bool = false
     @State private var isPresentingGachaView: Bool = false
-    @State private var audioPlayer: AVAudioPlayer?
+//    @State private var audioPlayer: AVAudioPlayer?
     @State private var audioPlayerKettei: AVAudioPlayer?
     @ObservedObject var audioManager = AudioManager.shared
     
@@ -31,6 +31,10 @@ struct ContentView: View {
                     HStack{
                         Image(systemName: "person.circle")
                         Text("\(userName)")
+                        
+                        Button("音声オン/オフ") {
+                                        audioManager.toggleSound()
+                                    }
                         
                         Spacer()
                         Image("コイン")
@@ -90,8 +94,6 @@ struct ContentView: View {
                             }.padding()
                         }
                         
-                    NavigationLink("", destination: QuizBeginnerList().navigationBarBackButtonHidden(true), isActive: $isPresentingQuizBeginnerList)
-                        
                         Button(action: {
                                             if isButtonEnabled {
                                                 if let userId = authManager.currentUserId {
@@ -136,7 +138,7 @@ struct ContentView: View {
                             }
                         
                         Button(action: {
-                                            audioPlayer?.play()
+                            audioManager.playSound()
                                             // 画面遷移のトリガーをオンにする
                                             self.isPresentingQuizList = true
                                         }) {
@@ -160,13 +162,13 @@ struct ContentView: View {
                         
                         .shadow(radius: 3)
                         .onTapGesture {
-                                        playSound()
+//                            audioManager.playSound()
                                     }
                         
                         
                         
                         Button(action: {
-                                            audioPlayer?.play()
+//                                            audioPlayer?.play()
                                             // 画面遷移のトリガーをオンにする
                                             self.isPresentingGachaView = true
                                         }) {
@@ -190,7 +192,7 @@ struct ContentView: View {
                         
                         .shadow(radius: 3)
                         .onTapGesture {
-                                        playSound()
+                            audioManager.playSound()
                                     }
                         
                         NavigationLink("", destination: QuizBeginnerList().navigationBarBackButtonHidden(true), isActive: $isPresentingQuizBeginnerList)
@@ -228,13 +230,13 @@ struct ContentView: View {
                 self.userAttack = attack ?? 20
             }
             authManager.fetchUserExperienceAndLevel()
-            if let soundURL = Bundle.main.url(forResource: "sound", withExtension: "mp3") {
-                do {
-                    audioPlayer = try AVAudioPlayer(contentsOf: soundURL)
-                } catch {
-                    print("Failed to initialize audio player: \(error)")
-                }
-            }
+//            if let soundURL = Bundle.main.url(forResource: "sound", withExtension: "mp3") {
+//                do {
+//                    audioPlayer = try AVAudioPlayer(contentsOf: soundURL)
+//                } catch {
+//                    print("Failed to initialize audio player: \(error)")
+//                }
+//            }
             if let soundURL = Bundle.main.url(forResource: "soundKettei", withExtension: "mp3") {
                 do {
                     audioPlayerKettei = try AVAudioPlayer(contentsOf: soundURL)
@@ -249,9 +251,9 @@ struct ContentView: View {
             .background(Color("purple2").opacity(0.6))  // ここで背景色を設定
             .edgesIgnoringSafeArea(.all)  // 画面の端まで背景色を伸ばす
             }
-    func playSound() {
-        audioPlayer?.play()
-    }
+//    func playSound() {
+//        audioPlayer?.play()
+//    }
     func playSoundKettei() {
         audioPlayerKettei?.play()
     }

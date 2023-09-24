@@ -73,6 +73,8 @@ struct QuizView: View {
     @State private var userHp: Int = 100
     @State private var userAttack: Int = 30
     @State private var monsterType: Int = 0
+    @State private var playerExperience: Int = 0
+    @State private var playerMoney: Int = 0
     @State private var shakeEffect = false
     @State private var audioPlayerCorrect: AVAudioPlayer?
     @State private var audioPlayerUnCorrect: AVAudioPlayer?
@@ -439,9 +441,15 @@ struct QuizView: View {
             }
         }
         .onChange(of: showCompletionMessage) { newValue in
-            if newValue && correctAnswerCount >= 0 {
-                authManager.addExperience(points: 80)
-                authManager.addMoney(amount: 50)
+            // 味方のHPが０以下のとき
+            print(playerHP)
+            if newValue && playerHP <= 0 {
+                print("testtest")
+                authManager.addExperience(points: 5)
+                authManager.addMoney(amount: 5)
+            }else{
+                authManager.addExperience(points: playerExperience)
+                authManager.addMoney(amount: playerMoney)
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                 showModal = false
@@ -453,6 +461,8 @@ struct QuizView: View {
             switch quizLevel {
             case .beginner:
                 monsterBackground = "beginnerBackground"
+                playerExperience = 20
+                playerMoney = 10
                 switch newMonsterType {
                 case 1:
                     monsterHP = 20
@@ -471,6 +481,8 @@ struct QuizView: View {
                 }
             case .intermediate:
                 monsterBackground = "intermediateBackground"
+                playerExperience = 30
+                playerMoney = 20
                 switch newMonsterType {
                 case 1:
                     monsterHP = 50
@@ -489,6 +501,8 @@ struct QuizView: View {
                 }
             case .advanced:
                 monsterBackground = "advancedBackground"
+                playerExperience = 40
+                playerMoney = 30
                 switch newMonsterType {
                 case 1:
                     monsterHP = 80

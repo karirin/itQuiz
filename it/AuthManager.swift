@@ -139,7 +139,7 @@ class AuthManager: ObservableObject {
             // 現在の所持金を取得
             userRef.observeSingleEvent(of: .value) { (snapshot) in
                 if let data = snapshot.value as? [String: Any] {
-                    let currentMoney = data["money"] as? Int ?? 0
+                    let currentMoney = data["userMoney"] as? Int ?? 0
                     
                     // 新しく獲得するお金を加える
                     let newMoney = currentMoney + amount
@@ -147,7 +147,7 @@ class AuthManager: ObservableObject {
                     self.money = newMoney
                     
                     // 更新された所持金をデータベースに保存
-                    let userData: [String: Any] = ["money": self.money]
+                    let userData: [String: Any] = ["userMoney": self.money]
                     userRef.updateChildValues(userData)
                 }
             }

@@ -17,13 +17,20 @@ class GachaManager {
         case normal = 60
         case rare = 30
         case superRare = 10
+        case ultraRare = 20
     }
 
     let items: [Item] = [
-        Item(name: "ノーマルアイテム1", rarity: .normal),
-        Item(name: "ノーマルアイテム2", rarity: .normal),
-        Item(name: "レアアイテム1", rarity: .rare),
-        Item(name: "超レアアイテム1", rarity: .superRare)
+        Item(name: "もりこう", rarity: .normal),
+        Item(name: "ルイーカ", rarity: .normal),
+        Item(name: "うっさん", rarity: .normal),
+        Item(name: "キリキリン", rarity: .normal),
+        Item(name: "カゲロウ", rarity: .rare),
+        Item(name: "ライム", rarity: .rare),
+        Item(name: "ラオン", rarity: .rare),
+        Item(name: "レッドドラゴン", rarity: .superRare),
+        Item(name: "ブルードラゴン", rarity: .superRare),
+        Item(name: "レインボードラゴン", rarity: .ultraRare)
     ]
 
     func drawGacha() -> Item {
@@ -52,6 +59,9 @@ struct GachaView: View {
            VStack(spacing: 20) {
                // ガチャの結果を表示
                if animationFinished, let item = obtainedItem {
+                   Image("\(item.name)")
+                       .resizable()
+                       .frame(width: 150,height:150)
                    Text("ゲットしたアイテム: \(item.name)")
                        .foregroundColor(colorForRarity(item.rarity))
                }
@@ -60,6 +70,9 @@ struct GachaView: View {
                Button(action: {
                    self.showAnimation = true
                    self.obtainedItem = self.gachaManager.drawGacha()
+                   DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                       animationFinished = true
+                   }
                }) {
                    Text("ガチャを引く")
                        .padding()
@@ -86,6 +99,8 @@ struct GachaView: View {
         case .rare:
             return .green
         case .superRare:
+            return .purple
+        case .ultraRare:
             return .purple
         }
     }

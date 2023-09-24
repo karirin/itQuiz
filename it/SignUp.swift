@@ -89,7 +89,7 @@ struct ImagePickerView: View {
     @State private var selectedIcon: String = "user1"
     @State private var showingIconPicker = false
     let defaultImage = UIImage(named: "defaultProfileImage")
-    let icons = ["user1", "user2", "user3"]
+    let icons = ["ネッキー", "ルイーカ", "ピョン吉"]
     @Environment(\.presentationMode) var presentationMode
     @State private var navigateToContentView: Bool = false
 
