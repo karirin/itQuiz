@@ -35,10 +35,27 @@ struct AVPlayerViewControllerRepresentable: UIViewControllerRepresentable {
 struct GachaAnimationView: View {
     @State private var player: AVPlayer?
     @Binding var showAnimation: Bool
-  
+    var rarity: GachaManager.Rarity?
+
     private func createPlayer() -> AVPlayer {
-        let asset = NSDataAsset(name: "gacha1")
-        let videoUrl = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("gacha1.mp4")
+        print(rarity)
+        let videoName: String
+        switch rarity {
+        case .normal:
+            videoName = "normal"
+        case .rare:
+            videoName = "rare"
+        case .superRare:
+            videoName = "superRare"
+        case .ultraRare:
+            videoName = "ultraRare"
+        default:
+            videoName = "normal"
+        }
+
+        let asset = NSDataAsset(name: videoName)
+        print("videoName:\(videoName)")
+        let videoUrl = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("\(videoName).mp4")
         try? asset?.data.write(to: videoUrl, options: [.atomic])
         let playerItem = AVPlayerItem(url: videoUrl)
         return AVPlayer(playerItem: playerItem)
@@ -52,5 +69,9 @@ struct GachaAnimationView: View {
                   showAnimation.toggle()
                 }
             }
+            .onChange(of: rarity) { _ in  // この行を追加
+                            self.player = createPlayer()  // この行を追加
+                
+                        }
     }
 }

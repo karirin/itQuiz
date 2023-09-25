@@ -109,7 +109,12 @@ struct ExperienceModalView: View {
                 withAnimation {
                     currentExperience += Double(addedExperience)
                 }
-                authManager.fetchUserExperienceAndLevel()
+                DispatchQueue.global(qos: .background).async {
+                    authManager.fetchUserExperienceAndLevel()
+                    DispatchQueue.main.async {
+                        // ここでUIの更新を行います。
+                    }
+                }
             }
             .padding()
 //            .frame(width: 300, height: 200) // このサイズを調整して好みの大きさにします

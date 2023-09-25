@@ -57,6 +57,7 @@ struct QuizView: View {
     @State private var timer: Timer? = nil
     @State private var navigateToQuizResultView = false
     @ObservedObject var authManager = AuthManager.shared
+    @ObservedObject var audioManager = AudioManager.shared
     @State private var showModal = false
     @State private var quizResults: [QuizResult] = []
     @State private var correctAnswerCount = 0
@@ -137,9 +138,9 @@ struct QuizView: View {
         audioPlayerCorrect?.play()
     }
     
-    func playerUnCorrectSound() {
-        audioPlayerUnCorrect?.play()
-    }
+//    func playerUnCorrectSound() {
+//        audioPlayerUnCorrect?.play()
+//    }
     
     func playAttackSound() {
         audioPlayerAttack?.play()
@@ -290,7 +291,7 @@ struct QuizView: View {
                                         
                                         let isAnswerCorrect = (selectedAnswerIndex == currentQuiz.correctAnswerIndex)
                                         if isAnswerCorrect {
-                                            playCorrectSound()
+                                            audioManager.playCorrectSound()
                                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                                                 playAttackSound()
                                                 self.showAttackImage = true
@@ -316,7 +317,7 @@ struct QuizView: View {
                                                 }
                                             }
                                         } else {
-                                            playerUnCorrectSound()
+                                            audioManager.playCorrectSound()
                                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                                                 playMonsterAttackSound()
                                                 playerHP -= monsterAttack
@@ -445,12 +446,24 @@ struct QuizView: View {
             print(playerHP)
             if newValue && playerHP <= 0 {
                 print("testtest")
-                authManager.addExperience(points: 5)
-                authManager.addMoney(amount: 5)
-            }else{
-                authManager.addExperience(points: playerExperience)
-                authManager.addMoney(amount: playerMoney)
+                DispatchQueue.global(qos: .background).async {
+                    authManager.addExperience(points: 5)
+                    authManager.addMoney(amount: 5)
+                    DispatchQueue.main.async {
+                        // ここでUIの更新を行います。
+                    }
+                }
+            } else {
+                DispatchQueue.global(qos: .background).async {
+                    authManager.addExperience(points: playerExperience)
+                    authManager.addMoney(amount: playerMoney)
+                    DispatchQueue.main.async {
+                        // ここでUIの更新を行います。
+                    }
+                }
             }
+
+
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                 showModal = false
                 navigateToQuizResultView = true

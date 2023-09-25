@@ -22,6 +22,7 @@ struct QuizManagerView: View {
     @State private var isPresentingQuizSecurity: Bool = false
     @State private var isPresentingQuizDatabase: Bool = false
     @State private var isSoundOn: Bool = true
+    @ObservedObject var audioManager = AudioManager.shared
     
     init() {
         _lastClickedDate = State(initialValue: Date())
@@ -30,7 +31,7 @@ struct QuizManagerView: View {
     var body: some View {
         VStack {
             Button(action: {
-                                audioPlayerKettei?.play()
+                audioManager.playKetteiSound()
                                 // 画面遷移のトリガーをオンにする
                                 self.isPresentingQuizBeginner = true
                             }) {
@@ -58,11 +59,11 @@ struct QuizManagerView: View {
             
             .shadow(radius: 3)
             .onTapGesture {
-                            playSound()
+//                            playSound()
                         }
             
             Button(action: {
-                  audioPlayerKettei?.play()
+                  audioManager.playKetteiSound()
                   self.isPresentingQuizIntermediate = true
               }) {
                   HStack {
@@ -89,7 +90,7 @@ struct QuizManagerView: View {
             
             
             Button(action: {
-                    audioPlayerKettei?.play()
+                    audioManager.playKetteiSound()
                     self.isPresentingQuizAdvanced = true
                 }) {
                     createButtonLabel(text: "IT基礎知識の問題（上級）", imageName: "advancedBackground")
@@ -100,7 +101,7 @@ struct QuizManagerView: View {
 
                 // ネットワーク系の問題
                 Button(action: {
-                    audioPlayerKettei?.play()
+                    audioManager.playKetteiSound()
                     self.isPresentingQuizNetwork = true
                 }) {
                     createButtonLabel(text: "ネットワーク系の問題", imageName: "networkBackground") // 画像名を適切に変更してください
@@ -111,7 +112,7 @@ struct QuizManagerView: View {
 
                 // セキュリティ系の問題
                 Button(action: {
-                    audioPlayerKettei?.play()
+                    audioManager.playKetteiSound()
                     self.isPresentingQuizSecurity = true
                 }) {
                     createButtonLabel(text: "セキュリティ系の問題", imageName: "securityBackground") // 画像名を適切に変更してください
@@ -122,7 +123,7 @@ struct QuizManagerView: View {
 
                 // データベース系の問題
                 Button(action: {
-                    audioPlayerKettei?.play()
+                    audioManager.playKetteiSound()
                     self.isPresentingQuizDatabase = true
                 }) {
                     createButtonLabel(text: "データベース系の問題", imageName: "databaseBackground") // 画像名を適切に変更してください
@@ -159,11 +160,12 @@ struct QuizManagerView: View {
                     print("Failed to initialize audio player: \(error)")
                 }
             }
+            if audioManager.isMuted {
+                audioPlayerKettei?.volume = 0
+            } else {
+                audioPlayerKettei?.volume = 1.0
+            }
         }
-    }
-    
-    func playSound() {
-        audioPlayerKettei?.play()
     }
     
     func createButtonLabel(text: String, imageName: String) -> some View {

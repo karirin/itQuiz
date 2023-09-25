@@ -10,43 +10,50 @@ import SwiftUI
 class GachaManager {
     struct Item {
         let name: String
+        let probability: Int
         let rarity: Rarity
     }
 
     enum Rarity: Int {
-        case normal = 60
+        case normal = 40
         case rare = 30
-        case superRare = 10
-        case ultraRare = 20
+        case superRare = 20
+        case ultraRare = 10
     }
 
-    let items: [Item] = [
-        Item(name: "もりこう", rarity: .normal),
-        Item(name: "ルイーカ", rarity: .normal),
-        Item(name: "うっさん", rarity: .normal),
-        Item(name: "キリキリン", rarity: .normal),
-        Item(name: "カゲロウ", rarity: .rare),
-        Item(name: "ライム", rarity: .rare),
-        Item(name: "ラオン", rarity: .rare),
-        Item(name: "レッドドラゴン", rarity: .superRare),
-        Item(name: "ブルードラゴン", rarity: .superRare),
-        Item(name: "レインボードラゴン", rarity: .ultraRare)
+    var items: [Item] = [
+        Item(name: "もりこう", probability: 25, rarity: .normal),
+        Item(name: "ルイーカ", probability: 25, rarity: .normal),
+        Item(name: "うっさん", probability: 25, rarity: .normal),
+        Item(name: "キリキリン", probability: 25, rarity: .normal),
+        Item(name: "カゲロウ", probability: 10, rarity: .rare),
+        Item(name: "ライム", probability: 10, rarity: .rare),
+        Item(name: "ラオン", probability: 10, rarity: .rare),
+        Item(name: "レッドドラゴン", probability: 5, rarity: .superRare),
+        Item(name: "ブルードラゴン", probability: 5, rarity: .superRare),
+        Item(name: "レインボードラゴン", probability: 3, rarity: .ultraRare)
     ]
 
-    func drawGacha() -> Item {
-        let randomNumber = Int.random(in: 0..<100)
-        var accumulatedProbability = 0
+    // itemsリストをシャッフルする関数
+      func shuffleItems() {
+          items.shuffle()
+      }
 
-        for item in items {
-            accumulatedProbability += item.rarity.rawValue
-            if randomNumber < accumulatedProbability {
-                return item
-            }
-        }
+      func drawGacha() -> Item {
+          let totalProbability = items.map { $0.probability }.reduce(0, +)
+          let randomNumber = Int.random(in: 0..<totalProbability)
+          var accumulatedProbability = 0
+          
+          for item in items {
+              accumulatedProbability += item.probability
+              if randomNumber < accumulatedProbability {
+                  return item
+              }
+          }
 
-        return items[0] // デフォルトのアイテムを返す
-    }
-}
+          return items[0] // 念のためのデフォルトのアイテムを返す
+      }
+  }
 
 
 struct GachaView: View {
@@ -54,42 +61,114 @@ struct GachaView: View {
     private let gachaManager = GachaManager()
     @State private var animationFinished: Bool = false
     @State private var showAnimation: Bool = false
+    @State private var showResult: Bool = true  // 新しい状態変数
 
     var body: some View {
-           VStack(spacing: 20) {
-               // ガチャの結果を表示
-               if animationFinished, let item = obtainedItem {
-                   Image("\(item.name)")
-                       .resizable()
-                       .frame(width: 150,height:150)
-                   Text("ゲットしたアイテム: \(item.name)")
-                       .foregroundColor(colorForRarity(item.rarity))
-               }
-
-               // ガチャを引くボタン
-               Button(action: {
-                   self.showAnimation = true
-                   self.obtainedItem = self.gachaManager.drawGacha()
-                   DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
-                       animationFinished = true
-                   }
-               }) {
-                   Text("ガチャを引く")
-                       .padding()
-                       .background(Color.blue)
-                       .foregroundColor(.white)
-                       .cornerRadius(8)
-               }
-           }
-           .padding()
+        VStack{
+            Spacer()
+            // ガチャの結果を表示
+//            if showResult, let item = obtainedItem {  // showResultを使用して制御
+            VStack{
+                    ZStack{
+                    Image("ガチャ結果名")
+                        .resizable()
+                        .frame(width: 300,height:100)
+                    Text("もりこう")
+                        .fontWeight(.bold)
+                        .font(.system(size: 20))
+                        .padding(.top,40)
+                }
+                    ZStack{
+                        Image("ガチャ背景")
+                            .resizable()
+                            .frame(maxWidth: .infinity,maxHeight:200)
+                            .padding(.bottom)
+                        //                    Image("\(item.name)")
+                        Image("もりこう")
+                            .resizable()
+                            .frame(width: 150,height:150)
+                    }
+                HStack{
+                    Image("ハート")
+                        .resizable()
+                        .frame(width: 30,height:30)
+                    Text("体力：20")
+                        .font(.system(size: 24))
+                    
+                    Image("ソード")
+                        .resizable()
+                        .frame(width: 40,height:30)
+                    Text("攻撃力：20")
+                        .font(.system(size: 24))
+                }
+            }
+//                Text("ゲットしたアイテム: \(item.name)")
+//                    .foregroundColor(colorForRarity(item.rarity))
+            Spacer()
+                Button(action: {
+                    self.gachaManager.shuffleItems()  // itemsリストをシャッフル
+                    self.obtainedItem = self.gachaManager.drawGacha()  // 先にobtainedItemを更新
+                    self.showAnimation = true
+                    self.showResult = false
+                    
+                    // 1秒の遅延を追加
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                        self.showResult = true  // 結果を表示
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                            animationFinished = true
+                        }
+                    }
+                }) {
+                    Image("もう一度ガチャる")
+                        .resizable()
+                        .frame(width:230,height:100)
+                }
+            Spacer()
+            Spacer()
+//            }else{
+//
+//                Image("ガチャ")
+//                    .resizable()
+//                    .frame(maxWidth:330,maxHeight:250)
+//
+//                // ガチャを引くボタン
+//                Button(action: {
+//                    self.gachaManager.shuffleItems()  // itemsリストをシャッフル
+//                    self.obtainedItem = self.gachaManager.drawGacha()  // 先にobtainedItemを更新
+//                    self.showAnimation = true
+//                    self.showResult = false
+//
+//                    // 1秒の遅延を追加
+//                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+//                        self.showResult = true  // 結果を表示
+//                        DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+//                            animationFinished = true
+//                        }
+//                    }
+//                }) {
+//                    Image("ガチャる")
+//                        .resizable()
+//                        .frame(width:260,height:130)
+//                    //                    .padding()
+//                    //                    .background(Color.blue)
+//                    //                    .foregroundColor(.white)
+//                    //                    .cornerRadius(8)
+//                }
+//                Image("卵レア度")
+//                    .resizable()
+//                    .frame(maxWidth:250,maxHeight:180)
+//            }
+        }
+        .frame(maxWidth: .infinity,maxHeight: .infinity)
            .onChange(of: animationFinished) { finished in  // この行を追加
                if finished {
                    self.showAnimation = false
                }
            }
            .fullScreenCover(isPresented: $showAnimation) {
-               GachaAnimationView(showAnimation: $showAnimation)  // この行を変更
+               GachaAnimationView(showAnimation: $showAnimation, rarity: obtainedItem?.rarity)  // この行を変更
            }
+        
        }
 
     func colorForRarity(_ rarity: GachaManager.Rarity) -> Color {

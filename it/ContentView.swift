@@ -33,7 +33,8 @@ struct ContentView: View {
                         Text("\(userName)")
                         
                         Button("音声オン/オフ") {
-                                        audioManager.toggleSound()
+                            audioManager.toggleSound()
+                            audioManager.isMuted.toggle()
                                     }
                         
                         Spacer()
