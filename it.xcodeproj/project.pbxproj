@@ -16,6 +16,8 @@
 		260E44232AB5963A00FBB487 /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260E44222AB5963A00FBB487 /* AuthManager.swift */; };
 		260E44252AB59A7900FBB487 /* QuizView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260E44242AB59A7900FBB487 /* QuizView.swift */; };
 		264199282AC025AD002013B9 /* sound.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 264199272AC025AD002013B9 /* sound.mp3 */; };
+		2641992A2AC1E996002013B9 /* ガチャる.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 264199292AC1E995002013B9 /* ガチャる.mp3 */; };
+		2641992C2AC2572F002013B9 /* AvatarListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2641992B2AC2572F002013B9 /* AvatarListView.swift */; };
 		268C3B9B2ABCA63300282BEE /* QuizAdvancedList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 268C3B9A2ABCA63200282BEE /* QuizAdvancedList.swift */; };
 		268C3B9D2ABCA95D00282BEE /* QuizNetworkList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 268C3B9C2ABCA95D00282BEE /* QuizNetworkList.swift */; };
 		268C3BA52ABD638200282BEE /* SettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 268C3BA22ABD638100282BEE /* SettingView.swift */; };
@@ -53,6 +55,8 @@
 		260E44222AB5963A00FBB487 /* AuthManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthManager.swift; sourceTree = "<group>"; };
 		260E44242AB59A7900FBB487 /* QuizView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizView.swift; sourceTree = "<group>"; };
 		264199272AC025AD002013B9 /* sound.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = sound.mp3; path = "../../../Downloads/名称未設定フォルダ/sound.mp3"; sourceTree = "<group>"; };
+		264199292AC1E995002013B9 /* ガチャる.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "ガチャる.mp3"; path = "../../../Downloads/ガチャる.mp3"; sourceTree = "<group>"; };
+		2641992B2AC2572F002013B9 /* AvatarListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarListView.swift; sourceTree = "<group>"; };
 		268C3B9A2ABCA63200282BEE /* QuizAdvancedList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizAdvancedList.swift; sourceTree = "<group>"; };
 		268C3B9C2ABCA95D00282BEE /* QuizNetworkList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizNetworkList.swift; sourceTree = "<group>"; };
 		268C3BA22ABD638100282BEE /* SettingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SettingView.swift; path = ../../sabusuku/sabusuku/SettingView.swift; sourceTree = "<group>"; };
@@ -129,6 +133,7 @@
 				268C3B9C2ABCA95D00282BEE /* QuizNetworkList.swift */,
 				260E44222AB5963A00FBB487 /* AuthManager.swift */,
 				26A25D4F2AB9FB1A006B368F /* TitleListView.swift */,
+				2641992B2AC2572F002013B9 /* AvatarListView.swift */,
 				269A87892AB86FC900F33C9E /* GachaView.swift */,
 				268C3BA42ABD638200282BEE /* PrivacyView.swift */,
 				268C3BA22ABD638100282BEE /* SettingView.swift */,
@@ -138,6 +143,7 @@
 				26A026EB2ABF16E600119F2B /* AudioManager.swift */,
 				264199272AC025AD002013B9 /* sound.mp3 */,
 				268C3BAA2ABDA3AC00282BEE /* soundKettei.mp3 */,
+				264199292AC1E995002013B9 /* ガチャる.mp3 */,
 				26A026E32ABDE67800119F2B /* 味方攻撃.mp3 */,
 				26A026E72ABE03FE00119F2B /* 敵攻撃.mp3 */,
 				26A026DF2ABDE27C00119F2B /* 正解.mp3 */,
@@ -242,6 +248,7 @@
 				260E441A2AB572DE00FBB487 /* Preview Assets.xcassets in Resources */,
 				264199282AC025AD002013B9 /* sound.mp3 in Resources */,
 				268C3BAB2ABDA3AC00282BEE /* soundKettei.mp3 in Resources */,
+				2641992A2AC1E996002013B9 /* ガチャる.mp3 in Resources */,
 				26A026E62ABE014200119F2B /* 不正解.mp3 in Resources */,
 				26A026E02ABDE27D00119F2B /* 正解.mp3 in Resources */,
 				260E44172AB572DE00FBB487 /* Assets.xcassets in Resources */,
@@ -301,6 +308,7 @@
 				26B5BEF42AB6CFA600056E79 /* RootView.swift in Sources */,
 				260000022AB5EEC900342CAE /* QuizBeginnerList.swift in Sources */,
 				269A87882AB7757C00F33C9E /* QuizResultView.swift in Sources */,
+				2641992C2AC2572F002013B9 /* AvatarListView.swift in Sources */,
 				269D44E22AB60D6800CAA91A /* SignUp.swift in Sources */,
 				268C3B9B2ABCA63300282BEE /* QuizAdvancedList.swift in Sources */,
 				269A878A2AB86FC900F33C9E /* GachaView.swift in Sources */,

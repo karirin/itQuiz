@@ -360,13 +360,14 @@ struct QuizNetworkList: View {
     ]
 
     @State private var shuffledQuizList: [QuizQuestion]
+    private var authManager = AuthManager()
 
     init() {
         _shuffledQuizList = State(initialValue: QuizNetworkList.shuffled())
     }
 
     var body: some View {
-        QuizView(quizzes: shuffledQuizList, quizLevel: .network)
+        QuizView(quizzes: shuffledQuizList, quizLevel: .network, authManager: authManager)
     }
 }
 

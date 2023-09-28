@@ -56,7 +56,7 @@ struct QuizView: View {
     @State private var remainingSeconds = 30
     @State private var timer: Timer? = nil
     @State private var navigateToQuizResultView = false
-    @ObservedObject var authManager = AuthManager.shared
+    @ObservedObject var authManager : AuthManager
     @ObservedObject var audioManager = AudioManager.shared
     @State private var showModal = false
     @State private var quizResults: [QuizResult] = []
@@ -68,7 +68,7 @@ struct QuizView: View {
     @State private var monsterUnderHP: Int = 30
     @State private var monsterAttack: Int = 30
     @State private var userName: String = ""
-    @State private var userIcon: String = ""
+    @State private var avator: [[String: Any]] = []
     @State private var monsterBackground: String = ""
     @State private var userMoney: Int = 0
     @State private var userHp: Int = 100
@@ -108,17 +108,21 @@ struct QuizView: View {
     
     // タイマーの処理
     func startTimer() {
-        self.timer?.invalidate() // 現在のタイマーを止める
-        self.remainingSeconds = 3000
-        self.timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
-            if self.remainingSeconds > 0 {
-                self.remainingSeconds -= 1
-            } else {
-                timer.invalidate()
-                playerHP -= monsterAttack
-                moveToNextQuiz()
+        // 現在のタイマーを止める
+        self.timer?.invalidate()
+
+        // 3秒後に以下のコードブロックを実行
+            self.remainingSeconds = 30
+            self.timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
+                if self.remainingSeconds > 0 {
+                    self.remainingSeconds -= 1
+                } else {
+                    timer.invalidate()
+                    // ここでplayerHPとmonsterAttackは既に定義されている必要があります
+                    playerHP -= monsterAttack
+                    self.moveToNextQuiz()
+                }
             }
-        }
     }
     
     // 次の問題へ移る処理
@@ -261,7 +265,7 @@ struct QuizView: View {
                         ZStack{
                             // 味方キャラのHP
                             HStack{
-                                Image(userIcon.isEmpty ? "defaultIcon" : userIcon)
+                                Image(avator.isEmpty ? "defaultIcon" : (avator.first?["name"] as? String) ?? "")
                                     .resizable()
                                     .frame(width: 30,height:30)
                                 ProgressBar3(value: Double(playerHP), maxValue: 1000.0, color: Color("hpUserColor"))
@@ -363,7 +367,7 @@ struct QuizView: View {
                 }
                 .frame(maxWidth: .infinity,maxHeight:.infinity)
                 .padding(.bottom)
-                .background(showIncorrectBackground ? Color("superLightRed") : Color("backgroudGray"))
+                .background(showIncorrectBackground ? Color("superLightRed") : Color("Color2"))
                 .sheet(isPresented: $showModal) {
                     ExperienceModalView(showModal: $showModal, addedExperience: 10)
                 }
@@ -383,12 +387,14 @@ struct QuizView: View {
             }
         }
         .onAppear {
-            startTimer() // Viewが表示されたときにタイマーを開始
             startCountdown()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                startTimer() // Viewが表示されたときにタイマーを開始
+            }
             self.monsterType = 1 // すぐに1に戻す
-            authManager.fetchUserInfo { (name, icon, money, hp, attack) in
+            authManager.fetchUserInfo { (name, avator, money, hp, attack) in
                 self.userName = name ?? ""
-                self.userIcon = icon ?? ""
+                self.avator = avator ?? [[String: Any]]()
                 self.userMoney = money ?? 0
                 self.userHp = hp ?? 100
                 self.userAttack = attack ?? 20
@@ -445,7 +451,6 @@ struct QuizView: View {
             // 味方のHPが０以下のとき
             print(playerHP)
             if newValue && playerHP <= 0 {
-                print("testtest")
                 DispatchQueue.global(qos: .background).async {
                     authManager.addExperience(points: 5)
                     authManager.addMoney(amount: 5)

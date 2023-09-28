@@ -240,13 +240,14 @@ struct QuizAdvancedList: View {
     ]
 
     @State private var shuffledQuizList: [QuizQuestion]
+    private var authManager = AuthManager()
 
     init() {
         _shuffledQuizList = State(initialValue: QuizAdvancedList.shuffled())
     }
 
     var body: some View {
-        QuizView(quizzes: shuffledQuizList, quizLevel: .advanced)
+        QuizView(quizzes: shuffledQuizList, quizLevel: .advanced, authManager: authManager)
     }
 }
 

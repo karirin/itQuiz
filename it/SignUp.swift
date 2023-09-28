@@ -82,7 +82,7 @@ struct SignUp: View {
 
 struct ImagePickerView: View {
     @Binding var userName: String
-    @State private var userIcon: UIImage?
+    @State private var avator: UIImage?
     @State private var isImagePickerDisplay = false
     @ObservedObject private var authManager = AuthManager.shared
     @State private var showProfileCreation: Bool = false // 追加
@@ -128,10 +128,12 @@ struct ImagePickerView: View {
                 }
                 
                 Button("ユーザーを作成") {
-                        let selectedIconName = selectedIcon
-                        authManager.saveUserToDatabase(userName: userName, userIcon: selectedIconName)
-                        self.navigateToContentView = true // ユーザーをデータベースに保存した後、ContentViewへの遷移をトリガー
-                    }
+                    let selectedAvatar = Avatar(name: selectedIcon, attack: 20, health: 20 ,usedFlag: 1)
+                    authManager.saveUserToDatabase(userName: userName)
+                    authManager.addAvatarToUser(avatar: selectedAvatar)
+                    self.navigateToContentView = true
+                }
+
                     .padding(.vertical,10)
                     .padding(.horizontal,25)
                     .font(.headline)

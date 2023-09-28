@@ -23,6 +23,7 @@ struct QuizManagerView: View {
     @State private var isPresentingQuizDatabase: Bool = false
     @State private var isSoundOn: Bool = true
     @ObservedObject var audioManager = AudioManager.shared
+    @Environment(\.presentationMode) var presentationMode
     
     init() {
         _lastClickedDate = State(initialValue: Date())
@@ -30,70 +31,58 @@ struct QuizManagerView: View {
 
     var body: some View {
         VStack {
-            Button(action: {
-                audioManager.playKetteiSound()
-                                // 画面遷移のトリガーをオンにする
-                                self.isPresentingQuizBeginner = true
-                            }) {
-                                HStack{
-                                    Text("IT基礎知識の問題（初級）")
-                                        .font(.system(size:24))
-                                        
-                                }
-                                .padding(.horizontal,5)
-                                .padding(.vertical)
-                                
-                            }
-                            .frame(maxWidth: .infinity)
-                            .background(
-                                Image("beginnerBackground")
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fill)
-                                    .opacity(1)
-                                )
-                    .foregroundColor(.white)
-                    .fontWeight(.bold)
-                    .cornerRadius(10)
-        .padding(.horizontal)
-                    .padding(.bottom)
-            
-            .shadow(radius: 3)
-            .onTapGesture {
-//                            playSound()
-                        }
-            
+            Group{
+                Button(action: {
+                    audioManager.playKetteiSound()
+                    // 画面遷移のトリガーをオンにする
+                    self.isPresentingQuizBeginner = true
+                }) {
+                    Image("IT基礎知識の問題の初級")
+                        .resizable()
+                        .frame(height: 80)
+                }
+                .frame(maxWidth: .infinity)
+                //                            .background(
+                //                                Image("beginnerBackground")
+                //                                    .resizable()
+                //                                    .aspectRatio(contentMode: .fill)
+                //                                    .opacity(1)
+                //                                )
+                //                    .foregroundColor(.white)
+                //                    .fontWeight(.bold)
+                //                    .cornerRadius(10)
+                .padding(.horizontal)
+                                    .padding(.bottom)
+                //
+                .shadow(radius: 3)
+                //            .onTapGesture {
+                ////                            playSound()
+                //                        }
+                
+            }
             Button(action: {
                   audioManager.playKetteiSound()
                   self.isPresentingQuizIntermediate = true
               }) {
-                  HStack {
-                      Text("IT基礎知識の問題（中級）")
-                          .font(.system(size: 24))
-                          .fontWeight(.bold)
-                          .foregroundColor(.white)
-                  }
-                  .padding(.horizontal, 5)
-                  .padding(.vertical)
-                  .frame(maxWidth: .infinity)
-                  .background(
-                      Image("intermediateBackground")
-                          .resizable()
-                          .aspectRatio(contentMode: .fill)
-                          .opacity(0.8)
-                  )
-                  .background(authManager.level >= 5 ? Color.white : Color("lightGray"))
-                  .cornerRadius(10)
-                  .shadow(radius: 1)
-                  .disabled(authManager.level >= 5)
+                  Image("IT基礎知識の問題の中級")
+                      .resizable()
+                      .frame(height: 80)
               }
               .padding(.horizontal)
+              .background(authManager.level >= 5 ? Color.white : Color("lightGray"))
+              .cornerRadius(10)
+              .shadow(radius: 1)
+              .disabled(authManager.level >= 5)
+              .padding(.bottom)
             
             
             Button(action: {
                     audioManager.playKetteiSound()
                     self.isPresentingQuizAdvanced = true
                 }) {
-                    createButtonLabel(text: "IT基礎知識の問題（上級）", imageName: "advancedBackground")
+                    Image("IT基礎知識の問題の上級")
+                        .resizable()
+                        .frame(height: 80)
                 }
                 .disabled(authManager.level >= 10)
                 .padding(.horizontal)
@@ -137,7 +126,8 @@ struct QuizManagerView: View {
             }
             
         }
-        .frame(maxWidth:.infinity)
+        .frame(maxWidth:.infinity,maxHeight: .infinity)
+        .background(Color("Color2"))
         .onAppear {
             if let userId = authManager.currentUserId {
                 authManager.fetchLastClickedDate(userId: userId) { date in
@@ -166,6 +156,15 @@ struct QuizManagerView: View {
                 audioPlayerKettei?.volume = 1.0
             }
         }
+        .navigationBarBackButtonHidden(true)
+        .navigationBarItems(leading: Button(action: {
+            self.presentationMode.wrappedValue.dismiss()
+        }) {
+            Image(systemName: "chevron.left")
+                .foregroundColor(.gray)
+            Text("戻る")
+                .foregroundColor(.gray)
+        })
     }
     
     func createButtonLabel(text: String, imageName: String) -> some View {

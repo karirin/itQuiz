@@ -8,11 +8,24 @@
 import SwiftUI
 import Firebase
 
+struct Avatar {
+    var name: String
+    var attack: Int
+    var health: Int
+    var usedFlag: Int
+}
+
+struct User {
+    var userName: String
+    var avatars: [Avatar]
+}
+
 class AuthManager: ObservableObject {
-    @Published var user: User?
+    @Published var user: FirebaseAuth.User?
     @Published var experience: Int = 0
     @Published var level: Int = 1
     @Published var money: Int = 0
+    @Published var avatars: [Avatar] = []
     @State private var earnedTitles: [Title] = []
     
     init() {
@@ -21,35 +34,66 @@ class AuthManager: ObservableObject {
             anonymousSignIn()
         }
     }
-
+    
     static let shared: AuthManager = {
         let instance = AuthManager()
         return instance
     }()
-
+    
     var onLoginCompleted: (() -> Void)?
     var currentUserId: String? {
         print("user?.uid:\(user?.uid)")
         return user?.uid
     }
-
-       func anonymousSignIn() {
-           Auth.auth().signInAnonymously { result, error in
-               if let error = error {
-                   print("Error: \(error.localizedDescription)")
-               } else if let result = result {
-                   print("Signed in anonymously with user ID: \(result.user.uid)")
-                   self.user = result.user
-                   self.onLoginCompleted?()
-               }
-           }
-       }
     
-    func saveUserToDatabase(userName: String, userIcon: String) {
+    func addAvatarToUser(avatar: Avatar) {
+        guard let userId = user?.uid else { return }
+        
+        // ユーザーのアバターデータの参照を作成
+        let avatarRef = Database.database().reference()
+            .child("users")
+            .child(userId)
+            .child("avatars")
+            .childByAutoId()  // このメソッドは、一意のIDを持つ新しい子ノードを作成します。
+        
+        // アバターデータを保存するための辞書を作成
+        let avatarData: [String: Any] = [
+            "name": avatar.name,
+            "attack": avatar.attack,
+            "health": avatar.health,
+            "usedFlag": avatar.usedFlag
+        ]
+        
+        // アバターデータをデータベースに保存
+        avatarRef.setValue(avatarData) { (error, ref) in
+            if let error = error {
+                print("Failed to save avatar to database:", error.localizedDescription)
+                return
+            }
+            
+            // ローカルのアバター配列にも追加
+            self.avatars.append(avatar)
+        }
+    }
+    
+    
+    func anonymousSignIn() {
+        Auth.auth().signInAnonymously { result, error in
+            if let error = error {
+                print("Error: \(error.localizedDescription)")
+            } else if let result = result {
+                print("Signed in anonymously with user ID: \(result.user.uid)")
+                self.user = result.user
+                self.onLoginCompleted?()
+            }
+        }
+    }
+    
+    func saveUserToDatabase(userName: String) {
         guard let userId = user?.uid else { return }
         
         let userRef = Database.database().reference().child("users").child(userId)
-        let userData: [String: Any] = ["userName": userName, "userIcon": userIcon, "avatar": userIcon,"userMoney": 0, "userHp": 100, "userAttack": 20]
+        let userData: [String: Any] = ["userName": userName, "userMoney": 0, "userHp": 100, "userAttack": 20]
         
         userRef.setValue(userData) { (error, ref) in
             if let error = error {
@@ -60,24 +104,56 @@ class AuthManager: ObservableObject {
         }
     }
     
-    func fetchUserInfo(completion: @escaping (String?, String?, Int?, Int?, Int?) -> Void) {
+    func fetchUserInfo(completion: @escaping (String?, [[String: Any]]?, Int?, Int?, Int?) -> Void) {
         guard let userId = user?.uid else {
-            completion(nil, nil, 0, 0, 0)
+            completion(nil, nil, nil, nil, nil)
             return
         }
-        
         let userRef = Database.database().reference().child("users").child(userId)
         userRef.observeSingleEvent(of: .value) { (snapshot) in
+            print(snapshot)
             if let data = snapshot.value as? [String: Any],
                let userName = data["userName"] as? String,
-               let userIcon = data["userIcon"] as? String,
+               let avatarsData = data["avatars"] as? [String:[String: Any]], // Adjust this line
                let userMoney = data["userMoney"] as? Int,
                let userHp = data["userHp"] as? Int,
-               let userAttack = data["userAttack"] as? Int{
-                completion(userName, userIcon, userMoney, userHp, userAttack)
+               let userAttack = data["userAttack"] as? Int {
+                print("test1")
+                // usedFlagが1のアバターのみをフィルタリング
+                var filteredAvatars: [[String: Any]] = []
+                for (_, avatarData) in avatarsData {
+                    if avatarData["usedFlag"] as? Int == 1 {
+                        filteredAvatars.append(avatarData)
+                    }
+                }
+                
+                completion(userName, filteredAvatars, userMoney, userHp, userAttack)
             } else {
                 completion(nil, nil, nil, nil, nil)
             }
+        }
+    }
+    
+    func fetchAvatars() {
+        guard let userId = user?.uid else { return }
+        let userRef = Database.database().reference().child("users").child(userId).child("avatars")
+        userRef.observeSingleEvent(of: .value) { (snapshot: DataSnapshot, error: String?) in
+            var newAvatars: [Avatar] = []
+            for child in snapshot.children {
+                if let childSnapshot = child as? DataSnapshot,
+                   let avatarData = childSnapshot.value as? [String: Any],
+                   let name = avatarData["name"] as? String,
+                   let attack = avatarData["attack"] as? Int,
+                   let health = avatarData["health"] as? Int,
+                   let usedFlag = avatarData["usedFlag"] as? Int {
+                    let avatar = Avatar(name: name, attack: attack, health: health, usedFlag: usedFlag)
+                    newAvatars.append(avatar)
+                }
+            }
+            self.avatars = newAvatars
+            print("ssss")
+            print(self.avatars)
+            print("ssss")
         }
     }
     
@@ -268,6 +344,48 @@ class AuthManager: ObservableObject {
             completion(snapshot.exists())
         }
     }
+    
+    func decreaseUserMoney(by amount: Int = 300, completion: @escaping (Bool) -> Void) {
+        guard let userId = user?.uid else { return }
+        
+        let userRef = Database.database().reference().child("users").child(userId)
+        
+        // 現在のuserMoneyを取得
+        userRef.observeSingleEvent(of: .value) { (snapshot) in
+            if let data = snapshot.value as? [String: Any] {
+                var currentMoney = data["userMoney"] as? Int ?? 0
+                
+                // userMoneyからamountを引く
+                currentMoney -= amount
+                
+                // 新しいuserMoneyの値をデータベースに保存
+                let userData: [String: Any] = ["userMoney": currentMoney]
+                userRef.updateChildValues(userData) { (error, ref) in
+                    if let error = error {
+                        print("Failed to update userMoney:", error.localizedDescription)
+                        completion(false)
+                    } else {
+                        print("Successfully updated userMoney.")
+                        completion(true)
+                    }
+                }
+            }
+        }
+    }
+    
+    func getUserMoney(completion: @escaping (Int) -> Void) {
+        guard let userId = user?.uid else { return }
+        
+        let userRef = Database.database().reference().child("users").child(userId)
+        
+        userRef.observeSingleEvent(of: .value) { (snapshot) in
+            if let data = snapshot.value as? [String: Any] {
+                let currentMoney = data["userMoney"] as? Int ?? 0
+                completion(currentMoney)
+            }
+        }
+    }
+
 }
 
 struct AuthManager1: View {
