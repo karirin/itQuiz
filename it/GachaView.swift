@@ -66,7 +66,7 @@ struct GachaView: View {
     private let gachaManager = GachaManager()
     @State private var animationFinished: Bool = false
     @State private var showAnimation: Bool = false
-    @State private var showResult: Bool = false
+    @State private var showResult: Bool = true
     @Environment(\.presentationMode) var presentationMode
     @ObservedObject var authManager = AuthManager.shared
     @State private var isGachaButtonDisabled: Bool = false
@@ -83,47 +83,40 @@ struct GachaView: View {
                 Text(" \(userMoney)")
             }
             .padding(.trailing)
-            Spacer()
             // ガチャの結果を表示
-//            if showResult, let item = obtainedItem {  // showResultを使用して制御
-            if(showResult){
+            if showResult, let item = obtainedItem {  // showResultを使用して制御
+//            if(showResult){
             VStack{
-                    ZStack{
-                    Image("ガチャ結果名")
+                ZStack{
+                    Image("ガチャ背景5")
                         .resizable()
-                        .frame(width: 300,height:100)
-                    Text("もりこう")
+                    
+                        .frame(maxWidth: .infinity,maxHeight:280)
+                    Text("\(item.name)")
                         .fontWeight(.bold)
                         .font(.system(size: 20))
-                        .padding(.top,40)
+                        .padding(.bottom,190)
+                            Image("\(item.name)")
+                                .resizable()
+                                .frame(width: 150,height:150)
+                                .padding(.top,70)
                 }
-                    ZStack{
-                        Image("ガチャ背景2")
-                            .resizable()
-                            .frame(maxWidth: .infinity,maxHeight:200)
-//                            .padding(.bottom)
-                        //                    Image("\(item.name)")
-                        Image("もりこう")
-                            .resizable()
-                            .frame(width: 150,height:150)
-                    }
+                
                 HStack{
                     Image("ハート")
                         .resizable()
                         .frame(width: 30,height:30)
-                    Text("体力：20")
+                    Text("体力：\(item.health)")
                         .font(.system(size: 24))
                     
                     Image("ソード")
                         .resizable()
                         .frame(width: 40,height:30)
-                    Text("攻撃力：20")
+                    Text("攻撃力：\(item.attack)")
                         .font(.system(size: 24))
                 }
             }
-//                Text("ゲットしたアイテム: \(item.name)")
-//                    .foregroundColor(colorForRarity(item.rarity))
-            Spacer()
+                Spacer()
                 Button(action: {
                     self.gachaManager.shuffleItems()  // itemsリストをシャッフル
                     self.obtainedItem = self.gachaManager.drawGacha()  // 先にobtainedItemを更新
@@ -162,8 +155,7 @@ struct GachaView: View {
                         .frame(maxWidth:150,maxHeight:50)
                     Spacer()
                 }
-            Spacer()
-            Spacer()
+                Spacer()
             }else{
                 Image("ガチャ")
                     .resizable()
@@ -215,8 +207,8 @@ Spacer()
                     Image("卵レア度")
                         .resizable()
                         .frame(maxWidth:350 , maxHeight:120)
-                    Spacer()
             }
+            Spacer()
         }
         .onAppear {
             authManager.getUserMoney { userMoney in

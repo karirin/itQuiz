@@ -241,7 +241,127 @@ struct QuizBeginnerList: View {
             ],
             correctAnswerIndex: 0,
             explanation: "データの重複を避けるために、データを複数のテーブルに分割することを「正規化」といいます。"
-        )
+        ),
+            QuizQuestion(
+                question: "クラウドコンピューティングの3つの主なサービスモデルの1つでないものは？",
+                choices: ["IaaS", "PaaS", "CaaS", "SaaS"],
+                correctAnswerIndex: 2,
+                explanation: "クラウドコンピューティングの3つの主なサービスモデルはIaaS、PaaS、およびSaaSです。CaaSは含まれません。"
+            ),
+            QuizQuestion(
+                question: "システム開発のライフサイクルモデルの一つで、反復的に製品を改善していくモデルは何か？",
+                choices: ["ウォーターフォールモデル", "スパイラルモデル", "Vモデル", "アジャイルモデル"],
+                correctAnswerIndex: 1,
+                explanation: "スパイラルモデルは、反復的に製品を改善していく開発モデルです。"
+            ),
+            QuizQuestion(
+                question: "プロジェクト管理で使用される、タスクの進捗を視覚的に表すツールは？",
+                choices: ["Gantt Chart", "PERT Chart", "Flow Chart", "Network Diagram"],
+                correctAnswerIndex: 0,
+                explanation: "Gantt Chartは、タスクの進捗を視覚的に表すツールの一つです。"
+            ),
+            QuizQuestion(
+                question: "情報セキュリティのCIAトライアドの「I」は何を指すか？",
+                choices: ["Integrity", "Information", "Infrastructure", "Internet"],
+                correctAnswerIndex: 0,
+                explanation: "CIAトライアドの「I」はIntegrity（完全性）を指します。"
+            ),
+            QuizQuestion(
+                question: "ソフトウェアのバージョン管理システムの一つは？",
+                choices: ["Git", "Bit", "Kit", "Sit"],
+                correctAnswerIndex: 0,
+                explanation: "Gitは、ソフトウェアのバージョン管理システムの一つです。"
+            ),
+            QuizQuestion(
+                question: "インターネットの通信プロトコルは？",
+                choices: ["HTTP", "FTP", "TCP/IP", "All of the above"],
+                correctAnswerIndex: 3,
+                explanation: "HTTP, FTP, TCP/IP など、すべてがインターネットの通信プロトコルです。"
+            ),
+            QuizQuestion(
+                question: "オペレーティングシステムの一つは？",
+                choices: ["Windows", "Doors", "Gates", "Walls"],
+                correctAnswerIndex: 0,
+                explanation: "Windowsは一般的なオペレーティングシステムの一つです。"
+            ),
+            QuizQuestion(
+                question: "インターネットでの安全な通信を確保するプロトコルは？",
+                choices: ["HTTP", "HTTPS", "HTTPT", "HTTPX"],
+                correctAnswerIndex: 1,
+                explanation: "HTTPSは、安全な通信を確保するためのプロトコルです。"
+            ),
+            QuizQuestion(
+                question: "データベース管理システム(DBMS)の一つは？",
+                choices: ["MySQL", "MySquare", "MyCircle", "MyTriangle"],
+                correctAnswerIndex: 0,
+                explanation: "MySQLは、リレーショナルデータベース管理システムの一つです。"
+            ),
+            QuizQuestion(
+                question: "オブジェクト指向プログラミングの4つの主な特性の一つでないものは？",
+                choices: ["継承", "カプセル化", "多態性", "分割"],
+                correctAnswerIndex: 3,
+                explanation: "オブジェクト指向プログラミングの主な特性には、継承、カプセル化、および多態性が含まれますが、分割は含まれません。"
+            ),
+            QuizQuestion(
+                question: "プログラミング言語の一つは？",
+                choices: ["Python", "Cobra", "Viper", "Mamba"],
+                correctAnswerIndex: 0,
+                explanation: "Pythonは、広く使用されているプログラミング言語の一つです。"
+            ),
+            QuizQuestion(
+                question: "ソフトウェアテストの種類の一つは？",
+                choices: ["ユニットテスト", "グループテスト", "ブロックテスト", "セグメントテスト"],
+                correctAnswerIndex: 0,
+                explanation: "ユニットテストは、ソフトウェアの個々の部分をテストするプロセスです。"
+            ),
+            QuizQuestion(
+                question: "ソフトウェア開発手法の一つは？",
+                choices: ["Scrum", "Jog", "Run", "Walk"],
+                correctAnswerIndex: 0,
+                explanation: "Scrumは、アジャイル開発の一形態で、イテラティブかつインクリメンタルな開発手法です。"
+            ),
+            QuizQuestion(
+                question: "ウェブ開発で使用されるマークアップ言語は？",
+                choices: ["HTML", "HTXL", "HTMLL", "HTMML"],
+                correctAnswerIndex: 0,
+                explanation: "HTMLは、ウェブページを作成するための標準的なマークアップ言語です。"
+            ),
+            QuizQuestion(
+                question: "インターネットのドメイン名の一部として使用されるものは？",
+                choices: [".com", ".net", ".org", "All of the above"],
+                correctAnswerIndex: 3,
+                explanation: ".com, .net, .org は、インターネットのドメイン名の一部として使用されるトップレベルドメインです。"
+            ),
+            QuizQuestion(
+                question: "ネットワークのトポロジの一つは？",
+                choices: ["スター", "ツリー", "メッシュ", "All of the above"],
+                correctAnswerIndex: 3,
+                explanation: "スター、ツリー、メッシュは、ネットワークのトポロジの種類です。"
+            ),
+            QuizQuestion(
+                question: "ソフトウェアライセンスの一つは？",
+                choices: ["GPL", "APL", "BPL", "CPL"],
+                correctAnswerIndex: 0,
+                explanation: "GPLは、ソフトウェアを自由に使用、修正、および配布することを許可するライセンスです。"
+            ),
+            QuizQuestion(
+                question: "ウェブブラウザの一つは？",
+                choices: ["Chrome", "Silver", "Gold", "Bronze"],
+                correctAnswerIndex: 0,
+                explanation: "Chromeは、Googleによって開発されたウェブブラウザです。"
+            ),
+            QuizQuestion(
+                question: "ウェブ開発で使用されるスクリプト言語の一つは？",
+                choices: ["JavaScript", "JavaNote", "JavaBook", "JavaPage"],
+                correctAnswerIndex: 0,
+                explanation: "JavaScriptは、ウェブページに対してインタラクティブな機能を追加するために使用されるプログラミング言語です。"
+            ),
+            QuizQuestion(
+                question: "コンピュータネットワークの標準プロトコルの集合は何と呼ばれるか？",
+                choices: ["Internet Protocol Suite", "Internet Protocol Set", "Internet Protocol Group", "Internet Protocol Bunch"],
+                correctAnswerIndex: 0,
+                explanation: "Internet Protocol Suiteは、インターネットプロトコルの集合を指します。"
+            )
     ]
 
     @State private var shuffledQuizList: [QuizQuestion]

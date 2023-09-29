@@ -63,7 +63,7 @@ struct ContentView: View {
                             HStack{
                                 Image("スター")
                                     .resizable()
-                                    .frame(width: 30,height:20)
+                                    .frame(width: 25,height:20)
                                 Text("Lv：\(authManager.level)")
                                 
                                 Image("ハート")
@@ -73,7 +73,7 @@ struct ContentView: View {
                                 
                                 Image("ソード")
                                     .resizable()
-                                    .frame(width: 30,height:20)
+                                    .frame(width: 25,height:20)
                                 Text("攻撃力：\(userAttack)")
                             }
                             //                            HStack{
@@ -95,128 +95,130 @@ struct ContentView: View {
                                 Text("\(authManager.experience) / \(authManager.level * 100)")
                             }.padding()
                         }
-                        Button(action: {
-                            if isButtonEnabled {
-                                if let userId = authManager.currentUserId {
-                                    authManager.saveLastClickedDate(userId: userId) { success in
-                                        lastClickedDate = Date()
-                                        isButtonEnabled = false
-                                    }
-                                }
-                            }
-                            audioPlayerKettei?.play()
-                            // 画面遷移のトリガーをオンにする
-                            self.isPresentingQuizBeginnerList = true
-                        }) {
-                            HStack{
-                                Image("daily")
-                                    .resizable()
-                                    .frame(width: 40,height:40)
-                                    .foregroundColor(.gray)
-                                Text("デイリーチャレンジ")
-                                    .font(.system(size:24))
-                            }
-                            .padding(.vertical)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .background(isButtonEnabled ? .white : Color("lightGray"))
-                        .disabled(!isButtonEnabled)
-                        .foregroundColor(.gray)
-                        .cornerRadius(20)
-                        .padding(.horizontal)
-                        .padding(.bottom)
-                        
-                        .shadow(radius: 3)
-                        .onTapGesture {
-                            if isButtonEnabled {
-                                if let userId = authManager.currentUserId {
-                                    authManager.saveLastClickedDate(userId: userId) { success in
-                                        lastClickedDate = Date()
-                                        isButtonEnabled = false
-                                    }
-                                }
-                            }
-                        }
-                        HStack{
+                        VStack{
                             Button(action: {
-                                audioManager.playSound()
+                                if isButtonEnabled {
+                                    if let userId = authManager.currentUserId {
+                                        authManager.saveLastClickedDate(userId: userId) { success in
+                                            lastClickedDate = Date()
+                                            isButtonEnabled = false
+                                        }
+                                    }
+                                }
+                                audioPlayerKettei?.play()
                                 // 画面遷移のトリガーをオンにする
-                                self.isPresentingQuizList = true
+                                self.isPresentingQuizBeginnerList = true
                             }) {
                                 HStack{
-                                    Image("quiz")
+                                    Image("daily")
                                         .resizable()
-                                        .frame(width: 35,height:35)
+                                        .frame(width: 40,height:40)
                                         .foregroundColor(.gray)
-                                    Text("問題を解く")
+                                    Text("デイリーチャレンジ")
                                         .font(.system(size:24))
                                 }
-                                .padding(.horizontal)
                                 .padding(.vertical)
                             }
-                            .background(.white)
+                            .frame(maxWidth: .infinity)
+                            .background(isButtonEnabled ? .white : Color("lightGray"))
+                            .disabled(!isButtonEnabled)
                             .foregroundColor(.gray)
                             .cornerRadius(20)
-                            .padding(.trailing,5)
+                            .padding(.horizontal)
                             .padding(.bottom)
                             
                             .shadow(radius: 3)
                             .onTapGesture {
-                                //                            audioManager.playSound()
+                                if isButtonEnabled {
+                                    if let userId = authManager.currentUserId {
+                                        authManager.saveLastClickedDate(userId: userId) { success in
+                                            lastClickedDate = Date()
+                                            isButtonEnabled = false
+                                        }
+                                    }
+                                }
+                            }
+                            HStack{
+                                Button(action: {
+                                    audioManager.playSound()
+                                    // 画面遷移のトリガーをオンにする
+                                    self.isPresentingQuizList = true
+                                }) {
+                                    HStack{
+                                        Image("quiz")
+                                            .resizable()
+                                            .frame(width: 35,height:35)
+                                            .foregroundColor(.gray)
+                                        Text("問題を解く")
+                                            .font(.system(size:24))
+                                    }
+                                    .padding(.horizontal)
+                                    .padding(.vertical)
+                                }
+                                .background(.white)
+                                .foregroundColor(.gray)
+                                .cornerRadius(20)
+                                .padding(.trailing,5)
+                                .padding(.bottom)
+                                
+                                .shadow(radius: 3)
+                                .onTapGesture {
+                                    //                            audioManager.playSound()
+                                }
+                                
+                                Button(action: {
+                                    audioManager.playSound()
+                                    // 画面遷移のトリガーをオンにする
+                                    self.isPresentingAvatarList = true
+                                }) {
+                                    HStack{
+                                        Image("ボタンライム")
+                                            .resizable()
+                                            .frame(width: 35,height:35)
+                                        Text("おとも")
+                                            .font(.system(size:24))
+                                    }
+                                    .padding(.horizontal)
+                                    .padding(.vertical)
+                                }
+                                .background(.white)
+                                .foregroundColor(.gray)
+                                .cornerRadius(20)
+                                .padding(.leading,5)
+                                .padding(.bottom)
+                                
+                                .shadow(radius: 3)
                             }
                             
                             Button(action: {
-                                audioManager.playSound()
+                                //                                            audioPlayer?.play()
                                 // 画面遷移のトリガーをオンにする
-                                self.isPresentingAvatarList = true
+                                self.isPresentingGachaView = true
                             }) {
                                 HStack{
-                                    Image("ボタンライム")
+                                    Image("gacha")
                                         .resizable()
-                                        .frame(width: 35,height:35)
-                                    Text("おとも")
+                                        .frame(width: 40,height:40)
+                                        .foregroundColor(.gray)
+                                    Text("ガチャをする")
                                         .font(.system(size:24))
                                 }
-                                .padding(.horizontal)
+                                .padding(.horizontal,5)
                                 .padding(.vertical)
                             }
+                            .frame(maxWidth: .infinity)
                             .background(.white)
                             .foregroundColor(.gray)
                             .cornerRadius(20)
-                            .padding(.leading,5)
+                            .padding(.horizontal)
                             .padding(.bottom)
                             
                             .shadow(radius: 3)
-                        }
-                        
-                        Button(action: {
-                            //                                            audioPlayer?.play()
-                            // 画面遷移のトリガーをオンにする
-                            self.isPresentingGachaView = true
-                        }) {
-                            HStack{
-                                Image("gacha")
-                                    .resizable()
-                                    .frame(width: 40,height:40)
-                                    .foregroundColor(.gray)
-                                Text("ガチャをする")
-                                    .font(.system(size:24))
+                            .onTapGesture {
+                                audioManager.playSound()
                             }
-                            .padding(.horizontal,5)
-                            .padding(.vertical)
                         }
-                        .frame(maxWidth: .infinity)
-                        .background(.white)
-                        .foregroundColor(.gray)
-                        .cornerRadius(20)
-                        .padding(.horizontal)
-                        .padding(.bottom)
-                        
-                        .shadow(radius: 3)
-                        .onTapGesture {
-                            audioManager.playSound()
-                        }
-                        
+                        .padding(.horizontal,5)
                         NavigationLink("", destination: QuizBeginnerList().navigationBarBackButtonHidden(true), isActive: $isPresentingQuizBeginnerList)
                         NavigationLink("", destination: QuizManagerView(), isActive: $isPresentingQuizList)
                         NavigationLink("", destination: AvatarListView(), isActive: $isPresentingAvatarList)

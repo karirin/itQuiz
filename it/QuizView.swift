@@ -26,43 +26,22 @@ struct TimerArc: Shape {
     }
 }
 
-struct ProgressBar3: View {
-    var value: Double
-    var maxValue: Double
-    var color: Color
-    
-    var body: some View {
-        GeometryReader { geometry in
-            ZStack(alignment: .leading) {
-                Rectangle()
-                    .opacity(0.3)
-                    .foregroundColor(color)
-                Rectangle()
-                    .frame(width: geometry.size.width * CGFloat(value / maxValue))
-                    .foregroundColor(color)
-            }
-        }
-        .cornerRadius(8.0)
-    }
-}
-
-
 struct QuizView: View {
     let quizzes: [QuizQuestion]
     let quizLevel: QuizLevel
     @State private var selectedAnswerIndex: Int? = nil
-    @State private var currentQuizIndex = 0
-    @State private var showCompletionMessage = false
-    @State private var remainingSeconds = 30
+    @State private var currentQuizIndex: Int = 0
+    @State private var showCompletionMessage: Bool = false
+    @State private var remainingSeconds: Int = 30
     @State private var timer: Timer? = nil
-    @State private var navigateToQuizResultView = false
+    @State private var navigateToQuizResultView: Bool = false
     @ObservedObject var authManager : AuthManager
     @ObservedObject var audioManager = AudioManager.shared
-    @State private var showModal = false
+    @State private var showModal: Bool = false
     @State private var quizResults: [QuizResult] = []
-    @State private var correctAnswerCount = 0
-    @State private var countdownValue = 3
-    @State private var showCountdown = true
+    @State private var correctAnswerCount: Int = 0
+    @State private var countdownValue: Int = 3
+    @State private var showCountdown: Bool = true
     @State private var playerHP: Int = 1000
     @State private var monsterHP: Int = 3000
     @State private var monsterUnderHP: Int = 30
@@ -76,15 +55,15 @@ struct QuizView: View {
     @State private var monsterType: Int = 0
     @State private var playerExperience: Int = 0
     @State private var playerMoney: Int = 0
-    @State private var shakeEffect = false
+    @State private var shakeEffect: Bool = false
     @State private var audioPlayerCorrect: AVAudioPlayer?
     @State private var audioPlayerUnCorrect: AVAudioPlayer?
     @State private var audioPlayerAttack: AVAudioPlayer?
     @State private var audioPlayerMonsterAttack: AVAudioPlayer?
     @State private var audioPlayerCountDown: AVAudioPlayer?
-    @State private var showAttackImage = false
-    @State private var showMonsterDownImage = false
-    @State private var showIncorrectBackground = false
+    @State private var showAttackImage: Bool = false
+    @State private var showMonsterDownImage: Bool = false
+    @State private var showIncorrectBackground: Bool = false
     @State private var hasAnswered: Bool = false
 
     

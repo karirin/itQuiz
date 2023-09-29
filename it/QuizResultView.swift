@@ -21,28 +21,37 @@ struct QuizResultView: View {
     @State private var showMemoView = false
     @State private var currentMemo = ""
     @State private var selectedQuestion = ""
-    private var authManager = AuthManager()
+    @ObservedObject var authManager: AuthManager
     
-    // 公開イニシャライザ
-//    public init(results: [QuizResult]) {
-//        self.results = results
-//    }
-
     var body: some View {
         NavigationView{
             ZStack {
                 VStack{
-                    NavigationLink(destination: ContentView().navigationBarBackButtonHidden(true)) {
-                        Text("トップに戻る")
-                            .padding()
-                            .background(Color.white)
-                            .foregroundColor(.gray)
-                            .cornerRadius(10)
-                            .shadow(radius: 1)
+                    HStack{
+                        NavigationLink(destination: ContentView().navigationBarBackButtonHidden(true)) {
+                            Image(systemName: "chevron.left")
+                                .foregroundColor(.gray)
+                            Text("戻る")
+                                .background(Color.white)
+                                .foregroundColor(.gray)
+                        }
+                        .padding(.leading)
+                        Spacer()
+                        Text("クイズ結果")
+                        Spacer()
+                        HStack{
+                            Image(systemName: "chevron.left")
+                                .foregroundColor(.gray)
+                            Text("戻る")
+                                .background(Color.white)
+                                .foregroundColor(.gray)
+                        }
+                        .padding(.trailing)
+                        .opacity(0)
                     }
                     ScrollView{
                         ForEach(results, id: \.question) { result in
-                            VStack(alignment: .leading) {
+                            VStack(alignment: .leading,spacing: 20) {
                                 HStack{
                                     Image(systemName:result.isCorrect ? "circle" : "xmark")
                                         .foregroundColor(result.isCorrect ? .red : .blue)
@@ -54,9 +63,9 @@ struct QuizResultView: View {
                                 Text("あなたの回答: \(result.userAnswer)")
                                 Text("正解: \(result.correctAnswer)")
                                 Text("解説: \(result.explanation)")
-                            }
+                            }.padding()
                             .frame(maxWidth:.infinity,alignment: .leading)
-                            .padding()
+                            Divider()
                             .onAppear {
                                 showModal = true
                             }
@@ -67,12 +76,13 @@ struct QuizResultView: View {
                 }
                 
                 if showModal {
-                    ExperienceModalView(showModal: $showModal, addedExperience: 10, authManager: authManager)
+                    ExperienceModalView(showModal: $showModal, addedExperience: 10)
                 }
                 if showMemoView {
                     MemoView(memo: $currentMemo, question: selectedQuestion)
                 }
             }
+            .background(Color("Color2"))
         }
     }
 
@@ -83,7 +93,7 @@ struct ExperienceModalView: View {
     var addedExperience: Int
     @State private var currentExperience: Double = 0
     let maxExperience: Double = 100
-    @ObservedObject var authManager:AuthManager
+    @ObservedObject var authManager = AuthManager.shared
 
     var body: some View {
         ZStack {
@@ -154,16 +164,18 @@ struct ProgressBar1: View {
     }
 }
 
-//
-//struct QuizResultView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        // ダミーデータを作成
-//        let dummyResults = [
-//            QuizResult(question: "情報セキュリティの方針やルールを組織全体に明確に伝えるための文章は？", userAnswer: "SLA", correctAnswer: "情報セキュリティポリシー", explanation: "情報セキュリティの３つの基本的な要素として、機密性、完全性に続くものは「可溶性」といいます。", isCorrect: false),
-//            QuizResult(question: "AIを開発するベンチャー企業のA社が，資金調達を目的に，金融商品取引所に初めて上場することになった。このように，企業の未公開の株式を，新たに公開することを表す用語として，最も適切なものはどれか。", userAnswer: "IPO", correctAnswer: "IPO", explanation: "IPO（Initial Public Offering）は、企業が初めて公開市場で株式を発行することを指します。", isCorrect: true)
-//        ]
-//        
-//        // ダミーデータを使用してQuizResultViewを呼び出す
-//        QuizResultView(results: dummyResults)
-//    }
-//}
+
+struct QuizResultView_Previews: PreviewProvider {
+    static private var authManager = AuthManager()
+    
+    static var previews: some View {
+        // ダミーデータを作成
+        let dummyResults = [
+            QuizResult(question: "情報セキュリティの方針やルールを組織全体に明確に伝えるための文章は？", userAnswer: "SLA", correctAnswer: "情報セキュリティポリシー", explanation: "情報セキュリティの３つの基本的な要素として、機密性、完全性に続くものは「可溶性」といいます。", isCorrect: false),
+            QuizResult(question: "AIを開発するベンチャー企業のA社が，資金調達を目的に，金融商品取引所に初めて上場することになった。このように，企業の未公開の株式を，新たに公開することを表す用語として，最も適切なものはどれか。", userAnswer: "IPO", correctAnswer: "IPO", explanation: "IPO（Initial Public Offering）は、企業が初めて公開市場で株式を発行することを指します。", isCorrect: true)
+        ]
+        
+        // ダミーデータを使用してQuizResultViewを呼び出す
+        QuizResultView(results: dummyResults, authManager: authManager)
+    }
+}
