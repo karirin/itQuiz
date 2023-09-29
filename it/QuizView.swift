@@ -265,77 +265,82 @@ struct QuizView: View {
                     }
                     Spacer()
                     VStack{
-                        ForEach(0..<currentQuiz.choices.count, id: \.self) { index in
-                            HStack{
-                                Button(action: {
-                                    if !hasAnswered {
-                                        self.selectedAnswerIndex = index
-                                        self.timer?.invalidate() // 回答を選択したらタイマーを止める
-                                        
-                                        let isAnswerCorrect = (selectedAnswerIndex == currentQuiz.correctAnswerIndex)
-                                        if isAnswerCorrect {
-                                            audioManager.playCorrectSound()
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                                playAttackSound()
-                                                self.showAttackImage = true
-                                                //                                        }
-                                                correctAnswerCount += 1 // 正解の場合、正解数をインクリメント
-                                                //                                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                                                monsterHP -= userAttack
-                                                if monsterHP <= 0 {
-                                                    // モンスターのHPが0以下になった場合の処理
-                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                                                        monsterType += 1  // 次のモンスターに移行
-                                                        monsterHP = 100  // 新しいモンスターのHPをリセット
-                                                        self.showMonsterDownImage = true
-                                                    }
-                                                    if monsterType == 2 {
-                                                        showCompletionMessage = true
-                                                        timer?.invalidate()
-                                                    }
-                                                } else if playerHP <= 0 {
-                                                    // プレイヤーのHPが0以下になった場合の処理
-                                                    showCompletionMessage = true
-                                                    timer?.invalidate()
-                                                }
-                                            }
-                                        } else {
-                                            audioManager.playCorrectSound()
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                                playMonsterAttackSound()
-                                                playerHP -= monsterAttack
-                                                self.showAttackImage = true
-                                            }
-                                        }
-                                        
-                                        let result = QuizResult(
-                                            question: currentQuiz.question,
-                                            userAnswer: currentQuiz.choices[index],
-                                            correctAnswer: currentQuiz.choices[currentQuiz.correctAnswerIndex],
-                                            explanation: currentQuiz.explanation,
-                                            isCorrect: isAnswerCorrect
-                                        )
-                                        quizResults.append(result)
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                                            self.showAttackImage = false
-                                            moveToNextQuiz()
-                                        }
-                                        hasAnswered = true
-                                    }
-                                }) {
-                                    Text(currentQuiz.choices[index])
-                                        .frame(maxWidth: .infinity)
-                                        .padding(.vertical)
-                                        .background(Color.white)
-                                        .foregroundColor(.black)
-                                        .cornerRadius(8)
-                                }
-                                .padding(.horizontal)
-                                .padding(.vertical,2)
+                        VStack {
+                            AnswerSelectionView(choices: currentQuiz.choices) { index in
+                                self.selectedAnswerIndex = index
                             }
-                            .frame(maxWidth: .infinity)
-                            .shadow(radius: 1)
                         }
+//                        ForEach(0..<currentQuiz.choices.count, id: \.self) { index in
+//                            HStack{
+//                                Button(action: {
+//                                    if !hasAnswered {
+//                                        self.selectedAnswerIndex = index
+//                                        self.timer?.invalidate() // 回答を選択したらタイマーを止める
+//
+//                                        let isAnswerCorrect = (selectedAnswerIndex == currentQuiz.correctAnswerIndex)
+//                                        if isAnswerCorrect {
+//                                            audioManager.playCorrectSound()
+//                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+//                                                playAttackSound()
+//                                                self.showAttackImage = true
+//                                                //                                        }
+//                                                correctAnswerCount += 1 // 正解の場合、正解数をインクリメント
+//                                                //                                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+//                                                monsterHP -= userAttack
+//                                                if monsterHP <= 0 {
+//                                                    // モンスターのHPが0以下になった場合の処理
+//                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+//                                                        monsterType += 1  // 次のモンスターに移行
+//                                                        monsterHP = 100  // 新しいモンスターのHPをリセット
+//                                                        self.showMonsterDownImage = true
+//                                                    }
+//                                                    if monsterType == 2 {
+//                                                        showCompletionMessage = true
+//                                                        timer?.invalidate()
+//                                                    }
+//                                                } else if playerHP <= 0 {
+//                                                    // プレイヤーのHPが0以下になった場合の処理
+//                                                    showCompletionMessage = true
+//                                                    timer?.invalidate()
+//                                                }
+//                                            }
+//                                        } else {
+//                                            audioManager.playCorrectSound()
+//                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+//                                                playMonsterAttackSound()
+//                                                playerHP -= monsterAttack
+//                                                self.showAttackImage = true
+//                                            }
+//                                        }
+//
+//                                        let result = QuizResult(
+//                                            question: currentQuiz.question,
+//                                            userAnswer: currentQuiz.choices[index],
+//                                            correctAnswer: currentQuiz.choices[currentQuiz.correctAnswerIndex],
+//                                            explanation: currentQuiz.explanation,
+//                                            isCorrect: isAnswerCorrect
+//                                        )
+//                                        quizResults.append(result)
+//                                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+//                                            self.showAttackImage = false
+//                                            moveToNextQuiz()
+//                                        }
+//                                        hasAnswered = true
+//                                    }
+//                                }) {
+//                                    Text(currentQuiz.choices[index])
+//                                        .frame(maxWidth: .infinity)
+//                                        .padding(.vertical)
+//                                        .background(Color.white)
+//                                        .foregroundColor(.black)
+//                                        .cornerRadius(8)
+//                                }
+//                                .padding(.horizontal)
+//                                .padding(.vertical,2)
+//                            }
+//                            .frame(maxWidth: .infinity)
+//                            .shadow(radius: 1)
+//                        }
                         //                Spacer()
                         
                         if showCompletionMessage {

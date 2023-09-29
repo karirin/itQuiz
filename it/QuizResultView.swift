@@ -21,8 +21,7 @@ struct QuizResultView: View {
     @State private var showMemoView = false
     @State private var currentMemo = ""
     @State private var selectedQuestion = ""
-    @ObservedObject var authManager: AuthManager
-    
+
     var body: some View {
         NavigationView{
             ZStack {
@@ -166,8 +165,6 @@ struct ProgressBar1: View {
 
 
 struct QuizResultView_Previews: PreviewProvider {
-    static private var authManager = AuthManager()
-    
     static var previews: some View {
         // ダミーデータを作成
         let dummyResults = [
@@ -176,6 +173,6 @@ struct QuizResultView_Previews: PreviewProvider {
         ]
         
         // ダミーデータを使用してQuizResultViewを呼び出す
-        QuizResultView(results: dummyResults, authManager: authManager)
+        QuizResultView(results: dummyResults)
     }
 }
