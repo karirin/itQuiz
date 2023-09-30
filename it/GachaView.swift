@@ -50,7 +50,7 @@ class GachaManager {
               accumulatedProbability += item.probability
               if randomNumber < accumulatedProbability {
                   print(item)
-                  let selectedAvatar = Avatar(name: item.name, attack: item.attack, health: item.health , usedFlag: 0)
+                  let selectedAvatar = Avatar(name: item.name, attack: item.attack, health: item.health , usedFlag: 0 ,count: 1)
                   authManager.addAvatarToUser(avatar: selectedAvatar)
                   return item
               }
@@ -71,6 +71,7 @@ struct GachaView: View {
     @ObservedObject var authManager = AuthManager.shared
     @State private var isGachaButtonDisabled: Bool = false
     @State private var userMoney: Int = 0
+    @ObservedObject var audioManager = AudioManager.shared
 
     var body: some View {
         VStack{
@@ -130,12 +131,12 @@ struct GachaView: View {
                         }
                     }
                     // 1秒の遅延を追加
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+//                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                         self.showResult = true  // 結果を表示
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+//                        DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
                             animationFinished = true
-                        }
-                    }
+//                        }
+//                    }
                 }) {
                     if(isGachaButtonDisabled){
                         Image("もう一度ガチャる")
@@ -165,7 +166,7 @@ Spacer()
                 HStack{
                     Button(action: {
                         self.gachaManager.shuffleItems()  // itemsリストをシャッフル
-                        self.obtainedItem = self.gachaManager.drawGacha()  // 先にobtainedItemを更新
+                        self.obtainedItem = self.gachaManager.drawGacha()
                         self.showAnimation = true
                         self.showResult = false
                         authManager.decreaseUserMoney { success in
@@ -176,12 +177,12 @@ Spacer()
                             }
                         }
                         // 1秒の遅延を追加
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+//                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                             self.showResult = true  // 結果を表示
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+//                            DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
                                 animationFinished = true
-                            }
-                        }
+//                            }
+//                        }
                     }) {
                         if(isGachaButtonDisabled){
                             Image("ガチャる")
@@ -227,11 +228,12 @@ Spacer()
         .navigationBarBackButtonHidden(true)
                 .navigationBarItems(leading: Button(action: {
                     self.presentationMode.wrappedValue.dismiss()
+                    audioManager.playCancelSound()
                 }) {
                     Image(systemName: "chevron.left")
-                        .foregroundColor(.gray)
+                        .foregroundColor(Color("fontGray"))
                     Text("戻る")
-                        .foregroundColor(.gray)
+                        .foregroundColor(Color("fontGray"))
                 })
         .background(Color("Color2"))
            .onChange(of: animationFinished) { finished in  // この行を追加
@@ -239,9 +241,9 @@ Spacer()
                    self.showAnimation = false
                }
            }
-           .fullScreenCover(isPresented: $showAnimation) {
-               GachaAnimationView(showAnimation: $showAnimation, rarity: obtainedItem?.rarity)  // この行を変更
-           }
+//           .fullScreenCover(isPresented: $showAnimation) {
+//               GachaAnimationView(showAnimation: $showAnimation, rarity: obtainedItem?.rarity)  // この行を変更
+//           }
         
        }
 

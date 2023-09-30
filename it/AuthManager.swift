@@ -13,6 +13,7 @@ struct Avatar {
     var attack: Int
     var health: Int
     var usedFlag: Int
+    var count: Int 
 }
 
 struct User {
@@ -48,34 +49,56 @@ class AuthManager: ObservableObject {
     
     func addAvatarToUser(avatar: Avatar) {
         guard let userId = user?.uid else { return }
-        
+
         // ユーザーのアバターデータの参照を作成
-        let avatarRef = Database.database().reference()
+        let avatarsRef = Database.database().reference()
             .child("users")
             .child(userId)
             .child("avatars")
-            .childByAutoId()  // このメソッドは、一意のIDを持つ新しい子ノードを作成します。
-        
-        // アバターデータを保存するための辞書を作成
-        let avatarData: [String: Any] = [
-            "name": avatar.name,
-            "attack": avatar.attack,
-            "health": avatar.health,
-            "usedFlag": avatar.usedFlag
-        ]
-        
-        // アバターデータをデータベースに保存
-        avatarRef.setValue(avatarData) { (error, ref) in
+
+        // すべてのアバターを取得
+        avatarsRef.observeSingleEvent(of: .value) { (snapshot, error) in
             if let error = error {
-                print("Failed to save avatar to database:", error.localizedDescription)
+                print("Error fetching avatars: \(error)")
                 return
             }
             
-            // ローカルのアバター配列にも追加
-            self.avatars.append(avatar)
+            var avatarExists = false
+            var existingRef: DatabaseReference?
+
+            // 各アバターをループして、新しいアバターが既存のものと一致するか確認
+            for child in snapshot.children {
+                if let childSnapshot = child as? DataSnapshot,
+                   let avatarData = childSnapshot.value as? [String: Any],
+                   let name = avatarData["name"] as? String,
+                   name == avatar.name {
+                    avatarExists = true
+                    existingRef = childSnapshot.ref
+                    break
+                }
+            }
+
+            if avatarExists, let existingRef = existingRef {
+                existingRef.child("count").runTransactionBlock { currentData in
+                    var count = currentData.value as? Int ?? 0
+                    count += 1
+                    currentData.value = count
+                    return TransactionResult.success(withValue: currentData)
+                }
+            } else {
+                // 新しいアバターをデータベースに追加
+                let avatarRef = avatarsRef.childByAutoId()
+                let avatarData: [String: Any] = [
+                    "name": avatar.name,
+                    "attack": avatar.attack,
+                    "health": avatar.health,
+                    "usedFlag": avatar.usedFlag,
+                    "count": 1  // 初期カウント値を設定
+                ]
+                avatarRef.setValue(avatarData)
+            }
         }
     }
-    
     
     func anonymousSignIn() {
         Auth.auth().signInAnonymously { result, error in
@@ -145,15 +168,13 @@ class AuthManager: ObservableObject {
                    let name = avatarData["name"] as? String,
                    let attack = avatarData["attack"] as? Int,
                    let health = avatarData["health"] as? Int,
-                   let usedFlag = avatarData["usedFlag"] as? Int {
-                    let avatar = Avatar(name: name, attack: attack, health: health, usedFlag: usedFlag)
+                   let usedFlag = avatarData["usedFlag"] as? Int,
+                   let count = avatarData["count"] as? Int {
+                    let avatar = Avatar(name: name, attack: attack, health: health, usedFlag: usedFlag,count: count)
                     newAvatars.append(avatar)
                 }
             }
             self.avatars = newAvatars
-            print("ssss")
-            print(self.avatars)
-            print("ssss")
         }
     }
     

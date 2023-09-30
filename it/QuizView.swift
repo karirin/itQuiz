@@ -56,11 +56,6 @@ struct QuizView: View {
     @State private var playerExperience: Int = 0
     @State private var playerMoney: Int = 0
     @State private var shakeEffect: Bool = false
-    @State private var audioPlayerCorrect: AVAudioPlayer?
-    @State private var audioPlayerUnCorrect: AVAudioPlayer?
-    @State private var audioPlayerAttack: AVAudioPlayer?
-    @State private var audioPlayerMonsterAttack: AVAudioPlayer?
-    @State private var audioPlayerCountDown: AVAudioPlayer?
     @State private var showAttackImage: Bool = false
     @State private var showMonsterDownImage: Bool = false
     @State private var showIncorrectBackground: Bool = false
@@ -117,24 +112,61 @@ struct QuizView: View {
         }
     }
     
-    func playCorrectSound() {
-        audioPlayerCorrect?.play()
-    }
-    
-//    func playerUnCorrectSound() {
-//        audioPlayerUnCorrect?.play()
-//    }
-    
-    func playAttackSound() {
-        audioPlayerAttack?.play()
-    }
-    
-    func playMonsterAttackSound() {
-        audioPlayerMonsterAttack?.play()
-    }
-    
-    func playerCountDownSound() {
-        audioPlayerCountDown?.play()
+    func answerSelectionAction(index: Int) {
+        if !hasAnswered {
+            self.selectedAnswerIndex = index
+            self.timer?.invalidate() // 回答を選択したらタイマーを止める
+            
+            let isAnswerCorrect = (selectedAnswerIndex == currentQuiz.correctAnswerIndex)
+            if isAnswerCorrect {
+                audioManager.playCorrectSound()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    audioManager.playAttackSound()
+                    self.showAttackImage = true
+                    //                                        }
+                    correctAnswerCount += 1 // 正解の場合、正解数をインクリメント
+                    //                                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                    monsterHP -= userAttack
+                    if monsterHP <= 0 {
+                        // モンスターのHPが0以下になった場合の処理
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                            monsterType += 1  // 次のモンスターに移行
+                            monsterHP = 100  // 新しいモンスターのHPをリセット
+                            self.showMonsterDownImage = true
+                        }
+                        if monsterType == 2 {
+                            showCompletionMessage = true
+                            timer?.invalidate()
+                        }
+                    } else if playerHP <= 0 {
+                        // プレイヤーのHPが0以下になった場合の処理
+                        showCompletionMessage = true
+                        timer?.invalidate()
+                    }
+                }
+            } else {
+                audioManager.playCorrectSound()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    audioManager.playMonsterAttackSound()
+                    playerHP -= monsterAttack
+                    self.showAttackImage = true
+                }
+            }
+            
+            let result = QuizResult(
+                question: currentQuiz.question,
+                userAnswer: currentQuiz.choices[index],
+                correctAnswer: currentQuiz.choices[currentQuiz.correctAnswerIndex],
+                explanation: currentQuiz.explanation,
+                isCorrect: isAnswerCorrect
+            )
+            quizResults.append(result)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                self.showAttackImage = false
+                moveToNextQuiz()
+            }
+            hasAnswered = true
+        }
     }
     
     var body: some View {
@@ -265,10 +297,8 @@ struct QuizView: View {
                     }
                     Spacer()
                     VStack{
-                        VStack {
-                            AnswerSelectionView(choices: currentQuiz.choices) { index in
-                                self.selectedAnswerIndex = index
-                            }
+                        AnswerSelectionView(choices: currentQuiz.choices) { index in
+                            answerSelectionAction(index: index)
                         }
 //                        ForEach(0..<currentQuiz.choices.count, id: \.self) { index in
 //                            HStack{
@@ -281,7 +311,7 @@ struct QuizView: View {
 //                                        if isAnswerCorrect {
 //                                            audioManager.playCorrectSound()
 //                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-//                                                playAttackSound()
+//                                                audioManager.playAttackSound()
 //                                                self.showAttackImage = true
 //                                                //                                        }
 //                                                correctAnswerCount += 1 // 正解の場合、正解数をインクリメント
@@ -305,9 +335,10 @@ struct QuizView: View {
 //                                                }
 //                                            }
 //                                        } else {
-//                                            audioManager.playCorrectSound()
+//                                            // 不正解の場合
+//                                            audioManager.playUnCorrectSound()
 //                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-//                                                playMonsterAttackSound()
+//                                                audioManager.playMonsterAttackSound()
 //                                                playerHP -= monsterAttack
 //                                                self.showAttackImage = true
 //                                            }
@@ -341,7 +372,7 @@ struct QuizView: View {
 //                            .frame(maxWidth: .infinity)
 //                            .shadow(radius: 1)
 //                        }
-                        //                Spacer()
+                                        Spacer()
                         
                         if showCompletionMessage {
                             NavigationLink("", destination: QuizResultView(results: quizResults).navigationBarBackButtonHidden(true), isActive: $navigateToQuizResultView)
@@ -383,43 +414,8 @@ struct QuizView: View {
                 self.userHp = hp ?? 100
                 self.userAttack = attack ?? 20
             }
-            if let soundURL = Bundle.main.url(forResource: "正解", withExtension: "mp3") {
-                do {
-                    audioPlayerCorrect = try AVAudioPlayer(contentsOf: soundURL)
-                } catch {
-                    print("Failed to initialize audio player: \(error)")
-                }
-            }
-            if let soundURL = Bundle.main.url(forResource: "不正解", withExtension: "mp3") {
-                do {
-                    audioPlayerUnCorrect = try AVAudioPlayer(contentsOf: soundURL)
-                } catch {
-                    print("Failed to initialize audio player: \(error)")
-                }
-            }
-            if let soundURL = Bundle.main.url(forResource: "味方攻撃", withExtension: "mp3") {
-                do {
-                    audioPlayerAttack = try AVAudioPlayer(contentsOf: soundURL)
-                } catch {
-                    print("Failed to initialize audio player: \(error)")
-                }
-            }
-            if let soundURL = Bundle.main.url(forResource: "敵攻撃", withExtension: "mp3") {
-                do {
-                    audioPlayerMonsterAttack = try AVAudioPlayer(contentsOf: soundURL)
-                } catch {
-                    print("Failed to initialize audio player: \(error)")
-                }
-            }
-            if let soundURL = Bundle.main.url(forResource: "カウントダウン", withExtension: "mp3") {
-                do {
-                    audioPlayerCountDown = try AVAudioPlayer(contentsOf: soundURL)
-                } catch {
-                    print("Failed to initialize audio player: \(error)")
-                }
-            }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                playerCountDownSound()
+                audioManager.playCountdownSound()
             }
         }
         .onChange(of: selectedAnswerIndex) { newValue in
@@ -456,7 +452,6 @@ struct QuizView: View {
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                 showModal = false
                 navigateToQuizResultView = true
-                print("navigateToQuizResultView:\(navigateToQuizResultView)")
             }
         }
         .onChange(of: monsterType) { newMonsterType in

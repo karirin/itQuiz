@@ -24,6 +24,7 @@ struct ContentView: View {
     @State private var isPresentingAvatarList: Bool = false
     @State private var audioPlayerKettei: AVAudioPlayer?
     @ObservedObject var audioManager = AudioManager.shared
+    @State private var isSoundOn: Bool = true
     
     var body: some View {
         NavigationView {
@@ -32,10 +33,22 @@ struct ContentView: View {
                     Image(systemName: "person.circle")
                     Text("\(userName)")
                     
-                    Button("音声オン/オフ") {
+                    Button(action: {
                         audioManager.toggleSound()
-                        audioManager.isMuted.toggle()
+                        isSoundOn.toggle()
+                    }) {
+                        HStack {
+                            if isSoundOn {
+                                Image(systemName: "speaker.slash")
+                                Text("音声オフ")
+                            } else {
+                                Image(systemName: "speaker.wave.2")
+                                Text("音声オン")
+                            }
+                        }
+                        .foregroundColor(.gray)
                     }
+
                     
                     Spacer()
                     Image("コイン")
@@ -105,7 +118,7 @@ struct ContentView: View {
                                         }
                                     }
                                 }
-                                audioPlayerKettei?.play()
+                                audioManager.playKetteiSound()
                                 // 画面遷移のトリガーをオンにする
                                 self.isPresentingQuizBeginnerList = true
                             }) {
@@ -162,9 +175,6 @@ struct ContentView: View {
                                 .padding(.bottom)
                                 
                                 .shadow(radius: 3)
-                                .onTapGesture {
-                                    //                            audioManager.playSound()
-                                }
                                 
                                 Button(action: {
                                     audioManager.playSound()
@@ -191,9 +201,9 @@ struct ContentView: View {
                             }
                             
                             Button(action: {
-                                //                                            audioPlayer?.play()
                                 // 画面遷移のトリガーをオンにする
                                 self.isPresentingGachaView = true
+                                audioManager.playSound()
                             }) {
                                 HStack{
                                     Image("gacha")
@@ -247,22 +257,6 @@ struct ContentView: View {
                     isButtonEnabled = true
                 }
             }
-                
-            authManager.fetchUserInfo { (name, avatar, money, hp, attack) in
-                self.userName = name ?? ""
-                self.avatar = avatar ?? [[String: Any]]()
-                self.userMoney = money ?? 0
-                self.userHp = hp ?? 100
-                self.userAttack = attack ?? 20
-            }
-            authManager.fetchUserExperienceAndLevel()
-            if let soundURL = Bundle.main.url(forResource: "soundKettei", withExtension: "mp3") {
-                do {
-                    audioPlayerKettei = try AVAudioPlayer(contentsOf: soundURL)
-                } catch {
-                    print("Failed to initialize audio player: \(error)")
-                }
-            }
         }
 //        .onReceive(soundSettings.$isSoundOn) { newValue in
 //            adjustVolume()
@@ -270,12 +264,6 @@ struct ContentView: View {
             .background(Color("purple2").opacity(0.6))  // ここで背景色を設定
             .edgesIgnoringSafeArea(.all)  // 画面の端まで背景色を伸ばす
             }
-//    func playSound() {
-//        audioPlayer?.play()
-//    }
-    func playSoundKettei() {
-        audioPlayerKettei?.play()
-    }
         }
 
 struct ProgressBar: View {

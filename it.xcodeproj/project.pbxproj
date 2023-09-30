@@ -20,6 +20,7 @@
 		2641992C2AC2572F002013B9 /* AvatarListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2641992B2AC2572F002013B9 /* AvatarListView.swift */; };
 		266A07282AC6E10200B85D4E /* ProgressBar3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 266A07272AC6E10200B85D4E /* ProgressBar3.swift */; };
 		266A072A2AC6FBC800B85D4E /* AnswerSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 266A07292AC6FBC800B85D4E /* AnswerSelectionView.swift */; };
+		266A072C2AC7242600B85D4E /* キャンセル.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 266A072B2AC7242500B85D4E /* キャンセル.mp3 */; };
 		268C3B9B2ABCA63300282BEE /* QuizAdvancedList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 268C3B9A2ABCA63200282BEE /* QuizAdvancedList.swift */; };
 		268C3B9D2ABCA95D00282BEE /* QuizNetworkList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 268C3B9C2ABCA95D00282BEE /* QuizNetworkList.swift */; };
 		268C3BA52ABD638200282BEE /* SettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 268C3BA22ABD638100282BEE /* SettingView.swift */; };
@@ -61,6 +62,7 @@
 		2641992B2AC2572F002013B9 /* AvatarListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarListView.swift; sourceTree = "<group>"; };
 		266A07272AC6E10200B85D4E /* ProgressBar3.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressBar3.swift; sourceTree = "<group>"; };
 		266A07292AC6FBC800B85D4E /* AnswerSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnswerSelectionView.swift; sourceTree = "<group>"; };
+		266A072B2AC7242500B85D4E /* キャンセル.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "キャンセル.mp3"; path = "../../../Downloads/キャンセル.mp3"; sourceTree = "<group>"; };
 		268C3B9A2ABCA63200282BEE /* QuizAdvancedList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizAdvancedList.swift; sourceTree = "<group>"; };
 		268C3B9C2ABCA95D00282BEE /* QuizNetworkList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizNetworkList.swift; sourceTree = "<group>"; };
 		268C3BA22ABD638100282BEE /* SettingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SettingView.swift; path = ../../sabusuku/sabusuku/SettingView.swift; sourceTree = "<group>"; };
@@ -150,6 +152,7 @@
 				264199272AC025AD002013B9 /* sound.mp3 */,
 				268C3BAA2ABDA3AC00282BEE /* soundKettei.mp3 */,
 				264199292AC1E995002013B9 /* ガチャる.mp3 */,
+				266A072B2AC7242500B85D4E /* キャンセル.mp3 */,
 				26A026E32ABDE67800119F2B /* 味方攻撃.mp3 */,
 				26A026E72ABE03FE00119F2B /* 敵攻撃.mp3 */,
 				26A026DF2ABDE27C00119F2B /* 正解.mp3 */,
@@ -253,6 +256,7 @@
 				26A026E82ABE03FE00119F2B /* 敵攻撃.mp3 in Resources */,
 				260E441A2AB572DE00FBB487 /* Preview Assets.xcassets in Resources */,
 				264199282AC025AD002013B9 /* sound.mp3 in Resources */,
+				266A072C2AC7242600B85D4E /* キャンセル.mp3 in Resources */,
 				268C3BAB2ABDA3AC00282BEE /* soundKettei.mp3 in Resources */,
 				2641992A2AC1E996002013B9 /* ガチャる.mp3 in Resources */,
 				26A026E62ABE014200119F2B /* 不正解.mp3 in Resources */,

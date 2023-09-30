@@ -128,7 +128,7 @@ struct ImagePickerView: View {
                 }
                 
                 Button("ユーザーを作成") {
-                    let selectedAvatar = Avatar(name: selectedIcon, attack: 20, health: 20 ,usedFlag: 1)
+                    let selectedAvatar = Avatar(name: selectedIcon, attack: 20, health: 20 ,usedFlag: 1, count:1)
                     authManager.saveUserToDatabase(userName: userName)
                     authManager.addAvatarToUser(avatar: selectedAvatar)
                     self.navigateToContentView = true

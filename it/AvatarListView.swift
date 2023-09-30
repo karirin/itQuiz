@@ -15,6 +15,7 @@ struct AvatarListView: View {
     @State private var avatars: [String] = []
     @ObservedObject var authManager = AuthManager.shared
     @Environment(\.presentationMode) var presentationMode
+    @ObservedObject var audioManager = AudioManager.shared
     
     // グリッドのレイアウトを定義
     var columns: [GridItem] = [
@@ -41,27 +42,26 @@ struct AvatarListView: View {
             ScrollView {
                 LazyVGrid(columns: columns, spacing: 20) {
                     ForEach(authManager.avatars, id: \.name) { avatar in
-                        
-//                        Image(avatar.isEmpty ? "defaultIcon" : (avatar.first?["name"] as? String) ?? "")
-//                            .resizable()  // 画像のサイズを変更可能にする
-//                            .aspectRatio(contentMode: .fit)  // 画像のアスペクト比を保持
-//                            .frame(width: 100, height: 100)  // 画像のフレームサイズを設定
-//                            .padding(5)
-//                            .cornerRadius(8)
-//                            .overlay(
-//                                // 選択されたアイテムの周りを光らせる
-//                                RoundedRectangle(cornerRadius: 8)
-//                                    .stroke(selectedItem == avatar ? Color.gray : Color.clear, lineWidth: 4)
-//                            )
-//                            .onTapGesture {
-//                                // アイテムをタップしたときのアクション
-//                                selectedItem = avatar
-//                            }
+                        VStack{
+                            Image(avatar.name) // avatarのnameを使用
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 100, height: 100)
+                                .padding(5)
+                                .cornerRadius(8)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .stroke(selectedItem == avatar.name ? Color.gray : Color.clear, lineWidth: 4)
+                                )
+                            Text("\(avatar.count)")
+                        }
+                        .onTapGesture {
+                            selectedItem = avatar.name
+                        }
                     }
                 }
                 .onAppear {
                         authManager.fetchAvatars()
-                    print("authManager.fetchAvatars():\(authManager.fetchAvatars())")
                 }
                 .padding()
             }
@@ -70,11 +70,12 @@ struct AvatarListView: View {
         .navigationBarBackButtonHidden(true)
         .navigationBarItems(leading: Button(action: {
             self.presentationMode.wrappedValue.dismiss()
+            audioManager.playCancelSound()
         }) {
             Image(systemName: "chevron.left")
                 .foregroundColor(.gray)
             Text("戻る")
-                .foregroundColor(.gray)
+                .foregroundColor(Color("fontGray"))
         })
     }
 }

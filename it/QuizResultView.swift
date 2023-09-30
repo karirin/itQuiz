@@ -21,6 +21,8 @@ struct QuizResultView: View {
     @State private var showMemoView = false
     @State private var currentMemo = ""
     @State private var selectedQuestion = ""
+    private var authManager = AuthManager()
+    @ObservedObject var audioManager:AudioManager
 
     var body: some View {
         NavigationView{
@@ -28,11 +30,18 @@ struct QuizResultView: View {
                 VStack{
                     HStack{
                         NavigationLink(destination: ContentView().navigationBarBackButtonHidden(true)) {
-                            Image(systemName: "chevron.left")
-                                .foregroundColor(.gray)
-                            Text("戻る")
-                                .background(Color.white)
-                                .foregroundColor(.gray)
+                            Button(action: {
+                                audioManager.playCancelSound()
+                                // ここで画面遷移を行います。
+                            }) {
+                                HStack {
+                                    Image(systemName: "chevron.left")
+                                        .foregroundColor(.gray)
+                                    Text("戻る")
+                                        .background(Color.white)
+                                        .foregroundColor(.gray)
+                                }
+                            }
                         }
                         .padding(.leading)
                         Spacer()
@@ -40,10 +49,10 @@ struct QuizResultView: View {
                         Spacer()
                         HStack{
                             Image(systemName: "chevron.left")
-                                .foregroundColor(.gray)
+                                .foregroundColor(Color("fontGray"))
                             Text("戻る")
                                 .background(Color.white)
-                                .foregroundColor(.gray)
+                                .foregroundColor(Color("fontGray"))
                         }
                         .padding(.trailing)
                         .opacity(0)
@@ -75,7 +84,7 @@ struct QuizResultView: View {
                 }
                 
                 if showModal {
-                    ExperienceModalView(showModal: $showModal, addedExperience: 10)
+                    ExperienceModalView(showModal: $showModal, addedExperience: 10, authManager: authManager)
                 }
                 if showMemoView {
                     MemoView(memo: $currentMemo, question: selectedQuestion)
@@ -92,7 +101,8 @@ struct ExperienceModalView: View {
     var addedExperience: Int
     @State private var currentExperience: Double = 0
     let maxExperience: Double = 100
-    @ObservedObject var authManager = AuthManager.shared
+    @ObservedObject var authManager:AuthManager
+    @ObservedObject var audioManager = AudioManager.shared
 
     var body: some View {
         ZStack {
@@ -117,6 +127,7 @@ struct ExperienceModalView: View {
 
                 Button("閉じる") {
                     showModal = false
+                    audioManager.playCancelSound()
                 }
                 .padding()
             }
@@ -163,16 +174,17 @@ struct ProgressBar1: View {
     }
 }
 
-
-struct QuizResultView_Previews: PreviewProvider {
-    static var previews: some View {
-        // ダミーデータを作成
-        let dummyResults = [
-            QuizResult(question: "情報セキュリティの方針やルールを組織全体に明確に伝えるための文章は？", userAnswer: "SLA", correctAnswer: "情報セキュリティポリシー", explanation: "情報セキュリティの３つの基本的な要素として、機密性、完全性に続くものは「可溶性」といいます。", isCorrect: false),
-            QuizResult(question: "AIを開発するベンチャー企業のA社が，資金調達を目的に，金融商品取引所に初めて上場することになった。このように，企業の未公開の株式を，新たに公開することを表す用語として，最も適切なものはどれか。", userAnswer: "IPO", correctAnswer: "IPO", explanation: "IPO（Initial Public Offering）は、企業が初めて公開市場で株式を発行することを指します。", isCorrect: true)
-        ]
-        
-        // ダミーデータを使用してQuizResultViewを呼び出す
-        QuizResultView(results: dummyResults)
-    }
-}
+//
+//struct QuizResultView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        private var authManager = AuthManager()
+//        // ダミーデータを作成
+//        let dummyResults = [
+//            QuizResult(question: "情報セキュリティの方針やルールを組織全体に明確に伝えるための文章は？", userAnswer: "SLA", correctAnswer: "情報セキュリティポリシー", explanation: "情報セキュリティの３つの基本的な要素として、機密性、完全性に続くものは「可溶性」といいます。", isCorrect: false),
+//            QuizResult(question: "AIを開発するベンチャー企業のA社が，資金調達を目的に，金融商品取引所に初めて上場することになった。このように，企業の未公開の株式を，新たに公開することを表す用語として，最も適切なものはどれか。", userAnswer: "IPO", correctAnswer: "IPO", explanation: "IPO（Initial Public Offering）は、企業が初めて公開市場で株式を発行することを指します。", isCorrect: true)
+//        ]
+//        
+//        // ダミーデータを使用してQuizResultViewを呼び出す
+//        QuizResultView(results: dummyResults, audioManager: authManager)
+//    }
+//}

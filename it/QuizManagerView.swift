@@ -159,11 +159,12 @@ struct QuizManagerView: View {
         .navigationBarBackButtonHidden(true)
         .navigationBarItems(leading: Button(action: {
             self.presentationMode.wrappedValue.dismiss()
+            audioManager.playCancelSound()
         }) {
             Image(systemName: "chevron.left")
-                .foregroundColor(.gray)
+                .foregroundColor(Color("fontGray"))
             Text("戻る")
-                .foregroundColor(.gray)
+                .foregroundColor(Color("fontGray"))
         })
     }
     
