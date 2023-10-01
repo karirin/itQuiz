@@ -21,7 +21,7 @@ struct QuizResultView: View {
     @State private var showMemoView = false
     @State private var currentMemo = ""
     @State private var selectedQuestion = ""
-    @ObservedObject var authManager: AuthManager
+    @ObservedObject var audioManager = AudioManager.shared
 
     var body: some View {
         NavigationView{
@@ -29,11 +29,18 @@ struct QuizResultView: View {
                 VStack{
                     HStack{
                         NavigationLink(destination: ContentView().navigationBarBackButtonHidden(true)) {
-                            Image(systemName: "chevron.left")
-                                .foregroundColor(.gray)
-                            Text("戻る")
-                                .background(Color.white)
-                                .foregroundColor(.gray)
+                            Button(action: {
+                                audioManager.playCancelSound()
+                                // ここで画面遷移を行います。
+                            }) {
+                                HStack {
+                                    Image(systemName: "chevron.left")
+                                        .foregroundColor(.gray)
+                                    Text("戻る")
+                                        .background(Color.white)
+                                        .foregroundColor(.gray)
+                                }
+                            }
                         }
                         .padding(.leading)
                         Spacer()
@@ -41,10 +48,10 @@ struct QuizResultView: View {
                         Spacer()
                         HStack{
                             Image(systemName: "chevron.left")
-                                .foregroundColor(.gray)
+                                .foregroundColor(Color("fontGray"))
                             Text("戻る")
                                 .background(Color.white)
-                                .foregroundColor(.gray)
+                                .foregroundColor(Color("fontGray"))
                         }
                         .padding(.trailing)
                         .opacity(0)
@@ -76,7 +83,7 @@ struct QuizResultView: View {
                 }
                 
                 if showModal {
-                    ExperienceModalView(showModal: $showModal, addedExperience: 10, authManager: authManager)
+                    ExperienceModalView(showModal: $showModal, addedExperience: 10)
                 }
                 if showMemoView {
                     MemoView(memo: $currentMemo, question: selectedQuestion)
@@ -93,7 +100,8 @@ struct ExperienceModalView: View {
     var addedExperience: Int
     @State private var currentExperience: Double = 0
     let maxExperience: Double = 100
-    @ObservedObject var authManager: AuthManager
+    @ObservedObject var authManager = AuthManager.shared
+    @ObservedObject var audioManager = AudioManager.shared
 
     var body: some View {
         ZStack {
@@ -118,6 +126,7 @@ struct ExperienceModalView: View {
 
                 Button("閉じる") {
                     showModal = false
+                    audioManager.playCancelSound()
                 }
                 .padding()
             }
@@ -166,7 +175,6 @@ struct ProgressBar1: View {
 
 
 struct QuizResultView_Previews: PreviewProvider {
-    @State static private var authManager = AuthManager.shared
     static var previews: some View {
         // ダミーデータを作成
         let dummyResults = [
@@ -175,6 +183,6 @@ struct QuizResultView_Previews: PreviewProvider {
         ]
         
         // ダミーデータを使用してQuizResultViewを呼び出す
-        QuizResultView(results: dummyResults, authManager: authManager)
+        QuizResultView(results: dummyResults)
     }
 }

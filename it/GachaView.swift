@@ -109,7 +109,6 @@ struct GachaView: View {
                         .frame(width: 30,height:30)
                     Text("体力：\(item.health)")
                         .font(.system(size: 24))
-                    
                     Image("ソード")
                         .resizable()
                         .frame(width: 40,height:30)

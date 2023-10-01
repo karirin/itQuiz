@@ -157,10 +157,10 @@ class AuthManager: ObservableObject {
         }
     }
     
-    func fetchAvatars() {
+    func fetchAvatars(completion: @escaping () -> Void) {
         guard let userId = user?.uid else { return }
         let userRef = Database.database().reference().child("users").child(userId).child("avatars")
-        userRef.observeSingleEvent(of: .value) { (snapshot: DataSnapshot, error: String?) in
+        userRef.observeSingleEvent(of: .value) { (snapshot: DataSnapshot) in
             var newAvatars: [Avatar] = []
             for child in snapshot.children {
                 if let childSnapshot = child as? DataSnapshot,
@@ -170,11 +170,54 @@ class AuthManager: ObservableObject {
                    let health = avatarData["health"] as? Int,
                    let usedFlag = avatarData["usedFlag"] as? Int,
                    let count = avatarData["count"] as? Int {
-                    let avatar = Avatar(name: name, attack: attack, health: health, usedFlag: usedFlag,count: count)
+                    let avatar = Avatar(name: name, attack: attack, health: health, usedFlag: usedFlag, count: count)
                     newAvatars.append(avatar)
                 }
             }
-            self.avatars = newAvatars
+            DispatchQueue.main.async {
+                self.avatars = newAvatars
+            }
+
+            completion() // データがフェッチされた後にクロージャを呼び出す
+        }
+    }
+    
+    func updateUsedFlag(for avatar: Avatar, to newValue: Int) -> Avatar {
+        print("testtest")
+        print(avatar)
+        print(newValue)
+        return Avatar(name: avatar.name, attack: avatar.attack, health: avatar.health, usedFlag: newValue, count: avatar.count)
+    }
+    
+    func switchAvatar(to newAvatar: Avatar) {
+        guard let userId = user?.uid else { return }
+        let avatarsRef = Database.database().reference()
+            .child("users")
+            .child(userId)
+            .child("avatars")
+
+        // すべてのアバターのusedFlagを0に設定
+        avatarsRef.observeSingleEvent(of: .value) { snapshot in
+            for child in snapshot.children {
+                guard let childSnapshot = child as? DataSnapshot else { continue }
+                let avatarKey = childSnapshot.key
+                let avatarRef = avatarsRef.child(avatarKey)
+                avatarRef.updateChildValues(["usedFlag": 0])
+            }
+
+            // 新しいアバターのusedFlagを1に設定
+            if let avatarKey = snapshot.children.allObjects.first(where: { (child) -> Bool in
+                guard let childSnapshot = child as? DataSnapshot,
+                      let avatarData = childSnapshot.value as? [String: Any],
+                      let name = avatarData["name"] as? String else { return false }
+                return name == newAvatar.name
+            }) as? DataSnapshot {
+                let avatarRef = avatarsRef.child(avatarKey.key)
+                avatarRef.updateChildValues(["usedFlag": 1])
+            }
+
+            // avatars配列を手動で更新
+            self.fetchAvatars {}
         }
     }
     
