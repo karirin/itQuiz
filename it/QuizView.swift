@@ -1,5 +1,5 @@
 //
-//  QuizView.swift
+//  QuizView.swift main
 //  it
 //
 //  Created by hashimo ryoya on 2023/09/16.
@@ -60,7 +60,7 @@ struct QuizView: View {
     @State private var showMonsterDownImage: Bool = false
     @State private var showIncorrectBackground: Bool = false
     @State private var hasAnswered: Bool = false
-
+    
     
     var currentQuiz: QuizQuestion {
         quizzes[currentQuizIndex]
@@ -84,19 +84,19 @@ struct QuizView: View {
     func startTimer() {
         // 現在のタイマーを止める
         self.timer?.invalidate()
-
+        
         // 3秒後に以下のコードブロックを実行
-            self.remainingSeconds = 30
-            self.timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
-                if self.remainingSeconds > 0 {
-                    self.remainingSeconds -= 1
-                } else {
-                    timer.invalidate()
-                    // ここでplayerHPとmonsterAttackは既に定義されている必要があります
-                    playerHP -= monsterAttack
-                    self.moveToNextQuiz()
-                }
+        self.remainingSeconds = 30
+        self.timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
+            if self.remainingSeconds > 0 {
+                self.remainingSeconds -= 1
+            } else {
+                timer.invalidate()
+                // ここでplayerHPとmonsterAttackは既に定義されている必要があります
+                playerHP -= monsterAttack
+                self.moveToNextQuiz()
             }
+        }
     }
     
     // 次の問題へ移る処理
@@ -122,6 +122,7 @@ struct QuizView: View {
                 audioManager.playCorrectSound()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     audioManager.playAttackSound()
+                    
                     self.showAttackImage = true
                     //                                        }
                     correctAnswerCount += 1 // 正解の場合、正解数をインクリメント
@@ -134,7 +135,7 @@ struct QuizView: View {
                             monsterHP = 100  // 新しいモンスターのHPをリセット
                             self.showMonsterDownImage = true
                         }
-                        if monsterType == 2 {
+                        if monsterType == 3 {
                             showCompletionMessage = true
                             timer?.invalidate()
                         }
@@ -145,7 +146,7 @@ struct QuizView: View {
                     }
                 }
             } else {
-                audioManager.playCorrectSound()
+                audioManager.playUnCorrectSound()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     audioManager.playMonsterAttackSound()
                     playerHP -= monsterAttack
@@ -242,22 +243,22 @@ struct QuizView: View {
                             VStack() {
                                 //                            Spacer()
                                 ZStack{
-                                        ZStack{
-                                            Image("\(quizLevel)Monster\(monsterType)")
+                                    ZStack{
+                                        Image("\(quizLevel)Monster\(monsterType)")
+                                            .resizable()
+                                            .frame(width:100,height:100)
+                                        // 敵キャラを倒した
+                                        if showMonsterDownImage && monsterHP == 0 {
+                                            Image("倒す")
                                                 .resizable()
-                                                .frame(width:100,height:100)
-                                                // 敵キャラを倒した
-                                                if showMonsterDownImage && monsterHP == 0 {
-                                                        Image("倒す")
-                                                            .resizable()
-                                                            .frame(width:150,height:150)
-                                                }
+                                                .frame(width:150,height:150)
                                         }
+                                    }
                                     
                                     // 問題に正解して敵キャラにダメージ
                                     if let selected = selectedAnswerIndex {
                                         if selected == currentQuiz.correctAnswerIndex {
-                                            if showAttackImage && monsterHP != 0 {
+                                            if showAttackImage {
                                                 Image("attack1")
                                                     .resizable()
                                                     .frame(width:80,height:80)
@@ -288,7 +289,8 @@ struct QuizView: View {
                             // 味方がダメージをくらう
                             if let selected = selectedAnswerIndex, selected != currentQuiz.correctAnswerIndex {
                                 if showAttackImage{
-                                    Image("\(quizLevel)MonsterAttack\(monsterType)")
+//                                    Image("\(quizLevel)MonsterAttack\(monsterType)")
+                                    Image("beginnerMonsterAttack\(monsterType)")
                                         .resizable()
                                         .frame(width:30,height:30)
                                 }
@@ -297,246 +299,182 @@ struct QuizView: View {
                     }
                     Spacer()
                     VStack{
+                        //                        VStack {
                         AnswerSelectionView(choices: currentQuiz.choices) { index in
                             answerSelectionAction(index: index)
                         }
-//                        ForEach(0..<currentQuiz.choices.count, id: \.self) { index in
-//                            HStack{
-//                                Button(action: {
-//                                    if !hasAnswered {
-//                                        self.selectedAnswerIndex = index
-//                                        self.timer?.invalidate() // 回答を選択したらタイマーを止める
-//
-//                                        let isAnswerCorrect = (selectedAnswerIndex == currentQuiz.correctAnswerIndex)
-//                                        if isAnswerCorrect {
-//                                            audioManager.playCorrectSound()
-//                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-//                                                audioManager.playAttackSound()
-//                                                self.showAttackImage = true
-//                                                //                                        }
-//                                                correctAnswerCount += 1 // 正解の場合、正解数をインクリメント
-//                                                //                                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-//                                                monsterHP -= userAttack
-//                                                if monsterHP <= 0 {
-//                                                    // モンスターのHPが0以下になった場合の処理
-//                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-//                                                        monsterType += 1  // 次のモンスターに移行
-//                                                        monsterHP = 100  // 新しいモンスターのHPをリセット
-//                                                        self.showMonsterDownImage = true
-//                                                    }
-//                                                    if monsterType == 2 {
-//                                                        showCompletionMessage = true
-//                                                        timer?.invalidate()
-//                                                    }
-//                                                } else if playerHP <= 0 {
-//                                                    // プレイヤーのHPが0以下になった場合の処理
-//                                                    showCompletionMessage = true
-//                                                    timer?.invalidate()
-//                                                }
-//                                            }
-//                                        } else {
-//                                            // 不正解の場合
-//                                            audioManager.playUnCorrectSound()
-//                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-//                                                audioManager.playMonsterAttackSound()
-//                                                playerHP -= monsterAttack
-//                                                self.showAttackImage = true
-//                                            }
-//                                        }
-//
-//                                        let result = QuizResult(
-//                                            question: currentQuiz.question,
-//                                            userAnswer: currentQuiz.choices[index],
-//                                            correctAnswer: currentQuiz.choices[currentQuiz.correctAnswerIndex],
-//                                            explanation: currentQuiz.explanation,
-//                                            isCorrect: isAnswerCorrect
-//                                        )
-//                                        quizResults.append(result)
-//                                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-//                                            self.showAttackImage = false
-//                                            moveToNextQuiz()
-//                                        }
-//                                        hasAnswered = true
-//                                    }
-//                                }) {
-//                                    Text(currentQuiz.choices[index])
-//                                        .frame(maxWidth: .infinity)
-//                                        .padding(.vertical)
-//                                        .background(Color.white)
-//                                        .foregroundColor(.black)
-//                                        .cornerRadius(8)
-//                                }
-//                                .padding(.horizontal)
-//                                .padding(.vertical,2)
-//                            }
-//                            .frame(maxWidth: .infinity)
-//                            .shadow(radius: 1)
-//                        }
-                                        Spacer()
+                        .frame(maxWidth: .infinity)
+                        .shadow(radius: 1)
+                        Spacer()
                         
                         if showCompletionMessage {
-                            NavigationLink("", destination: QuizResultView(results: quizResults).navigationBarBackButtonHidden(true), isActive: $navigateToQuizResultView)
+                            NavigationLink("", destination: QuizResultView(results: quizResults, authManager: authManager).navigationBarBackButtonHidden(true), isActive: $navigateToQuizResultView)
                         }
+                        //                        }
+                        Spacer()
                     }
-                    Spacer()
-                }
-                .frame(maxWidth: .infinity,maxHeight:.infinity)
-                .padding(.bottom)
-                .background(showIncorrectBackground ? Color("superLightRed") : Color("Color2"))
-                .sheet(isPresented: $showModal) {
-                    ExperienceModalView(showModal: $showModal, addedExperience: 10)
+                    .frame(maxWidth: .infinity,maxHeight:.infinity)
+                    .padding(.bottom)
+                    .background(showIncorrectBackground ? Color("superLightRed") : Color("Color2"))
+                    .sheet(isPresented: $showModal) {
+                        ExperienceModalView(showModal: $showModal, addedExperience: 10, authManager: authManager)
+                    }
+                    
+                   
                 }
                 if showCountdown {
-                    ZStack {
-                        // 背景
-                        Color.black.opacity(0.7)
-                            .edgesIgnoringSafeArea(.all)
-                        
-                        // カウントダウンの数字
-                        Text("\(countdownValue)")
-                            .font(.system(size: 100))
-                            .foregroundColor(.white)
-                            .bold()
-                    }
+                                       ZStack {
+                                           // 背景
+                                           Color.black.opacity(0.7)
+                                               .edgesIgnoringSafeArea(.all)
+                                           
+                                           // カウントダウンの数字
+                                           Text("\(countdownValue)")
+                                               .font(.system(size: 100))
+                                               .foregroundColor(.white)
+                                               .bold()
+                                       }
+                                   }
+        }
+            .onAppear {
+                startCountdown()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                    startTimer() // Viewが表示されたときにタイマーを開始
                 }
-            }
-        }
-        .onAppear {
-            startCountdown()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
-                startTimer() // Viewが表示されたときにタイマーを開始
-            }
-            self.monsterType = 1 // すぐに1に戻す
-            authManager.fetchUserInfo { (name, avator, money, hp, attack) in
-                self.userName = name ?? ""
-                self.avator = avator ?? [[String: Any]]()
-                self.userMoney = money ?? 0
-                self.userHp = hp ?? 100
-                self.userAttack = attack ?? 20
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                audioManager.playCountdownSound()
-            }
-        }
-        .onChange(of: selectedAnswerIndex) { newValue in
-            if let selected = newValue, selected != currentQuiz.correctAnswerIndex {
+                self.monsterType = 1 // すぐに1に戻す
+                authManager.fetchUserInfo { (name, avator, money, hp, attack) in
+                    self.userName = name ?? ""
+                    self.avator = avator ?? [[String: Any]]()
+                    self.userMoney = money ?? 0
+                    self.userHp = hp ?? 100
+                    self.userAttack = attack ?? 20
+                }
+                
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    self.showIncorrectBackground = true
+                    audioManager.playCountdownSound()
                 }
-            } else {
-                self.showIncorrectBackground = false
             }
-        }
-        .onChange(of: showCompletionMessage) { newValue in
-            // 味方のHPが０以下のとき
-            print(playerHP)
-            if newValue && playerHP <= 0 {
-                DispatchQueue.global(qos: .background).async {
-                    authManager.addExperience(points: 5)
-                    authManager.addMoney(amount: 5)
-                    DispatchQueue.main.async {
-                        // ここでUIの更新を行います。
+            .onChange(of: selectedAnswerIndex) { newValue in
+                if let selected = newValue, selected != currentQuiz.correctAnswerIndex {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        self.showIncorrectBackground = true
+                    }
+                } else {
+                    self.showIncorrectBackground = false
+                }
+            }
+            .onChange(of: showCompletionMessage) { newValue in
+                // 味方のHPが０以下のとき
+                print(playerHP)
+                if newValue && playerHP <= 0 {
+                    DispatchQueue.global(qos: .background).async {
+                        authManager.addExperience(points: 5)
+                        authManager.addMoney(amount: 5)
+                        DispatchQueue.main.async {
+                            // ここでUIの更新を行います。
+                        }
+                    }
+                } else {
+                    DispatchQueue.global(qos: .background).async {
+                        authManager.addExperience(points: playerExperience)
+                        authManager.addMoney(amount: playerMoney)
+                        DispatchQueue.main.async {
+                            // ここでUIの更新を行います。
+                        }
                     }
                 }
-            } else {
-                DispatchQueue.global(qos: .background).async {
-                    authManager.addExperience(points: playerExperience)
-                    authManager.addMoney(amount: playerMoney)
-                    DispatchQueue.main.async {
-                        // ここでUIの更新を行います。
+                
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                    showModal = false
+                    navigateToQuizResultView = true
+                    print("navigateToQuizResultView:\(navigateToQuizResultView)")
+                }
+            }
+            .onChange(of: monsterType) { newMonsterType in
+                switch quizLevel {
+                case .beginner:
+                    monsterBackground = "beginnerBackground"
+                    playerExperience = 20
+                    playerMoney = 10
+                    switch newMonsterType {
+                    case 1:
+                        monsterHP = 30
+                        monsterUnderHP = 30
+                        monsterAttack = 20
+                    case 2:
+                        monsterHP = 40
+                        monsterUnderHP = 40
+                        monsterAttack = 25
+                    case 3:
+                        monsterHP = 50
+                        monsterUnderHP = 50
+                        monsterAttack = 30
+                    default:
+                        monsterHP = 30
+                    }
+                case .intermediate:
+                    monsterBackground = "intermediateBackground"
+                    playerExperience = 30
+                    playerMoney = 20
+                    switch newMonsterType {
+                    case 1:
+                        monsterHP = 50
+                        monsterUnderHP = 50
+                        monsterAttack = 30
+                    case 2:
+                        monsterHP = 60
+                        monsterUnderHP = 60
+                        monsterAttack = 35
+                    case 3:
+                        monsterHP = 70
+                        monsterUnderHP = 70
+                        monsterAttack = 40
+                    default:
+                        monsterHP = 50
+                    }
+                case .advanced:
+                    monsterBackground = "advancedBackground"
+                    playerExperience = 40
+                    playerMoney = 30
+                    switch newMonsterType {
+                    case 1:
+                        monsterHP = 80
+                        monsterUnderHP = 80
+                        monsterAttack = 45
+                    case 2:
+                        monsterHP = 90
+                        monsterUnderHP = 90
+                        monsterAttack = 50
+                    case 3:
+                        monsterHP = 100
+                        monsterUnderHP = 100
+                        monsterAttack = 55
+                    default:
+                        monsterHP = 80
+                    }
+                case .network:
+                    monsterBackground = "networkBackground"
+                    switch newMonsterType {
+                    case 1:
+                        print("\(monsterBackground)")
+                        monsterHP = 50
+                        monsterUnderHP = 50
+                        monsterAttack = 30
+                    case 2:
+                        monsterHP = 60
+                        monsterUnderHP = 60
+                        monsterAttack = 35
+                    case 3:
+                        monsterHP = 70
+                        monsterUnderHP = 70
+                        monsterAttack = 40
+                    default:
+                        monsterHP = 50
                     }
                 }
             }
-
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                showModal = false
-                navigateToQuizResultView = true
-            }
-        }
-        .onChange(of: monsterType) { newMonsterType in
-            switch quizLevel {
-            case .beginner:
-                monsterBackground = "beginnerBackground"
-                playerExperience = 20
-                playerMoney = 10
-                switch newMonsterType {
-                case 1:
-                    monsterHP = 20
-                    monsterUnderHP = 30
-                    monsterAttack = 20
-                case 2:
-                    monsterHP = 20
-                    monsterUnderHP = 40
-                    monsterAttack = 25
-                case 3:
-                    monsterHP = 20
-                    monsterUnderHP = 50
-                    monsterAttack = 30
-                default:
-                    monsterHP = 30
-                }
-            case .intermediate:
-                monsterBackground = "intermediateBackground"
-                playerExperience = 30
-                playerMoney = 20
-                switch newMonsterType {
-                case 1:
-                    monsterHP = 50
-                    monsterUnderHP = 50
-                    monsterAttack = 30
-                case 2:
-                    monsterHP = 60
-                    monsterUnderHP = 60
-                    monsterAttack = 35
-                case 3:
-                    monsterHP = 70
-                    monsterUnderHP = 70
-                    monsterAttack = 40
-                default:
-                    monsterHP = 50
-                }
-            case .advanced:
-                monsterBackground = "advancedBackground"
-                playerExperience = 40
-                playerMoney = 30
-                switch newMonsterType {
-                case 1:
-                    monsterHP = 80
-                    monsterUnderHP = 80
-                    monsterAttack = 45
-                case 2:
-                    monsterHP = 90
-                    monsterUnderHP = 90
-                    monsterAttack = 50
-                case 3:
-                    monsterHP = 100
-                    monsterUnderHP = 100
-                    monsterAttack = 55
-                default:
-                    monsterHP = 80
-                }
-            case .network:
-                monsterBackground = "networkBackground"
-                switch newMonsterType {
-                case 1:
-                    print("\(monsterBackground)")
-                    monsterHP = 50
-                    monsterUnderHP = 50
-                    monsterAttack = 30
-                case 2:
-                    monsterHP = 60
-                    monsterUnderHP = 60
-                    monsterAttack = 35
-                case 3:
-                    monsterHP = 70
-                    monsterUnderHP = 70
-                    monsterAttack = 40
-                default:
-                    monsterHP = 50
-                }
-            }
-        }
+    }
     }
 }
 

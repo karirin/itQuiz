@@ -18,6 +18,7 @@ class AudioManager: ObservableObject {
     var audioMonsterAttackPlayer: AVPlayer?
     var audioCountdownPlayer: AVPlayer?
     var audioCancelPlayer: AVPlayer?
+    var audioChangePlayer: AVPlayer?
 
     @Published var isMuted: Bool = false
 
@@ -41,12 +42,13 @@ class AudioManager: ObservableObject {
             audioMonsterAttackPlayer = AVPlayer(url: soundURL)
         }
         if let soundURL = Bundle.main.url(forResource: "カウントダウン", withExtension: "mp3") {
-            print("countdown")
             audioCountdownPlayer = AVPlayer(url: soundURL)
         }
         if let soundURL = Bundle.main.url(forResource: "キャンセル", withExtension: "mp3") {
-            print("countdown")
             audioCancelPlayer = AVPlayer(url: soundURL)
+        }
+        if let soundURL = Bundle.main.url(forResource: "おとも切り替え", withExtension: "mp3") {
+            audioChangePlayer = AVPlayer(url: soundURL)
         }
     }
 
@@ -155,6 +157,19 @@ class AudioManager: ObservableObject {
                 player.play()  // 再生
             }
         }
+        if let player = audioChangePlayer {
+            if player.volume == 0 {
+                player.pause()  // 一時停止
+                player.volume = 1.0
+                isMuted = false
+                player.play()  // 再生
+            } else {
+                player.pause()  // 一時停止
+                player.volume = 0
+                isMuted = true
+                player.play()  // 再生
+            }
+        }
     }
 
 
@@ -189,7 +204,6 @@ class AudioManager: ObservableObject {
     }
     
     func playCountdownSound() {
-        print("countdown")
         audioCountdownPlayer?.seek(to: CMTime.zero) // 再生位置を先頭に戻す
         audioCountdownPlayer?.play()
     }
@@ -197,5 +211,10 @@ class AudioManager: ObservableObject {
     func playCancelSound() {
         audioCancelPlayer?.seek(to: CMTime.zero) // 再生位置を先頭に戻す
         audioCancelPlayer?.play()
+    }
+    
+    func playChangeSound() {
+        audioChangePlayer?.seek(to: CMTime.zero) // 再生位置を先頭に戻す
+        audioChangePlayer?.play()
     }
 }

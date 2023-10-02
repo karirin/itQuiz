@@ -32,7 +32,14 @@ struct ContentView: View {
                 HStack{
                     Image(systemName: "person.circle")
                     Text("\(userName)")
-                    
+                    Spacer()
+                    Image("コイン")
+                        .resizable()
+                        .frame(width:20,height:20)
+                    Text("+")
+                    Text(" \(userMoney)")
+                    Spacer()
+                    Spacer()
                     Button(action: {
                         audioManager.toggleSound()
                         isSoundOn.toggle()
@@ -48,14 +55,6 @@ struct ContentView: View {
                         }
                         .foregroundColor(.gray)
                     }
-
-                    
-                    Spacer()
-                    Image("コイン")
-                        .resizable()
-                        .frame(width:20,height:20)
-                    Text("+")
-                    Text(" \(userMoney)")
                 }
                 .padding()
                 ScrollView{
@@ -82,7 +81,7 @@ struct ContentView: View {
                                 Image("ハート")
                                     .resizable()
                                     .frame(width: 20,height:20)
-                                Text("体力：\(avatar.first?["name"] as? String ?? "不明")")
+                                Text("体力：\(userHp)")
                                 
                                 Image("ソード")
                                     .resizable()
@@ -239,7 +238,7 @@ struct ContentView: View {
                         .background(Color("Color2"))
                
             } .frame(maxWidth: .infinity,maxHeight: .infinity)
-        .onAppear {
+            .onAppear {
             // 1. lastClickedDateを取得
             authManager.fetchLastClickedDate(userId: authManager.currentUserId ?? "") { lastDate in
                 if let lastDate = lastDate {
@@ -257,10 +256,23 @@ struct ContentView: View {
                     isButtonEnabled = true
                 }
             }
+            authManager.fetchUserInfo { (name, avatar, money, hp, attack) in
+                         self.userName = name ?? ""
+                         self.avatar = avatar ?? [[String: Any]]()
+                         self.userMoney = money ?? 0
+                         self.userHp = hp ?? 100
+                         self.userAttack = attack ?? 20
+                     }
+            authManager.fetchAvatars {
+                self.avatar = authManager.avatars.map { avatar in
+                    return ["name": avatar.name]
+                }
+                print("|||||")
+                print(self.avatar)
+                print("|||||")
+            }
+             authManager.fetchUserExperienceAndLevel()
         }
-//        .onReceive(soundSettings.$isSoundOn) { newValue in
-//            adjustVolume()
-//        }
             .background(Color("purple2").opacity(0.6))  // ここで背景色を設定
             .edgesIgnoringSafeArea(.all)  // 画面の端まで背景色を伸ばす
             }

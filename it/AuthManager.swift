@@ -8,7 +8,7 @@
 import SwiftUI
 import Firebase
 
-struct Avatar {
+struct Avatar: Equatable {
     var name: String
     var attack: Int
     var health: Int
@@ -183,9 +183,6 @@ class AuthManager: ObservableObject {
     }
     
     func updateUsedFlag(for avatar: Avatar, to newValue: Int) -> Avatar {
-        print("testtest")
-        print(avatar)
-        print(newValue)
         return Avatar(name: avatar.name, attack: avatar.attack, health: avatar.health, usedFlag: newValue, count: avatar.count)
     }
     
