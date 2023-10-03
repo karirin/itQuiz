@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct QuizNetworkList: View {
+    @Binding var isPresenting: Bool
     let QuizNetworkList: [QuizQuestion] = [
         QuizQuestion(
             question: "プロジェクト管理において、プロジェクトの進捗を可視化するためのツールは何か？",
@@ -362,17 +363,18 @@ struct QuizNetworkList: View {
     @State private var shuffledQuizList: [QuizQuestion]
     private var authManager = AuthManager()
 
-    init() {
+    init(isPresenting: Binding<Bool>) {
+        _isPresenting = isPresenting
         _shuffledQuizList = State(initialValue: QuizNetworkList.shuffled())
     }
 
     var body: some View {
-        QuizView(quizzes: shuffledQuizList, quizLevel: .network, authManager: authManager)
+        QuizView(quizzes: shuffledQuizList, quizLevel: .network, authManager: authManager,isPresenting: $isPresenting)
     }
 }
 
 struct QuizNetworkList_Previews: PreviewProvider {
     static var previews: some View {
-        QuizNetworkList()
+        QuizNetworkList(isPresenting: .constant(false))
     }
 }

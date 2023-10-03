@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct QuizAdvancedList: View {
+    @Binding var isPresenting: Bool
     let QuizAdvancedList: [QuizQuestion] = [
         QuizQuestion(
             question: "プロジェクト管理において、プロジェクトの進捗を可視化するためのツールは何か？",
@@ -20,7 +21,7 @@ struct QuizAdvancedList: View {
             correctAnswerIndex: 0,
             explanation: "Gantt Chart（ガントチャート）は、プロジェクトの進捗を可視化するためのツールです。"
         ),
-
+        
         QuizQuestion(
             question: "ソフトウェアテストの中で、プログラムの内部構造を考慮してテストを行う手法は何か？",
             choices: [
@@ -1134,23 +1135,25 @@ struct QuizAdvancedList: View {
         explanation: "アジャイル開発は、定期的な短いイテレーションを使用するソフトウェア開発手法です。"
         )
 
-
+        
+        
     ]
-
+    
     @State private var shuffledQuizList: [QuizQuestion]
     private var authManager = AuthManager()
-
-    init() {
+    
+    init(isPresenting: Binding<Bool>) {
+        _isPresenting = isPresenting
         _shuffledQuizList = State(initialValue: QuizAdvancedList.shuffled())
     }
-
+    
     var body: some View {
-        QuizView(quizzes: shuffledQuizList, quizLevel: .advanced, authManager: authManager)
+        QuizView(quizzes: shuffledQuizList, quizLevel: .advanced, authManager: authManager, isPresenting: $isPresenting)
     }
 }
 
 struct QuizAdvancedList_Previews: PreviewProvider {
     static var previews: some View {
-        QuizAdvancedList()
+        QuizAdvancedList(isPresenting: .constant(false))
     }
 }

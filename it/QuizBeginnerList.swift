@@ -15,6 +15,7 @@ struct QuizQuestion {
 }
 
 struct QuizBeginnerList: View {
+    @Binding var isPresenting: Bool
     let quizBeginnerList: [QuizQuestion] = [
         QuizQuestion(
             question: "コンピュータウイルスの感染経路として最も一般的なものは？",
@@ -367,17 +368,18 @@ struct QuizBeginnerList: View {
     @State private var shuffledQuizList: [QuizQuestion]
     private var authManager = AuthManager()
 
-    init() {
+    init(isPresenting: Binding<Bool>) {
+        _isPresenting = isPresenting
         _shuffledQuizList = State(initialValue: quizBeginnerList.shuffled())
     }
 
     var body: some View {
-        QuizView(quizzes: shuffledQuizList, quizLevel: .beginner, authManager: authManager)
+        QuizView(quizzes: shuffledQuizList, quizLevel: .beginner, authManager: authManager, isPresenting: $isPresenting)
     }
 }
 
 struct QuizList_Previews: PreviewProvider {
     static var previews: some View {
-        QuizBeginnerList()
+        QuizBeginnerList(isPresenting: .constant(false))
     }
 }

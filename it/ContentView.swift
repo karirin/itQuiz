@@ -29,6 +29,9 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             VStack {
+                Spacer()
+                Spacer()
+                Spacer()
                 HStack{
                     Image(systemName: "person.circle")
                     Text("\(userName)")
@@ -57,7 +60,7 @@ struct ContentView: View {
                     }
                 }
                 .padding()
-                ScrollView{
+//                ScrollView{
                     VStack{
                         ZStack{
                             Image("image")
@@ -72,34 +75,47 @@ struct ContentView: View {
                         
                         .font(.system(size: 24))
                         VStack{
-                            HStack{
-                                Image("スター")
-                                    .resizable()
-                                    .frame(width: 25,height:20)
-                                Text("Lv：\(authManager.level)")
+                            HStack(alignment: .top){
+                                    HStack(alignment: .top){
+                                        Image("スター")
+                                            .resizable()
+                                            .frame(width: 25,height:20)
+                                        Text("Lv：\(authManager.level)")
+                                    }
                                 
-                                Image("ハート")
-                                    .resizable()
-                                    .frame(width: 20,height:20)
-                                Text("体力：\(userHp)")
-                                
-                                Image("ソード")
-                                    .resizable()
-                                    .frame(width: 25,height:20)
-                                Text("攻撃力：\(userAttack)")
+                                HStack(alignment: .top){
+                                        Image("ハート")
+                                            .resizable()
+                                            .frame(width: 20,height:20)
+                                        VStack(spacing: 0){
+                                            Text("体力：\(userHp + (avatar.first?["health"] as? Int ?? 0))")
+                                                .multilineTextAlignment(.leading)
+                                            HStack{
+                                                Text("( + \(avatar.first?["health"] as? Int ?? 0)")
+                                                Image(avatar.isEmpty ? "defaultIcon" : (avatar.first?["name"] as? String) ?? "")
+                                                    .resizable()
+                                                    .frame(width: 20,height:20)
+                                                Text(")")
+                                            }
+                                        }
+                                    }
+                                HStack(alignment: .top){
+                                        Image("ソード")
+                                            .resizable()
+                                            .frame(width: 20,height:20)
+                                        VStack(spacing: 0){
+                                            Text("攻撃力：\(userAttack + (avatar.first?["attack"] as? Int ?? 0))")
+                                                .multilineTextAlignment(.leading)
+                                            HStack{
+                                                Text("( + \(avatar.first?["attack"] as? Int ?? 0)")
+                                                Image(avatar.isEmpty ? "defaultIcon" : (avatar.first?["name"] as? String) ?? "")
+                                                    .resizable()
+                                                    .frame(width: 20,height:20)
+                                                Text(")")
+                                            }
+                                        }
+                                    }
                             }
-                            //                            HStack{
-                            //                                Image("ハート")
-                            //                                    .resizable()
-                            //                                    .frame(width: 20,height:20)
-                            //                                Text("体力：\(userHp)")
-                            //                            }
-                            //                            HStack{
-                            //                                Image("ソード")
-                            //                                    .resizable()
-                            //                                    .frame(width: 30,height:20)
-                            //                                Text("攻撃力：\(userAttack)")
-                            //                            }
                             HStack{
                                 Text("経験値")
                                 ProgressBar(value: Float(authManager.experience) / Float(authManager.level * 100))
@@ -108,6 +124,7 @@ struct ContentView: View {
                             }.padding()
                         }
                         VStack{
+                            Spacer()
                             Button(action: {
                                 if isButtonEnabled {
                                     if let userId = authManager.currentUserId {
@@ -150,6 +167,7 @@ struct ContentView: View {
                                     }
                                 }
                             }
+                            Spacer()
                             HStack{
                                 Button(action: {
                                     audioManager.playSound()
@@ -162,7 +180,7 @@ struct ContentView: View {
                                             .frame(width: 35,height:35)
                                             .foregroundColor(.gray)
                                         Text("問題を解く")
-                                            .font(.system(size:24))
+                                            .font(.system(size:20))
                                     }
                                     .padding(.horizontal)
                                     .padding(.vertical)
@@ -170,7 +188,7 @@ struct ContentView: View {
                                 .background(.white)
                                 .foregroundColor(.gray)
                                 .cornerRadius(20)
-                                .padding(.trailing,5)
+                                .padding(.trailing,3)
                                 .padding(.bottom)
                                 
                                 .shadow(radius: 3)
@@ -198,7 +216,8 @@ struct ContentView: View {
                                 
                                 .shadow(radius: 3)
                             }
-                            
+                            .padding(.horizontal,12)
+                            Spacer()
                             Button(action: {
                                 // 画面遷移のトリガーをオンにする
                                 self.isPresentingGachaView = true
@@ -228,12 +247,12 @@ struct ContentView: View {
                             }
                         }
                         .padding(.horizontal,5)
-                        NavigationLink("", destination: QuizBeginnerList().navigationBarBackButtonHidden(true), isActive: $isPresentingQuizBeginnerList)
-                        NavigationLink("", destination: QuizManagerView(), isActive: $isPresentingQuizList)
+                        NavigationLink("", destination: QuizBeginnerList(isPresenting: $isPresentingQuizList).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizBeginnerList)
+                        NavigationLink("", destination: QuizManagerView(isPresenting: $isPresentingQuizList), isActive: $isPresentingQuizList)
                         NavigationLink("", destination: AvatarListView(), isActive: $isPresentingAvatarList)
                         NavigationLink("", destination: GachaView(), isActive: $isPresentingGachaView)
                     }
-                }
+//                }
             }
                         .background(Color("Color2"))
                
@@ -259,6 +278,7 @@ struct ContentView: View {
             authManager.fetchUserInfo { (name, avatar, money, hp, attack) in
                          self.userName = name ?? ""
                          self.avatar = avatar ?? [[String: Any]]()
+                print(self.avatar)
                          self.userMoney = money ?? 0
                          self.userHp = hp ?? 100
                          self.userAttack = attack ?? 20
@@ -267,9 +287,6 @@ struct ContentView: View {
                 self.avatar = authManager.avatars.map { avatar in
                     return ["name": avatar.name]
                 }
-                print("|||||")
-                print(self.avatar)
-                print("|||||")
             }
              authManager.fetchUserExperienceAndLevel()
         }

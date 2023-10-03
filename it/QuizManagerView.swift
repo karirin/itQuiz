@@ -24,10 +24,13 @@ struct QuizManagerView: View {
     @State private var isSoundOn: Bool = true
     @ObservedObject var audioManager = AudioManager.shared
     @Environment(\.presentationMode) var presentationMode
+    @Binding var isPresenting: Bool
     
-    init() {
+    init(isPresenting: Binding<Bool>) {
+        _isPresenting = isPresenting
         _lastClickedDate = State(initialValue: Date())
     }
+
 
     var body: some View {
         VStack {
@@ -86,7 +89,7 @@ struct QuizManagerView: View {
                 }
                 .disabled(authManager.level >= 10)
                 .padding(.horizontal)
-                NavigationLink("", destination: QuizAdvancedList().navigationBarBackButtonHidden(true), isActive: $isPresentingQuizAdvanced)
+                NavigationLink("", destination: QuizAdvancedList(isPresenting: $isPresenting).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizAdvanced)
 
                 // ネットワーク系の問題
                 Button(action: {
@@ -97,7 +100,7 @@ struct QuizManagerView: View {
                 }
                 .disabled(authManager.level >= 10)
                 .padding(.horizontal)
-                NavigationLink("", destination: QuizNetworkList().navigationBarBackButtonHidden(true), isActive: $isPresentingQuizNetwork)
+                NavigationLink("", destination: QuizNetworkList(isPresenting: $isPresenting).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizNetwork)
 
                 // セキュリティ系の問題
                 Button(action: {
@@ -108,7 +111,8 @@ struct QuizManagerView: View {
                 }
                 .disabled(authManager.level >= 10)
                 .padding(.horizontal)
-                NavigationLink("", destination: QuizIntermediateList().navigationBarBackButtonHidden(true), isActive: $isPresentingQuizSecurity) // 適切な遷移先に変更してください
+
+                NavigationLink("", destination: QuizIntermediateList(isPresenting: $isPresenting).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizSecurity) // 適切な遷移先に変更してください
 
                 // データベース系の問題
                 Button(action: {
@@ -120,9 +124,9 @@ struct QuizManagerView: View {
                 .disabled(authManager.level >= 10)
                 .padding(.horizontal)
             Group{
-                NavigationLink("", destination: QuizIntermediateList().navigationBarBackButtonHidden(true), isActive: $isPresentingQuizDatabase) // 適切な遷移先に変更してください
-                NavigationLink("", destination: QuizBeginnerList().navigationBarBackButtonHidden(true), isActive: $isPresentingQuizBeginner) // 適切な遷移先に変更してください
-                NavigationLink("", destination: QuizIntermediateList().navigationBarBackButtonHidden(true), isActive: $isPresentingQuizIntermediate) // 適切な遷移先に変更してください
+                NavigationLink("", destination: QuizIntermediateList(isPresenting: $isPresenting).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizDatabase) // 適切な遷移先に変更してください
+                NavigationLink("", destination: QuizBeginnerList(isPresenting: $isPresenting).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizBeginner) // 適切な遷移先に変更してください
+                NavigationLink("", destination: QuizIntermediateList(isPresenting: $isPresenting).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizIntermediate) // 適切な遷移先に変更してください
             }
             
         }
@@ -190,6 +194,6 @@ struct QuizManagerView: View {
 
 struct QuizManagerView_Previews: PreviewProvider {
     static var previews: some View {
-        QuizManagerView()
+        QuizManagerView(isPresenting: .constant(false))
     }
 }

@@ -23,8 +23,15 @@ struct QuizResultView: View {
     @State private var selectedQuestion = ""
     @ObservedObject var authManager: AuthManager
     @ObservedObject var audioManager = AudioManager.shared
+    @Binding var isPresenting: Bool
 //    @Environment(\.rootPresentationMode) private var rootPresentationMode: Binding<RootPresentationMode>
 
+    init(results: [QuizResult], authManager: AuthManager, isPresenting: Binding<Bool>) {
+        self.results = results
+        self.authManager = authManager
+        _isPresenting = isPresenting
+    }
+    
     var body: some View {
         NavigationView{
             ZStack {
@@ -33,6 +40,7 @@ struct QuizResultView: View {
                         NavigationLink(destination: ContentView().navigationBarBackButtonHidden(true)) {
                             Button(action: {
                                 audioManager.playCancelSound()
+                                self.isPresenting = false
 //                                self.rootPresentationMode.wrappedValue.dismissToRoot()
                                 // ここで画面遷移を行います。
                             }) {
@@ -176,6 +184,7 @@ struct ProgressBar1: View {
 
 
 struct QuizResultView_Previews: PreviewProvider {
+    @State static private var isPresenting = true
     @State static private var authManager = AuthManager.shared
     static var previews: some View {
         // ダミーデータを作成
@@ -185,6 +194,6 @@ struct QuizResultView_Previews: PreviewProvider {
         ]
         
         // ダミーデータを使用してQuizResultViewを呼び出す
-        QuizResultView(results: dummyResults, authManager: authManager)
+        QuizResultView(results: dummyResults, authManager: authManager, isPresenting: $isPresenting)
     }
 }

@@ -60,6 +60,7 @@ struct QuizView: View {
     @State private var showMonsterDownImage: Bool = false
     @State private var showIncorrectBackground: Bool = false
     @State private var hasAnswered: Bool = false
+    @Binding var isPresenting: Bool
     
     
     var currentQuiz: QuizQuestion {
@@ -308,7 +309,7 @@ struct QuizView: View {
                         Spacer()
                         
                         if showCompletionMessage {
-                            NavigationLink("", destination: QuizResultView(results: quizResults, authManager: authManager).navigationBarBackButtonHidden(true), isActive: $navigateToQuizResultView)
+                            NavigationLink("", destination: QuizResultView(results: quizResults, authManager: authManager,isPresenting: $isPresenting).navigationBarBackButtonHidden(true), isActive: $navigateToQuizResultView)
                         }
                         //                        }
                         Spacer()
@@ -480,6 +481,6 @@ struct QuizView: View {
 
 struct QuizView_Previews: PreviewProvider {
     static var previews: some View {
-        QuizBeginnerList()
+        QuizBeginnerList(isPresenting: .constant(false))
     }
 }

@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct QuizIntermediateList: View {
+    @Binding var isPresenting: Bool
     let QuizIntermediateList: [QuizQuestion] = [
         QuizQuestion(
                 question: "コンピュータのCPUが直接参照する情報を保存する場所を何というか？",
@@ -696,17 +697,18 @@ struct QuizIntermediateList: View {
     @State private var shuffledQuizList: [QuizQuestion]
     private var authManager = AuthManager()
 
-    init() {
+    init(isPresenting: Binding<Bool>) {
+        _isPresenting = isPresenting
         _shuffledQuizList = State(initialValue: QuizIntermediateList.shuffled())
     }
 
     var body: some View {
-        QuizView(quizzes: shuffledQuizList, quizLevel: .intermediate, authManager: authManager)
+        QuizView(quizzes: shuffledQuizList, quizLevel: .intermediate, authManager: authManager,isPresenting: $isPresenting)
     }
 }
 
 struct QuizIntermediateList_Previews: PreviewProvider {
     static var previews: some View {
-        QuizIntermediateList()
+        QuizIntermediateList(isPresenting: .constant(false))
     }
 }

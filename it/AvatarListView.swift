@@ -51,6 +51,7 @@ struct AvatarListView: View {
                                     .position(x: UIScreen.main.bounds.width / 1.3, y: UIScreen.main.bounds.height / 4.7)
                             } else {
                                 Button(action: {
+                                    audioManager.playSound()
                                     // 切り替えるアバターを設定し、アラートを表示
                                     self.switchingAvatar = selected
                                     self.showingAlert1 = true
@@ -68,8 +69,9 @@ struct AvatarListView: View {
                                             if let switchingAvatar = switchingAvatar {
                                                 authManager.switchAvatar(to: switchingAvatar)
                                             }
+                                            audioManager.playChangeSound()
                                         }),
-                                        secondaryButton: .cancel()
+                                        secondaryButton: .cancel(Text("キャンセル"))
                                     )
                                 }
                             }
@@ -103,7 +105,6 @@ struct AvatarListView: View {
                                     // ここにおともを切り替えるコードを書く
                                     self.switchingAvatar = avatar
                                     if selectedItem == avatar {
-                                        print("tetetetetete2")
                                         // 2回目のタップでアラートを表示
                                         self.switchingAvatar = avatar
                                         self.showingAlert2 = true
@@ -159,7 +160,7 @@ struct AvatarListView: View {
                                     }
                                     audioManager.playChangeSound()
                                 }),
-                                secondaryButton: .cancel()
+                                secondaryButton: .cancel(Text("キャンセル"))
                             )
                         }
                         .padding()

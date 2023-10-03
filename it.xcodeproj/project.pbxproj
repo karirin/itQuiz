@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		260000022AB5EEC900342CAE /* QuizBeginnerList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260000012AB5EEC900342CAE /* QuizBeginnerList.swift */; };
 		260B56152ACADF7500E7785C /* おとも切り替え.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 260B56142ACADF7400E7785C /* おとも切り替え.mp3 */; };
+		260B56172ACB1CA200E7785C /* SpotlightView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260B56162ACB1CA200E7785C /* SpotlightView.swift */; };
+		260B56192ACB1CBE00E7785C /* SpotlightView1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260B56182ACB1CBE00E7785C /* SpotlightView1.swift */; };
 		260E44132AB572DC00FBB487 /* itApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260E44122AB572DC00FBB487 /* itApp.swift */; };
 		260E44152AB572DC00FBB487 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260E44142AB572DC00FBB487 /* ContentView.swift */; };
 		260E44172AB572DE00FBB487 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 260E44162AB572DE00FBB487 /* Assets.xcassets */; };
@@ -51,6 +53,8 @@
 /* Begin PBXFileReference section */
 		260000012AB5EEC900342CAE /* QuizBeginnerList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizBeginnerList.swift; sourceTree = "<group>"; };
 		260B56142ACADF7400E7785C /* おとも切り替え.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "おとも切り替え.mp3"; path = "../../../Downloads/おとも切り替え.mp3"; sourceTree = "<group>"; };
+		260B56162ACB1CA200E7785C /* SpotlightView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotlightView.swift; sourceTree = "<group>"; };
+		260B56182ACB1CBE00E7785C /* SpotlightView1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotlightView1.swift; sourceTree = "<group>"; };
 		260E440F2AB572DC00FBB487 /* it.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = it.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		260E44122AB572DC00FBB487 /* itApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = itApp.swift; sourceTree = "<group>"; };
 		260E44142AB572DC00FBB487 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -151,6 +155,8 @@
 				269A878B2AB873CC00F33C9E /* GachaAnimationView.swift */,
 				269D44E12AB60D6800CAA91A /* SignUp.swift */,
 				26A026EB2ABF16E600119F2B /* AudioManager.swift */,
+				260B56162ACB1CA200E7785C /* SpotlightView.swift */,
+				260B56182ACB1CBE00E7785C /* SpotlightView1.swift */,
 				264199272AC025AD002013B9 /* sound.mp3 */,
 				268C3BAA2ABDA3AC00282BEE /* soundKettei.mp3 */,
 				264199292AC1E995002013B9 /* ガチャる.mp3 */,
@@ -322,9 +328,11 @@
 				26B5BEF42AB6CFA600056E79 /* RootView.swift in Sources */,
 				260000022AB5EEC900342CAE /* QuizBeginnerList.swift in Sources */,
 				269A87882AB7757C00F33C9E /* QuizResultView.swift in Sources */,
+				260B56192ACB1CBE00E7785C /* SpotlightView1.swift in Sources */,
 				2641992C2AC2572F002013B9 /* AvatarListView.swift in Sources */,
 				269D44E22AB60D6800CAA91A /* SignUp.swift in Sources */,
 				268C3B9B2ABCA63300282BEE /* QuizAdvancedList.swift in Sources */,
+				260B56172ACB1CA200E7785C /* SpotlightView.swift in Sources */,
 				269A878A2AB86FC900F33C9E /* GachaView.swift in Sources */,
 				26A026DE2ABDD1EB00119F2B /* TopView.swift in Sources */,
 				26A25D4E2AB99235006B368F /* QuizIntermediateList.swift in Sources */,
