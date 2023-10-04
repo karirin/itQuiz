@@ -17,6 +17,17 @@ struct QuizQuestion {
 struct QuizBeginnerList: View {
     @Binding var isPresenting: Bool
     let quizBeginnerList: [QuizQuestion] = [
+//        QuizQuestion(
+//            question: "あああああああああああああああああああああああああああああああああああああああああああああああああああああああああ",
+//            choices: [
+//                "電源ケーブル",
+//                "Eメールの添付ファイル",
+//                "モニター",
+//                "キーボード"
+//            ],
+//            correctAnswerIndex: 1,
+//            explanation: " Eメールの添付ファイルは、コンピュータウイルスの感染経路として非常に一般的です。不明な送信元からのメールの添付ファイルは開かないよう注意が必要です。"
+//        )
         QuizQuestion(
             question: "コンピュータウイルスの感染経路として最も一般的なものは？",
             choices: [

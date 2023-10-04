@@ -51,127 +51,21 @@ class AudioManager: ObservableObject {
             audioChangePlayer = AVPlayer(url: soundURL)
         }
     }
-
+    
     func toggleSound() {
-        if let player = audioPlayer {
-            if player.volume == 0 {
-                player.pause()  // 一時停止
-                player.volume = 1.0
-                isMuted = false
-                player.play()  // 再生
-            } else {
-                player.pause()  // 一時停止
-                player.volume = 0
-                isMuted = true
-                player.play()  // 再生
-            }
-        }
-        if let player = audioKetteiPlayer {
-            if player.volume == 0 {
-                player.pause()  // 一時停止
-                player.volume = 1.0
-                isMuted = false
-                player.play()  // 再生
-            } else {
-                player.pause()  // 一時停止
-                player.volume = 0
-                isMuted = true
-                player.play()  // 再生
-            }
-        }
-        if let player = audioCorrectPlayer {
-            if player.volume == 0 {
-                player.pause()  // 一時停止
-                player.volume = 1.0
-                isMuted = false
-                player.play()  // 再生
-            } else {
-                player.pause()  // 一時停止
-                player.volume = 0
-                isMuted = true
-                player.play()  // 再生
-            }
-        }
-        if let player = audioUnCorrectPlayer {
-            if player.volume == 0 {
-                player.pause()  // 一時停止
-                player.volume = 1.0
-                isMuted = false
-                player.play()  // 再生
-            } else {
-                player.pause()  // 一時停止
-                player.volume = 0
-                isMuted = true
-                player.play()  // 再生
-            }
-        }
-        if let player = audioAttackPlayer {
-            if player.volume == 0 {
-                player.pause()  // 一時停止
-                player.volume = 1.0
-                isMuted = false
-                player.play()  // 再生
-            } else {
-                player.pause()  // 一時停止
-                player.volume = 0
-                isMuted = true
-                player.play()  // 再生
-            }
-        }
-        if let player = audioMonsterAttackPlayer {
-            if player.volume == 0 {
-                player.pause()  // 一時停止
-                player.volume = 1.0
-                isMuted = false
-                player.play()  // 再生
-            } else {
-                player.pause()  // 一時停止
-                player.volume = 0
-                isMuted = true
-                player.play()  // 再生
-            }
-        }
-        if let player = audioCountdownPlayer {
-            if player.volume == 0 {
-                player.pause()  // 一時停止
-                player.volume = 1.0
-                isMuted = false
-                player.play()  // 再生
-            } else {
-                player.pause()  // 一時停止
-                player.volume = 0
-                isMuted = true
-                player.play()  // 再生
-            }
-        }
-        if let player = audioCancelPlayer {
-            if player.volume == 0 {
-                player.pause()  // 一時停止
-                player.volume = 1.0
-                isMuted = false
-                player.play()  // 再生
-            } else {
-                player.pause()  // 一時停止
-                player.volume = 0
-                isMuted = true
-                player.play()  // 再生
-            }
-        }
-        if let player = audioChangePlayer {
-            if player.volume == 0 {
-                player.pause()  // 一時停止
-                player.volume = 1.0
-                isMuted = false
-                player.play()  // 再生
-            } else {
-                player.pause()  // 一時停止
-                player.volume = 0
-                isMuted = true
-                player.play()  // 再生
+        let players = [audioPlayer, audioKetteiPlayer, audioCorrectPlayer,audioUnCorrectPlayer,audioAttackPlayer,audioMonsterAttackPlayer,audioCountdownPlayer,audioCancelPlayer,audioChangePlayer]
+        for player in players {
+            if let player = player {
+                if player.volume == 0 {
+                    player.volume = 1.0
+                    isMuted = false
+                } else {
+                    player.volume = 0
+                    isMuted = true
+                }
             }
         }
     }
-
 
     func playSound() {
         audioPlayer?.seek(to: CMTime.zero) // 再生位置を先頭に戻す

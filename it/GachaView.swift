@@ -235,7 +235,7 @@ Spacer()
                         .foregroundColor(Color("fontGray"))
                 })
         .background(Color("Color2"))
-           .onChange(of: animationFinished) { finished in  // この行を追加
+           .onChange(of: animationFinished) { finished in
                if finished {
                    self.showAnimation = false
                }

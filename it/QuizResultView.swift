@@ -23,14 +23,22 @@ struct QuizResultView: View {
     @State private var selectedQuestion = ""
     @ObservedObject var authManager: AuthManager
     @ObservedObject var audioManager = AudioManager.shared
+    // QuizResultView.swift
+    @State private var playerExperience: Int
+    @State private var playerMoney: Int
+
     @Binding var isPresenting: Bool
 //    @Environment(\.rootPresentationMode) private var rootPresentationMode: Binding<RootPresentationMode>
 
-    init(results: [QuizResult], authManager: AuthManager, isPresenting: Binding<Bool>) {
+    // QuizResultView.swift
+    init(results: [QuizResult], authManager: AuthManager, isPresenting: Binding<Bool>, playerExperience: Int,playerMoney: Int) {
         self.results = results
         self.authManager = authManager
         _isPresenting = isPresenting
+        _playerExperience = State(initialValue: playerExperience) // ここでplayerExperienceをStateとして初期化
+        _playerMoney = State(initialValue: playerMoney)
     }
+
     
     var body: some View {
         NavigationView{
@@ -94,7 +102,8 @@ struct QuizResultView: View {
                 }
                 
                 if showModal {
-                    ExperienceModalView(showModal: $showModal, addedExperience: 10, authManager: authManager)
+                    ExperienceModalView(showModal: $showModal, addedExperience: playerExperience, addedMoney: playerMoney, authManager: authManager)
+
                 }
                 if showMemoView {
                     MemoView(memo: $currentMemo, question: selectedQuestion)
@@ -109,7 +118,9 @@ struct QuizResultView: View {
 struct ExperienceModalView: View {
     @Binding var showModal: Bool
     var addedExperience: Int
+    var addedMoney: Int
     @State private var currentExperience: Double = 0
+    @State private var currentMoney: Double = 0
     let maxExperience: Double = 100
     @ObservedObject var authManager: AuthManager
 
@@ -129,6 +140,9 @@ struct ExperienceModalView: View {
                 Text("+\(Int(currentExperience)) 経験値")
                     .font(.title)
                 
+                Text("+\(Int(currentMoney)) ゴールド")
+                    .font(.title)
+                
                 // ここでProgressBar1に現在の経験値とmax経験値を渡します。
                 Text("\(authManager.experience) / \(authManager.level * 100) 経験値")
                 ProgressBar1(value: Double(authManager.experience), maxValue: Double(authManager.level * 100))
@@ -142,6 +156,7 @@ struct ExperienceModalView: View {
             .onAppear {
                 withAnimation {
                     currentExperience += Double(addedExperience)
+                    currentMoney += Double(addedMoney)
                 }
                 DispatchQueue.global(qos: .background).async {
                     authManager.fetchUserExperienceAndLevel()
@@ -194,6 +209,6 @@ struct QuizResultView_Previews: PreviewProvider {
         ]
         
         // ダミーデータを使用してQuizResultViewを呼び出す
-        QuizResultView(results: dummyResults, authManager: authManager, isPresenting: $isPresenting)
+        QuizResultView(results: dummyResults, authManager: authManager, isPresenting: $isPresenting, playerExperience: 10, playerMoney: 10)
     }
 }

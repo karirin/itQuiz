@@ -309,7 +309,9 @@ struct QuizView: View {
                         Spacer()
                         
                         if showCompletionMessage {
-                            NavigationLink("", destination: QuizResultView(results: quizResults, authManager: authManager,isPresenting: $isPresenting).navigationBarBackButtonHidden(true), isActive: $navigateToQuizResultView)
+                            // QuizView.swift
+                            NavigationLink("", destination: QuizResultView(results: quizResults, authManager: authManager, isPresenting: $isPresenting, playerExperience: playerExperience, playerMoney: playerMoney).navigationBarBackButtonHidden(true), isActive: $navigateToQuizResultView)
+
                         }
                         //                        }
                         Spacer()
@@ -318,7 +320,7 @@ struct QuizView: View {
                     .padding(.bottom)
                     .background(showIncorrectBackground ? Color("superLightRed") : Color("Color2"))
                     .sheet(isPresented: $showModal) {
-                        ExperienceModalView(showModal: $showModal, addedExperience: 10, authManager: authManager)
+                        ExperienceModalView(showModal: $showModal, addedExperience: 10, addedMoney: 10, authManager: authManager)
                     }
                     
                    
@@ -377,6 +379,10 @@ struct QuizView: View {
                     }
                 } else {
                     DispatchQueue.global(qos: .background).async {
+                        print("|||||")
+                        print(playerExperience)
+                        print(playerMoney)
+                        print("|||||")
                         authManager.addExperience(points: playerExperience)
                         authManager.addMoney(amount: playerMoney)
                         DispatchQueue.main.async {
@@ -389,7 +395,6 @@ struct QuizView: View {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                     showModal = false
                     navigateToQuizResultView = true
-                    print("navigateToQuizResultView:\(navigateToQuizResultView)")
                 }
             }
             .onChange(of: monsterType) { newMonsterType in
