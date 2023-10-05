@@ -36,7 +36,7 @@ struct QuizView: View {
     @State private var timer: Timer? = nil
     @State private var navigateToQuizResultView: Bool = false
     @ObservedObject var authManager : AuthManager
-    @ObservedObject var audioManager = AudioManager.shared
+    @ObservedObject var audioManager : AudioManager
     @State private var showModal: Bool = false
     @State private var quizResults: [QuizResult] = []
     @State private var correctAnswerCount: Int = 0

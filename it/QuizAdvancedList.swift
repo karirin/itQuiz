@@ -1129,6 +1129,7 @@ struct QuizAdvancedList: View {
     
     @State private var shuffledQuizList: [QuizQuestion]
     private var authManager = AuthManager()
+    private var audioManager = AudioManager.shared
     
     init(isPresenting: Binding<Bool>) {
         _isPresenting = isPresenting
@@ -1136,7 +1137,7 @@ struct QuizAdvancedList: View {
     }
     
     var body: some View {
-        QuizView(quizzes: shuffledQuizList, quizLevel: .advanced, authManager: authManager, isPresenting: $isPresenting)
+        QuizView(quizzes: shuffledQuizList, quizLevel: .advanced, authManager: authManager,audioManager: audioManager, isPresenting: $isPresenting)
     }
 }
 
