@@ -61,6 +61,8 @@ struct QuizView: View {
     @State private var showIncorrectBackground: Bool = false
     @State private var hasAnswered: Bool = false
     @Binding var isPresenting: Bool
+    @State private var showHomeModal: Bool = false
+    @State private var isSoundOn: Bool = true
     
     
     var currentQuiz: QuizQuestion {
@@ -102,14 +104,21 @@ struct QuizView: View {
     
     // 次の問題へ移る処理
     func moveToNextQuiz() {
-        if currentQuizIndex + 1 < 100 { // 最大3問まで
+        if monsterType == 4 {
+            // 最後のモンスターが倒された場合、結果画面へ遷移
+            showCompletionMessage = true
+            timer?.invalidate()
+            navigateToQuizResultView = true  // ここで結果画面への遷移フラグをtrueに
+        } else if currentQuizIndex + 1 < quizzes.count { // 最大問題数を超えていないかチェック
             currentQuizIndex += 1
             selectedAnswerIndex = nil
             startTimer()
             hasAnswered = false
         } else {
+            // すべての問題が終了した場合、結果画面へ遷移
             showCompletionMessage = true
-            timer?.invalidate() // タイマーを止める
+            timer?.invalidate()
+            navigateToQuizResultView = true  // ここで結果画面への遷移フラグをtrueに
         }
     }
     
@@ -130,13 +139,24 @@ struct QuizView: View {
                     //                                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                     monsterHP -= userAttack
                     if monsterHP <= 0 {
-                        // モンスターのHPが0以下になった場合の処理
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                            monsterType += 1  // 次のモンスターに移行
-                            monsterHP = 100  // 新しいモンスターのHPをリセット
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                            audioManager.playDownSound()
                             self.showMonsterDownImage = true
                         }
-                        if monsterType == 3 {
+                        // モンスターのHPが0以下になった場合の処理
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                            self.showMonsterDownImage = false
+                            monsterType += 1  // 次のモンスターに移行
+                            if monsterType == 4 {
+                                // 最後のモンスターが倒された場合、結果画面へ遷移
+                                showCompletionMessage = true
+                                timer?.invalidate()
+                                navigateToQuizResultView = true  // ここで結果画面への遷移フラグをtrueに
+                            } else {
+                                monsterHP = 100  // 新しいモンスターのHPをリセット
+                            }
+                        }
+                        if monsterType == 4 {
                             showCompletionMessage = true
                             timer?.invalidate()
                         }
@@ -176,13 +196,17 @@ struct QuizView: View {
             ZStack{
                 VStack {
                     HStack{
-                        Circle()
-                            .stroke(style: StrokeStyle(lineWidth: 10, lineCap: .round, lineJoin: .round))
-                            .opacity(0.3)
-                            .foregroundColor(.gray)
-                            .frame(width: 50, height: 50)
-                            .padding(.leading)
-                            .opacity(0)
+                        Button(action: {
+                            showHomeModal.toggle()
+                            audioManager.playSound()
+                        }) {
+                            Image(systemName: "gearshape.fill")
+                                .resizable()
+                                .frame(width: 40, height: 40)
+                        }
+                        .padding(.leading)
+                        .foregroundColor(.gray)
+                        Spacer()
                         if let selected = selectedAnswerIndex, selected != currentQuiz.correctAnswerIndex {
                             Text("正解")
                             Text("\(currentQuiz.choices[currentQuiz.correctAnswerIndex])")
@@ -208,7 +232,7 @@ struct QuizView: View {
                                 .foregroundColor(remainingSeconds <= 5 ? .red : .black) // 5秒以下で赤色に
                         }
                         .frame(width: 50, height: 50)
-                        
+                        .padding(.leading)
                     }
                     .padding(.trailing)
                     Spacer()
@@ -249,10 +273,10 @@ struct QuizView: View {
                                             .resizable()
                                             .frame(width:100,height:100)
                                         // 敵キャラを倒した
-                                        if showMonsterDownImage && monsterHP == 0 {
+                                        if showMonsterDownImage && monsterHP <= 0 {
                                             Image("倒す")
                                                 .resizable()
-                                                .frame(width:150,height:150)
+                                                .frame(width:130,height:130)
                                         }
                                     }
                                     
@@ -325,19 +349,25 @@ struct QuizView: View {
                     
                    
                 }
-                if showCountdown {
-                                       ZStack {
-                                           // 背景
-                                           Color.black.opacity(0.7)
-                                               .edgesIgnoringSafeArea(.all)
-                                           
-                                           // カウントダウンの数字
-                                           Text("\(countdownValue)")
-                                               .font(.system(size: 100))
-                                               .foregroundColor(.white)
-                                               .bold()
-                                       }
-                                   }
+//                if showCountdown {
+//                       ZStack {
+//                           // 背景
+//                           Color.black.opacity(0.7)
+//                               .edgesIgnoringSafeArea(.all)
+//                           // カウントダウンの数字
+//                           Text("\(countdownValue)")
+//                               .font(.system(size: 100))
+//                               .foregroundColor(.white)
+//                               .bold()
+//                       }
+//                   }
+                if showHomeModal {
+                    ZStack {
+                        Color.black.opacity(0.7)
+                            .edgesIgnoringSafeArea(.all)
+                        ModalView(isSoundOn: $isSoundOn, isPresented: $showHomeModal, isPresenting: $isPresenting, audioManager: audioManager)
+                    }
+                }
         }
             .onAppear {
                 startCountdown()
@@ -379,10 +409,6 @@ struct QuizView: View {
                     }
                 } else {
                     DispatchQueue.global(qos: .background).async {
-                        print("|||||")
-                        print(playerExperience)
-                        print(playerMoney)
-                        print("|||||")
                         authManager.addExperience(points: playerExperience)
                         authManager.addMoney(amount: playerMoney)
                         DispatchQueue.main.async {
@@ -401,7 +427,7 @@ struct QuizView: View {
                 switch quizLevel {
                 case .beginner:
                     monsterBackground = "beginnerBackground"
-                    playerExperience = 20
+                    playerExperience = 20000
                     playerMoney = 10
                     switch newMonsterType {
                     case 1:
@@ -480,7 +506,7 @@ struct QuizView: View {
                     }
                 }
             }
-    }
+        }
     }
 }
 

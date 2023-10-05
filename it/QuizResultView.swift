@@ -100,7 +100,15 @@ struct QuizResultView: View {
                         .padding(5)
                     }
                 }
-                
+                .onChange(of: authManager.didLevelUp) { newValue in
+                    if newValue {
+                        // レベルアップ通知を表示した後、フラグをリセット
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                            authManager.didLevelUp = false
+                            audioManager.playCorrectSound()
+                        }
+                    }
+                }
                 if showModal {
                     ExperienceModalView(showModal: $showModal, addedExperience: playerExperience, addedMoney: playerMoney, authManager: authManager)
 

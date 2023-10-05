@@ -19,6 +19,8 @@ struct SpotlightView: View {
                     .offset(x: 50, y: 50) // このオフセットを変更してスポットライトの位置を調整
                     .blendMode(.destinationOut)
             )
+            .compositingGroup()
+            .background(.clear)
     }
 }
 

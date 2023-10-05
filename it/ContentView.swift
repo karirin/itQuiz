@@ -66,7 +66,7 @@ struct ContentView: View {
                             Image("image")
                                 .resizable()
                                 .frame(height:150)
-                                .padding(.top,50)
+                                .padding(.top,40)
                                 .opacity(0.5)
                             Image(avatar.isEmpty ? "defaultIcon" : (avatar.first?["name"] as? String) ?? "")
                                 .resizable()

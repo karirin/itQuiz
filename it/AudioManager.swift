@@ -19,6 +19,8 @@ class AudioManager: ObservableObject {
     var audioCountdownPlayer: AVPlayer?
     var audioCancelPlayer: AVPlayer?
     var audioChangePlayer: AVPlayer?
+    var audioReturnPlayer: AVPlayer?
+    var audioDownPlayer: AVPlayer?
 
     @Published var isMuted: Bool = false
 
@@ -50,10 +52,16 @@ class AudioManager: ObservableObject {
         if let soundURL = Bundle.main.url(forResource: "おとも切り替え", withExtension: "mp3") {
             audioChangePlayer = AVPlayer(url: soundURL)
         }
+        if let soundURL = Bundle.main.url(forResource: "ホームに戻る", withExtension: "mp3") {
+            audioReturnPlayer = AVPlayer(url: soundURL)
+        }
+        if let soundURL = Bundle.main.url(forResource: "倒した", withExtension: "mp3") {
+            audioDownPlayer = AVPlayer(url: soundURL)
+        }
     }
     
     func toggleSound() {
-        let players = [audioPlayer, audioKetteiPlayer, audioCorrectPlayer,audioUnCorrectPlayer,audioAttackPlayer,audioMonsterAttackPlayer,audioCountdownPlayer,audioCancelPlayer,audioChangePlayer]
+        let players = [audioPlayer, audioKetteiPlayer, audioCorrectPlayer,audioUnCorrectPlayer,audioAttackPlayer,audioMonsterAttackPlayer,audioCountdownPlayer,audioCancelPlayer,audioChangePlayer,audioReturnPlayer,audioDownPlayer]
         for player in players {
             if let player = player {
                 if player.volume == 0 {
@@ -110,5 +118,15 @@ class AudioManager: ObservableObject {
     func playChangeSound() {
         audioChangePlayer?.seek(to: CMTime.zero) // 再生位置を先頭に戻す
         audioChangePlayer?.play()
+    }
+    
+    func playReturnSound() {
+        audioReturnPlayer?.seek(to: CMTime.zero) // 再生位置を先頭に戻す
+        audioReturnPlayer?.play()
+    }
+    
+    func playDownSound() {
+        audioDownPlayer?.seek(to: CMTime.zero) // 再生位置を先頭に戻す
+        audioDownPlayer?.play()
     }
 }

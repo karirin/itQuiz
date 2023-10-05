@@ -27,6 +27,7 @@ class AuthManager: ObservableObject {
     @Published var level: Int = 1
     @Published var money: Int = 0
     @Published var avatars: [Avatar] = []
+    @Published var didLevelUp: Bool = false
     @State private var earnedTitles: [Title] = []
     
     init() {
@@ -246,6 +247,7 @@ class AuthManager: ObservableObject {
                     if error == nil {
                         // 称号の確認と保存
                         self.saveEarnedTitles()
+                        self.didLevelUp = true
                     }
                 }
             }
