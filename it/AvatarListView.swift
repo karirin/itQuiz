@@ -171,7 +171,7 @@ struct AvatarListView: View {
             .onReceive(authManager.$avatars) { newAvatars in
                         // avatarsが更新されたときに呼ばれる
                         if let updatedAvatar = newAvatars.first(where: { $0.usedFlag == 1 }) {
-                            print(updatedAvatar)
+//                            print(updatedAvatar)
                             self.selectedItem = updatedAvatar
                         }
                     }

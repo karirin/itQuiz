@@ -45,23 +45,9 @@ struct QuizManagerView: View {
                         .frame(height: 80)
                 }
                 .frame(maxWidth: .infinity)
-                //                            .background(
-                //                                Image("beginnerBackground")
-                //                                    .resizable()
-                //                                    .aspectRatio(contentMode: .fill)
-                //                                    .opacity(1)
-                //                                )
-                //                    .foregroundColor(.white)
-                //                    .fontWeight(.bold)
-                //                    .cornerRadius(10)
                 .padding(.horizontal)
-                                    .padding(.bottom)
-                //
+                .padding(.bottom)
                 .shadow(radius: 3)
-                //            .onTapGesture {
-                ////                            playSound()
-                //                        }
-                
             }
             Button(action: {
                   audioManager.playKetteiSound()
@@ -71,13 +57,10 @@ struct QuizManagerView: View {
                       .resizable()
                       .frame(height: 80)
               }
+              .frame(maxWidth: .infinity)
               .padding(.horizontal)
-              .background(authManager.level >= 5 ? Color.white : Color("lightGray"))
-              .cornerRadius(10)
-              .shadow(radius: 1)
-              .disabled(authManager.level >= 5)
               .padding(.bottom)
-            
+              .shadow(radius: 3)
             
             Button(action: {
                     audioManager.playKetteiSound()
@@ -87,8 +70,11 @@ struct QuizManagerView: View {
                         .resizable()
                         .frame(height: 80)
                 }
-                .disabled(authManager.level >= 10)
+                .frame(maxWidth: .infinity)
                 .padding(.horizontal)
+                .padding(.bottom)
+                .shadow(radius: 3)
+
                 NavigationLink("", destination: QuizAdvancedList(isPresenting: $isPresenting).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizAdvanced)
 
                 // ネットワーク系の問題

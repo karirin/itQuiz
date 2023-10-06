@@ -139,8 +139,8 @@
 			children = (
 				260E44122AB572DC00FBB487 /* itApp.swift */,
 				26B5BEF32AB6CFA600056E79 /* RootView.swift */,
-				260E44142AB572DC00FBB487 /* ContentView.swift */,
 				266A07292AC6FBC800B85D4E /* AnswerSelectionView.swift */,
+				260E44142AB572DC00FBB487 /* ContentView.swift */,
 				26A026DD2ABDD1EA00119F2B /* TopView.swift */,
 				26A25D512ABAFD82006B368F /* QuizManagerView.swift */,
 				260E44242AB59A7900FBB487 /* QuizView.swift */,

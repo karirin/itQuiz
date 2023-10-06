@@ -135,7 +135,7 @@ class AuthManager: ObservableObject {
         }
         let userRef = Database.database().reference().child("users").child(userId)
         userRef.observeSingleEvent(of: .value) { (snapshot) in
-            print(snapshot)
+//            print(snapshot)
             if let data = snapshot.value as? [String: Any],
                let userName = data["userName"] as? String,
                let avatarsData = data["avatars"] as? [String:[String: Any]], // Adjust this line
@@ -235,6 +235,7 @@ class AuthManager: ObservableObject {
                     newExperience -= self.level * 100  // 現在のレベル×100を引いて余りを計算
                     self.level += 1    // レベルを1つ上げる
                     
+                    self.didLevelUp = true
                     // ここで攻撃力とHPを更新
                     self.updateStatsUponLevelUp()
                 }
@@ -247,7 +248,6 @@ class AuthManager: ObservableObject {
                     if error == nil {
                         // 称号の確認と保存
                         self.saveEarnedTitles()
-                        self.didLevelUp = true
                     }
                 }
             }
@@ -334,7 +334,7 @@ class AuthManager: ObservableObject {
             if let data = snapshot.value as? [String: Any], let userLevel = data["level"] as? Int {
                 var earnedTitles: [Title] = []
 
-                print("userLevel:\(userLevel)")
+//                print("userLevel:\(userLevel)")
                 if userLevel >= 3 {
                     earnedTitles.append(Title(name: "レベル３達成", condition: "レベル3に到達", description: "レベル3に到達した証"))
                 }

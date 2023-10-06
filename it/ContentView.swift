@@ -29,9 +29,6 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             VStack {
-                Spacer()
-                Spacer()
-                Spacer()
                 HStack{
                     Image(systemName: "person.circle")
                     Text("\(userName)")
@@ -65,12 +62,13 @@ struct ContentView: View {
                         ZStack{
                             Image("image")
                                 .resizable()
-                                .frame(height:150)
+                                .frame(height:120)
                                 .padding(.top,40)
                                 .opacity(0.5)
                             Image(avatar.isEmpty ? "defaultIcon" : (avatar.first?["name"] as? String) ?? "")
+//                            Image("ぴょん吉")
                                 .resizable()
-                                .frame(width: 150,height:150)
+                                .frame(width: 140,height:140)
                         }
                         
                         .font(.system(size: 24))
@@ -278,7 +276,6 @@ struct ContentView: View {
             authManager.fetchUserInfo { (name, avatar, money, hp, attack) in
                          self.userName = name ?? ""
                          self.avatar = avatar ?? [[String: Any]]()
-                print(self.avatar)
                          self.userMoney = money ?? 0
                          self.userHp = hp ?? 100
                          self.userAttack = attack ?? 20

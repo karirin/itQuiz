@@ -13,7 +13,12 @@ struct AnswerSelectionView: View {
 
     var body: some View {
         VStack {
+            
+                Spacer()
+                Spacer()
             ForEach(0..<choices.count, id: \.self) { index in
+                
+                    Spacer()
                 Button(action: {
                     self.action(index)
                 }) {
@@ -27,6 +32,9 @@ struct AnswerSelectionView: View {
                 .padding(.horizontal)
                 .padding(.vertical, 2)
             }
+            
+                Spacer()
+                Spacer()
         }
     }
 }

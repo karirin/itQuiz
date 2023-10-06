@@ -43,6 +43,7 @@ struct QuizView: View {
     @State private var countdownValue: Int = 3
     @State private var showCountdown: Bool = true
     @State private var playerHP: Int = 1000
+    @State private var playerMaxHP: Int = 1000
     @State private var monsterHP: Int = 3000
     @State private var monsterUnderHP: Int = 30
     @State private var monsterAttack: Int = 30
@@ -51,6 +52,8 @@ struct QuizView: View {
     @State private var monsterBackground: String = ""
     @State private var userMoney: Int = 0
     @State private var userHp: Int = 100
+    @State private var userMaxHp: Int = 100
+    @State private var avatarHp: Int = 100
     @State private var userAttack: Int = 30
     @State private var monsterType: Int = 0
     @State private var playerExperience: Int = 0
@@ -235,6 +238,7 @@ struct QuizView: View {
                         .padding(.leading)
                     }
                     .padding(.trailing)
+                    .padding(.top,40)
                     Spacer()
                     VStack{
                         ZStack {
@@ -305,9 +309,9 @@ struct QuizView: View {
                                 Image(avator.isEmpty ? "defaultIcon" : (avator.first?["name"] as? String) ?? "")
                                     .resizable()
                                     .frame(width: 30,height:30)
-                                ProgressBar3(value: Double(playerHP), maxValue: 1000.0, color: Color("hpUserColor"))
+                                ProgressBar3(value: Double(playerHP), maxValue: Double(self.userMaxHp), color: Color("hpUserColor"))
                                     .frame(height: 20)
-                                Text("\(playerHP)/1000")
+                                Text("\(playerHP)/\(self.userMaxHp)")
                             }
                             .padding(.horizontal)
                             
@@ -342,25 +346,13 @@ struct QuizView: View {
                     }
                     .frame(maxWidth: .infinity,maxHeight:.infinity)
                     .padding(.bottom)
-                    .background(showIncorrectBackground ? Color("superLightRed") : Color("Color2"))
+                    
                     .sheet(isPresented: $showModal) {
                         ExperienceModalView(showModal: $showModal, addedExperience: 10, addedMoney: 10, authManager: authManager)
                     }
                     
                    
-                }
-//                if showCountdown {
-//                       ZStack {
-//                           // 背景
-//                           Color.black.opacity(0.7)
-//                               .edgesIgnoringSafeArea(.all)
-//                           // カウントダウンの数字
-//                           Text("\(countdownValue)")
-//                               .font(.system(size: 100))
-//                               .foregroundColor(.white)
-//                               .bold()
-//                       }
-//                   }
+                }.background(showIncorrectBackground ? Color("superLightRed") : Color("Color2"))
                 if showHomeModal {
                     ZStack {
                         Color.black.opacity(0.7)
@@ -381,8 +373,18 @@ struct QuizView: View {
                     self.userMoney = money ?? 0
                     self.userHp = hp ?? 100
                     self.userAttack = attack ?? 20
+                    if let additionalAttack = self.avator.first?["attack"] as? Int {
+                        self.userAttack = self.userAttack + additionalAttack
+                    }
+                    if let additionalHealth = self.avator.first?["health"] as? Int {
+                        self.userMaxHp = self.userHp + additionalHealth
+                    }
+                    if let additionalHealth = self.avator.first?["health"] as? Int {
+                        self.playerHP = self.userHp + additionalHealth
+                    } else {
+                        self.playerHP = self.userHp
+                    }
                 }
-                
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     audioManager.playCountdownSound()
                 }
@@ -398,7 +400,6 @@ struct QuizView: View {
             }
             .onChange(of: showCompletionMessage) { newValue in
                 // 味方のHPが０以下のとき
-                print(playerHP)
                 if newValue && playerHP <= 0 {
                     DispatchQueue.global(qos: .background).async {
                         authManager.addExperience(points: 5)
@@ -427,7 +428,7 @@ struct QuizView: View {
                 switch quizLevel {
                 case .beginner:
                     monsterBackground = "beginnerBackground"
-                    playerExperience = 20000
+                    playerExperience = 200
                     playerMoney = 10
                     switch newMonsterType {
                     case 1:
@@ -489,7 +490,6 @@ struct QuizView: View {
                     monsterBackground = "networkBackground"
                     switch newMonsterType {
                     case 1:
-                        print("\(monsterBackground)")
                         monsterHP = 50
                         monsterUnderHP = 50
                         monsterAttack = 30

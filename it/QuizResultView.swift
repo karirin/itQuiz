@@ -18,6 +18,7 @@ struct QuizResult {
 struct QuizResultView: View {
     var results: [QuizResult]
     @State private var showModal = true
+    @State private var showLevelUpModal = false
     @State private var showMemoView = false
     @State private var currentMemo = ""
     @State private var selectedQuestion = ""
@@ -35,10 +36,9 @@ struct QuizResultView: View {
         self.results = results
         self.authManager = authManager
         _isPresenting = isPresenting
-        _playerExperience = State(initialValue: playerExperience) // ここでplayerExperienceをStateとして初期化
+        _playerExperience = State(initialValue: playerExperience)
         _playerMoney = State(initialValue: playerMoney)
     }
-
     
     var body: some View {
         NavigationView{
@@ -104,14 +104,16 @@ struct QuizResultView: View {
                     if newValue {
                         // レベルアップ通知を表示した後、フラグをリセット
                         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                            authManager.didLevelUp = false
+                            showLevelUpModal = true
                             audioManager.playCorrectSound()
                         }
                     }
                 }
                 if showModal {
                     ExperienceModalView(showModal: $showModal, addedExperience: playerExperience, addedMoney: playerMoney, authManager: authManager)
-
+                }
+                if showLevelUpModal {
+                    LevelUpModalView(showLevelUpModal: $showLevelUpModal, authManager: authManager)
                 }
                 if showMemoView {
                     MemoView(memo: $currentMemo, question: selectedQuestion)
@@ -131,6 +133,7 @@ struct ExperienceModalView: View {
     @State private var currentMoney: Double = 0
     let maxExperience: Double = 100
     @ObservedObject var authManager: AuthManager
+    @ObservedObject var audioManager = AudioManager.shared
 
     var body: some View {
         ZStack {
@@ -140,26 +143,31 @@ struct ExperienceModalView: View {
                 .onTapGesture {
                     showModal = false
                 }
-
-            VStack(spacing: 20) {
-                Text("経験値獲得!")
-                    .font(.largeTitle)
-
-                Text("+\(Int(currentExperience)) 経験値")
-                    .font(.title)
-                
-                Text("+\(Int(currentMoney)) ゴールド")
-                    .font(.title)
-                
-                // ここでProgressBar1に現在の経験値とmax経験値を渡します。
-                Text("\(authManager.experience) / \(authManager.level * 100) 経験値")
-                ProgressBar1(value: Double(authManager.experience), maxValue: Double(authManager.level * 100))
-                    .padding(.horizontal)
-
-                Button("閉じる") {
-                    showModal = false
+            VStack{
+                VStack(spacing: 20) {
+                    Text("クリア！！")
+                        .font(.largeTitle)
+                    HStack{
+                        Image("経験値")
+                            .resizable()
+                            .frame(width:30,height:30)
+                        Text("経験値 ＋\(Int(currentExperience))")
+                            .font(.title)
+                    }
+                    
+                    HStack{
+                        Image("コイン")
+                            .resizable()
+                            .frame(width:30,height:30)
+                        Text("コイン ＋\(Int(currentMoney))")
+                            .font(.title)
+                    }
+                    // ここでProgressBar1に現在の経験値とmax経験値を渡します。
+                    Text("\(authManager.experience) / \(authManager.level * 100) 経験値")
+                        .font(.system(size: 20))
+                    ProgressBar1(value: Double(authManager.experience), maxValue: Double(authManager.level * 100))
+                        .padding(.horizontal,20)
                 }
-                .padding()
             }
             .onAppear {
                 withAnimation {
@@ -174,11 +182,76 @@ struct ExperienceModalView: View {
                 }
             }
             .padding()
-//            .frame(width: 300, height: 200) // このサイズを調整して好みの大きさにします
+            .background(Color.white)
+            .cornerRadius(20)
+            .shadow(radius: 10)
+            .padding(30)
+        }.overlay(
+            // 「×」ボタンを右上に配置
+            Button(action: {
+                showModal = false
+                audioManager.playCancelSound()
+            }) {
+                Image(systemName: "xmark.circle.fill")
+                    .resizable()
+                    .frame(width: 50, height: 50)
+                    .foregroundColor(.black)
+                    .background(.white)
+                    .cornerRadius(30)
+                    .padding()
+            }
+            .offset(x: 160, y: -130)
+        )
+    }
+}
+
+struct LevelUpModalView: View {
+    @Binding var showLevelUpModal: Bool
+    @ObservedObject var authManager: AuthManager
+
+    var body: some View {
+        ZStack {
+            // 半透明の背景
+            Color.black.opacity(0.4)
+                .edgesIgnoringSafeArea(.all)
+                .onTapGesture {
+                    showLevelUpModal = false
+                }
+
+            VStack(spacing: 0) {
+                ZStack{
+                    Image("レベルアップ")
+                        .resizable()
+                        .frame(width:250,height:250)
+                    Text("\(authManager.level)")
+                        .font(.system(size: 100))
+                        .fontWeight(.medium)
+                        .padding(.bottom,80)
+                }
+            }
+            .padding()
             .background(Color.white)
             .cornerRadius(20)
             .shadow(radius: 10)
             .padding()
+        }
+        .overlay(
+            // 「×」ボタンを右上に配置
+            Button(action: {
+                showLevelUpModal = false
+            }) {
+                Image(systemName: "xmark.circle.fill")
+                    .resizable()
+                    .frame(width: 80, height: 80)
+                    .foregroundColor(.black)
+                    .background(.white)
+                    .cornerRadius(50)
+                    .padding()
+            }
+            .offset(x: 130, y: -140)
+        )
+        .onAppear{
+            authManager.fetchUserExperienceAndLevel()
         }
     }
 }
