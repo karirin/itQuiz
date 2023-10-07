@@ -33,14 +33,28 @@ struct QuizManagerView: View {
 
 
     var body: some View {
-        VStack {
-            Group{
+        ScrollView{
+            VStack {
+                Group{
+                    Button(action: {
+                        audioManager.playKetteiSound()
+                        // 画面遷移のトリガーをオンにする
+                        self.isPresentingQuizBeginner = true
+                    }) {
+                        Image("IT基礎知識の問題の初級")
+                            .resizable()
+                            .frame(height: 80)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.horizontal)
+                    .padding(.bottom)
+                    .shadow(radius: 3)
+                }
                 Button(action: {
                     audioManager.playKetteiSound()
-                    // 画面遷移のトリガーをオンにする
-                    self.isPresentingQuizBeginner = true
+                    self.isPresentingQuizIntermediate = true
                 }) {
-                    Image("IT基礎知識の問題の初級")
+                    Image("IT基礎知識の問題の中級")
                         .resizable()
                         .frame(height: 80)
                 }
@@ -48,21 +62,8 @@ struct QuizManagerView: View {
                 .padding(.horizontal)
                 .padding(.bottom)
                 .shadow(radius: 3)
-            }
-            Button(action: {
-                  audioManager.playKetteiSound()
-                  self.isPresentingQuizIntermediate = true
-              }) {
-                  Image("IT基礎知識の問題の中級")
-                      .resizable()
-                      .frame(height: 80)
-              }
-              .frame(maxWidth: .infinity)
-              .padding(.horizontal)
-              .padding(.bottom)
-              .shadow(radius: 3)
-            
-            Button(action: {
+                
+                Button(action: {
                     audioManager.playKetteiSound()
                     self.isPresentingQuizAdvanced = true
                 }) {
@@ -74,47 +75,59 @@ struct QuizManagerView: View {
                 .padding(.horizontal)
                 .padding(.bottom)
                 .shadow(radius: 3)
-
-                NavigationLink("", destination: QuizAdvancedList(isPresenting: $isPresenting).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizAdvanced)
-
+                
                 // ネットワーク系の問題
                 Button(action: {
                     audioManager.playKetteiSound()
                     self.isPresentingQuizNetwork = true
                 }) {
-                    createButtonLabel(text: "ネットワーク系の問題", imageName: "networkBackground") // 画像名を適切に変更してください
+                    Image("ネットワーク系の問題")
+                        .resizable()
+                        .frame(height: 80)
                 }
-                .disabled(authManager.level >= 10)
+                .frame(maxWidth: .infinity)
                 .padding(.horizontal)
-                NavigationLink("", destination: QuizNetworkList(isPresenting: $isPresenting).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizNetwork)
-
+                .padding(.bottom)
+                .shadow(radius: 3)
+                
                 // セキュリティ系の問題
                 Button(action: {
                     audioManager.playKetteiSound()
                     self.isPresentingQuizSecurity = true
                 }) {
-                    createButtonLabel(text: "セキュリティ系の問題", imageName: "securityBackground") // 画像名を適切に変更してください
+                    Image("セキュリティ系の問題")
+                        .resizable()
+                        .frame(height: 80)
                 }
-                .disabled(authManager.level >= 10)
+                .frame(maxWidth: .infinity)
                 .padding(.horizontal)
-
-                NavigationLink("", destination: QuizIntermediateList(isPresenting: $isPresenting).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizSecurity) // 適切な遷移先に変更してください
-
+                .padding(.bottom)
+                .shadow(radius: 3)
+                
                 // データベース系の問題
                 Button(action: {
                     audioManager.playKetteiSound()
                     self.isPresentingQuizDatabase = true
                 }) {
-                    createButtonLabel(text: "データベース系の問題", imageName: "databaseBackground") // 画像名を適切に変更してください
+                    Image("データベース系の問題")
+                        .resizable()
+                        .frame(height: 80)
                 }
-                .disabled(authManager.level >= 10)
+                .frame(maxWidth: .infinity)
                 .padding(.horizontal)
+                .padding(.bottom)
+                .shadow(radius: 3)
+            }
+            
             Group{
                 NavigationLink("", destination: QuizIntermediateList(isPresenting: $isPresenting).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizDatabase) // 適切な遷移先に変更してください
                 NavigationLink("", destination: QuizBeginnerList(isPresenting: $isPresenting).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizBeginner) // 適切な遷移先に変更してください
                 NavigationLink("", destination: QuizIntermediateList(isPresenting: $isPresenting).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizIntermediate) // 適切な遷移先に変更してください
-            }
+                NavigationLink("", destination: QuizAdvancedList(isPresenting: $isPresenting).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizAdvanced)
+                NavigationLink("", destination: QuizIntermediateList(isPresenting: $isPresenting).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizSecurity) // 適切な遷移先に変更してください
             
+                NavigationLink("", destination: QuizNetworkList(isPresenting: $isPresenting).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizNetwork)
+            }
         }
         .frame(maxWidth:.infinity,maxHeight: .infinity)
         .background(Color("Color2"))

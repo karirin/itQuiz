@@ -23,18 +23,28 @@ struct AnswerSelectionView: View {
                     self.action(index)
                 }) {
                     Text(self.choices[index])
+                        .font(.system(size: 24))
                         .frame(maxWidth: .infinity)
-                        .padding()
+                        .padding(16)
                         .background(Color.white)
-                        .foregroundColor(.black)
+//                        .foregroundColor(.black)
+                        .foregroundColor(Color("fontGray"))
                         .cornerRadius(8)
                 }
-                .padding(.horizontal)
-                .padding(.vertical, 2)
+                .padding(.horizontal,20)
+                .padding(.vertical, 5)
             }
             
                 Spacer()
                 Spacer()
+        }
+    }
+}
+
+struct AnswerSelectionView_Previews: PreviewProvider {
+    static var previews: some View {
+        AnswerSelectionView(choices: ["選択肢1", "選択肢2", "選択肢3"]) { index in
+            print("選択肢 \(index + 1) がタップされました")
         }
     }
 }

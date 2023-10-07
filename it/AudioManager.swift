@@ -21,6 +21,7 @@ class AudioManager: ObservableObject {
     var audioChangePlayer: AVPlayer?
     var audioReturnPlayer: AVPlayer?
     var audioDownPlayer: AVPlayer?
+    var audioLevelUpPlayer: AVPlayer?
 
     @Published var isMuted: Bool = false
 
@@ -58,10 +59,13 @@ class AudioManager: ObservableObject {
         if let soundURL = Bundle.main.url(forResource: "倒した", withExtension: "mp3") {
             audioDownPlayer = AVPlayer(url: soundURL)
         }
+        if let soundURL = Bundle.main.url(forResource: "レベルアップ回復", withExtension: "mp3") {
+            audioLevelUpPlayer = AVPlayer(url: soundURL)
+        }
     }
     
     func toggleSound() {
-        let players = [audioPlayer, audioKetteiPlayer, audioCorrectPlayer,audioUnCorrectPlayer,audioAttackPlayer,audioMonsterAttackPlayer,audioCountdownPlayer,audioCancelPlayer,audioChangePlayer,audioReturnPlayer,audioDownPlayer]
+        let players = [audioPlayer, audioKetteiPlayer, audioCorrectPlayer,audioUnCorrectPlayer,audioAttackPlayer,audioMonsterAttackPlayer,audioCountdownPlayer,audioCancelPlayer,audioChangePlayer,audioReturnPlayer,audioDownPlayer,audioLevelUpPlayer]
         for player in players {
             if let player = player {
                 if player.volume == 0 {
@@ -128,5 +132,9 @@ class AudioManager: ObservableObject {
     func playDownSound() {
         audioDownPlayer?.seek(to: CMTime.zero) // 再生位置を先頭に戻す
         audioDownPlayer?.play()
+    }
+    func playLevelUpSound() {
+        audioLevelUpPlayer?.seek(to: CMTime.zero) // 再生位置を先頭に戻す
+        audioLevelUpPlayer?.play()
     }
 }

@@ -63,17 +63,24 @@ struct SignUp: View {
                     Button(action: {
                         self.showImagePicker = true
                     }) {
-                        Text("次へ")
+                        ZStack {
+                            // ボタンの背景
+                            RoundedRectangle(cornerRadius: 25)
+                                .fill(Color.white)
+                                .frame(width: 140, height: 70)
+                                .shadow(radius: 3) // ここで影をつけます
+                            Text("次へ")
+                        }
                     }
+                    .padding(.vertical,20)
+                    .padding(.horizontal,35)
+                    .font(.system(size:26))
+                    .foregroundColor(Color("fontGray"))
+                    .padding()
                         .disabled(userName.isEmpty)
-                        .padding(.vertical,10)
-                        .padding(.horizontal,25)
-                        .font(.headline)
-                        .foregroundColor(.white)
                         .background(RoundedRectangle(cornerRadius: 25)
-                            .fill(userName.isEmpty ? Color.gray : Color.red))
+                            .fill(userName.isEmpty ? Color.gray : Color.white))
                         .opacity(userName.isEmpty ? 0.5 : 1.0)
-                        .padding()
                 }
             }
         }
@@ -86,66 +93,102 @@ struct ImagePickerView: View {
     @State private var isImagePickerDisplay = false
     @ObservedObject private var authManager = AuthManager.shared
     @State private var showProfileCreation: Bool = false // 追加
-    @State private var selectedIcon: String = "user1"
+    @State private var selectedIcon: String = "ネッキー"
     @State private var showingIconPicker = false
     let defaultImage = UIImage(named: "defaultProfileImage")
-    let icons = ["ネッキー", "ルイーカ", "ピョン吉"]
+    @State private var selectedAvatar: Avatar? // 選択したアバターを保持するプロパティ
+    let avatars = [
+        Avatar(name: "ネッキー", attack: 10, health: 20, usedFlag: 1, count: 1),
+        Avatar(name: "ピョン吉", attack: 15, health: 15, usedFlag: 0, count: 1),
+        Avatar(name: "ルイーカ", attack: 20, health: 10, usedFlag: 0, count: 1)
+    ]
     @Environment(\.presentationMode) var presentationMode
     @State private var navigateToContentView: Bool = false
 
     var body: some View {
         NavigationView{
             VStack {
+                Spacer()
                 HStack{
-                    Text("アバターを選択してください")
+                    Text("おともを選択してください")
                             .font(.system(size:28))
                 }
-                
-                ScrollView {
-                    VStack(spacing: 20) {
-                        ForEach(0..<icons.count) { rowIndex in
-                            HStack(spacing: 20) {
-                                ForEach(0..<3) { colIndex in
-                                    let iconIndex = rowIndex * 3 + colIndex
-                                    if iconIndex < icons.count {
-                                        Button(action: {
-                                            self.selectedIcon = icons[iconIndex]
-                                        }) {
-                                            Image(icons[iconIndex])
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(width: 90, height: 300)
-                                            .padding(10)
-                                                .border(Color.blue, width: selectedIcon == icons[iconIndex] ? 2 : 0)
-                                        }
-                                        .padding(.vertical, 10)
-
-                                    }
-                                }
-                            }
+                Spacer()
+                if let selected = selectedAvatar {
+                    VStack {
+                        Text(selected.name)
+                            .font(.system(size:24))
+                            .fontWeight(.bold)
+                            .foregroundColor(Color.gray)
+                        Image(selected.name)
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(height: 180)
+                            .cornerRadius(15)
+                        HStack{
+                            Image("ハート")
+                                .resizable()
+                                .frame(width: 20,height:20)
+                            Text("\(selected.health)")
+                                .font(.system(size:24))
+                            Image("ソード")
+                                .resizable()
+                                .frame(width: 25,height:20)
+                            Text("\(selected.attack)")
+                                .font(.system(size:24))
                         }
                     }
                 }
-                
-                Button("ユーザーを作成") {
-                    let selectedAvatar = Avatar(name: selectedIcon, attack: 20, health: 20 ,usedFlag: 1, count:1)
+                Spacer()
+                    HStack() {
+                        ForEach(avatars, id: \.name) { avatar in
+                            Button(action: {
+                                self.selectedAvatar = avatar
+                            }) {
+                                Image(avatar.name)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 80, height: 80)
+                                    .padding(10)
+                                    .border(Color.blue, width: selectedAvatar?.name == avatar.name ? 2 : 0)
+                            }
+                        }
+                    }
+                Spacer()
+                Button(action: {
+                    let selectedAvatar = Avatar(name: self.selectedAvatar?.name ?? "ネッキー", attack: 20, health: 20 ,usedFlag: 1, count:1)
                     authManager.saveUserToDatabase(userName: userName)
                     authManager.addAvatarToUser(avatar: selectedAvatar)
                     self.navigateToContentView = true
+                }) {
+                    ZStack {
+                    // ボタンの背景
+                    RoundedRectangle(cornerRadius: 25)
+                        .fill(Color.white)
+                        .frame(width: 300, height: 70)
+                        .shadow(radius: 3) // ここで影をつけます
+                    Text("ユーザーを作成")
+                        .shadow(radius: 0)
                 }
-
-                    .padding(.vertical,10)
-                    .padding(.horizontal,25)
-                    .font(.headline)
-                    .foregroundColor(.white)
+                    }
+                    .padding(.vertical,20)
+                    .padding(.horizontal,35)
+                    .font(.system(size:26))
+                    .foregroundColor(Color("fontGray"))
                     .background(RoundedRectangle(cornerRadius: 25)
-                        .fill(Color.red))
+                        .fill(.white))
                     .padding()
+                
+            Spacer()
+                Spacer()
                 }
                 .background(
                     NavigationLink("", destination: ContentView().navigationBarBackButtonHidden(true), isActive: $navigateToContentView)
                         .hidden() // NavigationLinkを非表示にする
                 )
+        }
+        .onAppear{
+            self.selectedAvatar = avatars[0]
         }
         .navigationBarBackButtonHidden(true)
 //        .navigationBarItems(leading: Button(action: {

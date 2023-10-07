@@ -148,7 +148,7 @@ struct ContentView: View {
                             }
                             .frame(maxWidth: .infinity)
                             .background(isButtonEnabled ? .white : Color("lightGray"))
-                            .disabled(!isButtonEnabled)
+//                            .disabled(!isButtonEnabled)
                             .foregroundColor(.gray)
                             .cornerRadius(20)
                             .padding(.horizontal)
@@ -245,11 +245,12 @@ struct ContentView: View {
                             }
                         }
                         .padding(.horizontal,5)
-                        NavigationLink("", destination: QuizBeginnerList(isPresenting: $isPresentingQuizList).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizBeginnerList)
-                        NavigationLink("", destination: QuizManagerView(isPresenting: $isPresentingQuizList), isActive: $isPresentingQuizList)
-                        NavigationLink("", destination: AvatarListView(), isActive: $isPresentingAvatarList)
-                        NavigationLink("", destination: GachaView(), isActive: $isPresentingGachaView)
-                    }
+//                        if isPresentingQuizList {
+                            NavigationLink("", destination: QuizBeginnerList(isPresenting: $isPresentingQuizList).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizBeginnerList)
+                            NavigationLink("", destination: QuizManagerView(isPresenting: $isPresentingQuizList), isActive: $isPresentingQuizList)
+                            NavigationLink("", destination: AvatarListView(), isActive: $isPresentingAvatarList)
+                            NavigationLink("", destination: GachaView(), isActive: $isPresentingGachaView)}
+//                    }
 //                }
             }
                         .background(Color("Color2"))
@@ -258,6 +259,7 @@ struct ContentView: View {
             .onAppear {
             // 1. lastClickedDateを取得
             authManager.fetchLastClickedDate(userId: authManager.currentUserId ?? "") { lastDate in
+                print("userId:\(authManager.currentUserId)")
                 if let lastDate = lastDate {
                     // 2. 現在の日時との差を計算
                     let currentDate = Date()
@@ -274,6 +276,11 @@ struct ContentView: View {
                 }
             }
             authManager.fetchUserInfo { (name, avatar, money, hp, attack) in
+                print(name)
+                print(avatar)
+                print(money)
+                print(hp)
+                print(attack)
                          self.userName = name ?? ""
                          self.avatar = avatar ?? [[String: Any]]()
                          self.userMoney = money ?? 0

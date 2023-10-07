@@ -52,7 +52,6 @@ struct AvatarListView: View {
                             } else {
                                 Button(action: {
                                     audioManager.playSound()
-                                    // 切り替えるアバターを設定し、アラートを表示
                                     self.switchingAvatar = selected
                                     self.showingAlert1 = true
                                 }) {
@@ -119,18 +118,6 @@ struct AvatarListView: View {
                                         .padding(5)
                                         .cornerRadius(8)
                                 }
-//                                .onTapGesture {
-//                                    if selectedItem == nil || selectedItem != avatar {
-//                                        // 最初のタップでアバターを選択
-//                                        selectedItem = avatar
-//                                        print("tetetetetete")
-//                                    } else if selectedItem == avatar {
-//                                        print("tetetetetete2")
-//                                        // 2回目のタップでアラートを表示
-//                                        self.switchingAvatar = avatar
-//                                        self.showingAlert2 = true
-//                                    }
-//                                }
                                 VStack {
                                     Spacer()
                                     HStack {

@@ -105,7 +105,7 @@ struct QuizResultView: View {
                         // レベルアップ通知を表示した後、フラグをリセット
                         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                             showLevelUpModal = true
-                            audioManager.playCorrectSound()
+                            audioManager.playLevelUpSound()
                         }
                     }
                 }
@@ -200,7 +200,7 @@ struct ExperienceModalView: View {
                     .cornerRadius(30)
                     .padding()
             }
-            .offset(x: 160, y: -130)
+            .offset(x: 150, y: -130)
         )
     }
 }
@@ -208,6 +208,7 @@ struct ExperienceModalView: View {
 struct LevelUpModalView: View {
     @Binding var showLevelUpModal: Bool
     @ObservedObject var authManager: AuthManager
+    @ObservedObject var audioManager = AudioManager.shared
 
     var body: some View {
         ZStack {
@@ -239,6 +240,7 @@ struct LevelUpModalView: View {
             // 「×」ボタンを右上に配置
             Button(action: {
                 showLevelUpModal = false
+                audioManager.playCancelSound()
             }) {
                 Image(systemName: "xmark.circle.fill")
                     .resizable()

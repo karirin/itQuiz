@@ -130,12 +130,12 @@ struct GachaView: View {
                         }
                     }
                     // 1秒の遅延を追加
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+//                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                         self.showResult = true  // 結果を表示
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+//                        DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
                             animationFinished = true
-                        }
-                    }
+//                        }
+//                    }
                 }) {
                     if(isGachaButtonDisabled){
                         Image("もう一度ガチャる")
@@ -176,12 +176,12 @@ Spacer()
                             }
                         }
                         // 1秒の遅延を追加
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+//                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                             self.showResult = true  // 結果を表示
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+//                            DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
                                 animationFinished = true
-                            }
-                        }
+//                            }
+//                        }
                     }) {
                         if(isGachaButtonDisabled){
                             Image("ガチャる")
@@ -220,7 +220,6 @@ Spacer()
                 }else{
                     isGachaButtonDisabled = true
                 }
-                print(isGachaButtonDisabled)
             }
         }
         .frame(maxWidth: .infinity,maxHeight: .infinity)
@@ -240,9 +239,9 @@ Spacer()
                    self.showAnimation = false
                }
            }
-           .fullScreenCover(isPresented: $showAnimation) {
-               GachaAnimationView(showAnimation: $showAnimation, rarity: obtainedItem?.rarity)  // この行を変更
-           }
+//           .fullScreenCover(isPresented: $showAnimation) {
+//               GachaAnimationView(showAnimation: $showAnimation, rarity: obtainedItem?.rarity)  // この行を変更
+//           }
         
        }
 

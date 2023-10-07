@@ -13,6 +13,7 @@ enum QuizLevel {
     case intermediate
     case advanced
     case network
+    case security
 }
 
 struct TimerArc: Shape {
@@ -107,12 +108,7 @@ struct QuizView: View {
     
     // 次の問題へ移る処理
     func moveToNextQuiz() {
-        if monsterType == 4 {
-            // 最後のモンスターが倒された場合、結果画面へ遷移
-            showCompletionMessage = true
-            timer?.invalidate()
-            navigateToQuizResultView = true  // ここで結果画面への遷移フラグをtrueに
-        } else if currentQuizIndex + 1 < quizzes.count { // 最大問題数を超えていないかチェック
+        if currentQuizIndex + 1 < quizzes.count { // 最大問題数を超えていないかチェック
             currentQuizIndex += 1
             selectedAnswerIndex = nil
             startTimer()
@@ -186,7 +182,13 @@ struct QuizView: View {
                 isCorrect: isAnswerCorrect
             )
             quizResults.append(result)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            if monsterType == 4 {
+                // 最後のモンスターが倒された場合、結果画面へ遷移
+                showCompletionMessage = true
+                timer?.invalidate()
+                navigateToQuizResultView = true  // ここで結果画面への遷移フラグをtrueに
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.1) {
                 self.showAttackImage = false
                 moveToNextQuiz()
             }
@@ -428,7 +430,7 @@ struct QuizView: View {
                 switch quizLevel {
                 case .beginner:
                     monsterBackground = "beginnerBackground"
-                    playerExperience = 200
+                    playerExperience = 2000
                     playerMoney = 10
                     switch newMonsterType {
                     case 1:
@@ -488,6 +490,24 @@ struct QuizView: View {
                     }
                 case .network:
                     monsterBackground = "networkBackground"
+                    switch newMonsterType {
+                    case 1:
+                        monsterHP = 50
+                        monsterUnderHP = 50
+                        monsterAttack = 30
+                    case 2:
+                        monsterHP = 60
+                        monsterUnderHP = 60
+                        monsterAttack = 35
+                    case 3:
+                        monsterHP = 70
+                        monsterUnderHP = 70
+                        monsterAttack = 40
+                    default:
+                        monsterHP = 50
+                    }
+                case .security:
+                    monsterBackground = "securityBackground"
                     switch newMonsterType {
                     case 1:
                         monsterHP = 50
