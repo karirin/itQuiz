@@ -391,11 +391,12 @@ struct QuizBeginnerList: View {
 
     @State private var shuffledQuizList: [QuizQuestion]
     private var authManager = AuthManager()
-    private var audioManager = AudioManager.shared
+    @ObservedObject var audioManager : AudioManager
 
-    init(isPresenting: Binding<Bool>) {
+    init(isPresenting: Binding<Bool>, audioManager: AudioManager) {
         _isPresenting = isPresenting
         _shuffledQuizList = State(initialValue: quizBeginnerList.shuffled())
+        self.audioManager = audioManager
     }
 
     var body: some View {
@@ -405,6 +406,6 @@ struct QuizBeginnerList: View {
 
 struct QuizList_Previews: PreviewProvider {
     static var previews: some View {
-        QuizBeginnerList(isPresenting: .constant(false))
+        QuizBeginnerList(isPresenting: .constant(false), audioManager: AudioManager.shared)
     }
 }

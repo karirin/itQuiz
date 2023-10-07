@@ -22,13 +22,14 @@ struct QuizManagerView: View {
     @State private var isPresentingQuizSecurity: Bool = false
     @State private var isPresentingQuizDatabase: Bool = false
     @State private var isSoundOn: Bool = true
-    @ObservedObject var audioManager = AudioManager.shared
+    @ObservedObject var audioManager:AudioManager
     @Environment(\.presentationMode) var presentationMode
     @Binding var isPresenting: Bool
     
-    init(isPresenting: Binding<Bool>) {
+    init(isPresenting: Binding<Bool>, audioManager:AudioManager) {
         _isPresenting = isPresenting
         _lastClickedDate = State(initialValue: Date())
+        self.audioManager = audioManager
     }
 
 
@@ -121,7 +122,7 @@ struct QuizManagerView: View {
             
             Group{
                 NavigationLink("", destination: QuizIntermediateList(isPresenting: $isPresenting).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizDatabase) // 適切な遷移先に変更してください
-                NavigationLink("", destination: QuizBeginnerList(isPresenting: $isPresenting).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizBeginner) // 適切な遷移先に変更してください
+                NavigationLink("", destination: QuizBeginnerList(isPresenting: $isPresenting,audioManager:audioManager).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizBeginner) // 適切な遷移先に変更してください
                 NavigationLink("", destination: QuizIntermediateList(isPresenting: $isPresenting).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizIntermediate) // 適切な遷移先に変更してください
                 NavigationLink("", destination: QuizAdvancedList(isPresenting: $isPresenting).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizAdvanced)
                 NavigationLink("", destination: QuizIntermediateList(isPresenting: $isPresenting).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizSecurity) // 適切な遷移先に変更してください
@@ -193,6 +194,6 @@ struct QuizManagerView: View {
 
 struct QuizManagerView_Previews: PreviewProvider {
     static var previews: some View {
-        QuizManagerView(isPresenting: .constant(false))
+        QuizManagerView(isPresenting: .constant(false), audioManager: AudioManager.shared)
     }
 }

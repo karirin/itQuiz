@@ -246,8 +246,8 @@ struct ContentView: View {
                         }
                         .padding(.horizontal,5)
 //                        if isPresentingQuizList {
-                            NavigationLink("", destination: QuizBeginnerList(isPresenting: $isPresentingQuizList).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizBeginnerList)
-                            NavigationLink("", destination: QuizManagerView(isPresenting: $isPresentingQuizList), isActive: $isPresentingQuizList)
+                        NavigationLink("", destination: QuizBeginnerList(isPresenting: $isPresentingQuizList, audioManager: audioManager).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizBeginnerList)
+                        NavigationLink("", destination: QuizManagerView(isPresenting: $isPresentingQuizList, audioManager: audioManager), isActive: $isPresentingQuizList)
                             NavigationLink("", destination: AvatarListView(), isActive: $isPresentingAvatarList)
                             NavigationLink("", destination: GachaView(), isActive: $isPresentingGachaView)}
 //                    }
