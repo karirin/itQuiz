@@ -23,16 +23,19 @@ struct AnswerSelectionView: View {
                     self.action(index)
                 }) {
                     Text(self.choices[index])
-                        .font(.system(size: 24))
+//                        .font(.system(size: 24))
                         .frame(maxWidth: .infinity)
-                        .padding(16)
+//                        .padding(16)
+                        .padding()
                         .background(Color.white)
 //                        .foregroundColor(.black)
                         .foregroundColor(Color("fontGray"))
                         .cornerRadius(8)
                 }
-                .padding(.horizontal,20)
-                .padding(.vertical, 5)
+//                .padding(.horizontal,20)
+//                .padding(.vertical, 5)
+                .padding(.horizontal)
+                .padding(.vertical, 2)
             }
             
                 Spacer()

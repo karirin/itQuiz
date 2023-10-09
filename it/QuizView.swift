@@ -67,7 +67,8 @@ struct QuizView: View {
     @Binding var isPresenting: Bool
     @State private var showHomeModal: Bool = false
     @State private var isSoundOn: Bool = true
-    
+    @State private var showTutorial1 = false
+    @State private var showTutorial2 = true
     
     var currentQuiz: QuizQuestion {
         quizzes[currentQuizIndex]
@@ -108,7 +109,12 @@ struct QuizView: View {
     
     // 次の問題へ移る処理
     func moveToNextQuiz() {
-        if currentQuizIndex + 1 < quizzes.count { // 最大問題数を超えていないかチェック
+        if monsterType == 3 {
+//                                // 最後のモンスターが倒された場合、結果画面へ遷移
+            showCompletionMessage = true
+            timer?.invalidate()
+            navigateToQuizResultView = true  //ここで結果画面への遷移フラグをtrueに
+        }else if currentQuizIndex + 1 < quizzes.count { // 最大問題数を超えていないかチェック
             currentQuizIndex += 1
             selectedAnswerIndex = nil
             startTimer()
@@ -138,26 +144,20 @@ struct QuizView: View {
                     //                                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                     monsterHP -= userAttack
                     if monsterHP <= 0 {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                             audioManager.playDownSound()
                             self.showMonsterDownImage = true
                         }
                         // モンスターのHPが0以下になった場合の処理
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                             self.showMonsterDownImage = false
                             monsterType += 1  // 次のモンスターに移行
-                            if monsterType == 4 {
-                                // 最後のモンスターが倒された場合、結果画面へ遷移
-                                showCompletionMessage = true
-                                timer?.invalidate()
-                                navigateToQuizResultView = true  // ここで結果画面への遷移フラグをtrueに
-                            } else {
-                                monsterHP = 100  // 新しいモンスターのHPをリセット
-                            }
-                        }
-                        if monsterType == 4 {
-                            showCompletionMessage = true
-                            timer?.invalidate()
+//                            if monsterType == 4 {
+////                                // 最後のモンスターが倒された場合、結果画面へ遷移
+//                                showCompletionMessage = true
+//                                timer?.invalidate()
+//                                navigateToQuizResultView = true  //ここで結果画面への遷移フラグをtrueに
+//                            }
                         }
                     } else if playerHP <= 0 {
                         // プレイヤーのHPが0以下になった場合の処理
@@ -165,12 +165,18 @@ struct QuizView: View {
                         timer?.invalidate()
                     }
                 }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                    moveToNextQuiz()
+                }
             } else {
                 audioManager.playUnCorrectSound()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     audioManager.playMonsterAttackSound()
                     playerHP -= monsterAttack
                     self.showAttackImage = true
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                    moveToNextQuiz()
                 }
             }
             
@@ -182,16 +188,21 @@ struct QuizView: View {
                 isCorrect: isAnswerCorrect
             )
             quizResults.append(result)
-            if monsterType == 4 {
-                // 最後のモンスターが倒された場合、結果画面へ遷移
-                showCompletionMessage = true
-                timer?.invalidate()
-                navigateToQuizResultView = true  // ここで結果画面への遷移フラグをtrueに
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.1) {
-                self.showAttackImage = false
-                moveToNextQuiz()
-            }
+            self.showAttackImage = false
+//            if monsterType == 3 {
+//                
+//                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+//                // 最後のモンスターが倒された場合、結果画面へ遷移
+////                showCompletionMessage = true
+////                timer?.invalidate()
+////                navigateToQuizResultView = true  // ここで結果画面への遷移フラグをtrueに
+////                    moveToNextQuiz()
+//                }
+//            }else{
+//                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+//                    moveToNextQuiz()
+//                }
+//            }
             hasAnswered = true
         }
     }
@@ -362,7 +373,69 @@ struct QuizView: View {
                         ModalView(isSoundOn: $isSoundOn, isPresented: $showHomeModal, isPresenting: $isPresenting, audioManager: audioManager)
                     }
                 }
+                if showTutorial1 {
+                    GeometryReader { geometry in
+                        Color.black.opacity(0.5)
+                            .ignoresSafeArea()
+                        // スポットライトの領域をカットアウ
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                                    .frame(width: 360, height: 90)
+                                    .position(x: geometry.size.width / 2.0, y: geometry.size.height / 5.435)
+                                    .blendMode(.destinationOut)
+                            )
+                            .compositingGroup()
+                            .background(.clear)
+                    }
+                    VStack(alignment: .trailing, spacing: .zero) {
+                    Image("上矢印")
+                        .resizable()
+                        .frame(width: 20, height: 20)
+                        .padding(.trailing, 236.0)
+                        Text("問題が出題されます")
+                            .font(.system(size: 24.0))
+                            .padding(.all, 16.0)
+                            .background(Color.white)
+                            .cornerRadius(4.0)
+                            .padding(.horizontal, 16)
+                    }.offset(x: -40, y: -130)
+                }
+                if showTutorial2 {
+                    GeometryReader { geometry in
+                        Color.black.opacity(0.5)
+                            .ignoresSafeArea()
+                        // スポットライトの領域をカットアウ
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                                    .frame(width: 360, height: 260)
+                                    .position(x: geometry.size.width / 2.0, y: geometry.size.height / 1.32)
+                                    .blendMode(.destinationOut)
+                            )
+                            .compositingGroup()
+                            .background(.clear)
+                    }
+                    VStack(alignment: .trailing, spacing: .zero) {
+                        Text("選択肢の中から正解と思うものをクリックしてください")
+                            .font(.system(size: 23.0))
+                            .padding(.all, 16.0)
+                            .background(Color.white)
+                            .cornerRadius(4.0)
+                            .padding(.horizontal, 18)
+                        Image("下矢印")
+                            .resizable()
+                            .frame(width: 20, height: 20)
+                            .padding(.trailing, 236.0)
+                    }.offset(x: -10, y: -10)
+                }
         }
+            .onTapGesture {
+                if showTutorial1 {
+                    showTutorial1 = false // タップでチュートリアル1を終了
+                    showTutorial2 = true
+                } else if showTutorial2 {
+                    showTutorial2 = false // タップでチュートリアル2を終了
+                }
+            }
             .onAppear {
                 startCountdown()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
@@ -430,7 +503,7 @@ struct QuizView: View {
                 switch quizLevel {
                 case .beginner:
                     monsterBackground = "beginnerBackground"
-                    playerExperience = 2000
+                    playerExperience = 20
                     playerMoney = 10
                     switch newMonsterType {
                     case 1:
@@ -490,6 +563,8 @@ struct QuizView: View {
                     }
                 case .network:
                     monsterBackground = "networkBackground"
+                    playerExperience = 40
+                    playerMoney = 30
                     switch newMonsterType {
                     case 1:
                         monsterHP = 50
@@ -508,6 +583,8 @@ struct QuizView: View {
                     }
                 case .security:
                     monsterBackground = "securityBackground"
+                    playerExperience = 40
+                    playerMoney = 30
                     switch newMonsterType {
                     case 1:
                         monsterHP = 50
@@ -532,6 +609,6 @@ struct QuizView: View {
 
 struct QuizView_Previews: PreviewProvider {
     static var previews: some View {
-        QuizBeginnerList(isPresenting: .constant(false), audioManager: AudioManager.shared)
+        QuizBeginnerList(isPresenting: .constant(false))
     }
 }

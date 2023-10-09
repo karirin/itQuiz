@@ -25,7 +25,7 @@ class AudioManager: ObservableObject {
 
     @Published var isMuted: Bool = false
 
-    private init() {
+    init() {
         if let soundURL = Bundle.main.url(forResource: "sound", withExtension: "mp3") {
             audioPlayer = AVPlayer(url: soundURL)
         }

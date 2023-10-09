@@ -25,39 +25,41 @@ struct ContentView: View {
     @State private var audioPlayerKettei: AVAudioPlayer?
     @ObservedObject var audioManager = AudioManager.shared
     @State private var isSoundOn: Bool = true
+    @State private var showTutorial = true
     
     var body: some View {
         NavigationView {
-            VStack {
-                HStack{
-                    Image(systemName: "person.circle")
-                    Text("\(userName)")
-                    Spacer()
-                    Image("コイン")
-                        .resizable()
-                        .frame(width:20,height:20)
-                    Text("+")
-                    Text(" \(userMoney)")
-                    Spacer()
-                    Spacer()
-                    Button(action: {
-                        audioManager.toggleSound()
-                        isSoundOn.toggle()
-                    }) {
-                        HStack {
-                            if isSoundOn {
-                                Image(systemName: "speaker.slash")
-                                Text("音声オフ")
-                            } else {
-                                Image(systemName: "speaker.wave.2")
-                                Text("音声オン")
+            ZStack{
+                VStack {
+                    HStack{
+                        Image(systemName: "person.circle")
+                        Text("\(userName)")
+                        Spacer()
+                        Image("コイン")
+                            .resizable()
+                            .frame(width:20,height:20)
+                        Text("+")
+                        Text(" \(userMoney)")
+                        Spacer()
+                        Spacer()
+                        Button(action: {
+                            audioManager.toggleSound()
+                            isSoundOn.toggle()
+                        }) {
+                            HStack {
+                                if isSoundOn {
+                                    Image(systemName: "speaker.slash")
+                                    Text("音声オフ")
+                                } else {
+                                    Image(systemName: "speaker.wave.2")
+                                    Text("音声オン")
+                                }
                             }
+                            .foregroundColor(.gray)
                         }
-                        .foregroundColor(.gray)
                     }
-                }
-                .padding()
-//                ScrollView{
+                    .padding()
+                    //                ScrollView{
                     VStack{
                         ZStack{
                             Image("image")
@@ -66,7 +68,7 @@ struct ContentView: View {
                                 .padding(.top,40)
                                 .opacity(0.5)
                             Image(avatar.isEmpty ? "defaultIcon" : (avatar.first?["name"] as? String) ?? "")
-//                            Image("ぴょん吉")
+                            //                            Image("ぴょん吉")
                                 .resizable()
                                 .frame(width: 140,height:140)
                         }
@@ -74,45 +76,45 @@ struct ContentView: View {
                         .font(.system(size: 24))
                         VStack{
                             HStack(alignment: .top){
-                                    HStack(alignment: .top){
-                                        Image("スター")
-                                            .resizable()
-                                            .frame(width: 25,height:20)
-                                        Text("Lv：\(authManager.level)")
-                                    }
+                                HStack(alignment: .top){
+                                    Image("スター")
+                                        .resizable()
+                                        .frame(width: 25,height:20)
+                                    Text("Lv：\(authManager.level)")
+                                }
                                 
                                 HStack(alignment: .top){
-                                        Image("ハート")
-                                            .resizable()
-                                            .frame(width: 20,height:20)
-                                        VStack(spacing: 0){
-                                            Text("体力：\(userHp + (avatar.first?["health"] as? Int ?? 0))")
-                                                .multilineTextAlignment(.leading)
-                                            HStack{
-                                                Text("( + \(avatar.first?["health"] as? Int ?? 0)")
-                                                Image(avatar.isEmpty ? "defaultIcon" : (avatar.first?["name"] as? String) ?? "")
-                                                    .resizable()
-                                                    .frame(width: 20,height:20)
-                                                Text(")")
-                                            }
+                                    Image("ハート")
+                                        .resizable()
+                                        .frame(width: 20,height:20)
+                                    VStack(spacing: 0){
+                                        Text("体力：\(userHp + (avatar.first?["health"] as? Int ?? 0))")
+                                            .multilineTextAlignment(.leading)
+                                        HStack{
+                                            Text("( + \(avatar.first?["health"] as? Int ?? 0)")
+                                            Image(avatar.isEmpty ? "defaultIcon" : (avatar.first?["name"] as? String) ?? "")
+                                                .resizable()
+                                                .frame(width: 20,height:20)
+                                            Text(")")
                                         }
                                     }
+                                }
                                 HStack(alignment: .top){
-                                        Image("ソード")
-                                            .resizable()
-                                            .frame(width: 20,height:20)
-                                        VStack(spacing: 0){
-                                            Text("攻撃力：\(userAttack + (avatar.first?["attack"] as? Int ?? 0))")
-                                                .multilineTextAlignment(.leading)
-                                            HStack{
-                                                Text("( + \(avatar.first?["attack"] as? Int ?? 0)")
-                                                Image(avatar.isEmpty ? "defaultIcon" : (avatar.first?["name"] as? String) ?? "")
-                                                    .resizable()
-                                                    .frame(width: 20,height:20)
-                                                Text(")")
-                                            }
+                                    Image("ソード")
+                                        .resizable()
+                                        .frame(width: 20,height:20)
+                                    VStack(spacing: 0){
+                                        Text("攻撃力：\(userAttack + (avatar.first?["attack"] as? Int ?? 0))")
+                                            .multilineTextAlignment(.leading)
+                                        HStack{
+                                            Text("( + \(avatar.first?["attack"] as? Int ?? 0)")
+                                            Image(avatar.isEmpty ? "defaultIcon" : (avatar.first?["name"] as? String) ?? "")
+                                                .resizable()
+                                                .frame(width: 20,height:20)
+                                            Text(")")
                                         }
                                     }
+                                }
                             }
                             HStack{
                                 Text("経験値")
@@ -148,7 +150,7 @@ struct ContentView: View {
                             }
                             .frame(maxWidth: .infinity)
                             .background(isButtonEnabled ? .white : Color("lightGray"))
-//                            .disabled(!isButtonEnabled)
+                            //                            .disabled(!isButtonEnabled)
                             .foregroundColor(.gray)
                             .cornerRadius(20)
                             .padding(.horizontal)
@@ -245,16 +247,45 @@ struct ContentView: View {
                             }
                         }
                         .padding(.horizontal,5)
-//                        if isPresentingQuizList {
-                        NavigationLink("", destination: QuizBeginnerList(isPresenting: $isPresentingQuizList, audioManager: audioManager).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizBeginnerList)
-                        NavigationLink("", destination: QuizManagerView(isPresenting: $isPresentingQuizList, audioManager: audioManager), isActive: $isPresentingQuizList)
-                            NavigationLink("", destination: AvatarListView(), isActive: $isPresentingAvatarList)
-                            NavigationLink("", destination: GachaView(), isActive: $isPresentingGachaView)}
-//                    }
-//                }
+                        //                        if isPresentingQuizList {
+                        NavigationLink("", destination: QuizBeginnerList(isPresenting: $isPresentingQuizList).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizBeginnerList)
+                        NavigationLink("", destination: QuizManagerView(isPresenting: $isPresentingQuizList), isActive: $isPresentingQuizList)
+                        NavigationLink("", destination: AvatarListView(), isActive: $isPresentingAvatarList)
+                        NavigationLink("", destination: GachaView(), isActive: $isPresentingGachaView)}
+                    //                    }
+                    //                }
+                }
+                if showTutorial {
+                    GeometryReader { geometry in
+                        Color.black.opacity(0.5)
+                            .ignoresSafeArea()
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                                    .frame(width: 200, height: 90)
+                                    .position(x: geometry.size.width / 3.45, y: geometry.size.height / 1.435) // ここで位置を動的に調整
+                                    .blendMode(.destinationOut)
+                            )
+                            .compositingGroup()
+                            .background(.clear)
+                    }
+                    VStack(alignment: .trailing, spacing: .zero) {
+                        Text("「問題を解く」をクリックしてください。")
+                            .font(.system(size: 24.0))
+                            .padding(.all, 16.0)
+                            .background(Color.white)
+                            .cornerRadius(4.0)
+                            .padding(.horizontal, 16)
+                        Image("下矢印")
+                            .resizable()
+                            .frame(width: 20, height: 20)
+                            .padding(.trailing, 310.0)
+                    }.offset(x: -10, y: 30)
+                }
+            }
+            .onTapGesture {
+                showTutorial = false // タップでチュートリアルを終了
             }
                         .background(Color("Color2"))
-               
             } .frame(maxWidth: .infinity,maxHeight: .infinity)
             .onAppear {
             // 1. lastClickedDateを取得
@@ -276,11 +307,6 @@ struct ContentView: View {
                 }
             }
             authManager.fetchUserInfo { (name, avatar, money, hp, attack) in
-                print(name)
-                print(avatar)
-                print(money)
-                print(hp)
-                print(attack)
                          self.userName = name ?? ""
                          self.avatar = avatar ?? [[String: Any]]()
                          self.userMoney = money ?? 0

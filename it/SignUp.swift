@@ -72,11 +72,8 @@ struct SignUp: View {
                             Text("次へ")
                         }
                     }
-                    .padding(.vertical,20)
-                    .padding(.horizontal,35)
                     .font(.system(size:26))
-                    .foregroundColor(Color("fontGray"))
-                    .padding()
+                    .foregroundColor(Color.gray)
                         .disabled(userName.isEmpty)
                         .background(RoundedRectangle(cornerRadius: 25)
                             .fill(userName.isEmpty ? Color.gray : Color.white))

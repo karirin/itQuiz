@@ -70,6 +70,8 @@ struct GachaAnimationView: View {
                 }
             }
             .onChange(of: rarity) { _ in  // この行を追加
+                
+                    print(rarity)
                             self.player = createPlayer()  // この行を追加
                 
                         }
