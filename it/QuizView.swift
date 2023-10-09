@@ -56,6 +56,7 @@ struct QuizView: View {
     @State private var userMaxHp: Int = 100
     @State private var avatarHp: Int = 100
     @State private var userAttack: Int = 30
+    @State private var tutorialNum: Int = 0
     @State private var monsterType: Int = 0
     @State private var playerExperience: Int = 0
     @State private var playerMoney: Int = 0
@@ -67,8 +68,10 @@ struct QuizView: View {
     @Binding var isPresenting: Bool
     @State private var showHomeModal: Bool = false
     @State private var isSoundOn: Bool = true
-    @State private var showTutorial1 = false
-    @State private var showTutorial2 = true
+    @State private var showTutorial1 = true
+    @State private var showTutorial2 = false
+    @State private var showTutorial3 = false
+    @State private var showTutorial4 = false
     
     var currentQuiz: QuizQuestion {
         quizzes[currentQuizIndex]
@@ -189,20 +192,6 @@ struct QuizView: View {
             )
             quizResults.append(result)
             self.showAttackImage = false
-//            if monsterType == 3 {
-//                
-//                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-//                // 最後のモンスターが倒された場合、結果画面へ遷移
-////                showCompletionMessage = true
-////                timer?.invalidate()
-////                navigateToQuizResultView = true  // ここで結果画面への遷移フラグをtrueに
-////                    moveToNextQuiz()
-//                }
-//            }else{
-//                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-//                    moveToNextQuiz()
-//                }
-//            }
             hasAnswered = true
         }
     }
@@ -373,7 +362,7 @@ struct QuizView: View {
                         ModalView(isSoundOn: $isSoundOn, isPresented: $showHomeModal, isPresenting: $isPresenting, audioManager: audioManager)
                     }
                 }
-                if showTutorial1 {
+                if tutorialNum == 3 {
                     GeometryReader { geometry in
                         Color.black.opacity(0.5)
                             .ignoresSafeArea()
@@ -400,7 +389,7 @@ struct QuizView: View {
                             .padding(.horizontal, 16)
                     }.offset(x: -40, y: -130)
                 }
-                if showTutorial2 {
+                if tutorialNum == 4 {
                     GeometryReader { geometry in
                         Color.black.opacity(0.5)
                             .ignoresSafeArea()
@@ -427,13 +416,78 @@ struct QuizView: View {
                             .padding(.trailing, 236.0)
                     }.offset(x: -10, y: -10)
                 }
+                if tutorialNum == 5 {
+                    GeometryReader { geometry in
+                        Color.black.opacity(0.5)
+                            .ignoresSafeArea()
+                        // スポットライトの領域をカットアウ
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                                    .frame(width: 360, height: 80)
+                                    .position(x: geometry.size.width / 2.0, y: geometry.size.height / 2.05)
+                                    .blendMode(.destinationOut)
+                            )
+                            .compositingGroup()
+                            .background(.clear)
+                    }
+                    VStack(alignment: .trailing, spacing: .zero) {
+                        Text("正解すると相手モンスターにダメージ、不正解だと自分がダメージを受けます。\n相手のHPが０になれば次の相手に、自分のHPが０になればゲームオーバーです")
+                            .font(.system(size: 18.0))
+                            .padding(.all, 16.0)
+                            .background(Color.white)
+                            .cornerRadius(4.0)
+                            .padding(.horizontal, 18)
+                        Image("下矢印")
+                            .resizable()
+                            .frame(width: 20, height: 20)
+                            .padding(.trailing, 236.0)
+                    }.offset(x: -10, y: -150)
+                }
+                if tutorialNum == 6 {
+                    GeometryReader { geometry in
+                        Color.black.opacity(0.5)
+                            .ignoresSafeArea()
+                        // スポットライトの領域をカットアウ
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                                    .frame(width: 70, height: 70)
+                                    .position(x: geometry.size.width / 1.125, y: geometry.size.height / 10.9)
+                                    .blendMode(.destinationOut)
+                            )
+                            .compositingGroup()
+                            .background(.clear)
+                    }
+                    VStack(alignment: .trailing, spacing: .zero) {
+                        Image("上矢印")
+                            .resizable()
+                            .frame(width: 20, height: 20)
+                            .padding(.trailing, 46.0)
+                        Text("30秒経つと自分がダメージを受けることになります。")
+                            .font(.system(size: 24.0))
+                            .padding(.all, 16.0)
+                            .background(Color.white)
+                            .cornerRadius(4.0)
+                            .padding(.horizontal, 18)
+                    }.offset(x: 10, y: -190)
+                }
         }
             .onTapGesture {
-                if showTutorial1 {
-                    showTutorial1 = false // タップでチュートリアル1を終了
-                    showTutorial2 = true
-                } else if showTutorial2 {
-                    showTutorial2 = false // タップでチュートリアル2を終了
+                if tutorialNum == 3 {
+                    tutorialNum = 4
+                    authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 4) { success in
+                    }
+                } else if tutorialNum == 4 {
+                    tutorialNum = 5
+                    authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 5) { success in
+                    }
+                } else if tutorialNum == 5 {
+                    tutorialNum = 6
+                    authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 6) { success in
+                    }
+                } else if tutorialNum == 6 {
+                    tutorialNum = 0
+                    authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { success in
+                    }
                 }
             }
             .onAppear {
@@ -442,12 +496,13 @@ struct QuizView: View {
                     startTimer() // Viewが表示されたときにタイマーを開始
                 }
                 self.monsterType = 1 // すぐに1に戻す
-                authManager.fetchUserInfo { (name, avator, money, hp, attack) in
+                authManager.fetchUserInfo { (name, avator, money, hp, attack, tutorialNum) in
                     self.userName = name ?? ""
                     self.avator = avator ?? [[String: Any]]()
                     self.userMoney = money ?? 0
                     self.userHp = hp ?? 100
                     self.userAttack = attack ?? 20
+                    self.tutorialNum = tutorialNum ?? 0
                     if let additionalAttack = self.avator.first?["attack"] as? Int {
                         self.userAttack = self.userAttack + additionalAttack
                     }
@@ -462,6 +517,11 @@ struct QuizView: View {
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     audioManager.playCountdownSound()
+                }
+                authManager.fetchUserInfo { (name, avatar, money, hp, attack, tutorialNum) in
+                    if let fetchedTutorialNum = tutorialNum {
+                        self.tutorialNum = fetchedTutorialNum
+                    }
                 }
             }
             .onChange(of: selectedAnswerIndex) { newValue in

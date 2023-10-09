@@ -13,7 +13,7 @@ struct Avatar: Equatable {
     var attack: Int
     var health: Int
     var usedFlag: Int
-    var count: Int 
+    var count: Int
 }
 
 struct User {
@@ -117,7 +117,7 @@ class AuthManager: ObservableObject {
         guard let userId = user?.uid else { return }
         
         let userRef = Database.database().reference().child("users").child(userId)
-        let userData: [String: Any] = ["userName": userName, "userMoney": 0, "userHp": 100, "userAttack": 20]
+        let userData: [String: Any] = ["userName": userName, "userMoney": 0, "userHp": 100, "userAttack": 20, "tutorialNum": 1]
         
         userRef.setValue(userData) { (error, ref) in
             if let error = error {
@@ -128,22 +128,21 @@ class AuthManager: ObservableObject {
         }
     }
     
-    func fetchUserInfo(completion: @escaping (String?, [[String: Any]]?, Int?, Int?, Int?) -> Void) {
+    func fetchUserInfo(completion: @escaping (String?, [[String: Any]]?, Int?, Int?, Int?, Int?) -> Void) {
         guard let userId = user?.uid else {
-            completion(nil, nil, nil, nil, nil)
+            completion(nil, nil, nil, nil, nil, nil)
             return
         }
         let userRef = Database.database().reference().child("users").child(userId)
         userRef.observeSingleEvent(of: .value) { (snapshot) in
-//            print(snapshot)
             if let data = snapshot.value as? [String: Any],
                let userName = data["userName"] as? String,
-               let avatarsData = data["avatars"] as? [String:[String: Any]], // Adjust this line
+               let avatarsData = data["avatars"] as? [String:[String: Any]],
                let userMoney = data["userMoney"] as? Int,
                let userHp = data["userHp"] as? Int,
-               let userAttack = data["userAttack"] as? Int {
-                print("test1")
-                // usedFlagが1のアバターのみをフィルタリング
+               let userAttack = data["userAttack"] as? Int,
+               let tutorialNum = data["tutorialNum"] as? Int {  // 追加
+
                 var filteredAvatars: [[String: Any]] = []
                 for (_, avatarData) in avatarsData {
                     if avatarData["usedFlag"] as? Int == 1 {
@@ -151,9 +150,22 @@ class AuthManager: ObservableObject {
                     }
                 }
                 
-                completion(userName, filteredAvatars, userMoney, userHp, userAttack)
+                completion(userName, filteredAvatars, userMoney, userHp, userAttack, tutorialNum)  // 追加
             } else {
-                completion(nil, nil, nil, nil, nil)
+                completion(nil, nil, nil, nil, nil, nil)  // 追加
+            }
+        }
+    }
+
+    func updateTutorialNum(userId: String, tutorialNum: Int, completion: @escaping (Bool) -> Void) {
+        let userRef = Database.database().reference().child("users").child(userId)
+        let updates = ["tutorialNum": tutorialNum]
+        userRef.updateChildValues(updates) { (error, _) in
+            if let error = error {
+                print("Error updating tutorialNum: \(error)")
+                completion(false)
+            } else {
+                completion(true)
             }
         }
     }

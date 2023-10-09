@@ -15,6 +15,7 @@ struct ContentView: View {
     @State private var userMoney: Int = 0
     @State private var userHp: Int = 100
     @State private var userAttack: Int = 20
+    @State private var tutorialNum: Int = 0
     @State private var isButtonEnabled: Bool = true
     @State private var lastClickedDate: Date?
     @State private var isPresentingQuizBeginnerList: Bool = false
@@ -255,7 +256,7 @@ struct ContentView: View {
                     //                    }
                     //                }
                 }
-                if showTutorial {
+                if tutorialNum == 1 {
                     GeometryReader { geometry in
                         Color.black.opacity(0.5)
                             .ignoresSafeArea()
@@ -283,14 +284,16 @@ struct ContentView: View {
                 }
             }
             .onTapGesture {
-                showTutorial = false // タップでチュートリアルを終了
+                tutorialNum = 0 // タップでチュートリアルを終了
+                authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 2) { success in
+                       // データベースのアップデートが成功したかどうかをハンドリング
+                   }
             }
                         .background(Color("Color2"))
             } .frame(maxWidth: .infinity,maxHeight: .infinity)
             .onAppear {
             // 1. lastClickedDateを取得
             authManager.fetchLastClickedDate(userId: authManager.currentUserId ?? "") { lastDate in
-                print("userId:\(authManager.currentUserId)")
                 if let lastDate = lastDate {
                     // 2. 現在の日時との差を計算
                     let currentDate = Date()
@@ -306,12 +309,13 @@ struct ContentView: View {
                     isButtonEnabled = true
                 }
             }
-            authManager.fetchUserInfo { (name, avatar, money, hp, attack) in
+            authManager.fetchUserInfo { (name, avatar, money, hp, attack, tutorialNum) in
                          self.userName = name ?? ""
                          self.avatar = avatar ?? [[String: Any]]()
                          self.userMoney = money ?? 0
                          self.userHp = hp ?? 100
                          self.userAttack = attack ?? 20
+                         self.tutorialNum = tutorialNum ?? 0
                      }
             authManager.fetchAvatars {
                 self.avatar = authManager.avatars.map { avatar in

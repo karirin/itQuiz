@@ -12,6 +12,7 @@ struct ModalView: View {
     @Binding var isPresented: Bool
     @Binding var isPresenting: Bool
     @ObservedObject var audioManager:AudioManager
+    @ObservedObject var authManager = AuthManager.shared
     
     var body: some View {
         ZStack {
@@ -44,6 +45,22 @@ struct ModalView: View {
                             Image(systemName: "speaker.wave.2")
                             Text("　音声オン　")
                         }
+                    }
+                        .padding(20)
+                        .foregroundColor(.black)
+                        .background(Color.white)
+                        .cornerRadius(8)
+                        .shadow(radius: 1)
+                }
+                
+                Button(action: {
+                    authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 4) { success in
+                    }
+                    audioManager.playSound()
+                }) {
+                    HStack {
+                        Image(systemName: "questionmark.circle")
+                        Text("　ヘルプ　　")
                     }
                         .padding(20)
                         .foregroundColor(.black)

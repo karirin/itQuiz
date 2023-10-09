@@ -25,7 +25,7 @@ struct QuizManagerView: View {
     @ObservedObject var audioManager = AudioManager.shared
     @Environment(\.presentationMode) var presentationMode
     @Binding var isPresenting: Bool
-    @State private var showTutorial = true
+    @State private var tutorialNum: Int = 0
     
     init(isPresenting: Binding<Bool>) {
         _isPresenting = isPresenting
@@ -146,7 +146,7 @@ struct QuizManagerView: View {
                 }
                 
             }
-                if showTutorial {
+                if tutorialNum == 2 {
                     GeometryReader { geometry in
                         Color.black.opacity(0.5)
                             .ignoresSafeArea()
@@ -174,11 +174,19 @@ struct QuizManagerView: View {
                     }.offset(x: -10, y: -130)
                 }
         }.onTapGesture {
-            showTutorial = false // タップでチュートリアルを終了
+            tutorialNum = 0
+            authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 3) { success in
+                   // データベースのアップデートが成功したかどうかをハンドリング
+               }
         }
         .frame(maxWidth:.infinity,maxHeight: .infinity)
         .background(Color("Color2"))
         .onAppear {
+            authManager.fetchUserInfo { (name, avatar, money, hp, attack, tutorialNum) in
+                if let fetchedTutorialNum = tutorialNum {
+                    self.tutorialNum = fetchedTutorialNum
+                }
+            }
             if let userId = authManager.currentUserId {
                 authManager.fetchLastClickedDate(userId: userId) { date in
                     if let unwrappedDate = date {
