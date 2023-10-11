@@ -20,7 +20,7 @@ struct QuizBeginnerList: View {
 //        QuizQuestion(
 //                question: "どのプロトコルがコンピュータのホスト名をIPアドレスに変換しますか？",
 //                choices: [
-//                    "DHCP",
+//                    "あああああああああああああああああああああああああ",
 //                    "DNS",
 //                    "FTP",
 //                    "HTTP"
@@ -391,7 +391,7 @@ struct QuizBeginnerList: View {
 
     @State private var shuffledQuizList: [QuizQuestion]
     private var authManager = AuthManager()
-    private var audioManager = AudioManager()
+    private var audioManager = AudioManager.shared
 
     init(isPresenting: Binding<Bool>) {
         _isPresenting = isPresenting

@@ -22,6 +22,8 @@ class AudioManager: ObservableObject {
     var audioReturnPlayer: AVPlayer?
     var audioDownPlayer: AVPlayer?
     var audioLevelUpPlayer: AVPlayer?
+    var audioGameClearPlayer: AVPlayer?
+    var audioGameOverPlayer: AVPlayer?
 
     @Published var isMuted: Bool = false
 
@@ -62,10 +64,16 @@ class AudioManager: ObservableObject {
         if let soundURL = Bundle.main.url(forResource: "レベルアップ回復", withExtension: "mp3") {
             audioLevelUpPlayer = AVPlayer(url: soundURL)
         }
+        if let soundURL = Bundle.main.url(forResource: "ゲームクリア", withExtension: "mp3") {
+            audioGameClearPlayer = AVPlayer(url: soundURL)
+        }
+        if let soundURL = Bundle.main.url(forResource: "ゲームオーバー", withExtension: "mp3") {
+            audioGameOverPlayer = AVPlayer(url: soundURL)
+        }
     }
     
     func toggleSound() {
-        let players = [audioPlayer, audioKetteiPlayer, audioCorrectPlayer,audioUnCorrectPlayer,audioAttackPlayer,audioMonsterAttackPlayer,audioCountdownPlayer,audioCancelPlayer,audioChangePlayer,audioReturnPlayer,audioDownPlayer,audioLevelUpPlayer]
+        let players = [audioPlayer, audioKetteiPlayer, audioCorrectPlayer,audioUnCorrectPlayer,audioAttackPlayer,audioMonsterAttackPlayer,audioCountdownPlayer,audioCancelPlayer,audioChangePlayer,audioReturnPlayer,audioDownPlayer,audioLevelUpPlayer,audioGameClearPlayer,audioGameOverPlayer]
         for player in players {
             if let player = player {
                 if player.volume == 0 {
@@ -136,5 +144,13 @@ class AudioManager: ObservableObject {
     func playLevelUpSound() {
         audioLevelUpPlayer?.seek(to: CMTime.zero) // 再生位置を先頭に戻す
         audioLevelUpPlayer?.play()
+    }
+    func playGameClearSound() {
+        audioGameClearPlayer?.seek(to: CMTime.zero) // 再生位置を先頭に戻す
+        audioGameClearPlayer?.play()
+    }
+    func playGameOverSound() {
+        audioGameOverPlayer?.seek(to: CMTime.zero) // 再生位置を先頭に戻す
+        audioGameOverPlayer?.play()
     }
 }

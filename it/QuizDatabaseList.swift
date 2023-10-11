@@ -615,7 +615,7 @@ struct QuizDatabaseList: View {
     }
 
     var body: some View {
-        QuizView(quizzes: shuffledQuizList, quizLevel: .security, authManager: authManager,audioManager: audioManager,isPresenting: $isPresenting)
+        QuizView(quizzes: shuffledQuizList, quizLevel: .database, authManager: authManager,audioManager: audioManager,isPresenting: $isPresenting)
     }
 }
 

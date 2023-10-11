@@ -1,203 +1,223 @@
-//
-//  QuizView.swift main
-//  it
-//
-//  Created by hashimo ryoya on 2023/09/16.
-//
+    //
+    //  QuizView.swift main
+    //  it
+    //
+    //  Created by hashimo ryoya on 2023/09/16.
+    //
 
-import SwiftUI
-import AVFoundation
+    import SwiftUI
+    import AVFoundation
 
-enum QuizLevel {
-    case beginner
-    case intermediate
-    case advanced
-    case network
-    case security
-}
-
-struct TimerArc: Shape {
-    var startAngle: Angle
-    var endAngle: Angle
-    
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        path.addArc(center: CGPoint(x: rect.midX, y: rect.midY), radius: rect.width / 2, startAngle: startAngle, endAngle: endAngle, clockwise: false)
-        return path
+    enum QuizLevel {
+        case beginner
+        case intermediate
+        case advanced
+        case network
+        case security
+        case database
     }
-}
 
-struct QuizView: View {
-    let quizzes: [QuizQuestion]
-    let quizLevel: QuizLevel
-    @State private var selectedAnswerIndex: Int? = nil
-    @State private var currentQuizIndex: Int = 0
-    @State private var showCompletionMessage: Bool = false
-    @State private var remainingSeconds: Int = 30
-    @State private var timer: Timer? = nil
-    @State private var navigateToQuizResultView: Bool = false
-    @ObservedObject var authManager : AuthManager
-    @ObservedObject var audioManager : AudioManager
-    @State private var showModal: Bool = false
-    @State private var quizResults: [QuizResult] = []
-    @State private var correctAnswerCount: Int = 0
-    @State private var countdownValue: Int = 3
-    @State private var showCountdown: Bool = true
-    @State private var playerHP: Int = 1000
-    @State private var playerMaxHP: Int = 1000
-    @State private var monsterHP: Int = 3000
-    @State private var monsterUnderHP: Int = 30
-    @State private var monsterAttack: Int = 30
-    @State private var userName: String = ""
-    @State private var avator: [[String: Any]] = []
-    @State private var monsterBackground: String = ""
-    @State private var userMoney: Int = 0
-    @State private var userHp: Int = 100
-    @State private var userMaxHp: Int = 100
-    @State private var avatarHp: Int = 100
-    @State private var userAttack: Int = 30
-    @State private var tutorialNum: Int = 0
-    @State private var monsterType: Int = 0
-    @State private var playerExperience: Int = 0
-    @State private var playerMoney: Int = 0
-    @State private var shakeEffect: Bool = false
-    @State private var showAttackImage: Bool = false
-    @State private var showMonsterDownImage: Bool = false
-    @State private var showIncorrectBackground: Bool = false
-    @State private var hasAnswered: Bool = false
-    @Binding var isPresenting: Bool
-    @State var showHomeModal: Bool = false
-    @State private var isSoundOn: Bool = true
-    @State private var showTutorial1 = true
-    @State private var showTutorial2 = false
-    @State private var showTutorial3 = false
-    @State private var showTutorial4 = false
-    
-    var currentQuiz: QuizQuestion {
-        quizzes[currentQuizIndex]
+    struct TimerArc: Shape {
+        var startAngle: Angle
+        var endAngle: Angle
+        
+        func path(in rect: CGRect) -> Path {
+            var path = Path()
+            path.addArc(center: CGPoint(x: rect.midX, y: rect.midY), radius: rect.width / 2, startAngle: startAngle, endAngle: endAngle, clockwise: false)
+            return path
+        }
     }
-    
-    func startCountdown() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
-                if countdownValue > 1 {
-                    countdownValue -= 1
+
+    struct QuizView: View {
+        let quizzes: [QuizQuestion]
+        let quizLevel: QuizLevel
+        @State private var selectedAnswerIndex: Int? = nil
+        @State private var currentQuizIndex: Int = 0
+        @State private var showCompletionMessage: Bool = false
+        @State private var remainingSeconds: Int = 30
+        @State private var timer: Timer? = nil
+        @State private var navigateToQuizResultView: Bool = false
+        @ObservedObject var authManager : AuthManager
+        @ObservedObject var audioManager : AudioManager
+        @State private var showModal: Bool = false
+        @State private var showTutorial: Bool = false
+        @State private var quizResults: [QuizResult] = []
+        @State private var correctAnswerCount: Int = 0
+        @State private var countdownValue: Int = 3
+        @State private var showCountdown: Bool = true
+        @State private var playerHP: Int = 1000
+        @State private var playerMaxHP: Int = 1000
+        @State private var monsterHP: Int = 3000
+        @State private var monsterUnderHP: Int = 30
+        @State private var monsterAttack: Int = 30
+        @State private var userName: String = ""
+        @State private var avator: [[String: Any]] = []
+        @State private var monsterBackground: String = ""
+        @State private var userMoney: Int = 0
+        @State private var userHp: Int = 100
+        @State private var userMaxHp: Int = 100
+        @State private var avatarHp: Int = 100
+        @State private var userAttack: Int = 30
+        @State private var tutorialNum: Int = 0
+        @State private var monsterType: Int = 0
+        @State private var playerExperience: Int = 0
+        @State private var playerMoney: Int = 0
+        @State private var shakeEffect: Bool = false
+        @State private var showAttackImage: Bool = false
+        @State private var showMonsterDownImage: Bool = false
+        @State private var showIncorrectBackground: Bool = false
+        @State private var hasAnswered: Bool = false
+        @Binding var isPresenting: Bool
+        @State var showHomeModal: Bool = false
+        @State private var isSoundOn: Bool = true
+        @State private var showTutorial1 = true
+        @State private var showTutorial2 = false
+        @State private var showTutorial3 = false
+        @State private var showTutorial4 = false
+        
+        var currentQuiz: QuizQuestion {
+            quizzes[currentQuizIndex]
+        }
+        
+        func pauseTimer() {
+            timer?.invalidate()
+        }
+        
+        func resumeTimer() {
+            // 現在のタイマーを止める
+            self.timer?.invalidate()
+            
+            // ここではremainingSecondsをリセットしない
+            self.timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
+                if self.remainingSeconds > 0 {
+                    self.remainingSeconds -= 1
                 } else {
                     timer.invalidate()
-                    showCountdown = false
-                    startTimer() // カウントダウンが終了したら、クイズのタイマーを開始
+                    playerHP -= monsterAttack
+                    self.moveToNextQuiz()
                 }
             }
         }
-    }
-    
-    // タイマーの処理
-    func startTimer() {
-        // 現在のタイマーを止める
-        self.timer?.invalidate()
         
-        // 3秒後に以下のコードブロックを実行
-        self.remainingSeconds = 30
-        self.timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
-            if self.remainingSeconds > 0 {
-                self.remainingSeconds -= 1
-            } else {
-                timer.invalidate()
-                // ここでplayerHPとmonsterAttackは既に定義されている必要があります
-                playerHP -= monsterAttack
-                self.moveToNextQuiz()
-            }
-        }
-    }
-    
-    // 次の問題へ移る処理
-    func moveToNextQuiz() {
-        if monsterType == 3 {
-//                                // 最後のモンスターが倒された場合、結果画面へ遷移
-            showCompletionMessage = true
-            timer?.invalidate()
-            navigateToQuizResultView = true  //ここで結果画面への遷移フラグをtrueに
-        }else if currentQuizIndex + 1 < quizzes.count { // 最大問題数を超えていないかチェック
-            currentQuizIndex += 1
-            selectedAnswerIndex = nil
-            startTimer()
-            hasAnswered = false
-        } else {
-            // すべての問題が終了した場合、結果画面へ遷移
-            showCompletionMessage = true
-            timer?.invalidate()
-            navigateToQuizResultView = true  // ここで結果画面への遷移フラグをtrueに
-        }
-    }
-    
-    func answerSelectionAction(index: Int) {
-        if !hasAnswered {
-            self.selectedAnswerIndex = index
-            self.timer?.invalidate() // 回答を選択したらタイマーを止める
-            
-            let isAnswerCorrect = (selectedAnswerIndex == currentQuiz.correctAnswerIndex)
-            if isAnswerCorrect {
-                audioManager.playCorrectSound()
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    audioManager.playAttackSound()
-                    
-                    self.showAttackImage = true
-                    //                                        }
-                    correctAnswerCount += 1 // 正解の場合、正解数をインクリメント
-                    //                                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                    monsterHP -= userAttack
-                    if monsterHP <= 0 {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                            audioManager.playDownSound()
-                            self.showMonsterDownImage = true
-                        }
-                        // モンスターのHPが0以下になった場合の処理
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                            self.showMonsterDownImage = false
-                            monsterType += 1  // 次のモンスターに移行
-//                            if monsterType == 4 {
-////                                // 最後のモンスターが倒された場合、結果画面へ遷移
-//                                showCompletionMessage = true
-//                                timer?.invalidate()
-//                                navigateToQuizResultView = true  //ここで結果画面への遷移フラグをtrueに
-//                            }
-                        }
-                    } else if playerHP <= 0 {
-                        // プレイヤーのHPが0以下になった場合の処理
-                        showCompletionMessage = true
-                        timer?.invalidate()
+        func startCountdown() {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
+                    if countdownValue > 1 {
+                        countdownValue -= 1
+                    } else {
+                        timer.invalidate()
+                        showCountdown = false
+                        showTutorial = true
                     }
                 }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                    moveToNextQuiz()
-                }
-            } else {
-                audioManager.playUnCorrectSound()
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    audioManager.playMonsterAttackSound()
+            }
+        }
+
+        func startTimer() {
+            // 現在のタイマーを止める
+            self.timer?.invalidate()
+            
+            // 3秒後に以下のコードブロックを実行
+            self.remainingSeconds = 3000
+            self.timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
+                if self.remainingSeconds > 0 {
+                    self.remainingSeconds -= 1
+                } else {
+                    timer.invalidate()
                     playerHP -= monsterAttack
-                    self.showAttackImage = true
-                }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                    moveToNextQuiz()
+                    self.moveToNextQuiz()
                 }
             }
-            
-            let result = QuizResult(
-                question: currentQuiz.question,
-                userAnswer: currentQuiz.choices[index],
-                correctAnswer: currentQuiz.choices[currentQuiz.correctAnswerIndex],
-                explanation: currentQuiz.explanation,
-                isCorrect: isAnswerCorrect
-            )
-            quizResults.append(result)
-            self.showAttackImage = false
-            hasAnswered = true
         }
-    }
-    
-    var body: some View {
-        NavigationView{
+        
+        // 次の問題へ移る処理
+        func moveToNextQuiz() {
+            if monsterType == 3 && monsterHP <= 0 {
+                // 最後のモンスターが倒された場合、結果画面へ遷移
+                showCompletionMessage = true
+                timer?.invalidate()
+                navigateToQuizResultView = true  //ここで結果画面への遷移フラグをtrueに
+            } else if playerHP <= 0 {
+                showCompletionMessage = true
+                timer?.invalidate()
+                playerExperience = 5
+                playerMoney = 5
+                navigateToQuizResultView = true  //ここで結果画面への遷移フラグをtrueに
+            } else if currentQuizIndex + 1 < quizzes.count { // 最大問題数を超えていないかチェック
+                currentQuizIndex += 1
+                selectedAnswerIndex = nil
+                startTimer()
+                hasAnswered = false
+            } else {
+                // すべての問題が終了した場合、結果画面へ遷移
+                showCompletionMessage = true
+                timer?.invalidate()
+                navigateToQuizResultView = true  // ここで結果画面への遷移フラグをtrueに
+            }
+        }
+        
+        func answerSelectionAction(index: Int) {
+            if !hasAnswered {
+                self.selectedAnswerIndex = index
+                self.timer?.invalidate() // 回答を選択したらタイマーを止める
+                
+                let isAnswerCorrect = (selectedAnswerIndex == currentQuiz.correctAnswerIndex)
+                if isAnswerCorrect {
+                    audioManager.playCorrectSound()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        audioManager.playAttackSound()
+                        
+                        self.showAttackImage = true
+                        //                                        }
+                        correctAnswerCount += 1 // 正解の場合、正解数をインクリメント
+                        //                                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                        monsterHP -= userAttack
+                        if monsterHP <= 0 {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                audioManager.playDownSound()
+                                self.showMonsterDownImage = true
+                            }
+                            // モンスターのHPが0以下になった場合の処理
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                                self.showMonsterDownImage = false
+                                monsterType += 1
+                            }
+                        } else if playerHP <= 0 {
+                            // プレイヤーのHPが0以下になった場合の処理
+                            showCompletionMessage = true
+                            timer?.invalidate()
+                        }
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                        moveToNextQuiz()
+                    }
+                } else {
+                    audioManager.playUnCorrectSound()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        audioManager.playMonsterAttackSound()
+                        playerHP -= monsterAttack
+                        self.showAttackImage = true
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                        moveToNextQuiz()
+                    }
+                }
+                
+                let result = QuizResult(
+                    question: currentQuiz.question,
+                    userAnswer: currentQuiz.choices[index],
+                    correctAnswer: currentQuiz.choices[currentQuiz.correctAnswerIndex],
+                    explanation: currentQuiz.explanation,
+                    isCorrect: isAnswerCorrect
+                )
+                quizResults.append(result)
+                self.showAttackImage = false
+                hasAnswered = true
+            }
+        }
+        
+        var body: some View {
+            NavigationView{
             ZStack{
                 VStack {
                     HStack{
@@ -359,10 +379,10 @@ struct QuizView: View {
                     ZStack {
                         Color.black.opacity(0.7)
                             .edgesIgnoringSafeArea(.all)
-                        ModalView(isSoundOn: $isSoundOn, isPresented: $showHomeModal, isPresenting: $isPresenting, audioManager: audioManager, showHomeModal: $showHomeModal,tutorialNum: $tutorialNum )
+                        ModalView(isSoundOn: $isSoundOn, isPresented: $showHomeModal, isPresenting: $isPresenting, audioManager: audioManager, showHomeModal: $showHomeModal,tutorialNum: $tutorialNum,pauseTimer:pauseTimer,resumeTimer: resumeTimer)
                     }
                 }
-                if tutorialNum == 3 {
+                if tutorialNum == 3 && showTutorial == true {
                     GeometryReader { geometry in
                         Color.black.opacity(0.5)
                             .ignoresSafeArea()
@@ -389,7 +409,7 @@ struct QuizView: View {
                             .padding(.horizontal, 16)
                     }.offset(x: -40, y: -130)
                 }
-                if tutorialNum == 4 {
+                if tutorialNum == 4 && showTutorial == true{
                     GeometryReader { geometry in
                         Color.black.opacity(0.5)
                             .ignoresSafeArea()
@@ -416,7 +436,7 @@ struct QuizView: View {
                             .padding(.trailing, 236.0)
                     }.offset(x: -10, y: -10)
                 }
-                if tutorialNum == 5 {
+                if tutorialNum == 5 && showTutorial == true{
                     GeometryReader { geometry in
                         Color.black.opacity(0.5)
                             .ignoresSafeArea()
@@ -443,7 +463,7 @@ struct QuizView: View {
                             .padding(.trailing, 236.0)
                     }.offset(x: -10, y: -150)
                 }
-                if tutorialNum == 6 {
+                if tutorialNum == 6 && showTutorial == true{
                     GeometryReader { geometry in
                         Color.black.opacity(0.5)
                             .ignoresSafeArea()
@@ -470,31 +490,45 @@ struct QuizView: View {
                             .padding(.horizontal, 18)
                     }.offset(x: 10, y: -190)
                 }
+                if showCountdown {
+                       ZStack {
+                           // 背景
+                           Color.black.opacity(0.7)
+                               .edgesIgnoringSafeArea(.all)
+                           // カウントダウンの数字
+                           Text("\(countdownValue)")
+                               .font(.system(size: 100))
+                               .foregroundColor(.white)
+                               .bold()
+                       }
+                   }
         }
+            
             .onTapGesture {
-                if tutorialNum == 3 {
-                    tutorialNum = 4
-                    authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 4) { success in
-                    }
-                } else if tutorialNum == 4 {
-                    tutorialNum = 5
-                    authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 5) { success in
-                    }
-                } else if tutorialNum == 5 {
-                    tutorialNum = 6
-                    authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 6) { success in
-                    }
-                } else if tutorialNum == 6 {
-                    tutorialNum = 0
-                    authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { success in
+                audioManager.playSound()
+                if showCountdown == false {
+                    if tutorialNum == 3 {
+                        tutorialNum = 4
+                        authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 4) { success in
+                        }
+                    } else if tutorialNum == 4 {
+                        tutorialNum = 5
+                        authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 5) { success in
+                        }
+                    } else if tutorialNum == 5 {
+                        tutorialNum = 6
+                        authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 6) { success in
+                        }
+                    } else if tutorialNum == 6 {
+                                            resumeTimer()
+                        tutorialNum = 0
+                        authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { success in
+                        }
                     }
                 }
             }
             .onAppear {
                 startCountdown()
-                DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
-                    startTimer() // Viewが表示されたときにタイマーを開始
-                }
                 self.monsterType = 1 // すぐに1に戻す
                 authManager.fetchUserInfo { (name, avator, money, hp, attack, tutorialNum) in
                     self.userName = name ?? ""
@@ -514,14 +548,14 @@ struct QuizView: View {
                     } else {
                         self.playerHP = self.userHp
                     }
+                    if self.tutorialNum == 0 {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                            startTimer() // Viewが表示されたときにタイマーを開始
+                        }
+                    }
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     audioManager.playCountdownSound()
-                }
-                authManager.fetchUserInfo { (name, avatar, money, hp, attack, tutorialNum) in
-                    if let fetchedTutorialNum = tutorialNum {
-                        self.tutorialNum = fetchedTutorialNum
-                    }
                 }
             }
             .onChange(of: selectedAnswerIndex) { newValue in
@@ -539,12 +573,13 @@ struct QuizView: View {
                     DispatchQueue.global(qos: .background).async {
                         authManager.addExperience(points: 5)
                         authManager.addMoney(amount: 5)
+                        
                         DispatchQueue.main.async {
-                            // ここでUIの更新を行います。
                         }
                     }
                 } else {
                     DispatchQueue.global(qos: .background).async {
+                        print("||||||aaaaaaa")
                         authManager.addExperience(points: playerExperience)
                         authManager.addMoney(amount: playerMoney)
                         DispatchQueue.main.async {
@@ -552,8 +587,6 @@ struct QuizView: View {
                         }
                     }
                 }
-                
-                
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                     showModal = false
                     navigateToQuizResultView = true
@@ -565,6 +598,12 @@ struct QuizView: View {
                     monsterBackground = "beginnerBackground"
                     playerExperience = 20
                     playerMoney = 10
+                    print(playerExperience)
+                    if playerHP <= 0 {
+                        playerExperience = 5
+                        playerMoney = 5
+                    }
+                    print(playerHP)
                     switch newMonsterType {
                     case 1:
                         monsterHP = 30
@@ -585,6 +624,10 @@ struct QuizView: View {
                     monsterBackground = "intermediateBackground"
                     playerExperience = 30
                     playerMoney = 20
+                    if userHp <= 0 {
+                        playerExperience = 5
+                        playerMoney = 5
+                    }
                     switch newMonsterType {
                     case 1:
                         monsterHP = 50
@@ -605,6 +648,10 @@ struct QuizView: View {
                     monsterBackground = "advancedBackground"
                     playerExperience = 40
                     playerMoney = 30
+                    if userHp <= 0 {
+                        playerExperience = 5
+                        playerMoney = 5
+                    }
                     switch newMonsterType {
                     case 1:
                         monsterHP = 80
@@ -625,6 +672,10 @@ struct QuizView: View {
                     monsterBackground = "networkBackground"
                     playerExperience = 40
                     playerMoney = 30
+                    if userHp <= 0 {
+                        playerExperience = 5
+                        playerMoney = 5
+                    }
                     switch newMonsterType {
                     case 1:
                         monsterHP = 50
@@ -645,6 +696,34 @@ struct QuizView: View {
                     monsterBackground = "securityBackground"
                     playerExperience = 40
                     playerMoney = 30
+                    if userHp <= 0 {
+                        playerExperience = 5
+                        playerMoney = 5
+                    }
+                    switch newMonsterType {
+                    case 1:
+                        monsterHP = 50
+                        monsterUnderHP = 50
+                        monsterAttack = 30
+                    case 2:
+                        monsterHP = 60
+                        monsterUnderHP = 60
+                        monsterAttack = 35
+                    case 3:
+                        monsterHP = 70
+                        monsterUnderHP = 70
+                        monsterAttack = 40
+                    default:
+                        monsterHP = 50
+                    }
+                case .database:
+                    monsterBackground = "databaseBackground"
+                    playerExperience = 40
+                    playerMoney = 30
+                    if userHp <= 0 {
+                        playerExperience = 5
+                        playerMoney = 5
+                    }
                     switch newMonsterType {
                     case 1:
                         monsterHP = 50
@@ -663,98 +742,6 @@ struct QuizView: View {
                     }
                 }
             }
-        }
-    }
-}
-
-struct ModalView: View {
-    @Binding var isSoundOn: Bool
-    @Binding var isPresented: Bool
-    @Binding var isPresenting: Bool
-    @ObservedObject var audioManager:AudioManager
-    @ObservedObject var authManager = AuthManager.shared
-    @Binding var showHomeModal: Bool
-    @Binding var tutorialNum: Int
-    
-    var body: some View {
-        ZStack {
-            VStack(spacing: 20) {
-                Button(action: {
-                    isPresenting = false
-                    audioManager.playReturnSound()
-                }) {
-                    HStack{
-                        Image(systemName: "house.fill")
-                        Text("ホームに戻る")
-                            
-                    }.padding(20)
-                        .foregroundColor(.black)
-                        .background(Color.white)
-                        .cornerRadius(8)
-                        .shadow(radius: 1)
-                }
-                
-                Button(action: {
-                    audioManager.toggleSound()
-                    isSoundOn.toggle()
-                    audioManager.playSound()
-                }) {
-                    HStack {
-                        if isSoundOn {
-                            Image(systemName: "speaker.slash")
-                            Text("　音声オフ　")
-                        } else {
-                            Image(systemName: "speaker.wave.2")
-                            Text("　音声オン　")
-                        }
-                    }
-                        .padding(20)
-                        .foregroundColor(.black)
-                        .background(Color.white)
-                        .cornerRadius(8)
-                        .shadow(radius: 1)
-                }
-                
-                Button(action: {
-                    showHomeModal = false
-                    tutorialNum = 3
-                    authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 3) { success in
-                    }
-                    
-                    audioManager.playSound()
-                }) {
-                    HStack {
-                        Image(systemName: "questionmark.circle")
-                        Text("　ヘルプ　　")
-                    }
-                        .padding(20)
-                        .foregroundColor(.black)
-                        .background(Color.white)
-                        .cornerRadius(8)
-                        .shadow(radius: 1)
-                }
-            }
-            .padding(50)
-            .background(Color.white)
-            .cornerRadius(20)
-            .shadow(radius: 10)
-            .overlay(
-                // 「×」ボタンを右上に配置
-                Button(action: {
-                    isPresented = false
-                    audioManager.playCancelSound()
-                }) {
-                    Image(systemName: "xmark.circle.fill")
-                        .resizable()
-                        .frame(width: 50, height: 50)
-                        .foregroundColor(.gray)
-                        .background(.white)
-                        .cornerRadius(30)
-                        .padding()
-                }
-                .offset(x: 35, y: -35), // この値を調整してボタンを正しい位置に移動させます
-                alignment: .topTrailing // 枠の右上を基準に位置を調整します
-            )
         }
     }
 }

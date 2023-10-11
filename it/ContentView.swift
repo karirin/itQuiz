@@ -189,7 +189,7 @@ struct ContentView: View {
                                 .background(.white)
                                 .foregroundColor(.gray)
                                 .cornerRadius(20)
-                                .padding(.trailing,3)
+                                .padding(.trailing,5)
                                 .padding(.bottom)
                                 
                                 .shadow(radius: 3)
@@ -204,7 +204,7 @@ struct ContentView: View {
                                             .resizable()
                                             .frame(width: 35,height:35)
                                         Text("おとも")
-                                            .font(.system(size:24))
+                                            .font(.system(size:20))
                                     }
                                     .padding(.horizontal)
                                     .padding(.vertical)
@@ -217,7 +217,7 @@ struct ContentView: View {
                                 
                                 .shadow(radius: 3)
                             }
-                            .padding(.horizontal,12)
+                            .padding(.horizontal,9)
                             Spacer()
                             Button(action: {
                                 // 画面遷移のトリガーをオンにする
@@ -284,6 +284,7 @@ struct ContentView: View {
                 }
             }
             .onTapGesture {
+                audioManager.playSound()
                 tutorialNum = 0 // タップでチュートリアルを終了
                 authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 2) { success in
                        // データベースのアップデートが成功したかどうかをハンドリング
@@ -316,6 +317,12 @@ struct ContentView: View {
                          self.userHp = hp ?? 100
                          self.userAttack = attack ?? 20
                          self.tutorialNum = tutorialNum ?? 0
+                print("self.userName:\(self.userName)")
+                print("self.avatar:\(self.avatar)")
+                print("self.userMoney:\(self.userMoney)")
+                print("self.userHp:\(self.userHp)")
+                print("self.userAttack:\(self.userAttack)")
+                print("self.tutorialNum:\(self.tutorialNum)")
                      }
             authManager.fetchAvatars {
                 self.avatar = authManager.avatars.map { avatar in

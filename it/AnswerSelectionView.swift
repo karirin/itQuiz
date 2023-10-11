@@ -7,6 +7,19 @@
 
 import SwiftUI
 
+func fontSize(for text: String) -> CGFloat {
+    if text.count >= 25 {
+        return 10
+    } else
+    if text.count >= 21 {
+        return 12 // 21文字以上ならフォントサイズを12に
+    } else if text.count >= 17 {
+        return 14 // 17文字以上ならフォントサイズを14に
+    } else {
+        return 18 // それ以外ならフォントサイズを18に
+    }
+}
+
 struct AnswerSelectionView: View {
     let choices: [String]
     var action: (Int) -> Void
@@ -23,7 +36,10 @@ struct AnswerSelectionView: View {
                     self.action(index)
                 }) {
                     Text(self.choices[index])
+                        .font(.system(size: fontSize(for: self.choices[index])))
 //                        .font(.system(size: 24))
+//                        .lineLimit(nil) // テキストを複数行にわたって表示します
+//                        .minimumScaleFactor(0.5) // フォントサイズを小さく調整してテキストをフィットさせます
                         .frame(maxWidth: .infinity)
 //                        .padding(16)
                         .padding()

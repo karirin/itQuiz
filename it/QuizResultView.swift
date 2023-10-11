@@ -44,6 +44,7 @@ struct QuizResultView: View {
         NavigationView{
             ZStack {
                 VStack{
+                    Spacer()
                     HStack{
                         NavigationLink(destination: ContentView().navigationBarBackButtonHidden(true)) {
                             Button(action: {
@@ -145,8 +146,13 @@ struct ExperienceModalView: View {
                 }
             VStack{
                 VStack(spacing: 20) {
-                    Text("クリア！！")
-                        .font(.largeTitle)
+                    if currentExperience != 5{
+                        Text("クリア！！")
+                            .font(.largeTitle)
+                    }else{
+                        Text("ゲームオーバー")
+                            .font(.largeTitle)
+                    }
                     HStack{
                         Image("経験値")
                             .resizable()
@@ -173,6 +179,11 @@ struct ExperienceModalView: View {
                 withAnimation {
                     currentExperience += Double(addedExperience)
                     currentMoney += Double(addedMoney)
+                }
+                if currentExperience != 5 {
+                    audioManager.playGameClearSound()
+                }else{
+                    audioManager.playGameOverSound()
                 }
                 DispatchQueue.global(qos: .background).async {
                     authManager.fetchUserExperienceAndLevel()

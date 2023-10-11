@@ -34,16 +34,10 @@ struct QuizManagerView: View {
 
 
     var body: some View {
-        
             ZStack{
         ScrollView{
-            HStack{
-                Image(systemName: "chevron.left")
-                    .foregroundColor(Color("fontGray"))
-                Text("戻る")
-                    .foregroundColor(Color("fontGray"))
-            }
             VStack {
+                Spacer()
                 Group{
                     Button(action: {
                         audioManager.playKetteiSound()
@@ -135,11 +129,11 @@ struct QuizManagerView: View {
             }
                 VStack{
                     Group{
-                        NavigationLink("", destination: QuizIntermediateList(isPresenting: $isPresenting).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizDatabase) // 適切な遷移先に変更してください
+                        NavigationLink("", destination: QuizDatabaseList(isPresenting: $isPresenting).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizDatabase) // 適切な遷移先に変更してください
                         NavigationLink("", destination: QuizBeginnerList(isPresenting: $isPresenting).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizBeginner) // 適切な遷移先に変更してください
                         NavigationLink("", destination: QuizIntermediateList(isPresenting: $isPresenting).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizIntermediate) // 適切な遷移先に変更してください
                         NavigationLink("", destination: QuizAdvancedList(isPresenting: $isPresenting).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizAdvanced)
-                        NavigationLink("", destination: QuizIntermediateList(isPresenting: $isPresenting).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizSecurity) // 適切な遷移先に変更してください
+                        NavigationLink("", destination: QuizSecurityList(isPresenting: $isPresenting).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizSecurity) // 適切な遷移先に変更してください
                         
                         NavigationLink("", destination: QuizNetworkList(isPresenting: $isPresenting).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizNetwork)
                     }
@@ -174,6 +168,7 @@ struct QuizManagerView: View {
                     }.offset(x: -10, y: -130)
                 }
         }.onTapGesture {
+            audioManager.playSound()
             tutorialNum = 0
             authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 3) { success in
                    // データベースのアップデートが成功したかどうかをハンドリング
