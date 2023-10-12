@@ -26,6 +26,7 @@
 		266A072C2AC7242600B85D4E /* キャンセル.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 266A072B2AC7242500B85D4E /* キャンセル.mp3 */; };
 		267E708D2AD6E2E800EA7AA2 /* ゲームオーバー.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 267E708B2AD6E2E800EA7AA2 /* ゲームオーバー.mp3 */; };
 		267E708E2AD6E2E800EA7AA2 /* ゲームクリア.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 267E708C2AD6E2E800EA7AA2 /* ゲームクリア.mp3 */; };
+		267E70902AD6FD0200EA7AA2 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 267E708F2AD6FD0200EA7AA2 /* LoadingView.swift */; };
 		268C3B9B2ABCA63300282BEE /* QuizAdvancedList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 268C3B9A2ABCA63200282BEE /* QuizAdvancedList.swift */; };
 		268C3B9D2ABCA95D00282BEE /* QuizNetworkList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 268C3B9C2ABCA95D00282BEE /* QuizNetworkList.swift */; };
 		268C3BA52ABD638200282BEE /* SettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 268C3BA22ABD638100282BEE /* SettingView.swift */; };
@@ -80,6 +81,7 @@
 		267E708A2AD5ACDF00EA7AA2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		267E708B2AD6E2E800EA7AA2 /* ゲームオーバー.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "ゲームオーバー.mp3"; path = "../../../Downloads/ゲームオーバー.mp3"; sourceTree = "<group>"; };
 		267E708C2AD6E2E800EA7AA2 /* ゲームクリア.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "ゲームクリア.mp3"; path = "../../../Downloads/ゲームクリア.mp3"; sourceTree = "<group>"; };
+		267E708F2AD6FD0200EA7AA2 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
 		268C3B9A2ABCA63200282BEE /* QuizAdvancedList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizAdvancedList.swift; sourceTree = "<group>"; };
 		268C3B9C2ABCA95D00282BEE /* QuizNetworkList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizNetworkList.swift; sourceTree = "<group>"; };
 		268C3BA22ABD638100282BEE /* SettingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SettingView.swift; path = ../../sabusuku/sabusuku/SettingView.swift; sourceTree = "<group>"; };
@@ -153,6 +155,7 @@
 				26B5BEF32AB6CFA600056E79 /* RootView.swift */,
 				266A07292AC6FBC800B85D4E /* AnswerSelectionView.swift */,
 				260E44142AB572DC00FBB487 /* ContentView.swift */,
+				267E708F2AD6FD0200EA7AA2 /* LoadingView.swift */,
 				26A026DD2ABDD1EA00119F2B /* TopView.swift */,
 				26A25D512ABAFD82006B368F /* QuizManagerView.swift */,
 				260E44242AB59A7900FBB487 /* QuizView.swift */,
@@ -379,6 +382,7 @@
 				269304562AD061F000982840 /* QuizDatabaseList.swift in Sources */,
 				269A878C2AB873CC00F33C9E /* GachaAnimationView.swift in Sources */,
 				26A026EC2ABF16E600119F2B /* AudioManager.swift in Sources */,
+				267E70902AD6FD0200EA7AA2 /* LoadingView.swift in Sources */,
 				260E44132AB572DC00FBB487 /* itApp.swift in Sources */,
 				266A07282AC6E10200B85D4E /* ProgressBar3.swift in Sources */,
 				268C3BA72ABD638200282BEE /* PrivacyView.swift in Sources */,

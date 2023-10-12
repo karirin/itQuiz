@@ -154,9 +154,19 @@ struct ImagePickerView: View {
                 Spacer()
                 Button(action: {
                     let selectedAvatar = Avatar(name: self.selectedAvatar?.name ?? "ネッキー", attack: 20, health: 20 ,usedFlag: 1, count:1)
-                    authManager.saveUserToDatabase(userName: userName)
-                    authManager.addAvatarToUser(avatar: selectedAvatar)
-                    self.navigateToContentView = true
+                    authManager.saveUserToDatabase(userName: userName) { success in
+                        if success {
+                            authManager.addAvatarToUser(avatar: selectedAvatar) { success in
+                                if success {
+                                    self.navigateToContentView = true
+                                } else {
+                                    // アバターの追加に失敗した場合の処理をここに書く
+                                }
+                            }
+                        } else {
+                            // ユーザー情報の保存に失敗した場合の処理をここに書く
+                        }
+                    }
                 }) {
                     ZStack {
                     // ボタンの背景

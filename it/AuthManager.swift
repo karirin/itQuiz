@@ -48,7 +48,7 @@ class AuthManager: ObservableObject {
         return user?.uid
     }
     
-    func addAvatarToUser(avatar: Avatar) {
+    func addAvatarToUser(avatar: Avatar, completion: @escaping (Bool) -> Void) {
         guard let userId = user?.uid else { return }
 
         // ユーザーのアバターデータの参照を作成
@@ -99,6 +99,7 @@ class AuthManager: ObservableObject {
                 avatarRef.setValue(avatarData)
             }
         }
+        completion(true)
     }
     
     func anonymousSignIn() {
@@ -113,7 +114,7 @@ class AuthManager: ObservableObject {
         }
     }
     
-    func saveUserToDatabase(userName: String) {
+    func saveUserToDatabase(userName: String, completion: @escaping (Bool) -> Void) {
         guard let userId = user?.uid else { return }
         
         let userRef = Database.database().reference().child("users").child(userId)
@@ -126,6 +127,7 @@ class AuthManager: ObservableObject {
             }
             print("Successfully saved user to database.")
         }
+        completion(true)
     }
     
     func fetchUserInfo(completion: @escaping (String?, [[String: Any]]?, Int?, Int?, Int?, Int?) -> Void) {

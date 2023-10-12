@@ -127,9 +127,8 @@ struct GachaView: View {
                             print("Failed to decrease user money.")
                         }
                     }
-                    
-                            self.gachaManager.shuffleItems()  // itemsリストをシャッフル
-                            self.obtainedItem = self.gachaManager.drawGacha()  // 先にobtainedItemを更新
+                    self.gachaManager.shuffleItems()  // itemsリストをシャッフル
+                    self.obtainedItem = self.gachaManager.drawGacha()  // 先にobtainedItemを更新
                     // 1秒の遅延を追加
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                         self.showResult = true  // 結果を表示

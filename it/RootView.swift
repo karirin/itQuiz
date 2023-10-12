@@ -16,7 +16,7 @@ struct RootView: View {
         Group {
             if isUserExists == nil {
                 // ユーザー存在チェック中の表示 (例: ローディングインジケータ)
-                Text("Loading...")
+                ActivityIndicator()
             } else if isUserExists == false || isUserExists == nil {
                 SignUp()
             } else {
