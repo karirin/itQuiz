@@ -38,7 +38,6 @@ struct GachaAnimationView: View {
     var rarity: GachaManager.Rarity?
 
     private func createPlayer() -> AVPlayer {
-        print(rarity)
         let videoName: String
         switch rarity {
         case .normal:
@@ -54,7 +53,6 @@ struct GachaAnimationView: View {
         }
 
         let asset = NSDataAsset(name: videoName)
-        print("videoName:\(videoName)")
         let videoUrl = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("\(videoName).mp4")
         try? asset?.data.write(to: videoUrl, options: [.atomic])
         let playerItem = AVPlayerItem(url: videoUrl)
@@ -69,11 +67,8 @@ struct GachaAnimationView: View {
                   showAnimation.toggle()
                 }
             }
-            .onChange(of: rarity) { _ in  // この行を追加
-                
-                    print(rarity)
-                            self.player = createPlayer()  // この行を追加
-                
-                        }
+            .onChange(of: rarity) { _ in
+                self.player = createPlayer()
+            }
     }
 }

@@ -20,7 +20,7 @@ struct QuizBeginnerList: View {
 //        QuizQuestion(
 //                question: "どのプロトコルがコンピュータのホスト名をIPアドレスに変換しますか？",
 //                choices: [
-//                    "あああああああああああああああああああああああああ",
+//                    "ああああああああああああああああああああああああああああああ",
 //                    "DNS",
 //                    "FTP",
 //                    "HTTP"

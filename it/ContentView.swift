@@ -263,7 +263,7 @@ struct ContentView: View {
                             .overlay(
                                 RoundedRectangle(cornerRadius: 20, style: .continuous)
                                     .frame(width: 200, height: 90)
-                                    .position(x: geometry.size.width / 3.45, y: geometry.size.height / 1.435) // ここで位置を動的に調整
+                                    .position(x: geometry.size.width / 3.4, y: geometry.size.height / 1.426) // ここで位置を動的に調整
                                     .blendMode(.destinationOut)
                             )
                             .compositingGroup()
@@ -291,7 +291,9 @@ struct ContentView: View {
                    }
             }
                         .background(Color("Color2"))
-            } .frame(maxWidth: .infinity,maxHeight: .infinity)
+            }
+        .navigationViewStyle(StackNavigationViewStyle())
+        .frame(maxWidth: .infinity,maxHeight: .infinity)
             .onAppear {
             // 1. lastClickedDateを取得
             authManager.fetchLastClickedDate(userId: authManager.currentUserId ?? "") { lastDate in
@@ -317,12 +319,6 @@ struct ContentView: View {
                          self.userHp = hp ?? 100
                          self.userAttack = attack ?? 20
                          self.tutorialNum = tutorialNum ?? 0
-                print("self.userName:\(self.userName)")
-                print("self.avatar:\(self.avatar)")
-                print("self.userMoney:\(self.userMoney)")
-                print("self.userHp:\(self.userHp)")
-                print("self.userAttack:\(self.userAttack)")
-                print("self.tutorialNum:\(self.tutorialNum)")
                      }
             authManager.fetchAvatars {
                 self.avatar = authManager.avatars.map { avatar in

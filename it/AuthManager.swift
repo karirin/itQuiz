@@ -49,7 +49,10 @@ class AuthManager: ObservableObject {
     }
     
     func addAvatarToUser(avatar: Avatar, completion: @escaping (Bool) -> Void) {
-        guard let userId = user?.uid else { return }
+        guard let userId = user?.uid else {
+            completion(false) // user IDがnilの場合、失敗としてfalseを返す
+            return
+        }
 
         // ユーザーのアバターデータの参照を作成
         let avatarsRef = Database.database().reference()
@@ -61,6 +64,7 @@ class AuthManager: ObservableObject {
         avatarsRef.observeSingleEvent(of: .value) { (snapshot, error) in
             if let error = error {
                 print("Error fetching avatars: \(error)")
+                completion(false) // エラーが発生した場合、falseを返す
                 return
             }
             
@@ -86,6 +90,7 @@ class AuthManager: ObservableObject {
                     currentData.value = count
                     return TransactionResult.success(withValue: currentData)
                 }
+                completion(true) // トランザクションが完了した場合、trueを返す
             } else {
                 // 新しいアバターをデータベースに追加
                 let avatarRef = avatarsRef.childByAutoId()
@@ -96,10 +101,17 @@ class AuthManager: ObservableObject {
                     "usedFlag": avatar.usedFlag,
                     "count": 1  // 初期カウント値を設定
                 ]
-                avatarRef.setValue(avatarData)
+                avatarRef.setValue(avatarData) { (error, ref) in
+                    if let error = error {
+                        print("Failed to add avatar to database:", error.localizedDescription)
+                        completion(false) // 保存に失敗した場合、falseを返す
+                        return
+                    }
+                    print("Successfully added avatar to database.")
+                    completion(true) // 保存に成功した場合、trueを返す
+                }
             }
         }
-        completion(true)
     }
     
     func anonymousSignIn() {
@@ -201,14 +213,17 @@ class AuthManager: ObservableObject {
         return Avatar(name: avatar.name, attack: avatar.attack, health: avatar.health, usedFlag: newValue, count: avatar.count)
     }
     
-    func switchAvatar(to newAvatar: Avatar) {
-        guard let userId = user?.uid else { return }
+    func switchAvatar(to newAvatar: Avatar, completion: @escaping (Bool) -> Void) {
+        guard let userId = user?.uid else {
+            completion(false) // user IDがnilなので、失敗としてfalseを返します。
+            return
+        }
+        
         let avatarsRef = Database.database().reference()
             .child("users")
             .child(userId)
             .child("avatars")
-
-        // すべてのアバターのusedFlagを0に設定
+        
         avatarsRef.observeSingleEvent(of: .value) { snapshot in
             for child in snapshot.children {
                 guard let childSnapshot = child as? DataSnapshot else { continue }
@@ -216,8 +231,7 @@ class AuthManager: ObservableObject {
                 let avatarRef = avatarsRef.child(avatarKey)
                 avatarRef.updateChildValues(["usedFlag": 0])
             }
-
-            // 新しいアバターのusedFlagを1に設定
+            
             if let avatarKey = snapshot.children.allObjects.first(where: { (child) -> Bool in
                 guard let childSnapshot = child as? DataSnapshot,
                       let avatarData = childSnapshot.value as? [String: Any],
@@ -225,13 +239,23 @@ class AuthManager: ObservableObject {
                 return name == newAvatar.name
             }) as? DataSnapshot {
                 let avatarRef = avatarsRef.child(avatarKey.key)
-                avatarRef.updateChildValues(["usedFlag": 1])
+                avatarRef.updateChildValues(["usedFlag": 1]) { (error, ref) in
+                    if let error = error {
+                        print("Failed to update avatar: \(error.localizedDescription)")
+                        completion(false) // 更新に失敗したので、falseを返します。
+                    } else {
+                        print("Successfully updated avatar.")
+                        self.fetchAvatars {
+                            completion(true) // 更新に成功したので、trueを返します。
+                        }
+                    }
+                }
+            } else {
+                completion(false) // 新しいアバターが見つからなかったので、falseを返します。
             }
-
-            // avatars配列を手動で更新
-            self.fetchAvatars {}
         }
     }
+
     
     func addExperience(points: Int) {
         guard let userId = user?.uid else { return }

@@ -52,7 +52,7 @@ struct QuizManagerView: View {
                     .frame(maxWidth: .infinity)
                     .padding(.horizontal)
                     .padding(.bottom)
-                    .shadow(radius: 3)
+                    .shadow(radius: 5)
                 }
                 Button(action: {
                     audioManager.playKetteiSound()
@@ -148,7 +148,7 @@ struct QuizManagerView: View {
                             .overlay(
                                 RoundedRectangle(cornerRadius: 20, style: .continuous)
                                     .frame(width: 360, height: 90)
-                                    .position(x: geometry.size.width / 2.0, y: geometry.size.height / 9.435) // このオフセットを変更してスポットライトの位置を調整
+                                    .position(x: geometry.size.width / 2.0, y: geometry.size.height / 14.5) // このオフセットを変更してスポットライトの位置を調整
                                     .blendMode(.destinationOut)
                             )
                             .compositingGroup()

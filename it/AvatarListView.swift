@@ -66,7 +66,13 @@ struct AvatarListView: View {
                                         primaryButton: .default(Text("はい"), action: {
                                             // はいを選択した場合、usedFlagを更新
                                             if let switchingAvatar = switchingAvatar {
-                                                authManager.switchAvatar(to: switchingAvatar)
+                                                authManager.switchAvatar(to: switchingAvatar) { success in
+                                                    if success {
+                                                        print("Avatar successfully added!")
+                                                    } else {
+                                                        print("Failed to add avatar.")
+                                                    }
+                                                }
                                             }
                                             audioManager.playChangeSound()
                                         }),
@@ -143,7 +149,13 @@ struct AvatarListView: View {
                                 primaryButton: .default(Text("はい"), action: {
                                     // はいを選択した場合、usedFlagを更新
                                     if let switchingAvatar = switchingAvatar {
-                                        authManager.switchAvatar(to: switchingAvatar)
+                                        authManager.switchAvatar(to: switchingAvatar) { success in
+                                            if success {
+                                                print("Avatar successfully added!")
+                                            } else {
+                                                print("Failed to add avatar.")
+                                            }
+                                        }
                                     }
                                     audioManager.playChangeSound()
                                 }),

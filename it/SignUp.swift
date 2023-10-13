@@ -81,6 +81,7 @@ struct SignUp: View {
                 }
             }
         }
+        .navigationViewStyle(StackNavigationViewStyle())
     }
 }
 
@@ -194,6 +195,7 @@ struct ImagePickerView: View {
                         .hidden() // NavigationLinkを非表示にする
                 )
         }
+        .navigationViewStyle(StackNavigationViewStyle())
         .onAppear{
             self.selectedAvatar = avatars[0]
         }

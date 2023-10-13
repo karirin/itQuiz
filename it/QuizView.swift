@@ -579,7 +579,6 @@
                     }
                 } else {
                     DispatchQueue.global(qos: .background).async {
-                        print("||||||aaaaaaa")
                         authManager.addExperience(points: playerExperience)
                         authManager.addMoney(amount: playerMoney)
                         DispatchQueue.main.async {
@@ -603,20 +602,19 @@
                         playerExperience = 5
                         playerMoney = 5
                     }
-                    print(playerHP)
                     switch newMonsterType {
                     case 1:
-                        monsterHP = 30
-                        monsterUnderHP = 30
+                        monsterHP = 80
+                        monsterUnderHP = 80
                         monsterAttack = 20
                     case 2:
-                        monsterHP = 40
-                        monsterUnderHP = 40
-                        monsterAttack = 25
-                    case 3:
-                        monsterHP = 50
-                        monsterUnderHP = 50
+                        monsterHP = 120
+                        monsterUnderHP = 120
                         monsterAttack = 30
+                    case 3:
+                        monsterHP = 160
+                        monsterUnderHP = 160
+                        monsterAttack = 40
                     default:
                         monsterHP = 30
                     }
@@ -630,17 +628,17 @@
                     }
                     switch newMonsterType {
                     case 1:
-                        monsterHP = 50
-                        monsterUnderHP = 50
+                        monsterHP = 80
+                        monsterUnderHP = 80
                         monsterAttack = 30
                     case 2:
-                        monsterHP = 60
-                        monsterUnderHP = 60
-                        monsterAttack = 35
-                    case 3:
-                        monsterHP = 70
-                        monsterUnderHP = 70
+                        monsterHP = 120
+                        monsterUnderHP = 120
                         monsterAttack = 40
+                    case 3:
+                        monsterHP = 160
+                        monsterUnderHP = 160
+                        monsterAttack = 50
                     default:
                         monsterHP = 50
                     }
@@ -654,17 +652,17 @@
                     }
                     switch newMonsterType {
                     case 1:
-                        monsterHP = 80
-                        monsterUnderHP = 80
-                        monsterAttack = 45
+                        monsterHP = 120
+                        monsterUnderHP = 120
+                        monsterAttack = 40
                     case 2:
-                        monsterHP = 90
-                        monsterUnderHP = 90
+                        monsterHP = 160
+                        monsterUnderHP = 160
                         monsterAttack = 50
                     case 3:
-                        monsterHP = 100
-                        monsterUnderHP = 100
-                        monsterAttack = 55
+                        monsterHP = 200
+                        monsterUnderHP = 200
+                        monsterAttack = 60
                     default:
                         monsterHP = 80
                     }
@@ -678,17 +676,17 @@
                     }
                     switch newMonsterType {
                     case 1:
-                        monsterHP = 50
-                        monsterUnderHP = 50
-                        monsterAttack = 30
-                    case 2:
-                        monsterHP = 60
-                        monsterUnderHP = 60
-                        monsterAttack = 35
-                    case 3:
-                        monsterHP = 70
-                        monsterUnderHP = 70
+                        monsterHP = 80
+                        monsterUnderHP = 80
                         monsterAttack = 40
+                    case 2:
+                        monsterHP = 120
+                        monsterUnderHP = 120
+                        monsterAttack = 50
+                    case 3:
+                        monsterHP = 160
+                        monsterUnderHP = 160
+                        monsterAttack = 60
                     default:
                         monsterHP = 50
                     }
@@ -702,17 +700,17 @@
                     }
                     switch newMonsterType {
                     case 1:
-                        monsterHP = 50
-                        monsterUnderHP = 50
-                        monsterAttack = 30
-                    case 2:
-                        monsterHP = 60
-                        monsterUnderHP = 60
-                        monsterAttack = 35
-                    case 3:
-                        monsterHP = 70
-                        monsterUnderHP = 70
+                        monsterHP = 80
+                        monsterUnderHP = 80
                         monsterAttack = 40
+                    case 2:
+                        monsterHP = 120
+                        monsterUnderHP = 120
+                        monsterAttack = 50
+                    case 3:
+                        monsterHP = 160
+                        monsterUnderHP = 160
+                        monsterAttack = 60
                     default:
                         monsterHP = 50
                     }
@@ -726,23 +724,24 @@
                     }
                     switch newMonsterType {
                     case 1:
-                        monsterHP = 50
-                        monsterUnderHP = 50
-                        monsterAttack = 30
-                    case 2:
-                        monsterHP = 60
-                        monsterUnderHP = 60
-                        monsterAttack = 35
-                    case 3:
-                        monsterHP = 70
-                        monsterUnderHP = 70
+                        monsterHP = 80
+                        monsterUnderHP = 80
                         monsterAttack = 40
+                    case 2:
+                        monsterHP = 120
+                        monsterUnderHP = 120
+                        monsterAttack = 50
+                    case 3:
+                        monsterHP = 160
+                        monsterUnderHP = 160
+                        monsterAttack = 60
                     default:
                         monsterHP = 50
                     }
                 }
             }
         }
+            .navigationViewStyle(StackNavigationViewStyle())
     }
 }
 
