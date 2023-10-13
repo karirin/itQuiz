@@ -8,6 +8,13 @@
 import SwiftUI
 import AVFoundation
 
+struct ViewPositionKey: PreferenceKey {
+    static var defaultValue: [CGRect] = []
+    static func reduce(value: inout [CGRect], nextValue: () -> [CGRect]) {
+        value.append(contentsOf: nextValue())
+    }
+}
+
 struct ContentView: View {
     @ObservedObject var authManager = AuthManager.shared
     @State private var userName: String = ""
@@ -27,6 +34,7 @@ struct ContentView: View {
     @ObservedObject var audioManager = AudioManager.shared
     @State private var isSoundOn: Bool = true
     @State private var showTutorial = true
+    @State private var buttonRect: CGRect = .zero
     
     var body: some View {
         NavigationView {
@@ -186,6 +194,9 @@ struct ContentView: View {
                                     .padding(.horizontal)
                                     .padding(.vertical)
                                 }
+                                .background(GeometryReader { geometry in
+                                                Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
+                                            })
                                 .background(.white)
                                 .foregroundColor(.gray)
                                 .cornerRadius(20)
@@ -256,14 +267,17 @@ struct ContentView: View {
                     //                    }
                     //                }
                 }
-                if tutorialNum == 1 {
+                .onPreferenceChange(ViewPositionKey.self) { positions in
+                    self.buttonRect = positions.first ?? .zero
+                }
+//                if tutorialNum == 1 {
                     GeometryReader { geometry in
                         Color.black.opacity(0.5)
                             .ignoresSafeArea()
                             .overlay(
                                 RoundedRectangle(cornerRadius: 20, style: .continuous)
                                     .frame(width: 200, height: 90)
-                                    .position(x: geometry.size.width / 3.4, y: geometry.size.height / 1.426) // ここで位置を動的に調整
+                                    .position(x: buttonRect.midX, y: buttonRect.minY+25)
                                     .blendMode(.destinationOut)
                             )
                             .compositingGroup()
@@ -281,7 +295,7 @@ struct ContentView: View {
                             .frame(width: 20, height: 20)
                             .padding(.trailing, 310.0)
                     }.offset(x: -10, y: 30)
-                }
+//                }
             }
             .onTapGesture {
                 audioManager.playSound()
