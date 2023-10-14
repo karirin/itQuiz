@@ -122,9 +122,6 @@ struct GachaView: View {
             }
                 Spacer()
                 Button(action: {
-                    
-                    self.showAnimation = true
-
                     authManager.decreaseUserMoney { success in
                         if success {
                             print("User money decreased successfully.")
@@ -132,12 +129,15 @@ struct GachaView: View {
                             print("Failed to decrease user money.")
                         }
                     }
+                    
+                    self.showAnimation = true
                     self.gachaManager.shuffleItems()
-                    self.obtainedItem = self.gachaManager.drawGacha()
+                    let newItem = self.gachaManager.drawGacha()
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                        self.showResult = true
                         DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
                             animationFinished = true
+                            self.obtainedItem = newItem
+                            self.showResult = true
                         }
                     }
                 }) {
@@ -167,7 +167,6 @@ struct GachaView: View {
 Spacer()
                 HStack{
                     Button(action: {
-                        self.showAnimation = true
                         self.showResult = false
                         authManager.decreaseUserMoney { success in
                             if success {
@@ -176,10 +175,11 @@ Spacer()
                                 print("Failed to decrease user money.")
                             }
                         }
-                            self.showResult = true
+                            self.showAnimation = true
                             self.gachaManager.shuffleItems()
+                        self.obtainedItem = self.gachaManager.drawGacha()
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                                self.obtainedItem = self.gachaManager.drawGacha()
+                                self.showResult = true
                             DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
                                 animationFinished = true
                             }

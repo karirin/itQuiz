@@ -195,8 +195,8 @@ struct ContentView: View {
                                     .padding(.vertical)
                                 }
                                 .background(GeometryReader { geometry in
-                                                Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
-                                            })
+                                    Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
+                                })
                                 .background(.white)
                                 .foregroundColor(.gray)
                                 .cornerRadius(20)
@@ -276,9 +276,12 @@ struct ContentView: View {
                             .ignoresSafeArea()
                             .overlay(
                                 RoundedRectangle(cornerRadius: 20, style: .continuous)
-                                    .frame(width: 200, height: 90)
-                                    .position(x: buttonRect.midX, y: buttonRect.minY+25)
-                                    .blendMode(.destinationOut)
+//                                    .frame(width: 200, height: 90)
+//                                    .position(x: buttonRect.midX, y: buttonRect.minY+25)
+//                                    .blendMode(.destinationOut)
+                                .frame(width: 200, height: 90)
+                                .position(x: buttonRect.midX, y: buttonRect.minY+25)
+                                                    .blendMode(.destinationOut)
                             )
                             .compositingGroup()
                             .background(.clear)
