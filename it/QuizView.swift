@@ -118,7 +118,7 @@
             self.timer?.invalidate()
             
             // 3秒後に以下のコードブロックを実行
-            self.remainingSeconds = 3000
+            self.remainingSeconds = 30
             self.timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
                 if self.remainingSeconds > 0 {
                     self.remainingSeconds -= 1
@@ -266,6 +266,7 @@
                         ZStack {
                             Text(currentQuiz.question)
                                 .font(.headline)
+//                                .font(.system(size: 24.0))
                                 .frame(height:70)
                                 .padding(.horizontal)
                             
@@ -400,8 +401,8 @@
                     Image("上矢印")
                         .resizable()
                         .frame(width: 20, height: 20)
-                        .padding(.trailing, 236.0)
-                        Text("問題が出題されます")
+                        .padding(.trailing, 206.0)
+                        Text("問題が出題されます。")
                             .font(.system(size: 24.0))
                             .padding(.all, 16.0)
                             .background(Color.white)
@@ -424,7 +425,7 @@
                             .background(.clear)
                     }
                     VStack(alignment: .trailing, spacing: .zero) {
-                        Text("選択肢の中から正解と思うものをクリックしてください")
+                        Text("選択肢の中から正解と思うものをクリックしてください。")
                             .font(.system(size: 23.0))
                             .padding(.all, 16.0)
                             .background(Color.white)
@@ -451,7 +452,7 @@
                             .background(.clear)
                     }
                     VStack(alignment: .trailing, spacing: .zero) {
-                        Text("正解すると相手モンスターにダメージ、不正解だと自分がダメージを受けます。\n相手のHPが０になれば次の相手に、自分のHPが０になればゲームオーバーです")
+                        Text("正解すると相手モンスターにダメージ、不正解だと自分がダメージを受けます。\n相手のHPが０になれば次の相手に、自分のHPが０になればゲームオーバーです。")
                             .font(.system(size: 18.0))
                             .padding(.all, 16.0)
                             .background(Color.white)
@@ -571,7 +572,11 @@
                 // 味方のHPが０以下のとき
                 if newValue && playerHP <= 0 {
                     DispatchQueue.global(qos: .background).async {
-                        authManager.addExperience(points: 5)
+                        authManager.addExperience(points: 5, onSuccess: {
+                            // 成功した時の処理をここに書きます
+                        }, onFailure: { error in
+                            // 失敗した時の処理をここに書きます。`error`は失敗の原因を示す情報が含まれている可能性があります。
+                        })
                         authManager.addMoney(amount: 5)
                         
                         DispatchQueue.main.async {
@@ -579,7 +584,11 @@
                     }
                 } else {
                     DispatchQueue.global(qos: .background).async {
-                        authManager.addExperience(points: playerExperience)
+                        authManager.addExperience(points: playerExperience, onSuccess: {
+                            // 成功した時の処理をここに書きます
+                        }, onFailure: { error in
+                            // 失敗した時の処理をここに書きます。`error`は失敗の原因を示す情報が含まれている可能性があります。
+                        })
                         authManager.addMoney(amount: playerMoney)
                         DispatchQueue.main.async {
                             // ここでUIの更新を行います。

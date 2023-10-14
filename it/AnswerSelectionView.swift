@@ -10,8 +10,7 @@ import SwiftUI
 func fontSize(for text: String) -> CGFloat {
     if text.count >= 25 {
         return 10
-    } else
-    if text.count >= 21 {
+    } else if text.count >= 21 {
         return 12 // 21文字以上ならフォントサイズを12に
     } else if text.count >= 17 {
         return 14 // 17文字以上ならフォントサイズを14に

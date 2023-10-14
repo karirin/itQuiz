@@ -20,18 +20,22 @@ struct ActivityIndicator: View {
         startPoint: .leading, endPoint: .trailing)
 
     var body: some View {
-        Circle()
-            .trim(from: 0.0, to: 0.85)
-            .stroke(colorGradient, style: StrokeStyle(lineWidth: 5))
-            .frame(width: 40, height: 40)
-            .rotationEffect(Angle(degrees: currentDegrees))
-            .onAppear {
-                Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { _ in
-                    withAnimation {
-                        self.currentDegrees += 10
+        VStack{
+            Circle()
+                .trim(from: 0.0, to: 0.85)
+                .stroke(colorGradient, style: StrokeStyle(lineWidth: 5))
+                .frame(width: 40, height: 40)
+                .rotationEffect(Angle(degrees: currentDegrees))
+                .onAppear {
+                    Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { _ in
+                        withAnimation {
+                            self.currentDegrees += 10
+                        }
                     }
                 }
-            }
+        }
+        .frame(maxWidth:.infinity,maxHeight: .infinity)
+        .background(Color("Color2"))
     }
 }
 

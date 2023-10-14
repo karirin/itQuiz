@@ -257,40 +257,41 @@ class AuthManager: ObservableObject {
     }
 
     
-    func addExperience(points: Int) {
-        guard let userId = user?.uid else { return }
+    func addExperience(points: Int, onSuccess: @escaping () -> Void, onFailure: @escaping (Error?) -> Void) {
+        guard let userId = user?.uid else {
+            onFailure(nil)
+            return
+        }
         let userRef = Database.database().reference().child("users").child(userId)
         userRef.observeSingleEvent(of: .value) { (snapshot) in
 
             if let data = snapshot.value as? [String: Any] {
                 let currentExperience = data["experience"] as? Int ?? 0
-                
-                // 現在の経験値に新しく加算する経験値を加える
                 var newExperience = currentExperience + points
-                
-                // レベルアップの条件を確認
+
                 while newExperience >= self.level * 100 {
-                    newExperience -= self.level * 100  // 現在のレベル×100を引いて余りを計算
-                    self.level += 1    // レベルを1つ上げる
+                    newExperience -= self.level * 100
+                    self.level += 1
                     
                     self.didLevelUp = true
-                    // ここで攻撃力とHPを更新
                     self.updateStatsUponLevelUp()
                 }
                 
                 self.experience = newExperience
                 
-                // 更新された経験値とレベルをデータベースに保存
                 let userData: [String: Any] = ["experience": self.experience, "level": self.level]
                 userRef.updateChildValues(userData) { (error, ref) in
                     if error == nil {
-                        // 称号の確認と保存
                         self.saveEarnedTitles()
+                        onSuccess()  // 成功時のコールバックを呼ぶ
+                    } else {
+                        onFailure(error)  // エラー時のコールバックを呼ぶ
                     }
                 }
             }
         }
     }
+
     
     func calculateLevel(experience: Int) -> Int {
         return experience / 100 + 1

@@ -46,6 +46,7 @@ struct QuizResultView: View {
                 VStack{
                     Spacer()
                     HStack{
+//                        NavigationLink(destination: ContentView(isPresentingQuizBeginnerList: .constant(false), isPresentingAvatarList: .constant(false)).navigationBarBackButtonHidden(true)) {
                         NavigationLink(destination: ContentView().navigationBarBackButtonHidden(true)) {
                             Button(action: {
                                 audioManager.playCancelSound()
@@ -169,9 +170,9 @@ struct ExperienceModalView: View {
                             .font(.title)
                     }
                     // ここでProgressBar1に現在の経験値とmax経験値を渡します。
-                    Text("\(authManager.experience) / \(authManager.level * 100) 経験値")
+                    Text("\(authManager.experience + Int(currentExperience)) / \(authManager.level * 100) 経験値")
                         .font(.system(size: 20))
-                    ProgressBar1(value: Double(authManager.experience), maxValue: Double(authManager.level * 100))
+                    ProgressBar1(value: Double(authManager.experience + Int(currentExperience)), maxValue: Double(authManager.level * 100))
                         .padding(.horizontal,20)
                 }
             }

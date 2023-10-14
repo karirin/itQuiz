@@ -30,6 +30,7 @@ struct ContentView: View {
     @State private var isIntermediateQuizActive: Bool = false
     @State private var isPresentingGachaView: Bool = false
     @State private var isPresentingAvatarList: Bool = false
+//    @State private var localIsPresentingAvatarList: Bool = false
     @State private var audioPlayerKettei: AVAudioPlayer?
     @ObservedObject var audioManager = AudioManager.shared
     @State private var isSoundOn: Bool = true
@@ -262,7 +263,7 @@ struct ContentView: View {
                         //                        if isPresentingQuizList {
                         NavigationLink("", destination: QuizBeginnerList(isPresenting: $isPresentingQuizList).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizBeginnerList)
                         NavigationLink("", destination: QuizManagerView(isPresenting: $isPresentingQuizList), isActive: $isPresentingQuizList)
-                        NavigationLink("", destination: AvatarListView(), isActive: $isPresentingAvatarList)
+                        NavigationLink("", destination: AvatarListView(isPresenting: .constant(false)), isActive: $isPresentingAvatarList)
                         NavigationLink("", destination: GachaView(), isActive: $isPresentingGachaView)}
                     //                    }
                     //                }
@@ -270,7 +271,7 @@ struct ContentView: View {
                 .onPreferenceChange(ViewPositionKey.self) { positions in
                     self.buttonRect = positions.first ?? .zero
                 }
-//                if tutorialNum == 1 {
+                if tutorialNum == 1 {
                     GeometryReader { geometry in
                         Color.black.opacity(0.5)
                             .ignoresSafeArea()
@@ -298,7 +299,7 @@ struct ContentView: View {
                             .frame(width: 20, height: 20)
                             .padding(.trailing, 310.0)
                     }.offset(x: -10, y: 30)
-//                }
+                }
             }
             .onTapGesture {
                 audioManager.playSound()
@@ -311,7 +312,7 @@ struct ContentView: View {
             }
         .navigationViewStyle(StackNavigationViewStyle())
         .frame(maxWidth: .infinity,maxHeight: .infinity)
-            .onAppear {
+        .onAppear {
             // 1. lastClickedDateを取得
             authManager.fetchLastClickedDate(userId: authManager.currentUserId ?? "") { lastDate in
                 if let lastDate = lastDate {
@@ -330,23 +331,45 @@ struct ContentView: View {
                 }
             }
             authManager.fetchUserInfo { (name, avatar, money, hp, attack, tutorialNum) in
-                         self.userName = name ?? ""
-                         self.avatar = avatar ?? [[String: Any]]()
-                         self.userMoney = money ?? 0
-                         self.userHp = hp ?? 100
-                         self.userAttack = attack ?? 20
-                         self.tutorialNum = tutorialNum ?? 0
-                     }
+                self.userName = name ?? ""
+                self.avatar = avatar ?? [[String: Any]]()
+                self.userMoney = money ?? 0
+                self.userHp = hp ?? 100
+                self.userAttack = attack ?? 20
+                self.tutorialNum = tutorialNum ?? 0
+            }
             authManager.fetchAvatars {
                 self.avatar = authManager.avatars.map { avatar in
                     return ["name": avatar.name]
                 }
             }
-             authManager.fetchUserExperienceAndLevel()
+            authManager.fetchUserExperienceAndLevel()
         }
+            .onChange(of: isPresentingQuizList) { isPresenting in
+                fetchUserInfoIfNeeded(isPresenting: isPresenting)
+                authManager.fetchUserExperienceAndLevel()
+            }
+//            .onChange(of: $isPresentingAvatarList) { isPresenting in
+//                fetchUserInfoIfNeeded(isPresenting: isPresenting)
+//                authManager.fetchUserExperienceAndLevel()
+//            }
             .background(Color("purple2").opacity(0.6))  // ここで背景色を設定
             .edgesIgnoringSafeArea(.all)  // 画面の端まで背景色を伸ばす
             }
+    private func fetchUserInfoIfNeeded(isPresenting: Bool) {
+        print("isPresenting")
+        print(isPresenting)
+        if !isPresenting {
+            authManager.fetchUserInfo { (name, avatar, money, hp, attack, tutorialNum) in
+                self.userName = name ?? ""
+                self.avatar = avatar ?? [[String: Any]]()
+                self.userMoney = money ?? 0
+                self.userHp = hp ?? 100
+                self.userAttack = attack ?? 20
+                self.tutorialNum = tutorialNum ?? 0
+            }
+        }
+    }
         }
 
 struct ProgressBar: View {

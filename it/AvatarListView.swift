@@ -21,6 +21,11 @@ struct AvatarListView: View {
     @State private var showingAlert2 = false
     // 切り替えるアバターを保持するState変数
     @State private var switchingAvatar: Avatar?
+    @Binding var isPresenting: Bool
+    
+    init(isPresenting: Binding<Bool>) {
+        _isPresenting = isPresenting
+    }
     
     // グリッドのレイアウトを定義
     var columns: [GridItem] = [
@@ -199,6 +204,6 @@ Spacer()
 
 struct OtomoListView_Previews: PreviewProvider {
     static var previews: some View {
-        AvatarListView()
+        AvatarListView(isPresenting: .constant(false))
     }
 }

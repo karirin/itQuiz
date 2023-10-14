@@ -191,6 +191,7 @@ struct ImagePickerView: View {
                 Spacer()
                 }
                 .background(
+//                    NavigationLink("", destination: ContentView(isPresentingQuizBeginnerList: .constant(false), isPresentingAvatarList: .constant(false)).navigationBarBackButtonHidden(true), isActive: $navigateToContentView)
                     NavigationLink("", destination: ContentView().navigationBarBackButtonHidden(true), isActive: $navigateToContentView)
                         .hidden() // NavigationLinkを非表示にする
                 )

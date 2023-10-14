@@ -76,97 +76,55 @@ struct GachaView: View {
     @State private var isGachaButtonDisabled: Bool = false
     @State private var userMoney: Int = 0
     @ObservedObject var audioManager = AudioManager.shared
+    @State private var isShowingActivityIndicator: Bool = false
 
     var body: some View {
-        VStack{
-            HStack{
-                Spacer()
-                Image("コイン")
-                    .resizable()
-                    .frame(width:20,height:20)
-                Text("+")
-                Text(" \(userMoney)")
-            }
-            .padding(.trailing)
-            // ガチャの結果を表示
-            if showResult, let item = obtainedItem {  // showResultを使用して制御
-//            if(showResult){
+        ZStack{
             VStack{
-                ZStack{
-                    Image("ガチャ背景5")
+                HStack{
+                    Spacer()
+                    Image("コイン")
                         .resizable()
-                    
-                        .frame(maxWidth: .infinity,maxHeight:280)
-                    Text("\(item.name)")
-                        .fontWeight(.bold)
-                        .font(.system(size: 20))
-                        .padding(.bottom,190)
+                        .frame(width:20,height:20)
+                    Text("+")
+                    Text(" \(userMoney)")
+                }
+                .padding(.trailing)
+                // ガチャの結果を表示
+                if showResult, let item = obtainedItem {  // showResultを使用して制御
+                    //            if(showResult){
+                    VStack{
+                        ZStack{
+                            Image("ガチャ背景5")
+                                .resizable()
+                            
+                                .frame(maxWidth: .infinity,maxHeight:280)
+                            Text("\(item.name)")
+                                .fontWeight(.bold)
+                                .font(.system(size: 20))
+                                .padding(.bottom,190)
                             Image("\(item.name)")
                                 .resizable()
                                 .frame(width: 150,height:150)
                                 .padding(.top,70)
-                }
-                
-                HStack{
-                    Image("ハート")
-                        .resizable()
-                        .frame(width: 30,height:30)
-                    Text("体力：\(item.health)")
-                        .font(.system(size: 24))
-                    Image("ソード")
-                        .resizable()
-                        .frame(width: 40,height:30)
-                    Text("攻撃力：\(item.attack)")
-                        .font(.system(size: 24))
-                }
-            }
-                Spacer()
-                Button(action: {
-                    authManager.decreaseUserMoney { success in
-                        if success {
-                            print("User money decreased successfully.")
-                        } else {
-                            print("Failed to decrease user money.")
+                        }
+                        
+                        HStack{
+                            Image("ハート")
+                                .resizable()
+                                .frame(width: 30,height:30)
+                            Text("体力：\(item.health)")
+                                .font(.system(size: 24))
+                            Image("ソード")
+                                .resizable()
+                                .frame(width: 40,height:30)
+                            Text("攻撃力：\(item.attack)")
+                                .font(.system(size: 24))
                         }
                     }
-                    
-                    self.showAnimation = true
-                    self.gachaManager.shuffleItems()
-                    let newItem = self.gachaManager.drawGacha()
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
-                            animationFinished = true
-                            self.obtainedItem = newItem
-                            self.showResult = true
-                        }
-                    }
-                }) {
-                    if(isGachaButtonDisabled){
-                        Image("もう一度ガチャる")
-                            .resizable()
-                            .frame(width:210,height:100)
-                    }else{
-                        Image("もう一度ガチャる白黒")
-                            .resizable()
-                            .frame(width:210,height:100)
-                    }
-                }
-                .disabled(!isGachaButtonDisabled)
-                HStack{
                     Spacer()
-                    Image("コイン300")
-                        .resizable()
-                        .frame(maxWidth:150,maxHeight:50)
-                    Spacer()
-                }
-                Spacer()
-            }else{
-                Image("ガチャ")
-                    .resizable()
-                    .frame(maxWidth:350,maxHeight:280)
-Spacer()
-                HStack{
                     Button(action: {
+                        self.isShowingActivityIndicator = true  // ローディング画面を表示
                         self.showResult = false
                         authManager.decreaseUserMoney { success in
                             if success {
@@ -175,42 +133,101 @@ Spacer()
                                 print("Failed to decrease user money.")
                             }
                         }
-                            self.showAnimation = true
+                        self.showAnimation = true
+                        
+                        // ガチャを引く処理を非同期で実行
+                        DispatchQueue.global().async {
                             self.gachaManager.shuffleItems()
-                        self.obtainedItem = self.gachaManager.drawGacha()
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                            self.obtainedItem = self.gachaManager.drawGacha()
+                            
+                            // UIの更新はメインスレッドで実行
+                            DispatchQueue.main.async {
+                                self.isShowingActivityIndicator = false  // ローディング画面を非表示
                                 self.showResult = true
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
-                                animationFinished = true
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                                    animationFinished = true
+                                }
                             }
                         }
-                    }) {
+                    }){
                         if(isGachaButtonDisabled){
-                            Image("ガチャる")
+                            Image("もう一度ガチャる")
                                 .resizable()
                                 .frame(width:210,height:100)
                         }else{
-                            Image("ガチャる白黒")
+                            Image("もう一度ガチャる白黒")
                                 .resizable()
                                 .frame(width:210,height:100)
                         }
                     }
-                    .shadow(radius: 10)
                     .disabled(!isGachaButtonDisabled)
-                }
-                HStack{
+                    HStack{
+                        Spacer()
+                        Image("コイン300")
+                            .resizable()
+                            .frame(maxWidth:150,maxHeight:50)
+                        Spacer()
+                    }
                     Spacer()
-                    Image("コイン300")
+                }else{
+                    Image("ガチャ")
                         .resizable()
-                        .frame(maxWidth:150,maxHeight:50)
+                        .frame(maxWidth:350,maxHeight:280)
                     Spacer()
-                }
-                Spacer()
+                    HStack{
+                        Button(action: {
+                            self.showResult = false
+                            authManager.decreaseUserMoney { success in
+                                if success {
+                                    print("User money decreased successfully.")
+                                } else {
+                                    print("Failed to decrease user money.")
+                                }
+                            }
+                            self.showAnimation = true
+                            self.gachaManager.shuffleItems()
+                            self.obtainedItem = self.gachaManager.drawGacha()
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                                self.showResult = true
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                                    animationFinished = true
+                                }
+                            }
+                        }) {
+                            if(isGachaButtonDisabled){
+                                Image("ガチャる")
+                                    .resizable()
+                                    .frame(width:210,height:100)
+                            }else{
+                                Image("ガチャる白黒")
+                                    .resizable()
+                                    .frame(width:210,height:100)
+                            }
+                        }
+                        .shadow(radius: 10)
+                        .disabled(!isGachaButtonDisabled)
+                    }
+                    HStack{
+                        Spacer()
+                        Image("コイン300")
+                            .resizable()
+                            .frame(maxWidth:150,maxHeight:50)
+                        Spacer()
+                    }
+                    Spacer()
                     Image("卵レア度")
                         .resizable()
                         .frame(maxWidth:350 , maxHeight:120)
+                }
+                Spacer()
             }
-            Spacer()
+            if isShowingActivityIndicator {
+                              ActivityIndicator()
+                          .frame(maxWidth: .infinity, maxHeight: .infinity)
+                          .background(Color.white)
+                          .cornerRadius(10)
+                          .shadow(radius: 10)
+                      }
         }
         .onAppear {
             authManager.getUserMoney { userMoney in

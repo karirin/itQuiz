@@ -20,6 +20,7 @@ struct RootView: View {
             } else if isUserExists == false || isUserExists == nil {
                 SignUp()
             } else {
+//                ContentView(isPresentingQuizBeginnerList: .constant(false), isPresentingAvatarList: .constant(false))
                 ContentView()
             }
         }
