@@ -318,7 +318,7 @@ struct ContentView: View {
                             .resizable()
                             .frame(width: 20, height: 20)
                             .padding(.trailing, 310.0)
-                    }.position(x: buttonRect.midX, y: buttonRect.midY-170)
+                    }.position(x: buttonRect.midX, y: buttonRect.midY-130)
                 }
             }
             .onTapGesture {
