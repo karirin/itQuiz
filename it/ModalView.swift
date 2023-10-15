@@ -15,14 +15,19 @@ struct ModalView: View {
     @ObservedObject var authManager = AuthManager.shared
     @Binding var showHomeModal: Bool
     @Binding var tutorialNum: Int
+    @State private var isContentView: Bool = false
+    @State private var isDaily: Bool = false
     var pauseTimer: () -> Void
     var resumeTimer: () -> Void
     
     var body: some View {
         ZStack {
-            VStack(spacing: 20) {
+            VStack(spacing: 10) {
                 Button(action: {
-                    isPresenting = false
+//                    isPresenting = false
+//                    if isDaily {
+                        isContentView = true
+//                    }
                     audioManager.playReturnSound()
                 }) {
                     HStack{
@@ -35,6 +40,7 @@ struct ModalView: View {
                         .cornerRadius(8)
                         .shadow(radius: 1)
                 }
+                NavigationLink("", destination: ContentView().navigationBarBackButtonHidden(true), isActive: $isContentView)
                 
 //                Button(action: {
 //                    audioManager.toggleSound()
@@ -107,6 +113,6 @@ struct ModalView: View {
 //struct ModalView_Previews: PreviewProvider {
 //    @State static private var isPresenting = true
 //    static var previews: some View {
-////        ModalView(isSoundOn: .constant(true), isPresented: .constant(true), isPresenting: $isPresenting, audioManager: AudioManager.shared)
+//        ModalView(isSoundOn: .constant(true), isPresented: .constant(true), isPresenting: $isPresenting, audioManager: AudioManager.shared)
 //    }
 //}

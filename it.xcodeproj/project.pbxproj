@@ -38,6 +38,7 @@
 		269A878A2AB86FC900F33C9E /* GachaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269A87892AB86FC900F33C9E /* GachaView.swift */; };
 		269A878C2AB873CC00F33C9E /* GachaAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269A878B2AB873CC00F33C9E /* GachaAnimationView.swift */; };
 		269A878E2AB87CBA00F33C9E /* MemoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269A878D2AB87CBA00F33C9E /* MemoView.swift */; };
+		269B1C312ADAE43500C3E82B /* QuizDailyList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269B1C302ADAE43500C3E82B /* QuizDailyList.swift */; };
 		269D44E22AB60D6800CAA91A /* SignUp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269D44E12AB60D6800CAA91A /* SignUp.swift */; };
 		26A026DE2ABDD1EB00119F2B /* TopView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26A026DD2ABDD1EA00119F2B /* TopView.swift */; };
 		26A026E02ABDE27D00119F2B /* 正解.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 26A026DF2ABDE27C00119F2B /* 正解.mp3 */; };
@@ -93,6 +94,7 @@
 		269A87892AB86FC900F33C9E /* GachaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GachaView.swift; sourceTree = "<group>"; };
 		269A878B2AB873CC00F33C9E /* GachaAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GachaAnimationView.swift; sourceTree = "<group>"; };
 		269A878D2AB87CBA00F33C9E /* MemoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoView.swift; sourceTree = "<group>"; };
+		269B1C302ADAE43500C3E82B /* QuizDailyList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizDailyList.swift; sourceTree = "<group>"; };
 		269D44E12AB60D6800CAA91A /* SignUp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignUp.swift; sourceTree = "<group>"; };
 		26A026DD2ABDD1EA00119F2B /* TopView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopView.swift; sourceTree = "<group>"; };
 		26A026DF2ABDE27C00119F2B /* 正解.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "正解.mp3"; path = "../../../Downloads/正解.mp3"; sourceTree = "<group>"; };
@@ -169,6 +171,7 @@
 				268C3B9C2ABCA95D00282BEE /* QuizNetworkList.swift */,
 				26AA13152AD019BD0035F5F4 /* QuizSecurityList.swift */,
 				269304552AD061F000982840 /* QuizDatabaseList.swift */,
+				269B1C302ADAE43500C3E82B /* QuizDailyList.swift */,
 				260E44222AB5963A00FBB487 /* AuthManager.swift */,
 				26A25D4F2AB9FB1A006B368F /* TitleListView.swift */,
 				2641992B2AC2572F002013B9 /* AvatarListView.swift */,
@@ -371,6 +374,7 @@
 				26A026DE2ABDD1EB00119F2B /* TopView.swift in Sources */,
 				26A25D4E2AB99235006B368F /* QuizIntermediateList.swift in Sources */,
 				260E44152AB572DC00FBB487 /* ContentView.swift in Sources */,
+				269B1C312ADAE43500C3E82B /* QuizDailyList.swift in Sources */,
 				26A25D502AB9FB1A006B368F /* TitleListView.swift in Sources */,
 				268C3BA52ABD638200282BEE /* SettingView.swift in Sources */,
 				26AA13162AD019BD0035F5F4 /* QuizSecurityList.swift in Sources */,

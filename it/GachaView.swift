@@ -241,6 +241,17 @@ struct GachaView: View {
                 }
             }
         }
+        .onChange(of: showAnimation) { userMoney in
+            authManager.getUserMoney { userMoney in
+                self.userMoney = userMoney
+                // ここで userMoney を使用する
+                if(userMoney < 300){
+                    isGachaButtonDisabled = false
+                }else{
+                    isGachaButtonDisabled = true
+                }
+            }
+        }
         .frame(maxWidth: .infinity,maxHeight: .infinity)
         .navigationBarBackButtonHidden(true)
                 .navigationBarItems(leading: Button(action: {

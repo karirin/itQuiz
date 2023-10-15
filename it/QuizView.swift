@@ -15,6 +15,7 @@
         case network
         case security
         case database
+        case daily
     }
 
     struct TimerArc: Shape {
@@ -744,6 +745,30 @@
                         monsterHP = 160
                         monsterUnderHP = 160
                         monsterAttack = 60
+                    default:
+                        monsterHP = 50
+                    }
+                case .daily:
+                    monsterBackground = "dailyBackground"
+                    playerExperience = 60
+                    playerMoney = 60
+                    if userHp <= 0 {
+                        playerExperience = 5
+                        playerMoney = 5
+                    }
+                    switch newMonsterType {
+                    case 1:
+                        monsterHP = 50
+                        monsterUnderHP = 50
+                        monsterAttack = 20
+                    case 2:
+                        monsterHP = 60
+                        monsterUnderHP = 60
+                        monsterAttack = 30
+                    case 3:
+                        monsterHP = 70
+                        monsterUnderHP = 70
+                        monsterAttack = 40
                     default:
                         monsterHP = 50
                     }

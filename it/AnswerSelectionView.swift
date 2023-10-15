@@ -8,16 +8,23 @@
 import SwiftUI
 
 func fontSize(for text: String) -> CGFloat {
-    if text.count >= 25 {
-        return 10
-    } else if text.count >= 21 {
-        return 12 // 21文字以上ならフォントサイズを12に
-    } else if text.count >= 17 {
-        return 14 // 17文字以上ならフォントサイズを14に
+    let englishAlphabet = CharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+    if text.rangeOfCharacter(from: englishAlphabet) != nil {
+        // アルファベットが含まれていれば、フォントサイズを20にします。
+        return 20
     } else {
-        return 18 // それ以外ならフォントサイズを18に
+        if text.count >= 25 {
+            return 10
+        } else if text.count >= 21 {
+            return 12
+        } else if text.count >= 17 {
+            return 14
+        } else {
+            return 18
+        }
     }
 }
+
 
 struct AnswerSelectionView: View {
     let choices: [String]
