@@ -18,6 +18,27 @@
         case daily
     }
 
+struct ViewPositionKey1: PreferenceKey {
+    static var defaultValue: [CGRect] = []
+    static func reduce(value: inout [CGRect], nextValue: () -> [CGRect]) {
+        value.append(contentsOf: nextValue())
+    }
+}
+
+struct ViewPositionKey2: PreferenceKey {
+    static var defaultValue: [CGRect] = []
+    static func reduce(value: inout [CGRect], nextValue: () -> [CGRect]) {
+        value.append(contentsOf: nextValue())
+    }
+}
+
+struct ViewPositionKey3: PreferenceKey {
+    static var defaultValue: [CGRect] = []
+    static func reduce(value: inout [CGRect], nextValue: () -> [CGRect]) {
+        value.append(contentsOf: nextValue())
+    }
+}
+
     struct TimerArc: Shape {
         var startAngle: Angle
         var endAngle: Angle
@@ -75,6 +96,10 @@
         @State private var showTutorial2 = false
         @State private var showTutorial3 = false
         @State private var showTutorial4 = false
+        @State private var buttonRect: CGRect = .zero
+        @State private var buttonRect1: CGRect = .zero
+        @State private var buttonRect2: CGRect = .zero
+        @State private var buttonRect3: CGRect = .zero
         
         var currentQuiz: QuizQuestion {
             quizzes[currentQuizIndex]
@@ -109,6 +134,9 @@
                         timer.invalidate()
                         showCountdown = false
                         showTutorial = true
+                        if tutorialNum != 3 {
+                            startTimer()
+                        }
                     }
                 }
             }
@@ -241,36 +269,25 @@
                         // 正解の場合の赤い円
                         if let selected = selectedAnswerIndex, selected == currentQuiz.correctAnswerIndex {
                         }
-                        ZStack {
-                            // 背景の円
-                            Circle()
-                                .stroke(style: StrokeStyle(lineWidth: 10, lineCap: .round, lineJoin: .round))
-                                .opacity(0.3)
-                                .foregroundColor(.gray)
-                            
-                            // アニメーションする円
-                            TimerArc(startAngle: .degrees(-90), endAngle: .degrees(-90 + Double(remainingSeconds) / 30.0 * 360.0))
-                                .stroke(style: StrokeStyle(lineWidth: 10, lineCap: .round, lineJoin: .round))
-                                .foregroundColor(remainingSeconds <= 5 ? Color.red : Color("purple1"))
-                                .rotationEffect(.degrees(-90))
-                            
-                            Text("\(remainingSeconds)秒")
-                                .foregroundColor(remainingSeconds <= 5 ? .red : .black) // 5秒以下で赤色に
-                        }
-                        .frame(width: 50, height: 50)
-                        .padding(.leading)
+                        TimerView(remainingSeconds: $remainingSeconds)
+                            .background(GeometryReader { geometry in
+                                Color.clear.preference(key: ViewPositionKey3.self, value: [geometry.frame(in: .global)])
+                            })
                     }
                     .padding(.trailing)
                     .padding(.top,40)
                     Spacer()
                     VStack{
                         ZStack {
-                            Text(currentQuiz.question)
-                                .font(.headline)
-//                                .font(.system(size: 24.0))
-                                .frame(height:70)
-                                .padding(.horizontal)
-                            
+                            VStack{
+                                Text(currentQuiz.question)
+                                    .font(.headline)
+//                                    .frame(height:70)
+                                    .padding(.horizontal)
+                            }.background(GeometryReader { geometry in
+                                Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
+                            })
+                                
                             // 正解の場合の赤い円
                             if let selected = selectedAnswerIndex, selected == currentQuiz.correctAnswerIndex {
                                 Circle()
@@ -321,23 +338,29 @@
                                 }
                             }
                         }
-                        HStack{
-                            ProgressBar3(value: Double(monsterHP), maxValue: Double(monsterUnderHP), color: Color("hpMonsterColor"))
-                                .frame(height: 20)
-                            Text("\(monsterHP)/\(monsterUnderHP)")
-                        }
-                        .padding(.horizontal)
-                        ZStack{
-                            // 味方キャラのHP
+                        VStack{
                             HStack{
-                                Image(avator.isEmpty ? "defaultIcon" : (avator.first?["name"] as? String) ?? "")
-                                    .resizable()
-                                    .frame(width: 30,height:30)
-                                ProgressBar3(value: Double(playerHP), maxValue: Double(self.userMaxHp), color: Color("hpUserColor"))
+                                ProgressBar3(value: Double(monsterHP), maxValue: Double(monsterUnderHP), color: Color("hpMonsterColor"))
                                     .frame(height: 20)
-                                Text("\(playerHP)/\(self.userMaxHp)")
+                                Text("\(monsterHP)/\(monsterUnderHP)")
                             }
                             .padding(.horizontal)
+                            ZStack{
+                                // 味方キャラのHP
+                                HStack{
+                                    Image(avator.isEmpty ? "defaultIcon" : (avator.first?["name"] as? String) ?? "")
+                                        .resizable()
+                                        .frame(width: 30,height:30)
+                                    ProgressBar3(value: Double(playerHP), maxValue: Double(self.userMaxHp), color: Color("hpUserColor"))
+                                        .frame(height: 20)
+                                    Text("\(playerHP)/\(self.userMaxHp)")
+                                }
+                                .padding(.horizontal)
+                            }
+                        }
+                            .background(GeometryReader { geometry in
+                                Color.clear.preference(key: ViewPositionKey2.self, value: [geometry.frame(in: .global)])
+                            })
                             
                             // 味方がダメージをくらう
                             if let selected = selectedAnswerIndex, selected != currentQuiz.correctAnswerIndex {
@@ -349,7 +372,6 @@
                                 }
                             }
                         }
-                    }
                     Spacer()
                     VStack{
                         //                        VStack {
@@ -358,6 +380,9 @@
                         }
                         .frame(maxWidth: .infinity)
                         .shadow(radius: 1)
+                        .background(GeometryReader { geometry in
+                            Color.clear.preference(key: ViewPositionKey1.self, value: [geometry.frame(in: .global)])
+                        })
                         Spacer()
                         
                         if showCompletionMessage {
@@ -377,6 +402,18 @@
                     
                    
                 }.background(showIncorrectBackground ? Color("superLightRed") : Color("Color2"))
+                .onPreferenceChange(ViewPositionKey.self) { positions in
+                    self.buttonRect = positions.first ?? .zero
+                }
+                .onPreferenceChange(ViewPositionKey1.self) { positions in
+                    self.buttonRect1 = positions.first ?? .zero
+                }
+                .onPreferenceChange(ViewPositionKey2.self) { positions in
+                    self.buttonRect2 = positions.first ?? .zero
+                }
+                .onPreferenceChange(ViewPositionKey3.self) { positions in
+                    self.buttonRect3 = positions.first ?? .zero
+                }
                 if showHomeModal {
                     ZStack {
                         Color.black.opacity(0.7)
@@ -387,14 +424,14 @@
                 if tutorialNum == 3 && showTutorial == true {
                     GeometryReader { geometry in
                         Color.black.opacity(0.5)
-                            .ignoresSafeArea()
                         // スポットライトの領域をカットアウ
                             .overlay(
                                 RoundedRectangle(cornerRadius: 20, style: .continuous)
-                                    .frame(width: 360, height: 90)
-                                    .position(x: geometry.size.width / 2.0, y: geometry.size.height / 5.435)
+                                    .frame(width: buttonRect.width, height: buttonRect.height+20)
+                                    .position(x: buttonRect.midX, y: buttonRect.midY)
                                     .blendMode(.destinationOut)
                             )
+                            .ignoresSafeArea()
                             .compositingGroup()
                             .background(.clear)
                     }
@@ -418,10 +455,11 @@
                         // スポットライトの領域をカットアウ
                             .overlay(
                                 RoundedRectangle(cornerRadius: 20, style: .continuous)
-                                    .frame(width: 360, height: 260)
-                                    .position(x: geometry.size.width / 2.0, y: geometry.size.height / 1.32)
+                                    .frame(width: buttonRect1.width, height: buttonRect1.height-20)
+                                    .position(x: buttonRect1.midX, y: buttonRect1.midY)
                                     .blendMode(.destinationOut)
                             )
+                            .ignoresSafeArea()
                             .compositingGroup()
                             .background(.clear)
                     }
@@ -436,19 +474,19 @@
                             .resizable()
                             .frame(width: 20, height: 20)
                             .padding(.trailing, 236.0)
-                    }.offset(x: -10, y: -10)
+                    }.offset(x: -10, y: -40)
                 }
                 if tutorialNum == 5 && showTutorial == true{
                     GeometryReader { geometry in
                         Color.black.opacity(0.5)
-                            .ignoresSafeArea()
                         // スポットライトの領域をカットアウ
                             .overlay(
                                 RoundedRectangle(cornerRadius: 20, style: .continuous)
-                                    .frame(width: 360, height: 80)
-                                    .position(x: geometry.size.width / 2.0, y: geometry.size.height / 2.05)
+                                    .frame(width: buttonRect2.width, height: buttonRect2.height+10)
+                                    .position(x: buttonRect2.midX, y: buttonRect2.midY)
                                     .blendMode(.destinationOut)
                             )
+                            .ignoresSafeArea()
                             .compositingGroup()
                             .background(.clear)
                     }
@@ -468,14 +506,14 @@
                 if tutorialNum == 6 && showTutorial == true{
                     GeometryReader { geometry in
                         Color.black.opacity(0.5)
-                            .ignoresSafeArea()
                         // スポットライトの領域をカットアウ
                             .overlay(
                                 RoundedRectangle(cornerRadius: 20, style: .continuous)
-                                    .frame(width: 70, height: 70)
-                                    .position(x: geometry.size.width / 1.125, y: geometry.size.height / 10.9)
+                                    .frame(width: buttonRect3.width, height: buttonRect3.height+20)
+                                    .position(x: buttonRect3.midX+8, y: buttonRect3.midY)
                                     .blendMode(.destinationOut)
                             )
+                            .ignoresSafeArea()
                             .compositingGroup()
                             .background(.clear)
                     }
@@ -522,7 +560,7 @@
                         authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 6) { success in
                         }
                     } else if tutorialNum == 6 {
-                                            resumeTimer()
+                        resumeTimer()
                         tutorialNum = 0
                         authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { success in
                         }

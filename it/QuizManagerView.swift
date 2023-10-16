@@ -26,6 +26,7 @@ struct QuizManagerView: View {
     @Environment(\.presentationMode) var presentationMode
     @Binding var isPresenting: Bool
     @State private var tutorialNum: Int = 0
+    @State private var buttonRect: CGRect = .zero
     
     init(isPresenting: Binding<Bool>) {
         _isPresenting = isPresenting
@@ -54,6 +55,9 @@ struct QuizManagerView: View {
                     .padding(.bottom)
                     .shadow(radius: 5)
                 }
+                .background(GeometryReader { geometry in
+                    Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
+                })
                 Button(action: {
                     audioManager.playKetteiSound()
                     self.isPresentingQuizIntermediate = true
@@ -140,17 +144,20 @@ struct QuizManagerView: View {
                 }
                 
             }
+                .onPreferenceChange(ViewPositionKey.self) { positions in
+                    self.buttonRect = positions.first ?? .zero
+                }
                 if tutorialNum == 2 {
                     GeometryReader { geometry in
                         Color.black.opacity(0.5)
-                            .ignoresSafeArea()
                         // スポットライトの領域をカットアウ
                             .overlay(
                                 RoundedRectangle(cornerRadius: 20, style: .continuous)
-                                    .frame(width: 360, height: 90)
-                                    .position(x: geometry.size.width / 2.0, y: geometry.size.height / 14.5) // このオフセットを変更してスポットライトの位置を調整
+                                    .frame(width: buttonRect.width - 20, height: buttonRect.height)
+                                    .position(x: buttonRect.midX, y: buttonRect.midY-10)
                                     .blendMode(.destinationOut)
                             )
+                            .ignoresSafeArea()
                             .compositingGroup()
                             .background(.clear)
                     }

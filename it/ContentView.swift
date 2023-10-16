@@ -30,12 +30,13 @@ struct ContentView: View {
     @State private var isIntermediateQuizActive: Bool = false
     @State private var isPresentingGachaView: Bool = false
     @State private var isPresentingAvatarList: Bool = false
+    @State private var isPresentingSettingView: Bool = false
 //    @State private var localIsPresentingAvatarList: Bool = false
     @State private var audioPlayerKettei: AVAudioPlayer?
     @ObservedObject var audioManager = AudioManager.shared
-    @State private var isSoundOn: Bool = true
     @State private var showTutorial = true
     @State private var buttonRect: CGRect = .zero
+    @State private var bubbleHeight: CGFloat = 0.0
     
     var body: some View {
         NavigationView {
@@ -52,23 +53,19 @@ struct ContentView: View {
                         Text(" \(userMoney)")
                         Spacer()
                         Spacer()
+                        
                         Button(action: {
-                            audioManager.toggleSound()
-                            isSoundOn.toggle()
+                            isPresentingSettingView = true
+                            audioManager.playSound()
                         }) {
-                            HStack {
-                                if isSoundOn {
-                                    Image(systemName: "speaker.slash")
-                                    Text("音声オフ")
-                                } else {
-                                    Image(systemName: "speaker.wave.2")
-                                    Text("音声オン")
-                                }
-                            }
-                            .foregroundColor(.gray)
+                            Image(systemName: "gearshape.fill")
+                                .resizable()
+                                .frame(width: 40, height: 40)
                         }
+                        .padding(.leading)
+                        .foregroundColor(.gray)
                     }
-                    .padding()
+                    .padding(.horizontal)
                     //                ScrollView{
                     VStack{
                         ZStack{
@@ -223,25 +220,11 @@ struct ContentView: View {
                                     // 画面遷移のトリガーをオンにする
                                     self.isPresentingAvatarList = true
                                 }) {
-//                                    HStack{
-//                                        Image("ボタンライム")
-//                                            .resizable()
-//                                            .frame(width: 35,height:35)
-//                                        Text("おとも")
-//                                            .font(.system(size:20))
-//                                    }
-//                                    .padding(.horizontal)
-//                                    .padding(.vertical)
                                     Image("おとも一覧")
                                         .resizable()
                                         .frame(height:70)
                                         .padding(.horizontal)
                                 }
-//                                .background(.white)
-//                                .foregroundColor(.gray)
-//                                .cornerRadius(20)
-//                                .padding(.leading,5)
-//                                .padding(.bottom)
                                 
                                 .shadow(radius: 3)
                                Button(action: {
@@ -279,7 +262,9 @@ struct ContentView: View {
                                 NavigationLink("", destination: QuizDailyList(isPresenting: $isPresentingQuizList).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizBeginnerList)
                                 NavigationLink("", destination: QuizManagerView(isPresenting: $isPresentingQuizList), isActive: $isPresentingQuizList)
                                 NavigationLink("", destination: AvatarListView(isPresenting: .constant(false)), isActive: $isPresentingAvatarList)
-                                NavigationLink("", destination: GachaView(), isActive: $isPresentingGachaView)}
+                                NavigationLink("", destination: GachaView(), isActive: $isPresentingGachaView)
+                                NavigationLink("", destination: SettingView().navigationBarBackButtonHidden(true), isActive: $isPresentingSettingView)
+                            }
                             }
 //                            .padding(.horizontal,5)
                         }
@@ -296,29 +281,43 @@ struct ContentView: View {
                         Color.black.opacity(0.5)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 20, style: .continuous)
-//                                    .frame(width: 200, height: 90)
-//                                    .position(x: buttonRect.midX, y: buttonRect.minY+25)
-//                                    .blendMode(.destinationOut)
-                                 .frame(width: buttonRect.width - 20, height: buttonRect.height)
-                                 .position(x: buttonRect.midX, y: buttonRect.midY)
-                                 .blendMode(.destinationOut)
+                                //                                    .frame(width: 200, height: 90)
+                                //                                    .position(x: buttonRect.midX, y: buttonRect.minY+25)
+                                //                                    .blendMode(.destinationOut)
+                                    .frame(width: buttonRect.width - 20, height: buttonRect.height)
+                                    .position(x: buttonRect.midX, y: buttonRect.midY)
+                                    .blendMode(.destinationOut)
                             )
                             .ignoresSafeArea()
                             .compositingGroup()
                             .background(.clear)
                     }
-                    VStack(alignment: .trailing, spacing: .zero) {
-                        Text("「問題を解く」をクリックしてください。")
-                            .font(.system(size: 24.0))
-                            .padding(.all, 16.0)
-                            .background(Color.white)
-                            .cornerRadius(4.0)
-                            .padding(.horizontal, 16)
-                        Image("下矢印")
-                            .resizable()
-                            .frame(width: 20, height: 20)
-                            .padding(.trailing, 310.0)
-                    }.position(x: buttonRect.midX, y: buttonRect.midY-130)
+                    VStack {
+                        Spacer()
+                            .frame(height: buttonRect.minY - bubbleHeight)
+                        VStack(alignment: .trailing, spacing: .zero) {
+                            Text("「問題を解く」をクリックしてください。")
+                                .font(.system(size: 24.0))
+                                .padding(.all, 16.0)
+                                .background(Color.white)
+                                .cornerRadius(4.0)
+                                .padding(.horizontal, 16)
+                            Image("下矢印")
+                                .resizable()
+                                .frame(width: 20, height: 20)
+                                .padding(.trailing, 310.0)
+                        }
+                        //                    .position(x: buttonRect.midX, y: buttonRect.midY-130)
+                        .background(GeometryReader { geometry in
+                            Path { _ in
+                                DispatchQueue.main.async {
+                                    self.bubbleHeight = geometry.size.height + 16
+                                }
+                            }
+                        })
+                        Spacer()
+                    }
+                    .ignoresSafeArea()
                 }
             }
             .onTapGesture {
