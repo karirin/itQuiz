@@ -100,6 +100,7 @@ struct ViewPositionKey3: PreferenceKey {
         @State private var buttonRect1: CGRect = .zero
         @State private var buttonRect2: CGRect = .zero
         @State private var buttonRect3: CGRect = .zero
+        @State private var bubbleHeight: CGFloat = 0.0
         
         var currentQuiz: QuizQuestion {
             quizzes[currentQuizIndex]
@@ -263,7 +264,9 @@ struct ViewPositionKey3: PreferenceKey {
                         Spacer()
                         if let selected = selectedAnswerIndex, selected != currentQuiz.correctAnswerIndex {
                             Text("正解")
+                                .foregroundColor(Color("fontGray"))
                             Text("\(currentQuiz.choices[currentQuiz.correctAnswerIndex])")
+                                .foregroundColor(Color("fontGray"))
                         }
                         Spacer()
                         // 正解の場合の赤い円
@@ -279,14 +282,16 @@ struct ViewPositionKey3: PreferenceKey {
                     Spacer()
                     VStack{
                         ZStack {
-                            VStack{
-                                Text(currentQuiz.question)
-                                    .font(.headline)
-//                                    .frame(height:70)
-                                    .padding(.horizontal)
-                            }.background(GeometryReader { geometry in
-                                Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
-                            })
+                                VStack{
+                                    Text(currentQuiz.question)
+                                        .font(.headline)
+                                        .frame(height: tutorialNum == 0 ? 70 : nil)
+                                        .padding(.horizontal)
+                                        .foregroundColor(Color("fontGray"))
+                                    
+                                }.background(GeometryReader { geometry in
+                                    Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
+                                })//
                                 
                             // 正解の場合の赤い円
                             if let selected = selectedAnswerIndex, selected == currentQuiz.correctAnswerIndex {
@@ -343,6 +348,7 @@ struct ViewPositionKey3: PreferenceKey {
                                 ProgressBar3(value: Double(monsterHP), maxValue: Double(monsterUnderHP), color: Color("hpMonsterColor"))
                                     .frame(height: 20)
                                 Text("\(monsterHP)/\(monsterUnderHP)")
+                                    .foregroundColor(Color("fontGray"))
                             }
                             .padding(.horizontal)
                             ZStack{
@@ -354,23 +360,25 @@ struct ViewPositionKey3: PreferenceKey {
                                     ProgressBar3(value: Double(playerHP), maxValue: Double(self.userMaxHp), color: Color("hpUserColor"))
                                         .frame(height: 20)
                                     Text("\(playerHP)/\(self.userMaxHp)")
+                                        .foregroundColor(Color("fontGray"))
                                 }
                                 .padding(.horizontal)
+                                // 味方がダメージをくらう
+                                if let selected = selectedAnswerIndex, selected != currentQuiz.correctAnswerIndex {
+                                    if showAttackImage{
+    //                                    Image("\(quizLevel)MonsterAttack\(monsterType)")
+                                        Image("beginnerMonsterAttack\(monsterType)")
+                                            .resizable()
+                                            .frame(width:30,height:30)
+                                    }
+                                }
                             }
                         }
                             .background(GeometryReader { geometry in
                                 Color.clear.preference(key: ViewPositionKey2.self, value: [geometry.frame(in: .global)])
                             })
                             
-                            // 味方がダメージをくらう
-                            if let selected = selectedAnswerIndex, selected != currentQuiz.correctAnswerIndex {
-                                if showAttackImage{
-//                                    Image("\(quizLevel)MonsterAttack\(monsterType)")
-                                    Image("beginnerMonsterAttack\(monsterType)")
-                                        .resizable()
-                                        .frame(width:30,height:30)
-                                }
-                            }
+                            
                         }
                     Spacer()
                     VStack{
@@ -435,18 +443,39 @@ struct ViewPositionKey3: PreferenceKey {
                             .compositingGroup()
                             .background(.clear)
                     }
-                    VStack(alignment: .trailing, spacing: .zero) {
-                    Image("上矢印")
-                        .resizable()
-                        .frame(width: 20, height: 20)
-                        .padding(.trailing, 206.0)
-                        Text("問題が出題されます。")
-                            .font(.system(size: 24.0))
-                            .padding(.all, 16.0)
-                            .background(Color.white)
-                            .cornerRadius(4.0)
-                            .padding(.horizontal, 16)
-                    }.offset(x: -40, y: -130)
+                    VStack {
+                    Spacer()
+                        .frame(height: buttonRect.minY - bubbleHeight)
+                        VStack(alignment: .trailing, spacing: .zero) {
+                            Image("上矢印")
+                                .resizable()
+                                .frame(width: 20, height: 20)
+                                .padding(.trailing, 206.0)
+                            Text("問題が出題されます。")
+                                .font(.system(size: 24.0))
+                                .padding(.all, 16.0)
+                                .background(Color.white)
+                                .cornerRadius(4.0)
+                                .padding(.horizontal, 16)
+                                .foregroundColor(Color("fontGray"))
+                        }
+                            .background(GeometryReader { geometry in
+                                Path { _ in
+                                    DispatchQueue.main.async {
+                                        print(currentQuiz.question.count)
+                                        if currentQuiz.question.count <= 19{
+                                            self.bubbleHeight = geometry.size.height - 130
+                                        }else if currentQuiz.question.count <= 38{
+                                            self.bubbleHeight = geometry.size.height - 150
+                                        }else{
+                                            self.bubbleHeight = geometry.size.height - 170
+                                        }
+                                    }
+                                }
+                            })
+                            Spacer()
+                        }
+                        .ignoresSafeArea()
                 }
                 if tutorialNum == 4 && showTutorial == true{
                     GeometryReader { geometry in
@@ -456,25 +485,45 @@ struct ViewPositionKey3: PreferenceKey {
                             .overlay(
                                 RoundedRectangle(cornerRadius: 20, style: .continuous)
                                     .frame(width: buttonRect1.width, height: buttonRect1.height-20)
-                                    .position(x: buttonRect1.midX, y: buttonRect1.midY)
+                                    .position(x: buttonRect1.midX, y: buttonRect1.midY+5)
                                     .blendMode(.destinationOut)
                             )
                             .ignoresSafeArea()
                             .compositingGroup()
                             .background(.clear)
                     }
-                    VStack(alignment: .trailing, spacing: .zero) {
+                    VStack {
+                        Spacer()
+                            .frame(height: buttonRect.minY - bubbleHeight)
+                        VStack(alignment: .trailing, spacing: .zero) {
                         Text("選択肢の中から正解と思うものをクリックしてください。")
                             .font(.system(size: 23.0))
                             .padding(.all, 16.0)
                             .background(Color.white)
                             .cornerRadius(4.0)
                             .padding(.horizontal, 18)
+                            .foregroundColor(Color("fontGray"))
                         Image("下矢印")
                             .resizable()
                             .frame(width: 20, height: 20)
                             .padding(.trailing, 236.0)
-                    }.offset(x: -10, y: -40)
+                    }
+                        .background(GeometryReader { geometry in
+                        Path { _ in
+                            DispatchQueue.main.async {
+                                if currentQuiz.question.count <= 19{
+                                    self.bubbleHeight = geometry.size.height - 240
+                                }else if currentQuiz.question.count <= 38{
+                                    self.bubbleHeight = geometry.size.height - 260
+                                }else{
+                                    self.bubbleHeight = geometry.size.height - 290
+                                }
+                            }
+                        }
+                    })
+                    Spacer()
+                }
+                .ignoresSafeArea()
                 }
                 if tutorialNum == 5 && showTutorial == true{
                     GeometryReader { geometry in
@@ -490,6 +539,9 @@ struct ViewPositionKey3: PreferenceKey {
                             .compositingGroup()
                             .background(.clear)
                     }
+                    VStack {
+                        Spacer()
+                            .frame(height: buttonRect.minY - bubbleHeight)
                     VStack(alignment: .trailing, spacing: .zero) {
                         Text("正解すると相手モンスターにダメージ、不正解だと自分がダメージを受けます。\n相手のHPが０になれば次の相手に、自分のHPが０になればゲームオーバーです。")
                             .font(.system(size: 18.0))
@@ -497,11 +549,27 @@ struct ViewPositionKey3: PreferenceKey {
                             .background(Color.white)
                             .cornerRadius(4.0)
                             .padding(.horizontal, 18)
+                            .foregroundColor(Color("fontGray"))
                         Image("下矢印")
                             .resizable()
                             .frame(width: 20, height: 20)
                             .padding(.trailing, 236.0)
-                    }.offset(x: -10, y: -150)
+                    }  .background(GeometryReader { geometry in
+                        Path { _ in
+                            DispatchQueue.main.async {
+                                if currentQuiz.question.count <= 19{
+                                    self.bubbleHeight = geometry.size.height - 150
+                                }else if currentQuiz.question.count <= 38{
+                                    self.bubbleHeight = geometry.size.height - 180
+                                }else{
+                                    self.bubbleHeight = geometry.size.height - 190
+                                }
+                            }
+                        }
+                    })
+                    Spacer()
+                }
+                .ignoresSafeArea()
                 }
                 if tutorialNum == 6 && showTutorial == true{
                     GeometryReader { geometry in
@@ -510,13 +578,22 @@ struct ViewPositionKey3: PreferenceKey {
                             .overlay(
                                 RoundedRectangle(cornerRadius: 20, style: .continuous)
                                     .frame(width: buttonRect3.width, height: buttonRect3.height+20)
-                                    .position(x: buttonRect3.midX+8, y: buttonRect3.midY)
+                                    .frame(
+                                        width: currentQuiz.question.count <= 19 ? buttonRect3.width : buttonRect3.width,
+//                                        height: currentQuiz.question.count <= 19 ? buttonRect3.height + 20 : buttonRect3.height+20
+                                        height: currentQuiz.question.count <= 19 ? buttonRect3.height + 20 :
+                                                (currentQuiz.question.count <= 29 ? buttonRect3.height - 20 : buttonRect3.height + 40)
+                                    )
+                                    .position(x: buttonRect3.midX+8, y: buttonRect3.midY+1)
                                     .blendMode(.destinationOut)
                             )
                             .ignoresSafeArea()
                             .compositingGroup()
                             .background(.clear)
                     }
+                    VStack {
+                        Spacer()
+                            .frame(height: buttonRect.minY - bubbleHeight)
                     VStack(alignment: .trailing, spacing: .zero) {
                         Image("上矢印")
                             .resizable()
@@ -528,7 +605,17 @@ struct ViewPositionKey3: PreferenceKey {
                             .background(Color.white)
                             .cornerRadius(4.0)
                             .padding(.horizontal, 18)
-                    }.offset(x: 10, y: -190)
+                            .foregroundColor(Color("fontGray"))
+                    } .background(GeometryReader { geometry in
+                        Path { _ in
+                            DispatchQueue.main.async {
+                                self.bubbleHeight = geometry.size.height - 130
+                            }
+                        }
+                    })
+                    Spacer()
+                }
+                .ignoresSafeArea()
                 }
                 if showCountdown {
                        ZStack {

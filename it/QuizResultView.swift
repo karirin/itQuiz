@@ -27,6 +27,7 @@ struct QuizResultView: View {
     // QuizResultView.swift
     @State private var playerExperience: Int
     @State private var playerMoney: Int
+    @State private var isContentView: Bool = false
 
     @Binding var isPresenting: Bool
 //    @Environment(\.rootPresentationMode) private var rootPresentationMode: Binding<RootPresentationMode>
@@ -41,16 +42,17 @@ struct QuizResultView: View {
     }
     
     var body: some View {
+        ZStack {
         NavigationView{
-            ZStack {
                 VStack{
                     Spacer()
                     HStack{
 //                        NavigationLink(destination: ContentView(isPresentingQuizBeginnerList: .constant(false), isPresentingAvatarList: .constant(false)).navigationBarBackButtonHidden(true)) {
-                        NavigationLink(destination: ContentView().navigationBarBackButtonHidden(true)) {
+//                        NavigationLink(destination: ContentView().navigationBarBackButtonHidden(true)) {
                             Button(action: {
                                 audioManager.playCancelSound()
-                                self.isPresenting = false
+//                                self.isPresenting = false
+                                isContentView = true
 //                                self.rootPresentationMode.wrappedValue.dismissToRoot()
                                 // ここで画面遷移を行います。
                             }) {
@@ -61,8 +63,9 @@ struct QuizResultView: View {
                                         .background(Color.white)
                                         .foregroundColor(.gray)
                                 }
+                                .foregroundColor(Color("fontGray"))
                             }
-                        }
+//                        }
                         .padding(.leading)
                         Spacer()
                         Text("クイズ結果")
@@ -77,6 +80,7 @@ struct QuizResultView: View {
                         .padding(.trailing)
                         .opacity(0)
                     }
+                    .foregroundColor(Color("fontGray"))
                     ScrollView{
                         ForEach(results, id: \.question) { result in
                             VStack(alignment: .leading,spacing: 20) {
@@ -101,6 +105,8 @@ struct QuizResultView: View {
                         }
                         .padding(5)
                     }
+                    .foregroundColor(Color("fontGray"))
+                    
                 }
                 .onChange(of: authManager.didLevelUp) { newValue in
                     if newValue {
@@ -111,20 +117,21 @@ struct QuizResultView: View {
                         }
                     }
                 }
-                if showModal {
-                    ExperienceModalView(showModal: $showModal, addedExperience: playerExperience, addedMoney: playerMoney, authManager: authManager)
-                }
-                if showLevelUpModal {
-                    LevelUpModalView(showLevelUpModal: $showLevelUpModal, authManager: authManager)
-                }
+
                 if showMemoView {
                     MemoView(memo: $currentMemo, question: selectedQuestion)
                 }
             }
             .background(Color("Color2"))
+            if showModal {
+                ExperienceModalView(showModal: $showModal, addedExperience: playerExperience, addedMoney: playerMoney, authManager: authManager)
+            }
+            if showLevelUpModal {
+                LevelUpModalView(showLevelUpModal: $showLevelUpModal, authManager: authManager)
+            }
+            NavigationLink("", destination: ContentView().navigationBarBackButtonHidden(true), isActive: $isContentView)
         }
     }
-
 }
 
 struct ExperienceModalView: View {
@@ -176,6 +183,7 @@ struct ExperienceModalView: View {
                         .padding(.horizontal,20)
                 }
             }
+            .foregroundColor(Color("fontGray"))
             .onAppear {
                 withAnimation {
                     currentExperience += Double(addedExperience)

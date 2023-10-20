@@ -31,259 +31,226 @@ struct ContentView: View {
     @State private var isPresentingGachaView: Bool = false
     @State private var isPresentingAvatarList: Bool = false
     @State private var isPresentingSettingView: Bool = false
-//    @State private var localIsPresentingAvatarList: Bool = false
     @State private var audioPlayerKettei: AVAudioPlayer?
     @ObservedObject var audioManager = AudioManager.shared
     @State private var showTutorial = true
     @State private var buttonRect: CGRect = .zero
     @State private var bubbleHeight: CGFloat = 0.0
+    @State private var isSoundOn: Bool = true
+    @State private var isLoading: Bool = true
     
     var body: some View {
         NavigationView {
             ZStack{
-                VStack {
-                    HStack{
-                        Image(systemName: "person.circle")
-                        Text("\(userName)")
-                        Spacer()
-                        Image("コイン")
-                            .resizable()
-                            .frame(width:20,height:20)
-                        Text("+")
-                        Text(" \(userMoney)")
-                        Spacer()
-                        Spacer()
-                        
-                        Button(action: {
-                            isPresentingSettingView = true
-                            audioManager.playSound()
-                        }) {
-                            Image(systemName: "gearshape.fill")
+                if isLoading {
+                    // ローディングインジケータの表示
+                    Text("")
+                        .frame(maxWidth:.infinity,maxHeight:.infinity)
+                } else {
+                    VStack {
+                        HStack{
+                            
+                            Image(systemName: "person.circle")
+                                .foregroundColor(Color("fontGray"))
+                            Text("\(userName)")
+                                .foregroundColor(Color("fontGray"))
+                            Spacer()
+                            Image("コイン")
                                 .resizable()
-                                .frame(width: 40, height: 40)
-                        }
-                        .padding(.leading)
-                        .foregroundColor(.gray)
-                    }
-                    .padding(.horizontal)
-                    //                ScrollView{
-                    VStack{
-                        ZStack{
-                            Image("image")
-                                .resizable()
-                                .frame(height:120)
-                                .padding(.top,40)
-                                .opacity(0.5)
-                            Image(avatar.isEmpty ? "defaultIcon" : (avatar.first?["name"] as? String) ?? "")
-                            //                            Image("ぴょん吉")
-                                .resizable()
-                                .frame(width: 140,height:140)
-                        }
-                        
-                        .font(.system(size: 24))
-                        VStack{
-                            HStack(alignment: .top){
-                                HStack(alignment: .top){
-                                    Image("スター")
-                                        .resizable()
-                                        .frame(width: 25,height:20)
-                                    Text("Lv：\(authManager.level)")
-                                }
-                                
-                                HStack(alignment: .top){
-                                    Image("ハート")
-                                        .resizable()
-                                        .frame(width: 20,height:20)
-                                    VStack(spacing: 0){
-                                        Text("体力：\(userHp + (avatar.first?["health"] as? Int ?? 0))")
-                                            .multilineTextAlignment(.leading)
-                                        HStack{
-                                            Text("( + \(avatar.first?["health"] as? Int ?? 0)")
-                                            Image(avatar.isEmpty ? "defaultIcon" : (avatar.first?["name"] as? String) ?? "")
-                                                .resizable()
-                                                .frame(width: 20,height:20)
-                                            Text(")")
-                                        }
-                                    }
-                                }
-                                HStack(alignment: .top){
-                                    Image("ソード")
-                                        .resizable()
-                                        .frame(width: 20,height:20)
-                                    VStack(spacing: 0){
-                                        Text("攻撃力：\(userAttack + (avatar.first?["attack"] as? Int ?? 0))")
-                                            .multilineTextAlignment(.leading)
-                                        HStack{
-                                            Text("( + \(avatar.first?["attack"] as? Int ?? 0)")
-                                            Image(avatar.isEmpty ? "defaultIcon" : (avatar.first?["name"] as? String) ?? "")
-                                                .resizable()
-                                                .frame(width: 20,height:20)
-                                            Text(")")
-                                        }
-                                    }
-                                }
+                                .frame(width:20,height:20)
+                            Text("+")
+                                .foregroundColor(Color("fontGray"))
+                            Text(" \(userMoney)")
+                                .foregroundColor(Color("fontGray"))
+                            Spacer()
+                            Spacer()
+                            
+                            Button(action: {
+                                isPresentingSettingView = true
+                                audioManager.playSound()
+                            }) {
+                                Image(systemName: "gearshape.fill")
+                                    .resizable()
+                                    .frame(width: 40, height: 40)
                             }
-                            HStack{
-                                Text("経験値")
-                                ProgressBar(value: Float(authManager.experience) / Float(authManager.level * 100))
-                                    .frame(height: 20)
-                                Text("\(authManager.experience) / \(authManager.level * 100)")
-                            }
-                            .padding(.horizontal)
+                            .padding(.leading)
+                            .foregroundColor(Color("gray"))
                         }
-                        
+                        .padding(.horizontal)
+                        //                ScrollView{
                         VStack{
-                            ScrollView{
-                                Button(action: {
-                                    if isButtonEnabled {
-                                        if let userId = authManager.currentUserId {
-                                            authManager.saveLastClickedDate(userId: userId) { success in
-                                                lastClickedDate = Date()
-                                                isButtonEnabled = false
-                                            }
+                            ZStack{
+                                Image("image")
+                                    .resizable()
+                                    .frame(height:120)
+                                    .padding(.top,40)
+                                    .opacity(0.5)
+                                Image(avatar.isEmpty ? "defaultIcon" : (avatar.first?["name"] as? String) ?? "")
+                                //                            Image("ぴょん吉")
+                                    .resizable()
+                                    .frame(width: 140,height:140)
+                            }
+                            
+                            .font(.system(size: 24))
+                            VStack{
+                                HStack(alignment: .top){
+                                    HStack(alignment: .top){
+                                        Image("スター")
+                                            .resizable()
+                                            .frame(width: 25,height:20)
+                                        Text("Lv：\(authManager.level)")
+                                            .foregroundColor(Color("fontGray"))
+                                    }
+                                    
+                                    HStack(alignment: .top){
+                                        Image("ハート")
+                                            .resizable()
+                                            .frame(width: 20,height:20)
+                                        VStack(spacing: 0){
+                                            Text("体力：\(userHp + (avatar.first?["health"] as? Int ?? 0))")
+                                                .multilineTextAlignment(.leading)
+                                                .foregroundColor(Color("fontGray"))
+                                            HStack{
+                                                Text("( + \(avatar.first?["health"] as? Int ?? 0)")
+                                                Image(avatar.isEmpty ? "defaultIcon" : (avatar.first?["name"] as? String) ?? "")
+                                                    .resizable()
+                                                    .frame(width: 20,height:20)
+                                                Text(")")
+                                            }.foregroundColor(Color("fontGray"))
                                         }
                                     }
-                                    audioManager.playKetteiSound()
-                                    // 画面遷移のトリガーをオンにする
-                                    self.isPresentingQuizBeginnerList = true
-                                }) {
-                                    //                                HStack{
-                                    //                                    Image("daily")
-                                    //                                        .resizable()
-                                    //                                        .frame(width: 40,height:40)
-                                    //                                        .foregroundColor(.gray)
-                                    //                                    Text("デイリーチャレンジ")
-                                    //                                        .font(.system(size:24))
-                                    //                                }
-                                    //                                .padding(.vertical)
-                                    if isButtonEnabled {
-                                        Image("デイリー")
+                                    HStack(alignment: .top){
+                                        Image("ソード")
                                             .resizable()
-                                            .frame(height:70)
-                                    }else{
-                                        Image("白黒デイリー")
-                                            .resizable()
-                                            .frame(height:70)
+                                            .frame(width: 20,height:20)
+                                        VStack(spacing: 0){
+                                            Text("攻撃力：\(userAttack + (avatar.first?["attack"] as? Int ?? 0))").foregroundColor(Color("fontGray"))
+                                                .multilineTextAlignment(.leading)
+                                            HStack{
+                                                Text("( + \(avatar.first?["attack"] as? Int ?? 0)")
+                                                Image(avatar.isEmpty ? "defaultIcon" : (avatar.first?["name"] as? String) ?? "")
+                                                    .resizable()
+                                                    .frame(width: 20,height:20)
+                                                Text(")")
+                                            }.foregroundColor(Color("fontGray"))
+                                        }
                                     }
-                                    //                                        .foregroundColor(.gray)
                                 }
-                                .frame(maxWidth: .infinity)
-                                //                            .background(isButtonEnabled ? .white : Color("lightGray"))
-                                                                                        .disabled(!isButtonEnabled)
-                                //                            .foregroundColor(.gray)
-                                //                            .cornerRadius(20)
+                                HStack{
+                                    Text("経験値").foregroundColor(Color("fontGray"))
+                                    ProgressBar(value: Float(authManager.experience) / Float(authManager.level * 100))
+                                        .frame(height: 20)
+                                    Text("\(authManager.experience) / \(authManager.level * 100)")
+                                        .foregroundColor(Color("fontGray"))
+                                }
                                 .padding(.horizontal)
-                                //                            .padding(.bottom)
-                                
-                                .shadow(radius: 3)
-                                .onTapGesture {
-                                    if isButtonEnabled {
-                                        if let userId = authManager.currentUserId {
-                                            authManager.saveLastClickedDate(userId: userId) { success in
-                                                lastClickedDate = Date()
-                                                isButtonEnabled = false
+                            }
+                            
+                            VStack{
+                                ScrollView{
+                                    Button(action: {
+                                        if isButtonEnabled {
+                                            if let userId = authManager.currentUserId {
+                                                authManager.saveLastClickedDate(userId: userId) { success in
+                                                    lastClickedDate = Date()
+                                                    isButtonEnabled = false
+                                                }
+                                            }
+                                        }
+                                        audioManager.playKetteiSound()
+                                        // 画面遷移のトリガーをオンにする
+                                        self.isPresentingQuizBeginnerList = true
+                                    }) {
+                                        if isButtonEnabled {
+                                            Image("デイリー")
+                                                .resizable()
+                                                .frame(height:70)
+                                        }else{
+                                            Image("白黒デイリー")
+                                                .resizable()
+                                                .frame(height:70)
+                                        }
+                                        //                                        .foregroundColor(.gray)
+                                    }
+                                    .frame(maxWidth: .infinity)
+//                                    .disabled(!isButtonEnabled)
+                                    .padding(.horizontal)
+                                    //                            .padding(.bottom)
+                                    
+                                    .shadow(radius: 3)
+                                    .onTapGesture {
+                                        if isButtonEnabled {
+                                            if let userId = authManager.currentUserId {
+                                                authManager.saveLastClickedDate(userId: userId) { success in
+                                                    lastClickedDate = Date()
+                                                    isButtonEnabled = false
+                                                }
                                             }
                                         }
                                     }
+                                    Button(action: {
+                                        audioManager.playSound()
+                                        // 画面遷移のトリガーをオンにする
+                                        self.isPresentingQuizList = true
+                                    }) {
+                                        Image("ダンジョン一覧")
+                                            .resizable()
+                                            .frame(height:70)
+                                            .padding(.horizontal)
+                                    }
+                                    .background(GeometryReader { geometry in
+                                        Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
+                                    })
+                                    
+                                    .shadow(radius: 3)
+                                    
+                                    Button(action: {
+                                        audioManager.playSound()
+                                        // 画面遷移のトリガーをオンにする
+                                        self.isPresentingAvatarList = true
+                                    }) {
+                                        Image("おとも一覧")
+                                            .resizable()
+                                            .frame(height:70)
+                                            .padding(.horizontal)
+                                    }
+                                    
+                                    .shadow(radius: 3)
+                                    Button(action: {
+                                        // 画面遷移のトリガーをオンにする
+                                        self.isPresentingGachaView = true
+                                        audioManager.playSound()
+                                    }) {
+                                        Image("ガチャトップ")
+                                            .resizable()
+                                            .frame(height:70)
+                                            .padding(.horizontal)
+                                    }
+                                    
+                                    .shadow(radius: 3)
+                                    .onTapGesture {
+                                        audioManager.playSound()
+                                    }
+                                    
+                                    NavigationLink("", destination: QuizDailyList(isPresenting: $isPresentingQuizList).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizBeginnerList)
+                                    NavigationLink("", destination: QuizManagerView(isPresenting: $isPresentingQuizList), isActive: $isPresentingQuizList)
+                                    NavigationLink("", destination: AvatarListView(isPresenting: .constant(false)), isActive: $isPresentingAvatarList)
+                                    NavigationLink("", destination: GachaView(), isActive: $isPresentingGachaView)
+                                    NavigationLink("", destination: SettingView().navigationBarBackButtonHidden(true), isActive: $isPresentingSettingView)
                                 }
-                                Button(action: {
-                                    audioManager.playSound()
-                                    // 画面遷移のトリガーをオンにする
-                                    self.isPresentingQuizList = true
-                                }) {
-                                    //                                    HStack{
-                                    //                                        Image("quiz")
-                                    //                                            .resizable()
-                                    //                                            .frame(width: 35,height:35)
-                                    //                                            .foregroundColor(.gray)
-                                    //                                        Text("問題を解く")
-                                    //                                            .font(.system(size:20))
-                                    //                                    }
-                                    Image("ダンジョン一覧")
-                                        .resizable()
-                                        .frame(height:70)
-                                        .padding(.horizontal)
-                                }
-                                .background(GeometryReader { geometry in
-                                    Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
-                                })
-                                //                                .background(.white)
-                                //                                .foregroundColor(.gray)
-                                //                                .cornerRadius(20)
-                                //                                .padding(.trailing,5)
-                                //                                .padding(.bottom)
-                                
-                                .shadow(radius: 3)
-                                
-                                Button(action: {
-                                    audioManager.playSound()
-                                    // 画面遷移のトリガーをオンにする
-                                    self.isPresentingAvatarList = true
-                                }) {
-                                    Image("おとも一覧")
-                                        .resizable()
-                                        .frame(height:70)
-                                        .padding(.horizontal)
-                                }
-                                
-                                .shadow(radius: 3)
-                               Button(action: {
-                                    // 画面遷移のトリガーをオンにする
-                                    self.isPresentingGachaView = true
-                                    audioManager.playSound()
-                                }) {
-//                                    HStack{
-//                                        Image("gacha")
-//                                            .resizable()
-//                                            .frame(width: 40,height:40)
-//                                            .foregroundColor(.gray)
-//                                        Text("ガチャをする")
-//                                            .font(.system(size:24))
-//                                    }
-//                                    .padding(.horizontal,5)
-//                                    .padding(.vertical)
-                                    Image("ガチャトップ")
-                                        .resizable()
-                                        .frame(height:70)
-                                        .padding(.horizontal)
-                                }
-//                                .frame(maxWidth: .infinity)
-//                                .background(.white)
-//                                .foregroundColor(.gray)
-//                                .cornerRadius(20)
-//                                .padding(.horizontal)
-//                                .padding(.bottom)
-                                
-                                .shadow(radius: 3)
-                                .onTapGesture {
-                                    audioManager.playSound()
-                                }
-                                
-                                NavigationLink("", destination: QuizDailyList(isPresenting: $isPresentingQuizList).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizBeginnerList)
-                                NavigationLink("", destination: QuizManagerView(isPresenting: $isPresentingQuizList), isActive: $isPresentingQuizList)
-                                NavigationLink("", destination: AvatarListView(isPresenting: .constant(false)), isActive: $isPresentingAvatarList)
-                                NavigationLink("", destination: GachaView(), isActive: $isPresentingGachaView)
-                                NavigationLink("", destination: SettingView().navigationBarBackButtonHidden(true), isActive: $isPresentingSettingView)
                             }
-                            }
-//                            .padding(.horizontal,5)
+                            //                            .padding(.horizontal,5)
                         }
-                        //                        if isPresentingQuizList {
-                       
-                    //                    }
-                    //                }
-                }
-                .onPreferenceChange(ViewPositionKey.self) { positions in
-                    self.buttonRect = positions.first ?? .zero
+                    }
+                    .onPreferenceChange(ViewPositionKey.self) { positions in
+                        self.buttonRect = positions.first ?? .zero
+                    }
                 }
                 if tutorialNum == 1 {
                     GeometryReader { geometry in
                         Color.black.opacity(0.5)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 20, style: .continuous)
-                                //                                    .frame(width: 200, height: 90)
-                                //                                    .position(x: buttonRect.midX, y: buttonRect.minY+25)
-                                //                                    .blendMode(.destinationOut)
                                     .frame(width: buttonRect.width - 20, height: buttonRect.height)
                                     .position(x: buttonRect.midX, y: buttonRect.midY)
                                     .blendMode(.destinationOut)
@@ -302,6 +269,7 @@ struct ContentView: View {
                                 .background(Color.white)
                                 .cornerRadius(4.0)
                                 .padding(.horizontal, 16)
+                                .foregroundColor(Color("fontGray"))
                             Image("下矢印")
                                 .resizable()
                                 .frame(width: 20, height: 20)
@@ -356,6 +324,7 @@ struct ContentView: View {
                 self.userHp = hp ?? 100
                 self.userAttack = attack ?? 20
                 self.tutorialNum = tutorialNum ?? 0
+                self.isLoading = false
             }
             authManager.fetchAvatars {
                 self.avatar = authManager.avatars.map { avatar in

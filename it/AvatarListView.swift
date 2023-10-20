@@ -93,11 +93,13 @@ struct AvatarListView: View {
                                 .frame(width: 20,height:20)
                             Text("\(selected.health)")
                                 .font(.system(size:24))
+                                .foregroundColor(Color("fontGray"))
                             Image("ソード")
                                 .resizable()
                                 .frame(width: 25,height:20)
                             Text("\(selected.attack)")
                                 .font(.system(size:24))
+                                .foregroundColor(Color("fontGray"))
                         }
                 }
             }
@@ -138,6 +140,7 @@ struct AvatarListView: View {
                                             .frame(width: 20, height: 20)
                                         Text("\(avatar.count)")
                                             .font(.system(size:38))
+                                            .foregroundColor(Color("fontGray"))
                                     }
                                     .padding(.trailing,5)
                                 }

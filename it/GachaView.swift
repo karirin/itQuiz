@@ -89,6 +89,7 @@ struct GachaView: View {
                     Text("+")
                     Text(" \(userMoney)")
                 }
+                .foregroundColor(Color("fontGray"))
                 .padding(.trailing)
                 // ガチャの結果を表示
                 if showResult, let item = obtainedItem {  // showResultを使用して制御
@@ -100,6 +101,7 @@ struct GachaView: View {
                             
                                 .frame(maxWidth: .infinity,maxHeight:280)
                             Text("\(item.name)")
+                                .foregroundColor(Color("fontGray"))
                                 .fontWeight(.bold)
                                 .font(.system(size: 20))
                                 .padding(.bottom,190)
@@ -121,10 +123,11 @@ struct GachaView: View {
                             Text("攻撃力：\(item.attack)")
                                 .font(.system(size: 24))
                         }
+                        .foregroundColor(Color("fontGray"))
                     }
                     Spacer()
                     Button(action: {
-                        self.isShowingActivityIndicator = true  // ローディング画面を表示
+//                        self.isShowingActivityIndicator = true  // ローディング画面を表示
                         self.showResult = false
                         authManager.decreaseUserMoney { success in
                             if success {
@@ -134,18 +137,16 @@ struct GachaView: View {
                             }
                         }
                         self.showAnimation = true
-                        
-                        // ガチャを引く処理を非同期で実行
-                        DispatchQueue.global().async {
                             self.gachaManager.shuffleItems()
                             self.obtainedItem = self.gachaManager.drawGacha()
-                            
+                        // ガチャを引く処理を非同期で実行
+                        DispatchQueue.global().async {
                             // UIの更新はメインスレッドで実行
                             DispatchQueue.main.async {
-                                self.isShowingActivityIndicator = false  // ローディング画面を非表示
-                                self.showResult = true
+//                                self.isShowingActivityIndicator = false
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
                                     animationFinished = true
+                                    self.showResult = true
                                 }
                             }
                         }
@@ -250,6 +251,11 @@ struct GachaView: View {
                 }else{
                     isGachaButtonDisabled = true
                 }
+            }
+        }
+        .onChange(of: isShowingActivityIndicator) { isShowing in
+            if isShowing {
+                self.isShowingActivityIndicator = isShowingActivityIndicator
             }
         }
         .frame(maxWidth: .infinity,maxHeight: .infinity)

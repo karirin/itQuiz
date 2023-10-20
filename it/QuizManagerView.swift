@@ -27,6 +27,7 @@ struct QuizManagerView: View {
     @Binding var isPresenting: Bool
     @State private var tutorialNum: Int = 0
     @State private var buttonRect: CGRect = .zero
+    @State private var bubbleHeight: CGFloat = 0.0
     
     init(isPresenting: Binding<Bool>) {
         _isPresenting = isPresenting
@@ -35,102 +36,102 @@ struct QuizManagerView: View {
 
 
     var body: some View {
-            ZStack{
-        ScrollView{
-            VStack {
-                Spacer()
-                Group{
+        ZStack{
+            ScrollView{
+                VStack {
+                    Spacer()
+                    Group{
+                        Button(action: {
+                            audioManager.playKetteiSound()
+                            // 画面遷移のトリガーをオンにする
+                            self.isPresentingQuizBeginner = true
+                        }) {
+                            //                        Image("IT基礎知識の問題の初級")
+                            Image("選択肢1")
+                                .resizable()
+                                .frame(height: 70)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.horizontal)
+                        .padding(.bottom)
+                        .shadow(radius: 5)
+                    }
+                    .background(GeometryReader { geometry in
+                        Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
+                    })
                     Button(action: {
                         audioManager.playKetteiSound()
-                        // 画面遷移のトリガーをオンにする
-                        self.isPresentingQuizBeginner = true
+                        self.isPresentingQuizIntermediate = true
                     }) {
-//                        Image("IT基礎知識の問題の初級")
-                        Image("選択肢1")
+                        //                    Image("IT基礎知識の問題の中級")
+                        Image("選択肢2")
                             .resizable()
                             .frame(height: 70)
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.horizontal)
                     .padding(.bottom)
-                    .shadow(radius: 5)
+                    .shadow(radius: 3)
+                    
+                    Button(action: {
+                        audioManager.playKetteiSound()
+                        self.isPresentingQuizAdvanced = true
+                    }) {
+                        //                    Image("IT基礎知識の問題の上級")
+                        Image("選択肢3")
+                            .resizable()
+                            .frame(height: 70)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.horizontal)
+                    .padding(.bottom)
+                    .shadow(radius: 3)
+                    
+                    // ネットワーク系の問題
+                    Button(action: {
+                        audioManager.playKetteiSound()
+                        self.isPresentingQuizNetwork = true
+                    }) {
+                        //                    Image("ネットワーク系の問題")
+                        Image("選択肢4")
+                            .resizable()
+                            .frame(height: 70)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.horizontal)
+                    .padding(.bottom)
+                    .shadow(radius: 3)
+                    
+                    // セキュリティ系の問題
+                    Button(action: {
+                        audioManager.playKetteiSound()
+                        self.isPresentingQuizSecurity = true
+                    }) {
+                        //                    Image("セキュリティ系の問題")
+                        Image("選択肢5")
+                            .resizable()
+                            .frame(height: 70)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.horizontal)
+                    .padding(.bottom)
+                    .shadow(radius: 3)
+                    
+                    // データベース系の問題
+                    Button(action: {
+                        audioManager.playKetteiSound()
+                        self.isPresentingQuizDatabase = true
+                    }) {
+                        //                    Image("データベース系の問題")
+                        Image("選択肢6")
+                            .resizable()
+                            .frame(height: 70)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.horizontal)
+                    .padding(.bottom)
+                    .shadow(radius: 3)
                 }
-                .background(GeometryReader { geometry in
-                    Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
-                })
-                Button(action: {
-                    audioManager.playKetteiSound()
-                    self.isPresentingQuizIntermediate = true
-                }) {
-//                    Image("IT基礎知識の問題の中級")
-                    Image("選択肢2")
-                        .resizable()
-                        .frame(height: 70)
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.horizontal)
-                .padding(.bottom)
-                .shadow(radius: 3)
-                
-                Button(action: {
-                    audioManager.playKetteiSound()
-                    self.isPresentingQuizAdvanced = true
-                }) {
-//                    Image("IT基礎知識の問題の上級")
-                    Image("選択肢3")
-                        .resizable()
-                        .frame(height: 70)
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.horizontal)
-                .padding(.bottom)
-                .shadow(radius: 3)
-                
-                // ネットワーク系の問題
-                Button(action: {
-                    audioManager.playKetteiSound()
-                    self.isPresentingQuizNetwork = true
-                }) {
-//                    Image("ネットワーク系の問題")
-                    Image("選択肢4")
-                        .resizable()
-                        .frame(height: 70)
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.horizontal)
-                .padding(.bottom)
-                .shadow(radius: 3)
-                
-                // セキュリティ系の問題
-                Button(action: {
-                    audioManager.playKetteiSound()
-                    self.isPresentingQuizSecurity = true
-                }) {
-//                    Image("セキュリティ系の問題")
-                    Image("選択肢5")
-                        .resizable()
-                        .frame(height: 70)
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.horizontal)
-                .padding(.bottom)
-                .shadow(radius: 3)
-                
-                // データベース系の問題
-                Button(action: {
-                    audioManager.playKetteiSound()
-                    self.isPresentingQuizDatabase = true
-                }) {
-//                    Image("データベース系の問題")
-                    Image("選択肢6")
-                        .resizable()
-                        .frame(height: 70)
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.horizontal)
-                .padding(.bottom)
-                .shadow(radius: 3)
-            }
                 VStack{
                     Group{
                         NavigationLink("", destination: QuizDatabaseList(isPresenting: $isPresenting).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizDatabase) // 適切な遷移先に変更してください
@@ -144,37 +145,52 @@ struct QuizManagerView: View {
                 }
                 
             }
-                .onPreferenceChange(ViewPositionKey.self) { positions in
-                    self.buttonRect = positions.first ?? .zero
+            .onPreferenceChange(ViewPositionKey.self) { positions in
+                self.buttonRect = positions.first ?? .zero
+            }
+            if tutorialNum == 2 {
+                GeometryReader { geometry in
+                    Color.black.opacity(0.5)
+                    // スポットライトの領域をカットアウ
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                                .frame(width: buttonRect.width - 20, height: buttonRect.height)
+                                .position(x: buttonRect.midX, y: buttonRect.midY-10)
+                                .blendMode(.destinationOut)
+                        )
+                        .ignoresSafeArea()
+                        .compositingGroup()
+                        .background(.clear)
                 }
-                if tutorialNum == 2 {
-                    GeometryReader { geometry in
-                        Color.black.opacity(0.5)
-                        // スポットライトの領域をカットアウ
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                                    .frame(width: buttonRect.width - 20, height: buttonRect.height)
-                                    .position(x: buttonRect.midX, y: buttonRect.midY-10)
-                                    .blendMode(.destinationOut)
-                            )
-                            .ignoresSafeArea()
-                            .compositingGroup()
-                            .background(.clear)
-                    }
+                VStack {
+                    Spacer()
+                        .frame(height: buttonRect.minY + bubbleHeight)
                     VStack(alignment: .trailing, spacing: .zero) {
-                    Image("上矢印")
-                        .resizable()
-                        .frame(width: 20, height: 20)
-                        .padding(.trailing, 306.0)
+                        Image("上矢印")
+                            .resizable()
+                            .frame(width: 20, height: 20)
+                            .padding(.trailing, 306.0)
                         Text("「IT基礎知識の問題（初級）」をクリックしてください。")
                             .font(.system(size: 24.0))
                             .padding(.all, 16.0)
                             .background(Color.white)
                             .cornerRadius(4.0)
                             .padding(.horizontal, 16)
-                    }.offset(x: -10, y: -130)
+                            .foregroundColor(Color("fontGray"))
+                    }
+                    .background(GeometryReader { geometry in
+                        Path { _ in
+                            DispatchQueue.main.async {
+                                self.bubbleHeight = geometry.size.height - 40
+                            }
+                        }
+                    })
+                    Spacer()
                 }
-        }.onTapGesture {
+                .ignoresSafeArea()
+            }
+        }
+        .onTapGesture {
             audioManager.playSound()
             tutorialNum = 0
             authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 3) { success in

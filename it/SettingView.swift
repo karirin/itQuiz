@@ -9,7 +9,7 @@ import SwiftUI
 import WebKit
 
 struct SettingView: View {
-//    @ObservedObject var audioManager = AudioManager.shared
+    @ObservedObject var audioManager = AudioManager.shared
     @Environment(\.presentationMode) var presentationMode
     @State private var isSoundOn: Bool = true
 
@@ -17,6 +17,19 @@ struct SettingView: View {
         NavigationView {
             List {
                 Section(header: Text("情報")) {
+                    Toggle(isOn: $isSoundOn) {
+                        if isSoundOn {
+                            Image(systemName: "speaker.wave.2")
+                            Text("音声オン")
+                        } else {
+                            Image(systemName: "speaker.slash")
+                            Text("音声オフ")
+                        }
+                    }
+                    .toggleStyle(SwitchToggleStyle(tint: .blue)) // Switch color. You can adjust as per your need.
+                    .onChange(of: isSoundOn, perform: { newValue in
+                        audioManager.toggleSound()
+                    })
                     NavigationLink(destination: TermsOfServiceView()) {
                         HStack {
                             Text("利用規約")
@@ -51,7 +64,7 @@ struct SettingView: View {
         .navigationViewStyle(StackNavigationViewStyle())
         .navigationBarItems(leading: Button(action: {
                             self.presentationMode.wrappedValue.dismiss()
-//                            audioManager.playCancelSound()
+                            audioManager.playCancelSound()
                         }) {
                             Image(systemName: "chevron.left")
                                 .foregroundColor(Color("fontGray"))
