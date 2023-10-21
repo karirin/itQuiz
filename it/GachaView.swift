@@ -21,6 +21,19 @@ class GachaManager {
         case rare = 30
         case superRare = 20
         case ultraRare = 10
+        
+        var displayString: String {
+            switch self {
+            case .normal:
+                return "ノーマル" // 任意の文字列を返す
+            case .rare:
+                return "レア"
+            case .superRare:
+                return "スーパーレア"
+            case .ultraRare:
+                return "ウルトラレア"
+            }
+        }
     }
 
     var items: [Item] = [
@@ -67,6 +80,7 @@ class GachaManager {
 
 struct GachaView: View {
     @State private var obtainedItem: GachaManager.Item? = nil
+    @State private var obtainedRareItem: GachaManager.Item? = nil
     private let gachaManager = GachaManager()
     @State private var animationFinished: Bool = false
     @State private var showAnimation: Bool = false
@@ -76,7 +90,7 @@ struct GachaView: View {
     @State private var isGachaButtonDisabled: Bool = false
     @State private var userMoney: Int = 0
     @ObservedObject var audioManager = AudioManager.shared
-    @State private var isShowingActivityIndicator: Bool = false
+//    @State private var isShowingActivityIndicator: Bool = false
 
     var body: some View {
         ZStack{
@@ -98,8 +112,12 @@ struct GachaView: View {
                         ZStack{
                             Image("ガチャ背景5")
                                 .resizable()
-                            
                                 .frame(maxWidth: .infinity,maxHeight:280)
+                            Image("\(item.rarity.displayString)")
+                                .resizable()
+                                .frame(width: 70,height:70)
+                                .padding(.trailing,280)
+                                .padding(.bottom,100)
                             Text("\(item.name)")
                                 .foregroundColor(Color("fontGray"))
                                 .fontWeight(.bold)
@@ -127,8 +145,8 @@ struct GachaView: View {
                     }
                     Spacer()
                     Button(action: {
-//                        self.isShowingActivityIndicator = true  // ローディング画面を表示
-                        self.showResult = false
+                        //                        self.isShowingActivityIndicator = true  // ローディング画面を表示
+                        //                        self.showResult = false
                         authManager.decreaseUserMoney { success in
                             if success {
                                 print("User money decreased successfully.")
@@ -137,16 +155,18 @@ struct GachaView: View {
                             }
                         }
                         self.showAnimation = true
-                            self.gachaManager.shuffleItems()
-                            self.obtainedItem = self.gachaManager.drawGacha()
-                        // ガチャを引く処理を非同期で実行
+                        self.gachaManager.shuffleItems()
+                        //                        self.obtainedItem = self.gachaManager.drawGacha()
+                        //                         ガチャを引く処理を非同期で実行
+                        self.obtainedRareItem = self.gachaManager.drawGacha()
                         DispatchQueue.global().async {
                             // UIの更新はメインスレッドで実行
                             DispatchQueue.main.async {
-//                                self.isShowingActivityIndicator = false
+                                //                                self.isShowingActivityIndicator = false
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                                    self.obtainedItem = self.obtainedRareItem
                                     animationFinished = true
-//                                    self.showResult = true
+                                    self.showResult = true
                                 }
                             }
                         }
@@ -187,10 +207,12 @@ struct GachaView: View {
                             }
                             self.showAnimation = true
                             self.gachaManager.shuffleItems()
-                            self.obtainedItem = self.gachaManager.drawGacha()
+//                            self.obtainedItem = self.gachaManager.drawGacha()
+                            self.obtainedRareItem = self.gachaManager.drawGacha()
                             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-//                                self.showResult = true
+                                self.showResult = true
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                                    self.obtainedItem = self.obtainedRareItem
                                     animationFinished = true
                                 }
                             }
@@ -222,13 +244,13 @@ struct GachaView: View {
                 }
                 Spacer()
             }
-            if isShowingActivityIndicator {
-                              ActivityIndicator()
-                          .frame(maxWidth: .infinity, maxHeight: .infinity)
-                          .background(Color.white)
-                          .cornerRadius(10)
-                          .shadow(radius: 10)
-                      }
+//            if isShowingActivityIndicator {
+//                              ActivityIndicator()
+//                          .frame(maxWidth: .infinity, maxHeight: .infinity)
+//                          .background(Color.white)
+//                          .cornerRadius(10)
+//                          .shadow(radius: 10)
+//                      }
         }
         .onAppear {
             authManager.getUserMoney { userMoney in
@@ -253,11 +275,11 @@ struct GachaView: View {
                 }
             }
         }
-        .onChange(of: isShowingActivityIndicator) { isShowing in
-            if isShowing {
-                self.isShowingActivityIndicator = isShowingActivityIndicator
-            }
-        }
+//        .onChange(of: isShowingActivityIndicator) { isShowing in
+//            if isShowing {
+//                self.isShowingActivityIndicator = isShowingActivityIndicator
+//            }
+//        }
         .frame(maxWidth: .infinity,maxHeight: .infinity)
         .navigationBarBackButtonHidden(true)
                 .navigationBarItems(leading: Button(action: {
@@ -276,7 +298,7 @@ struct GachaView: View {
                }
            }
            .fullScreenCover(isPresented: $showAnimation) {
-               GachaAnimationView(showAnimation: $showAnimation, rarity: obtainedItem?.rarity, showResult: $showResult) // この行を変更
+               GachaAnimationView(showAnimation: $showAnimation, rarity: obtainedRareItem?.rarity) // この行を変更
            }
         
        }

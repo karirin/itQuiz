@@ -201,14 +201,14 @@ struct ImagePickerView: View {
             self.selectedAvatar = avatars[0]
         }
         .navigationBarBackButtonHidden(true)
-//        .navigationBarItems(leading: Button(action: {
-//            self.presentationMode.wrappedValue.dismiss()
-//        }) {
-//            Image(systemName: "chevron.left")
-//                .foregroundColor(.black)
-//            Text("戻る")
-//                .foregroundColor(.black)
-//        })
+        .navigationBarItems(leading: Button(action: {
+            self.presentationMode.wrappedValue.dismiss()
+        }) {
+            Image(systemName: "chevron.left")
+                .foregroundColor(.black)
+            Text("戻る")
+                .foregroundColor(.black)
+        })
     }
 }
 
