@@ -36,6 +36,7 @@ struct GachaAnimationView: View {
     @State private var player: AVPlayer?
     @Binding var showAnimation: Bool
     var rarity: GachaManager.Rarity?
+    @Binding var showResult: Bool 
 
     private func createPlayer() -> AVPlayer {
         let videoName: String
@@ -65,6 +66,7 @@ struct GachaAnimationView: View {
                 self.player = createPlayer()
                 NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: self.player?.currentItem, queue: .main) { _ in
                   showAnimation.toggle()
+                  showResult = true
                 }
             }
             .onChange(of: rarity) { _ in

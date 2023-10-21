@@ -337,10 +337,10 @@ struct ContentView: View {
                 fetchUserInfoIfNeeded(isPresenting: isPresenting)
                 authManager.fetchUserExperienceAndLevel()
             }
-//            .onChange(of: $isPresentingAvatarList) { isPresenting in
-//                fetchUserInfoIfNeeded(isPresenting: isPresenting)
-//                authManager.fetchUserExperienceAndLevel()
-//            }
+            .onChange(of: isPresentingAvatarList) { isPresenting in
+                fetchUserInfoIfNeeded(isPresenting: isPresenting)
+                authManager.fetchUserExperienceAndLevel()
+            }
             .background(Color("purple2").opacity(0.6))  // ここで背景色を設定
             .edgesIgnoringSafeArea(.all)  // 画面の端まで背景色を伸ばす
             }

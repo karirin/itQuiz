@@ -146,7 +146,7 @@ struct GachaView: View {
 //                                self.isShowingActivityIndicator = false
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
                                     animationFinished = true
-                                    self.showResult = true
+//                                    self.showResult = true
                                 }
                             }
                         }
@@ -189,7 +189,7 @@ struct GachaView: View {
                             self.gachaManager.shuffleItems()
                             self.obtainedItem = self.gachaManager.drawGacha()
                             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                                self.showResult = true
+//                                self.showResult = true
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
                                     animationFinished = true
                                 }
@@ -276,7 +276,7 @@ struct GachaView: View {
                }
            }
            .fullScreenCover(isPresented: $showAnimation) {
-               GachaAnimationView(showAnimation: $showAnimation, rarity: obtainedItem?.rarity)  // この行を変更
+               GachaAnimationView(showAnimation: $showAnimation, rarity: obtainedItem?.rarity, showResult: $showResult) // この行を変更
            }
         
        }
