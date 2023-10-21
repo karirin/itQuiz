@@ -106,6 +106,20 @@ struct ImagePickerView: View {
     var body: some View {
         NavigationView{
             VStack {
+                Button(action: {
+                    self.presentationMode.wrappedValue.dismiss()
+                }) {
+                    HStack {
+                        Image(systemName: "chevron.left")
+                            .aspectRatio(contentMode: .fit)
+                            .foregroundColor(.black)
+                        Text("戻る")
+                            .foregroundColor(.black)
+                            .font(.body)
+                        Spacer()
+                    }
+                    .padding(.leading)
+                }
                 Spacer()
                 HStack{
                     Text("おともを選択してください")
@@ -188,8 +202,9 @@ struct ImagePickerView: View {
                     .padding()
                 
             Spacer()
-                Spacer()
+//                Spacer()
                 }
+            
                 .background(
 //                    NavigationLink("", destination: ContentView(isPresentingQuizBeginnerList: .constant(false), isPresentingAvatarList: .constant(false)).navigationBarBackButtonHidden(true), isActive: $navigateToContentView)
                     NavigationLink("", destination: ContentView().navigationBarBackButtonHidden(true), isActive: $navigateToContentView)
@@ -201,14 +216,14 @@ struct ImagePickerView: View {
             self.selectedAvatar = avatars[0]
         }
         .navigationBarBackButtonHidden(true)
-        .navigationBarItems(leading: Button(action: {
-            self.presentationMode.wrappedValue.dismiss()
-        }) {
-            Image(systemName: "chevron.left")
-                .foregroundColor(.black)
-            Text("戻る")
-                .foregroundColor(.black)
-        })
+//        .navigationBarItems(leading: Button(action: {
+//            self.presentationMode.wrappedValue.dismiss()
+//        }) {
+//            Image(systemName: "chevron.left")
+//                .foregroundColor(.black)
+//            Text("戻る")
+//                .foregroundColor(.black)
+//        })
     }
 }
 
