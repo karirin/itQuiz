@@ -12,6 +12,7 @@ pod 'Firebase/Storage'
 pod 'Firebase/Database'
 pod 'Charts'
 pod 'FSCalendar'
+pod 'Google-Mobile-Ads-SDK'
 end
 
 post_install do |installer|

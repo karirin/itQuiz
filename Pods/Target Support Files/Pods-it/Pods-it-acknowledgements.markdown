@@ -3129,6 +3129,18 @@ FirestoreEncoder
    limitations under the License.
 
 
+## Google-Mobile-Ads-SDK
+
+Copyright 2023 Google
+
+## GoogleAppMeasurement
+
+Copyright 2022 Google
+
+## GoogleUserMessagingPlatform
+
+Copyright 2023 Google
+
 ## GoogleUtilities
 
 

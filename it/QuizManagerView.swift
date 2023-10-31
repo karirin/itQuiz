@@ -21,6 +21,7 @@ struct QuizManagerView: View {
     @State private var isPresentingQuizNetwork: Bool = false
     @State private var isPresentingQuizSecurity: Bool = false
     @State private var isPresentingQuizDatabase: Bool = false
+    @State private var isPresentingQuizGod: Bool = false
     @State private var isSoundOn: Bool = true
     @ObservedObject var audioManager = AudioManager.shared
     @Environment(\.presentationMode) var presentationMode
@@ -86,7 +87,19 @@ struct QuizManagerView: View {
                     .padding(.horizontal)
                     .padding(.bottom)
                     .shadow(radius: 3)
-                    
+                    Button(action: {
+                        audioManager.playKetteiSound()
+                        self.isPresentingQuizGod = true
+                    }) {
+                        //                    Image("データベース系の問題")
+                        Image("選択肢7")
+                            .resizable()
+                            .frame(height: 70)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.horizontal)
+                    .padding(.bottom)
+                    .shadow(radius: 3)
                     // ネットワーク系の問題
                     Button(action: {
                         audioManager.playKetteiSound()
@@ -131,6 +144,7 @@ struct QuizManagerView: View {
                     .padding(.horizontal)
                     .padding(.bottom)
                     .shadow(radius: 3)
+                    
                 }
                 VStack{
                     Group{
@@ -141,6 +155,7 @@ struct QuizManagerView: View {
                         NavigationLink("", destination: QuizSecurityList(isPresenting: $isPresenting).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizSecurity) // 適切な遷移先に変更してください
                         
                         NavigationLink("", destination: QuizNetworkList(isPresenting: $isPresenting).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizNetwork)
+                        NavigationLink("", destination: QuizGodList(isPresenting: $isPresenting).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizGod)
                     }
                 }
                 

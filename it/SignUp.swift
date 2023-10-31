@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SignUp: View {
     @ObservedObject private var authManager = AuthManager.shared
-    @State private var userName: String = "りょうた"
+    @State private var userName: String = ""
     @State private var showImagePicker: Bool = false
 
     var body: some View {
@@ -72,13 +72,13 @@ struct SignUp: View {
                             Text("次へ")
                         }
                     }
+                    
                     .font(.system(size:26))
                     .foregroundColor(Color.gray)
-                        .disabled(userName.isEmpty)
-                        .background(RoundedRectangle(cornerRadius: 25)
-                            .fill(userName.isEmpty ? Color.gray : Color.white))
-                        .opacity(userName.isEmpty ? 0.5 : 1.0)
-                }
+                    .background(RoundedRectangle(cornerRadius: 25)
+                        .fill(userName.isEmpty ? Color.gray : Color.white))
+                    .opacity(userName.isEmpty ? 0.5 : 1.0)
+                }.disabled(userName.isEmpty)
             }
         }
         .navigationViewStyle(StackNavigationViewStyle())

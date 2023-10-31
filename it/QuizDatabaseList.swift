@@ -9,6 +9,19 @@ import SwiftUI
 
 struct QuizDatabaseList: View {
     @Binding var isPresenting: Bool
+//    let QuizDatabaseList: [QuizQuestion] = [
+//        QuizQuestion(
+//            question: "「SQLインジェクション」攻撃とは何ですか？",
+//            choices: [
+//                "データベースに不正なSQLクエリを挿入し、データを操る攻撃",
+//                "データベースのサイズを増加させる攻撃",
+//                "データベースの接続を遮断する攻撃",
+//                "データベースのバックアップを削除する攻撃"
+//            ],
+//            correctAnswerIndex: 0,
+//            explanation: "SQLインジェクションは、攻撃者がデータベースに不正なSQLクエリを挿入し、データを操るタイプの攻撃です。"
+//        )
+//    ]
     let QuizDatabaseList: [QuizQuestion] = [
         QuizQuestion(
             question: "SQLは何の略語ですか？",
@@ -162,18 +175,6 @@ struct QuizDatabaseList: View {
             ],
             correctAnswerIndex: 0,
             explanation: "リレーショナルデータベースの主な特徴は、データがテーブル形式で保存され、テーブル間でリレーションシップを持つことです。"
-        ),
-
-        QuizQuestion(
-            question: "「SQLインジェクション」攻撃とは何ですか？",
-            choices: [
-                "データベースに不正なSQLクエリを挿入し、データを操る攻撃",
-                "データベースのサイズを増加させる攻撃",
-                "データベースの接続を遮断する攻撃",
-                "データベースのバックアップを削除する攻撃"
-            ],
-            correctAnswerIndex: 0,
-            explanation: "SQLインジェクションは、攻撃者がデータベースに不正なSQLクエリを挿入し、データを操るタイプの攻撃です。"
         ),
 
         QuizQuestion(

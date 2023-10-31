@@ -109,7 +109,9 @@ struct QuizResultView: View {
                     
                 }
                 .onChange(of: authManager.didLevelUp) { newValue in
+                    print("test1")
                     if newValue {
+                        print("test2")
                         // レベルアップ通知を表示した後、フラグをリセット
                         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                             showLevelUpModal = true
@@ -177,15 +179,17 @@ struct ExperienceModalView: View {
                             .font(.title)
                     }
                     // ここでProgressBar1に現在の経験値とmax経験値を渡します。
-                    Text("\(authManager.experience + Int(currentExperience)) / \(authManager.level * 100) 経験値")
+                    Text("\(authManager.experience) / \(authManager.level * 100) 経験値")
                         .font(.system(size: 20))
-                    ProgressBar1(value: Double(authManager.experience + Int(currentExperience)), maxValue: Double(authManager.level * 100))
+                    ProgressBar1(value: Double(authManager.experience), maxValue: Double(authManager.level * 100))
                         .padding(.horizontal,20)
                 }
             }
             .foregroundColor(Color("fontGray"))
             .onAppear {
+                print("test3")
                 withAnimation {
+                    print("test4")
                     currentExperience += Double(addedExperience)
                     currentMoney += Double(addedMoney)
                 }
@@ -195,6 +199,7 @@ struct ExperienceModalView: View {
                     audioManager.playGameOverSound()
                 }
                 DispatchQueue.global(qos: .background).async {
+                    print("test5")
                     authManager.fetchUserExperienceAndLevel()
                     DispatchQueue.main.async {
                         // ここでUIの更新を行います。
@@ -273,6 +278,7 @@ struct LevelUpModalView: View {
             .offset(x: 130, y: -140)
         )
         .onAppear{
+            print("test6")
             authManager.fetchUserExperienceAndLevel()
         }
     }

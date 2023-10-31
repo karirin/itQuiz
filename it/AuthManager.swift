@@ -257,40 +257,82 @@ class AuthManager: ObservableObject {
     }
 
     
+//    func addExperience(points: Int, onSuccess: @escaping () -> Void, onFailure: @escaping (Error?) -> Void) {
+//        guard let userId = user?.uid else {
+//            onFailure(nil)
+//            return
+//        }
+//        let userRef = Database.database().reference().child("users").child(userId)
+//        userRef.observeSingleEvent(of: .value) { (snapshot) in
+//
+//            if let data = snapshot.value as? [String: Any] {
+//                let currentExperience = data["experience"] as? Int ?? 0
+//                var newExperience = currentExperience + points
+//
+//                while newExperience >= self.level * 100 {
+//                    newExperience -= self.level * 100
+//                    print("self.level1:\(self.level)")
+//                    self.level += 1
+//                    print("self.level2:\(self.level)")
+//                    self.didLevelUp = true
+//                    self.updateStatsUponLevelUp()
+//                }
+//
+//                self.experience = newExperience
+//
+//                let userData: [String: Any] = ["experience": self.experience, "level": self.level]
+//                print("userData")
+//                print(userData)
+//                userRef.updateChildValues(userData) { (error, ref) in
+//                    if error == nil {
+//                        self.saveEarnedTitles()
+//                        onSuccess()  // 成功時のコールバックを呼ぶ
+//                    } else {
+//                        onFailure(error)  // エラー時のコールバックを呼ぶ
+//                    }
+//                }
+//            }
+//        }
+//    }
+    
     func addExperience(points: Int, onSuccess: @escaping () -> Void, onFailure: @escaping (Error?) -> Void) {
         guard let userId = user?.uid else {
             onFailure(nil)
             return
         }
+        
         let userRef = Database.database().reference().child("users").child(userId)
         userRef.observeSingleEvent(of: .value) { (snapshot) in
-
             if let data = snapshot.value as? [String: Any] {
-                let currentExperience = data["experience"] as? Int ?? 0
-                var newExperience = currentExperience + points
-
-                while newExperience >= self.level * 100 {
-                    newExperience -= self.level * 100
-                    self.level += 1
-                    
+                var currentExperience = data["experience"] as? Int ?? 0
+                var currentLevel = data["level"] as? Int ?? 1
+                
+                currentExperience += points
+                
+                while currentExperience >= currentLevel * 100 {
+                    currentExperience -= currentLevel * 100
+                    currentLevel += 1
                     self.didLevelUp = true
                     self.updateStatsUponLevelUp()
                 }
                 
-                self.experience = newExperience
-                
-                let userData: [String: Any] = ["experience": self.experience, "level": self.level]
-                userRef.updateChildValues(userData) { (error, ref) in
-                    if error == nil {
-                        self.saveEarnedTitles()
-                        onSuccess()  // 成功時のコールバックを呼ぶ
+                let updatedData: [String: Any] = ["experience": currentExperience, "level": currentLevel]
+                userRef.updateChildValues(updatedData) { (error, ref) in
+                    if let error = error {
+                        onFailure(error)
                     } else {
-                        onFailure(error)  // エラー時のコールバックを呼ぶ
+                        self.experience = currentExperience
+                        self.level = currentLevel
+                        self.saveEarnedTitles()
+                        onSuccess()
                     }
                 }
+            } else {
+                onFailure(nil)
             }
         }
     }
+
 
     
     func calculateLevel(experience: Int) -> Int {
@@ -301,8 +343,14 @@ class AuthManager: ObservableObject {
         guard let userId = user?.uid else { return }
         
         let userRef = Database.database().reference().child("users").child(userId)
+        print("userId")
+        print(userId)
+        print("userRef")
+        print(userRef)
         userRef.observeSingleEvent(of: .value) { (snapshot) in
             if let data = snapshot.value as? [String: Any] {
+                print("data['level']")
+                print(data["level"])
                 self.experience = data["experience"] as? Int ?? 0
                 self.level = data["level"] as? Int ?? 1
             }

@@ -7,15 +7,22 @@
 
 import SwiftUI
 import Firebase
+import GoogleMobileAds
 
-func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-    FirebaseApp.configure()
-    return true
+class AppDelegate: NSObject, UIApplicationDelegate {
+    func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil
+    ) -> Bool {
+        GADMobileAds.sharedInstance().start(completionHandler: nil)
+        return true
+    }
 }
 
 @main
 struct itApp: App {
     @ObservedObject var authManager: AuthManager
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     init() {
         FirebaseApp.configure()
@@ -25,6 +32,7 @@ struct itApp: App {
     var body: some Scene {
         WindowGroup {
             RootView(authManager: authManager)
+//            RewardView()
 //            GachaView()
         }
     }

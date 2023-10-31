@@ -173,7 +173,7 @@ struct ContentView: View {
                                         //                                        .foregroundColor(.gray)
                                     }
                                     .frame(maxWidth: .infinity)
-//                                    .disabled(!isButtonEnabled)
+                                    .disabled(!isButtonEnabled)
                                     .padding(.horizontal)
                                     //                            .padding(.bottom)
                                     

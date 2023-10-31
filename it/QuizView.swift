@@ -16,6 +16,7 @@
         case security
         case database
         case daily
+        case god
     }
 
 struct ViewPositionKey1: PreferenceKey {
@@ -381,34 +382,34 @@ struct ViewPositionKey3: PreferenceKey {
                             
                         }
                     Spacer()
-                    VStack{
-                        //                        VStack {
-                        AnswerSelectionView(choices: currentQuiz.choices) { index in
-                            answerSelectionAction(index: index)
+                    ScrollView{
+                        VStack{
+                            
+                            AnswerSelectionView(choices: currentQuiz.choices) { index in
+                                answerSelectionAction(index: index)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .shadow(radius: 1)
+                            .background(GeometryReader { geometry in
+                                Color.clear.preference(key: ViewPositionKey1.self, value: [geometry.frame(in: .global)])
+                            })
+                            
+                            Spacer()
+                            
+                            if showCompletionMessage {
+                                // QuizView.swift
+                                NavigationLink("", destination: QuizResultView(results: quizResults, authManager: authManager, isPresenting: $isPresenting, playerExperience: playerExperience, playerMoney: playerMoney).navigationBarBackButtonHidden(true), isActive: $navigateToQuizResultView)
+                                
+                            }
+                            Spacer()
                         }
-                        .frame(maxWidth: .infinity)
-                        .shadow(radius: 1)
-                        .background(GeometryReader { geometry in
-                            Color.clear.preference(key: ViewPositionKey1.self, value: [geometry.frame(in: .global)])
-                        })
-                        Spacer()
+                                            }
+                        .frame(maxWidth: .infinity,maxHeight:.infinity)
+                        .padding(.bottom)
                         
-                        if showCompletionMessage {
-                            // QuizView.swift
-                            NavigationLink("", destination: QuizResultView(results: quizResults, authManager: authManager, isPresenting: $isPresenting, playerExperience: playerExperience, playerMoney: playerMoney).navigationBarBackButtonHidden(true), isActive: $navigateToQuizResultView)
-
+                        .sheet(isPresented: $showModal) {
+                            ExperienceModalView(showModal: $showModal, addedExperience: 10, addedMoney: 10, authManager: authManager)
                         }
-                        //                        }
-                        Spacer()
-                    }
-                    .frame(maxWidth: .infinity,maxHeight:.infinity)
-                    .padding(.bottom)
-                    
-                    .sheet(isPresented: $showModal) {
-                        ExperienceModalView(showModal: $showModal, addedExperience: 10, addedMoney: 10, authManager: authManager)
-                    }
-                    
-                   
                 }.background(showIncorrectBackground ? Color("superLightRed") : Color("Color2"))
                 .onPreferenceChange(ViewPositionKey.self) { positions in
                     self.buttonRect = positions.first ?? .zero
@@ -897,10 +898,35 @@ struct ViewPositionKey3: PreferenceKey {
                     default:
                         monsterHP = 50
                     }
+                case .god:
+                monsterBackground = "godBackground"
+                playerExperience = 200
+                playerMoney = 200
+                if userHp <= 0 {
+                    playerExperience = 5
+                    playerMoney = 5
                 }
+                switch newMonsterType {
+                case 1:
+                    monsterHP = 80
+                    monsterUnderHP = 80
+                    monsterAttack = 500
+                case 2:
+                    monsterHP = 120
+                    monsterUnderHP = 120
+                    monsterAttack = 1000
+                case 3:
+                    monsterHP = 160
+                    monsterUnderHP = 160
+                    monsterAttack = 1500
+                default:
+                    monsterHP = 1000
+                }
+            }
             }
         }
             .navigationViewStyle(StackNavigationViewStyle())
+
     }
 }
 
