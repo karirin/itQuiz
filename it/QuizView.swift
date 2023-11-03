@@ -102,6 +102,10 @@ struct ViewPositionKey3: PreferenceKey {
         @State private var buttonRect2: CGRect = .zero
         @State private var buttonRect3: CGRect = .zero
         @State private var bubbleHeight: CGFloat = 0.0
+        @State private var startTime = Date()
+        @State private var endTime: Date?
+        @State private var elapsedTime: TimeInterval?
+        @State private var navigateToQuizResult = false
         
         var currentQuiz: QuizQuestion {
             quizzes[currentQuizIndex]
@@ -279,7 +283,7 @@ struct ViewPositionKey3: PreferenceKey {
                             })
                     }
                     .padding(.trailing)
-                    .padding(.top,40)
+//                    .padding(.top,40)
                     Spacer()
                     VStack{
                         ZStack {
@@ -398,7 +402,7 @@ struct ViewPositionKey3: PreferenceKey {
                             
                             if showCompletionMessage {
                                 // QuizView.swift
-                                NavigationLink("", destination: QuizResultView(results: quizResults, authManager: authManager, isPresenting: $isPresenting, playerExperience: playerExperience, playerMoney: playerMoney).navigationBarBackButtonHidden(true), isActive: $navigateToQuizResultView)
+                                NavigationLink("", destination: QuizResultView(results: quizResults, authManager: authManager, isPresenting: $isPresenting, playerExperience: playerExperience, playerMoney: playerMoney, elapsedTime: self.elapsedTime ?? 0).navigationBarBackButtonHidden(true), isActive: $navigateToQuizResultView)
                                 
                             }
                             Spacer()
@@ -684,6 +688,20 @@ struct ViewPositionKey3: PreferenceKey {
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     audioManager.playCountdownSound()
+                }
+                self.startTime = Date()
+            }
+            .onDisappear {
+                // QuizViewが閉じるときの時刻を記録する
+                // ただし、playerExperienceとplayerMoneyが5以外の時だけ
+                // ここで条件を確認してください
+                if playerExperience != 5 && playerMoney != 5 {
+                    self.endTime = Date()
+                    self.elapsedTime = self.endTime?.timeIntervalSince(self.startTime)
+                    // QuizResultViewへの遷移フラグを設定
+                    self.navigateToQuizResult = true
+                    // ここで経過時間を表示または保存する
+                    print("経過時間: \(self.elapsedTime!) 秒")
                 }
             }
             .onChange(of: selectedAnswerIndex) { newValue in

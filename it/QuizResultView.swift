@@ -28,17 +28,19 @@ struct QuizResultView: View {
     @State private var playerExperience: Int
     @State private var playerMoney: Int
     @State private var isContentView: Bool = false
+    var elapsedTime: TimeInterval
 
     @Binding var isPresenting: Bool
 //    @Environment(\.rootPresentationMode) private var rootPresentationMode: Binding<RootPresentationMode>
 
     // QuizResultView.swift
-    init(results: [QuizResult], authManager: AuthManager, isPresenting: Binding<Bool>, playerExperience: Int,playerMoney: Int) {
+    init(results: [QuizResult], authManager: AuthManager, isPresenting: Binding<Bool>, playerExperience: Int,playerMoney: Int, elapsedTime: TimeInterval) {
         self.results = results
         self.authManager = authManager
         _isPresenting = isPresenting
         _playerExperience = State(initialValue: playerExperience)
         _playerMoney = State(initialValue: playerMoney)
+        self.elapsedTime = elapsedTime
     }
     
     var body: some View {
@@ -82,6 +84,7 @@ struct QuizResultView: View {
                     }
                     .foregroundColor(Color("fontGray"))
                     ScrollView{
+//                        Text("所要時間: \(elapsedTime) 秒")
                         ForEach(results, id: \.question) { result in
                             VStack(alignment: .leading,spacing: 20) {
                                 HStack{
@@ -187,9 +190,7 @@ struct ExperienceModalView: View {
             }
             .foregroundColor(Color("fontGray"))
             .onAppear {
-                print("test3")
                 withAnimation {
-                    print("test4")
                     currentExperience += Double(addedExperience)
                     currentMoney += Double(addedMoney)
                 }
@@ -199,7 +200,6 @@ struct ExperienceModalView: View {
                     audioManager.playGameOverSound()
                 }
                 DispatchQueue.global(qos: .background).async {
-                    print("test5")
                     authManager.fetchUserExperienceAndLevel()
                     DispatchQueue.main.async {
                         // ここでUIの更新を行います。
@@ -278,7 +278,6 @@ struct LevelUpModalView: View {
             .offset(x: 130, y: -140)
         )
         .onAppear{
-            print("test6")
             authManager.fetchUserExperienceAndLevel()
         }
     }
@@ -317,7 +316,7 @@ struct QuizResultView_Previews: PreviewProvider {
             QuizResult(question: "AIを開発するベンチャー企業のA社が，資金調達を目的に，金融商品取引所に初めて上場することになった。このように，企業の未公開の株式を，新たに公開することを表す用語として，最も適切なものはどれか。", userAnswer: "IPO", correctAnswer: "IPO", explanation: "IPO（Initial Public Offering）は、企業が初めて公開市場で株式を発行することを指します。", isCorrect: true)
         ]
         
-        // ダミーデータを使用してQuizResultViewを呼び出す
-        QuizResultView(results: dummyResults, authManager: authManager, isPresenting: $isPresenting, playerExperience: 10, playerMoney: 10)
+        // ダミーの経過時間を追加してQuizResultViewを呼び出す
+        QuizResultView(results: dummyResults, authManager: authManager, isPresenting: $isPresenting, playerExperience: 10, playerMoney: 10, elapsedTime: 0)
     }
 }

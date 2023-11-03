@@ -16,9 +16,31 @@ struct Avatar: Equatable {
     var count: Int
 }
 
-struct User {
+//struct User {
+//    var userName: String
+//    var avatars: [Avatar]
+//}
+
+class User: Identifiable {
+    var id: String
     var userName: String
-    var avatars: [Avatar]
+    var level: Int
+    var experience: Int
+    var avatars: [[String: Any]]
+    var userMoney: Int
+    var userHp: Int
+    var userAttack: Int
+
+    init(id: String, userName: String, level: Int, experience: Int, avatars: [[String: Any]], userMoney: Int, userHp: Int, userAttack: Int) {
+        self.id = id
+        self.userName = userName
+        self.level = level
+        self.experience = experience
+        self.avatars = avatars
+        self.userMoney = userMoney
+        self.userHp = userHp
+        self.userAttack = userAttack
+    }
 }
 
 class AuthManager: ObservableObject {
@@ -332,8 +354,6 @@ class AuthManager: ObservableObject {
             }
         }
     }
-
-
     
     func calculateLevel(experience: Int) -> Int {
         return experience / 100 + 1
@@ -409,6 +429,32 @@ class AuthManager: ObservableObject {
             }
         }
     }
+    
+    func saveLastLoginDate(userId: String, completion: @escaping (Bool) -> Void) {
+        let ref = Database.database().reference().child("users").child(userId)
+        ref.updateChildValues(["lastLoginDate": "\(Date())"]) { (error, _) in
+            if let error = error {
+                print("Error saving last login date: \(error)")
+                completion(false)
+            } else {
+                completion(true)
+            }
+        }
+    }
+
+    func fetchLastLoginDate(userId: String, completion: @escaping (Date?) -> Void) {
+        let ref = Database.database().reference().child("users").child(userId)
+        ref.child("lastLoginDate").observeSingleEvent(of: .value) { (snapshot) in
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss Z"
+            if let dateString = snapshot.value as? String, let date = dateFormatter.date(from: dateString) {
+                completion(date)
+            } else {
+                completion(nil)
+            }
+        }
+    }
+
 
     func checkForTitles(completion: @escaping ([Title]) -> Void) {
         guard let userId = user?.uid else {

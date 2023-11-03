@@ -22,6 +22,8 @@
 		2641992A2AC1E996002013B9 /* ガチャる.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 264199292AC1E995002013B9 /* ガチャる.mp3 */; };
 		2641992C2AC2572F002013B9 /* AvatarListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2641992B2AC2572F002013B9 /* AvatarListView.swift */; };
 		264552092ADC085200827D42 /* TimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 264552082ADC085200827D42 /* TimerView.swift */; };
+		264F19152AF2824700B6FB10 /* RankingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 264F19142AF2824700B6FB10 /* RankingView.swift */; };
+		264F19172AF3B1A900B6FB10 /* RewardModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 264F19162AF3B1A900B6FB10 /* RewardModalView.swift */; };
 		266A07282AC6E10200B85D4E /* ProgressBar3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 266A07272AC6E10200B85D4E /* ProgressBar3.swift */; };
 		266A072A2AC6FBC800B85D4E /* AnswerSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 266A07292AC6FBC800B85D4E /* AnswerSelectionView.swift */; };
 		266A072C2AC7242600B85D4E /* キャンセル.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 266A072B2AC7242500B85D4E /* キャンセル.mp3 */; };
@@ -60,6 +62,7 @@
 		26B5BEF42AB6CFA600056E79 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26B5BEF32AB6CFA600056E79 /* RootView.swift */; };
 		26B9BA1D2AEFDEFD00AC7C40 /* RewardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26B9BA1C2AEFDEFD00AC7C40 /* RewardView.swift */; };
 		26B9BA1F2AF0091C00AC7C40 /* QuizGodList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26B9BA1E2AF0091C00AC7C40 /* QuizGodList.swift */; };
+		26B9BA232AF2647300AC7C40 /* LoginModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26B9BA222AF2647300AC7C40 /* LoginModalView.swift */; };
 		E853D050BCB03C7E80A63918 /* Pods_it.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E16B2CC5D533F92BAD9A8A1F /* Pods_it.framework */; };
 /* End PBXBuildFile section */
 
@@ -80,6 +83,8 @@
 		264199292AC1E995002013B9 /* ガチャる.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "ガチャる.mp3"; path = "../../../Downloads/ガチャる.mp3"; sourceTree = "<group>"; };
 		2641992B2AC2572F002013B9 /* AvatarListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarListView.swift; sourceTree = "<group>"; };
 		264552082ADC085200827D42 /* TimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerView.swift; sourceTree = "<group>"; };
+		264F19142AF2824700B6FB10 /* RankingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RankingView.swift; sourceTree = "<group>"; };
+		264F19162AF3B1A900B6FB10 /* RewardModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardModalView.swift; sourceTree = "<group>"; };
 		266A07272AC6E10200B85D4E /* ProgressBar3.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressBar3.swift; sourceTree = "<group>"; };
 		266A07292AC6FBC800B85D4E /* AnswerSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnswerSelectionView.swift; sourceTree = "<group>"; };
 		266A072B2AC7242500B85D4E /* キャンセル.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "キャンセル.mp3"; path = "../../../Downloads/キャンセル.mp3"; sourceTree = "<group>"; };
@@ -119,6 +124,7 @@
 		26B5BEF32AB6CFA600056E79 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		26B9BA1C2AEFDEFD00AC7C40 /* RewardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardView.swift; sourceTree = "<group>"; };
 		26B9BA1E2AF0091C00AC7C40 /* QuizGodList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizGodList.swift; sourceTree = "<group>"; };
+		26B9BA222AF2647300AC7C40 /* LoginModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginModalView.swift; sourceTree = "<group>"; };
 		B872405D7B916C9F1628DFCC /* Pods-it.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-it.debug.xcconfig"; path = "Target Support Files/Pods-it/Pods-it.debug.xcconfig"; sourceTree = "<group>"; };
 		E16B2CC5D533F92BAD9A8A1F /* Pods_it.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_it.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB46333AF02BB87CB42728DB /* Pods-it.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-it.release.xcconfig"; path = "Target Support Files/Pods-it/Pods-it.release.xcconfig"; sourceTree = "<group>"; };
@@ -164,12 +170,15 @@
 				26B5BEF32AB6CFA600056E79 /* RootView.swift */,
 				266A07292AC6FBC800B85D4E /* AnswerSelectionView.swift */,
 				260E44142AB572DC00FBB487 /* ContentView.swift */,
+				264F19142AF2824700B6FB10 /* RankingView.swift */,
 				267E708F2AD6FD0200EA7AA2 /* LoadingView.swift */,
 				26A026DD2ABDD1EA00119F2B /* TopView.swift */,
 				26A25D512ABAFD82006B368F /* QuizManagerView.swift */,
 				260E44242AB59A7900FBB487 /* QuizView.swift */,
 				264552082ADC085200827D42 /* TimerView.swift */,
 				26AA130B2ACD74660035F5F4 /* ModalView.swift */,
+				26B9BA222AF2647300AC7C40 /* LoginModalView.swift */,
+				264F19162AF3B1A900B6FB10 /* RewardModalView.swift */,
 				266A07272AC6E10200B85D4E /* ProgressBar3.swift */,
 				269A878D2AB87CBA00F33C9E /* MemoView.swift */,
 				269A87872AB7757C00F33C9E /* QuizResultView.swift */,
@@ -372,9 +381,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				26B5BEF42AB6CFA600056E79 /* RootView.swift in Sources */,
+				264F19152AF2824700B6FB10 /* RankingView.swift in Sources */,
 				260000022AB5EEC900342CAE /* QuizBeginnerList.swift in Sources */,
 				269A87882AB7757C00F33C9E /* QuizResultView.swift in Sources */,
 				260B56192ACB1CBE00E7785C /* SpotlightView1.swift in Sources */,
+				264F19172AF3B1A900B6FB10 /* RewardModalView.swift in Sources */,
 				2641992C2AC2572F002013B9 /* AvatarListView.swift in Sources */,
 				26ADE3422ADC382F009BDF48 /* SettingView.swift in Sources */,
 				269D44E22AB60D6800CAA91A /* SignUp.swift in Sources */,
@@ -402,6 +413,7 @@
 				260E44132AB572DC00FBB487 /* itApp.swift in Sources */,
 				266A07282AC6E10200B85D4E /* ProgressBar3.swift in Sources */,
 				268C3BA72ABD638200282BEE /* PrivacyView.swift in Sources */,
+				26B9BA232AF2647300AC7C40 /* LoginModalView.swift in Sources */,
 				269A878E2AB87CBA00F33C9E /* MemoView.swift in Sources */,
 				268C3B9D2ABCA95D00282BEE /* QuizNetworkList.swift in Sources */,
 				268C3BA62ABD638200282BEE /* TermsOfServiceView.swift in Sources */,
@@ -532,7 +544,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1.3;
+				CURRENT_PROJECT_VERSION = 1.5;
 				DEVELOPMENT_ASSET_PATHS = "\"it/Preview Content\"";
 				DEVELOPMENT_TEAM = F3XS565TSX;
 				ENABLE_PREVIEWS = YES;
@@ -548,7 +560,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.3;
+				MARKETING_VERSION = 1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = "Swift-Beginners-app.it";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -564,7 +576,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1.3;
+				CURRENT_PROJECT_VERSION = 1.5;
 				DEVELOPMENT_ASSET_PATHS = "\"it/Preview Content\"";
 				DEVELOPMENT_TEAM = F3XS565TSX;
 				ENABLE_PREVIEWS = YES;
@@ -580,7 +592,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.3;
+				MARKETING_VERSION = 1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = "Swift-Beginners-app.it";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;

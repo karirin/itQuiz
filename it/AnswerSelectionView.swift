@@ -22,7 +22,7 @@ func fontSize(for text: String) -> CGFloat {
         } else if text.count >= 17 {
             return 14
         } else {
-            return 14
+            return 16
         }
     }
 }

@@ -14,7 +14,7 @@ struct QuizGodList: View {
             question: "ネットワークプロトコル「HTTP/3」で主に使用されるトランスポートプロトコルは何ですか？",
             choices: [
                 "TCP",
-                "UDP",
+                "TPP",
                 "SCTP",
                 "QUIC"
             ],
@@ -158,11 +158,11 @@ struct QuizGodList: View {
             choices: [
                 "Simple",
                 "Secure",
-                "Stateless",
+                "State",
                 "Service"
             ],
             correctAnswerIndex: 2,
-            explanation: "RESTはRepresentational State Transferの略であり、「S」は「Stateless」を意味します。RESTfulなAPIでは、各リクエストは独立しており、以前のリクエストの状態に依存しません。"
+            explanation: "RESTはRepresentational State Transferの略であり、「S」は「State」を意味します。RESTfulなAPIでは、各リクエストは独立しており、以前のリクエストの状態に依存しません。"
         ),
         QuizQuestion(
             question: "「ビッグエンディアン」および「リトルエンディアン」は何に関連していますか？",

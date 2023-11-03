@@ -38,6 +38,8 @@ struct ContentView: View {
     @State private var bubbleHeight: CGFloat = 0.0
     @State private var isSoundOn: Bool = true
     @State private var isLoading: Bool = true
+    @State private var isShowingLoginBonus = false
+    @State private var showLoginModal: Bool = false
     
     var body: some View {
         NavigationView {
@@ -246,6 +248,13 @@ struct ContentView: View {
                         self.buttonRect = positions.first ?? .zero
                     }
                 }
+                if showLoginModal && tutorialNum == 0 {
+                    ZStack {
+                        Color.black.opacity(0.7)
+                            .edgesIgnoringSafeArea(.all)
+                        LoginModalView(audioManager: audioManager, isPresented: $showLoginModal)
+                    }
+                }
                 if tutorialNum == 1 {
                     GeometryReader { geometry in
                         Color.black.opacity(0.5)
@@ -317,6 +326,33 @@ struct ContentView: View {
                     isButtonEnabled = true
                 }
             }
+            if let userId = authManager.currentUserId {
+                authManager.fetchLastLoginDate(userId: userId) { lastLoginDate in
+                    let currentDate = Date()
+                    if let lastLoginDate = lastLoginDate {
+                        let timeInterval = currentDate.timeIntervalSince(lastLoginDate)
+                        if timeInterval >= 86400 {
+                            authManager.saveLastLoginDate(userId: userId) { success in
+                                if success {
+                                    print("ログインボーナスの日時を保存しました")
+                                } else {
+                                    print("ログインボーナスの日時の保存に失敗しました")
+                                }
+                            }
+                        }
+                    } else {
+                        authManager.saveLastLoginDate(userId: userId) { success in
+                            if success {
+                                self.showLoginModal = true
+                                authManager.addMoney(amount: 300)
+                                print("ログインボーナスの日時を保存しました")
+                            } else {
+                                print("ログインボーナスの日時の保存に失敗しました")
+                            }
+                        }
+                    }
+                }
+            }
             authManager.fetchUserInfo { (name, avatar, money, hp, attack, tutorialNum) in
                 self.userName = name ?? ""
                 self.avatar = avatar ?? [[String: Any]]()
@@ -332,6 +368,9 @@ struct ContentView: View {
                 }
             }
             authManager.fetchUserExperienceAndLevel()
+        }
+        .sheet(isPresented: $isShowingLoginBonus) {
+            LoginBonusView()
         }
             .onChange(of: isPresentingQuizList) { isPresenting in
                 fetchUserInfoIfNeeded(isPresenting: isPresenting)
@@ -356,7 +395,45 @@ struct ContentView: View {
             }
         }
     }
+    func saveLastLoginDate() {
+        let defaults = UserDefaults.standard
+        defaults.set(Date(), forKey: "lastLoginDate")
+    }
+    
+    func saveLoginBonusReceivedDate() {
+        let defaults = UserDefaults.standard
+        defaults.set(Date(), forKey: "lastLoginBonusReceivedDate")
+    }
+
+    func checkForLoginBonus() -> Bool {
+        let defaults = UserDefaults.standard
+        let lastLoginDate = defaults.object(forKey: "lastLoginDate") as? Date ?? Date.distantPast
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.day], from: lastLoginDate, to: Date())
+        
+        if let days = components.day, days > 0 {
+            // 1日以上経過している場合はボーナスを付与
+            return true
+        } else {
+            // 1日経過していない場合はボーナスを付与しない
+            return false
         }
+    }
+        }
+
+struct LoginBonusView: View {
+    var body: some View {
+        VStack {
+            Text("おめでとうございます！")
+                .font(.largeTitle)
+            Text("ログインボーナスを獲得しました！")
+        }
+        .padding()
+        .background(Color.white)
+        .cornerRadius(10)
+        .shadow(radius: 5)
+    }
+}
 
 struct ProgressBar: View {
     var value: Float

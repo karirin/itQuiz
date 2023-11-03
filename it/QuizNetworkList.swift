@@ -126,8 +126,8 @@ struct QuizNetworkList: View {
                 "UNIQUE",
                 "NOT NULL"
             ],
-            correctAnswerIndex: 0,
-            explanation: "PRIMARY KEY制約は、一つのテーブル内の特定の列に重複したデータを許さない制約です。"
+            correctAnswerIndex: 2,
+            explanation: "UNIQUEはデータベースの制約の一つで、特定の列または列の組合せにおいて、各行がユニークな値、つまり重複しない値を持つことを保証します。"
         ),
 
         QuizQuestion(
