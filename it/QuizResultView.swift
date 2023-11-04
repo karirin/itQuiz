@@ -41,6 +41,7 @@ struct QuizResultView: View {
         _playerExperience = State(initialValue: playerExperience)
         _playerMoney = State(initialValue: playerMoney)
         self.elapsedTime = elapsedTime
+        print("self.elapsedTime init:\(self.elapsedTime)")
     }
     
     var body: some View {
@@ -133,6 +134,7 @@ struct QuizResultView: View {
                     }
                 }
                 .onAppear {
+                    print("elapsedTime onAppear:\(elapsedTime)")
                     if elapsedTime != 0 {
                         authManager.saveElapsedTime(category: "Beginner", elapsedTime: elapsedTime) { success in
                             if success {

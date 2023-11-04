@@ -31,6 +31,7 @@ struct ContentView: View {
     @State private var isPresentingGachaView: Bool = false
     @State private var isPresentingAvatarList: Bool = false
     @State private var isPresentingSettingView: Bool = false
+    @State private var isPresentingTimeAttakView: Bool = false
     @State private var audioPlayerKettei: AVAudioPlayer?
     @ObservedObject var audioManager = AudioManager.shared
     @State private var showTutorial = true
@@ -233,11 +234,29 @@ struct ContentView: View {
                                     .onTapGesture {
                                         audioManager.playSound()
                                     }
+                                    Button(action: {
+                                        // 画面遷移のトリガーをオンにする
+                                        self.isPresentingTimeAttakView = true
+                                        audioManager.playSound()
+                                    }) {
+                                        Image("タイムアタック")
+                                            .resizable()
+                                            .frame(height:70)
+                                            .padding(.horizontal)
+                                    }
                                     
-                                    NavigationLink("", destination: QuizDailyList(isPresenting: $isPresentingQuizList).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizBeginnerList)
-                                    NavigationLink("", destination: QuizManagerView(isPresenting: $isPresentingQuizList), isActive: $isPresentingQuizList)
-                                    NavigationLink("", destination: AvatarListView(isPresenting: .constant(false)), isActive: $isPresentingAvatarList)
+                                    .shadow(radius: 3)
+                                    .onTapGesture {
+                                        audioManager.playSound()
+                                    }
+                                    
+                                    Group{
+                                        NavigationLink("", destination: QuizDailyList(isPresenting: $isPresentingQuizList).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizBeginnerList)
+                                        NavigationLink("", destination: QuizManagerView(isPresenting: $isPresentingQuizList), isActive: $isPresentingQuizList)
+                                        NavigationLink("", destination: AvatarListView(isPresenting: .constant(false)), isActive: $isPresentingAvatarList)
+                                    }
                                     NavigationLink("", destination: GachaView(), isActive: $isPresentingGachaView)
+                                    NavigationLink("", destination: QuizManagerTimerView(isPresenting: $isPresentingQuizList), isActive: $isPresentingTimeAttakView)
                                     NavigationLink("", destination: SettingView().navigationBarBackButtonHidden(true), isActive: $isPresentingSettingView)
                                 }
                             }
