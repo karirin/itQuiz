@@ -17,6 +17,9 @@
         case database
         case daily
         case god
+        case timeBeginner
+        case timeIntermediate
+        case timeAdvanced
     }
 
 struct ViewPositionKey1: PreferenceKey {
@@ -402,7 +405,11 @@ struct ViewPositionKey3: PreferenceKey {
                             
                             if showCompletionMessage {
                                 // QuizView.swift
-                                NavigationLink("", destination: QuizResultView(results: quizResults, authManager: authManager, isPresenting: $isPresenting, playerExperience: playerExperience, playerMoney: playerMoney, elapsedTime: self.elapsedTime ?? 0).navigationBarBackButtonHidden(true), isActive: $navigateToQuizResultView)
+                                if quizLevel == .timeBeginner {
+                                    NavigationLink("", destination: QuizResultView(results: quizResults, authManager: authManager, isPresenting: $isPresenting, playerExperience: playerExperience, playerMoney: playerMoney, elapsedTime: self.elapsedTime ?? 0).navigationBarBackButtonHidden(true), isActive: $navigateToQuizResultView)
+                                }else{
+                                    NavigationLink("", destination: QuizResultView(results: quizResults, authManager: authManager, isPresenting: $isPresenting, playerExperience: playerExperience, playerMoney: playerMoney, elapsedTime: 0).navigationBarBackButtonHidden(true), isActive: $navigateToQuizResultView)
+                                }
                                 
                             }
                             Spacer()
@@ -937,6 +944,79 @@ struct ViewPositionKey3: PreferenceKey {
                     monsterHP = 160
                     monsterUnderHP = 160
                     monsterAttack = 1500
+                default:
+                    monsterHP = 1000
+                }
+                    
+                case .timeBeginner:
+                monsterBackground = "timeBeginnerBackground"
+                playerExperience = 20
+                playerMoney = 20
+                if userHp <= 0 {
+                    playerExperience = 5
+                    playerMoney = 5
+                }
+                switch newMonsterType {
+                case 1:
+                    monsterHP = 20
+                    monsterUnderHP = 20
+                    monsterAttack = 20
+                case 2:
+                    monsterHP = 30
+                    monsterUnderHP = 30
+                    monsterAttack = 30
+                case 3:
+                    monsterHP = 40
+                    monsterUnderHP = 40
+                    monsterAttack = 40
+                default:
+                    monsterHP = 1000
+                }
+                case .timeIntermediate:
+                monsterBackground = "timeIntermediateBackground"
+                playerExperience = 30
+                playerMoney = 30
+                if userHp <= 0 {
+                    playerExperience = 5
+                    playerMoney = 5
+                }
+                switch newMonsterType {
+                case 1:
+                    monsterHP = 40
+                    monsterUnderHP = 40
+                    monsterAttack = 40
+                case 2:
+                    monsterHP = 50
+                    monsterUnderHP = 50
+                    monsterAttack = 50
+                case 3:
+                    monsterHP = 60
+                    monsterUnderHP = 60
+                    monsterAttack = 60
+                default:
+                    monsterHP = 1000
+                }
+                case .timeAdvanced:
+                monsterBackground = "timeAdvancedBackground"
+                playerExperience = 40
+                playerMoney = 40
+                if userHp <= 0 {
+                    playerExperience = 5
+                    playerMoney = 5
+                }
+                switch newMonsterType {
+                case 1:
+                    monsterHP = 50
+                    monsterUnderHP = 50
+                    monsterAttack = 50
+                case 2:
+                    monsterHP = 60
+                    monsterUnderHP = 60
+                    monsterAttack = 60
+                case 3:
+                    monsterHP = 70
+                    monsterUnderHP = 70
+                    monsterAttack = 70
                 default:
                     monsterHP = 1000
                 }

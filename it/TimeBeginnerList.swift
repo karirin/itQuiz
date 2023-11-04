@@ -1,20 +1,13 @@
 //
-//  QuizList.swift
+//  TimeBeginnerList.swift
 //  it
 //
-//  Created by hashimo ryoya on 2023/09/16.
+//  Created by hashimo ryoya on 2023/11/04.
 //
 
 import SwiftUI
 
-struct QuizQuestion {
-    var question: String
-    var choices: [String]
-    var correctAnswerIndex: Int
-    var explanation: String
-}
-
-struct QuizBeginnerList: View {
+struct TimeBeginnerList: View {
     @Binding var isPresenting: Bool
 //    let quizBeginnerList: [QuizQuestion] = [
 //        QuizQuestion(
@@ -29,18 +22,7 @@ struct QuizBeginnerList: View {
 //            explanation: "CRM（Customer Relationship Management）は、顧客との長期的な関係を築くことを重視し、継続的なサービス提供を行うビジネスモデルです。"
 //        )
 //        ]
-    let quizBeginnerList: [QuizQuestion] = [
-//        QuizQuestion(
-//            question: "あああああああああああああああああああああああああああああああああああああああああああああああああああああああああ",
-//            choices: [
-//                "電源ケーブル",
-//                "Eメールの添付ファイル",
-//                "モニター",
-//                "キーボード"
-//            ],
-//            correctAnswerIndex: 1,
-//            explanation: " Eメールの添付ファイルは、コンピュータウイルスの感染経路として非常に一般的です。不明な送信元からのメールの添付ファイルは開かないよう注意が必要です。"
-//        )
+    let timeBeginnerList: [QuizQuestion] = [
         QuizQuestion(
             question: "コンピュータウイルスの感染経路として最も一般的なものは？",
             choices: [
@@ -395,16 +377,16 @@ struct QuizBeginnerList: View {
 
     init(isPresenting: Binding<Bool>) {
         _isPresenting = isPresenting
-        _shuffledQuizList = State(initialValue: quizBeginnerList.shuffled())
+        _shuffledQuizList = State(initialValue: timeBeginnerList.shuffled())
     }
 
     var body: some View {
-        QuizView(quizzes: shuffledQuizList, quizLevel: .beginner, authManager: authManager, audioManager: audioManager, isPresenting: $isPresenting)
+        QuizView(quizzes: shuffledQuizList, quizLevel: .timeBeginner, authManager: authManager, audioManager: audioManager, isPresenting: $isPresenting)
     }
 }
 
-struct QuizList_Previews: PreviewProvider {
+struct TimeBeginnerList_Previews: PreviewProvider {
     static var previews: some View {
-        QuizBeginnerList(isPresenting: .constant(false))
+        TimeBeginnerList(isPresenting: .constant(false))
     }
 }

@@ -47,7 +47,7 @@ struct QuizResultView: View {
         ZStack {
         NavigationView{
                 VStack{
-                    Spacer()
+//                    Spacer()
                     HStack{
 //                        NavigationLink(destination: ContentView(isPresentingQuizBeginnerList: .constant(false), isPresentingAvatarList: .constant(false)).navigationBarBackButtonHidden(true)) {
 //                        NavigationLink(destination: ContentView().navigationBarBackButtonHidden(true)) {
@@ -83,42 +83,63 @@ struct QuizResultView: View {
                         .opacity(0)
                     }
                     .foregroundColor(Color("fontGray"))
-                    ScrollView{
-//                        Text("所要時間: \(elapsedTime) 秒")
-                        ForEach(results, id: \.question) { result in
-                            VStack(alignment: .leading,spacing: 20) {
-                                HStack{
-                                    Image(systemName:result.isCorrect ? "circle" : "xmark")
-                                        .foregroundColor(result.isCorrect ? .red : .blue)
-                                        .opacity(0.7)
-                                    Text(result.isCorrect ? "正解" : "不正解")
-                                }
-                                .font(.system(size:24))
-                                Text(result.question)
-                                Text("あなたの回答: \(result.userAnswer)")
-                                Text("正解: \(result.correctAnswer)")
-                                Text("解説: \(result.explanation)")
-                            }.padding()
-                            .frame(maxWidth:.infinity,alignment: .leading)
-                            Divider()
-                            .onAppear {
-                                showModal = true
-                            }
-                            .frame(maxWidth:.infinity)
-                        }
-                        .padding(5)
+                    Spacer()
+                        if elapsedTime != 0 {
+                    HStack{
+                        Image(systemName: "stopwatch")
+                            .font(.system(size: 20))
+                            .foregroundColor(.red)
+                        Text("タイムアタックの結果")
+                            .font(.system(size: 20))
                     }
-                    .foregroundColor(Color("fontGray"))
-                    
+                    Text("\(formatDuration(elapsedTime))")
+                        .font(.system(size: 70))
+                        } else {
+                        ScrollView{
+                            ForEach(results, id: \.question) { result in
+                                VStack(alignment: .leading,spacing: 20) {
+                                    HStack{
+                                        Image(systemName:result.isCorrect ? "circle" : "xmark")
+                                            .foregroundColor(result.isCorrect ? .red : .blue)
+                                            .opacity(0.7)
+                                        Text(result.isCorrect ? "正解" : "不正解")
+                                    }
+                                    .font(.system(size:24))
+                                    Text(result.question)
+                                    Text("あなたの回答: \(result.userAnswer)")
+                                    Text("正解: \(result.correctAnswer)")
+                                    Text("解説: \(result.explanation)")
+                                }.padding()
+                                    .frame(maxWidth:.infinity,alignment: .leading)
+                                Divider()
+                                    .onAppear {
+                                        showModal = true
+                                    }
+                                    .frame(maxWidth:.infinity)
+                            }
+                            .padding(5)
+                        }
+                        .foregroundColor(Color("fontGray"))
+                    }
+                    Spacer()
                 }
                 .onChange(of: authManager.didLevelUp) { newValue in
-                    print("test1")
                     if newValue {
-                        print("test2")
                         // レベルアップ通知を表示した後、フラグをリセット
                         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                             showLevelUpModal = true
                             audioManager.playLevelUpSound()
+                        }
+                    }
+                }
+                .onAppear {
+                    if elapsedTime != 0 {
+                        authManager.saveElapsedTime(category: "Beginner", elapsedTime: elapsedTime) { success in
+                            if success {
+                                print("経過時間を保存しました。")
+                            } else {
+                                print("経過時間の保存に失敗しました。")
+                            }
                         }
                     }
                 }
@@ -136,6 +157,13 @@ struct QuizResultView: View {
             }
             NavigationLink("", destination: ContentView().navigationBarBackButtonHidden(true), isActive: $isContentView)
         }
+    }
+    func formatDuration(_ duration: TimeInterval) -> String {
+        let formatter = DateComponentsFormatter()
+        formatter.unitsStyle = .positional
+        formatter.allowedUnits = [.hour, .minute, .second]
+        formatter.zeroFormattingBehavior = .pad
+        return formatter.string(from: duration) ?? ""
     }
 }
 

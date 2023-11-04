@@ -581,6 +581,31 @@ class AuthManager: ObservableObject {
             }
         }
     }
+    
+    func saveElapsedTime(category: String, elapsedTime: TimeInterval, completion: @escaping (Bool) -> Void) {
+        guard let userId = user?.uid else {
+            completion(false) // ユーザーIDがnilの場合、失敗としてfalseを返す
+            return
+        }
+
+        // ユーザーの経過時間データの参照を作成
+        let userRef = Database.database().reference().child("users").child(userId)
+
+        // 経過時間を保存する辞書を作成
+        let elapsedTimeData: [String: Any] = ["タイム": elapsedTime]
+
+        // カテゴリに応じて保存する場所を指定
+        userRef.child(category).setValue(elapsedTimeData) { (error, ref) in
+            if let error = error {
+                print("Failed to save elapsed time:", error.localizedDescription)
+                completion(false) // 保存に失敗した場合、falseを返す
+                return
+            }
+            print("Successfully saved elapsed time.")
+            completion(true) // 保存に成功した場合、trueを返す
+        }
+    }
+
 
 }
 

@@ -24,6 +24,8 @@
 		264552092ADC085200827D42 /* TimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 264552082ADC085200827D42 /* TimerView.swift */; };
 		264F19152AF2824700B6FB10 /* RankingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 264F19142AF2824700B6FB10 /* RankingView.swift */; };
 		264F19172AF3B1A900B6FB10 /* RewardModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 264F19162AF3B1A900B6FB10 /* RewardModalView.swift */; };
+		265FA3932AF5502200F3E0EF /* TimeBeginnerList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 265FA3922AF5502200F3E0EF /* TimeBeginnerList.swift */; };
+		265FA3952AF5FEF600F3E0EF /* TimeIntermediateList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 265FA3942AF5FEF600F3E0EF /* TimeIntermediateList.swift */; };
 		266A07282AC6E10200B85D4E /* ProgressBar3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 266A07272AC6E10200B85D4E /* ProgressBar3.swift */; };
 		266A072A2AC6FBC800B85D4E /* AnswerSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 266A07292AC6FBC800B85D4E /* AnswerSelectionView.swift */; };
 		266A072C2AC7242600B85D4E /* キャンセル.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 266A072B2AC7242500B85D4E /* キャンセル.mp3 */; };
@@ -85,6 +87,8 @@
 		264552082ADC085200827D42 /* TimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerView.swift; sourceTree = "<group>"; };
 		264F19142AF2824700B6FB10 /* RankingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RankingView.swift; sourceTree = "<group>"; };
 		264F19162AF3B1A900B6FB10 /* RewardModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardModalView.swift; sourceTree = "<group>"; };
+		265FA3922AF5502200F3E0EF /* TimeBeginnerList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeBeginnerList.swift; sourceTree = "<group>"; };
+		265FA3942AF5FEF600F3E0EF /* TimeIntermediateList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeIntermediateList.swift; sourceTree = "<group>"; };
 		266A07272AC6E10200B85D4E /* ProgressBar3.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressBar3.swift; sourceTree = "<group>"; };
 		266A07292AC6FBC800B85D4E /* AnswerSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnswerSelectionView.swift; sourceTree = "<group>"; };
 		266A072B2AC7242500B85D4E /* キャンセル.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "キャンセル.mp3"; path = "../../../Downloads/キャンセル.mp3"; sourceTree = "<group>"; };
@@ -183,6 +187,8 @@
 				269A878D2AB87CBA00F33C9E /* MemoView.swift */,
 				269A87872AB7757C00F33C9E /* QuizResultView.swift */,
 				260000012AB5EEC900342CAE /* QuizBeginnerList.swift */,
+				265FA3922AF5502200F3E0EF /* TimeBeginnerList.swift */,
+				265FA3942AF5FEF600F3E0EF /* TimeIntermediateList.swift */,
 				26A25D4D2AB99235006B368F /* QuizIntermediateList.swift */,
 				268C3B9A2ABCA63200282BEE /* QuizAdvancedList.swift */,
 				268C3B9C2ABCA95D00282BEE /* QuizNetworkList.swift */,
@@ -409,11 +415,13 @@
 				269A878C2AB873CC00F33C9E /* GachaAnimationView.swift in Sources */,
 				26A026EC2ABF16E600119F2B /* AudioManager.swift in Sources */,
 				267E70902AD6FD0200EA7AA2 /* LoadingView.swift in Sources */,
+				265FA3952AF5FEF600F3E0EF /* TimeIntermediateList.swift in Sources */,
 				26B9BA1F2AF0091C00AC7C40 /* QuizGodList.swift in Sources */,
 				260E44132AB572DC00FBB487 /* itApp.swift in Sources */,
 				266A07282AC6E10200B85D4E /* ProgressBar3.swift in Sources */,
 				268C3BA72ABD638200282BEE /* PrivacyView.swift in Sources */,
 				26B9BA232AF2647300AC7C40 /* LoginModalView.swift in Sources */,
+				265FA3932AF5502200F3E0EF /* TimeBeginnerList.swift in Sources */,
 				269A878E2AB87CBA00F33C9E /* MemoView.swift in Sources */,
 				268C3B9D2ABCA95D00282BEE /* QuizNetworkList.swift in Sources */,
 				268C3BA62ABD638200282BEE /* TermsOfServiceView.swift in Sources */,
