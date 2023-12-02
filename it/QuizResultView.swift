@@ -13,10 +13,11 @@ struct QuizResult {
     var correctAnswer: String
     var explanation: String
     var isCorrect: Bool  // 正解か不正解かを示すプロパティ
+    var showExplanation: Bool = false
 }
 
 struct QuizResultView: View {
-    var results: [QuizResult]
+//    var results: [QuizResult]
     @State private var showModal = true
     @State private var showLevelUpModal = false
     @State private var showMemoView = false
@@ -29,15 +30,22 @@ struct QuizResultView: View {
     @State private var playerMoney: Int
     @State private var isContentView: Bool = false
     var elapsedTime: TimeInterval
-
+    @State var results: [QuizResult]
+    @State private var isShow: Bool = true
+    @State private var flag: Bool = false
+//    @Int var elapsedTime = 1
     @Binding var isPresenting: Bool
+    @Binding var navigateToQuizResultView: Bool
 //    @Environment(\.rootPresentationMode) private var rootPresentationMode: Binding<RootPresentationMode>
+    @State private var isHidden = false
+    @ObservedObject var interstitial = Interstitial()
 
     // QuizResultView.swift
-    init(results: [QuizResult], authManager: AuthManager, isPresenting: Binding<Bool>, playerExperience: Int,playerMoney: Int, elapsedTime: TimeInterval) {
-        self.results = results
+    init(results: [QuizResult], authManager: AuthManager, isPresenting: Binding<Bool>, navigateToQuizResultView: Binding<Bool>, playerExperience: Int, playerMoney: Int, elapsedTime: TimeInterval) {
+        _results = State(initialValue: results)
         self.authManager = authManager
         _isPresenting = isPresenting
+        _navigateToQuizResultView = navigateToQuizResultView
         _playerExperience = State(initialValue: playerExperience)
         _playerMoney = State(initialValue: playerMoney)
         self.elapsedTime = elapsedTime
@@ -84,17 +92,80 @@ struct QuizResultView: View {
                         .opacity(0)
                     }
                     .foregroundColor(Color("fontGray"))
-                    Spacer()
+//                    Spacer()
                         if elapsedTime != 0 {
-                    HStack{
-                        Image(systemName: "stopwatch")
-                            .font(.system(size: 20))
-                            .foregroundColor(.red)
-                        Text("タイムアタックの結果")
-                            .font(.system(size: 20))
-                    }
-                    Text("\(formatDuration(elapsedTime))")
-                        .font(.system(size: 70))
+//                            Spacer()
+                            Spacer()
+                                .frame(height: 50)
+                            
+                                HStack{
+                                    Image(systemName: "stopwatch")
+                                        .font(.system(size: 20))
+                                        .foregroundColor(.red)
+                                    Text("タイムアタックの結果")
+                                        .font(.system(size: 20))
+                                }
+                            VStack(spacing: 10){
+                                Text("\(formatDuration(elapsedTime))")
+                                    .font(.system(size: 70))
+                                HStack{
+                                    Spacer()
+                                    Button(action: {
+                                        isHidden.toggle() // isHidden の値を切り替える
+                                    }) {
+                                        Text(isHidden ? "解説" : "解説") // ボタンのラベルを動的に設定
+                                    }
+                                    .padding(.vertical,10)
+                                    .padding(.horizontal,25)
+                                    .font(.headline)
+                                    .foregroundColor(.white)
+                                    .background(Color("skyBlue"),in: RoundedRectangle(cornerRadius: 25))
+                                    Spacer()
+                                    Button(action: {
+                                        //                                    isHidden.toggle() // isHidden の値を切り替える
+                                    }) {
+                                        Text("ランキング") // ボタンのラベルを動的に設定
+                                    }
+                                    .padding(.vertical,10)
+                                    .padding(.horizontal,25)
+                                    .font(.headline)
+                                    .foregroundColor(.white)
+                                    .background(Color("skyBlue"),in: RoundedRectangle(cornerRadius: 25))
+                                    Spacer()
+                                }
+                            }
+                                
+                            ScrollView {
+                          ForEach(results, id: \.question) { result in
+                              VStack(alignment: .leading, spacing: 20) {
+                                  HStack {
+                                      Image(systemName: result.isCorrect ? "circle" : "xmark")
+                                          .foregroundColor(result.isCorrect ? .red : .blue)
+                                          .opacity(0.7)
+                                      Text(result.isCorrect ? "正解" : "不正解")
+                                  }
+                                  .font(.system(size: 24))
+                                  Text(result.question)
+                                  Text("あなたの回答: \(result.userAnswer)")
+                                  Text("正解: \(result.correctAnswer)")
+                                  // 解説を表示するための修正
+                                  if result.showExplanation {
+                                      Text("解説: \(result.explanation)")
+                                  }
+                              }
+                              .padding()
+                              .frame(maxWidth: .infinity, alignment: .leading)
+                              Divider()
+                              .onAppear {
+                                  showModal = true
+                              }
+                              .frame(maxWidth: .infinity)
+                          }
+                          .padding(5)
+                            }
+                            .opacity(isHidden ? 1 : 0)
+                                        
+                                        
                         } else {
                         ScrollView{
                             ForEach(results, id: \.question) { result in
@@ -122,7 +193,7 @@ struct QuizResultView: View {
                         }
                         .foregroundColor(Color("fontGray"))
                     }
-                    Spacer()
+//                    Spacer()
                 }
                 .onChange(of: authManager.didLevelUp) { newValue in
                     if newValue {
@@ -133,8 +204,31 @@ struct QuizResultView: View {
                         }
                     }
                 }
+                .onChange(of: elapsedTime) { newValue in
+                    print("onChange")
+                    print(elapsedTime)
+                    if elapsedTime != 0 {
+                        authManager.saveElapsedTime(category: "Beginner", elapsedTime: elapsedTime) { success in
+                            if success {
+                                print("経過時間を保存しました。")
+                            } else {
+                                print("経過時間の保存に失敗しました。")
+                            }
+                        }
+                    }
+                }
+                .onChange(of: interstitial.interstitialAdLoaded) { isLoaded in
+                    print("onChange isLoaded:\(isLoaded)")
+                    print("onChange interstitial.wasAdDismissed:\(interstitial.wasAdDismissed)")
+                      if isLoaded && !interstitial.wasAdDismissed {
+                          interstitial.presentInterstitial()
+                      }
+                  }
                 .onAppear {
-                    print("elapsedTime onAppear:\(elapsedTime)")
+//                    if !interstitial.interstitialAdLoaded {
+//                        print("onAppear interstitial.presentInterstitial()")
+//                        interstitial.presentInterstitial()
+//                    }
                     if elapsedTime != 0 {
                         authManager.saveElapsedTime(category: "Beginner", elapsedTime: elapsedTime) { success in
                             if success {
@@ -160,6 +254,7 @@ struct QuizResultView: View {
             NavigationLink("", destination: ContentView().navigationBarBackButtonHidden(true), isActive: $isContentView)
         }
     }
+    
     func formatDuration(_ duration: TimeInterval) -> String {
         let formatter = DateComponentsFormatter()
         formatter.unitsStyle = .positional
@@ -337,16 +432,16 @@ struct ProgressBar1: View {
 
 
 struct QuizResultView_Previews: PreviewProvider {
-    @State static private var isPresenting = true
-    @State static private var authManager = AuthManager.shared
+    // プレビュー用の状態変数
+    @State static var isPresenting = false
+    @State static var navigateToQuizResultView = false
+
     static var previews: some View {
-        // ダミーデータを作成
-        let dummyResults = [
-            QuizResult(question: "情報セキュリティの方針やルールを組織全体に明確に伝えるための文章は？", userAnswer: "SLA", correctAnswer: "情報セキュリティポリシー", explanation: "情報セキュリティの３つの基本的な要素として、機密性、完全性に続くものは「可溶性」といいます。", isCorrect: false),
-            QuizResult(question: "AIを開発するベンチャー企業のA社が，資金調達を目的に，金融商品取引所に初めて上場することになった。このように，企業の未公開の株式を，新たに公開することを表す用語として，最も適切なものはどれか。", userAnswer: "IPO", correctAnswer: "IPO", explanation: "IPO（Initial Public Offering）は、企業が初めて公開市場で株式を発行することを指します。", isCorrect: true)
-        ]
-        
-        // ダミーの経過時間を追加してQuizResultViewを呼び出す
-        QuizResultView(results: dummyResults, authManager: authManager, isPresenting: $isPresenting, playerExperience: 10, playerMoney: 10, elapsedTime: 0)
+        // プレビューで使用するためのダミーの依存オブジェクト
+        let dummyResults = [QuizResult]() // 適切なダミーデータで置き換えてください
+        let authManager = AuthManager() // 適切なダミーまたはモックオブジェクトで置き換えてください
+
+        // プレビュー用にビューを初期化
+        QuizResultView(results: dummyResults, authManager: authManager, isPresenting: $isPresenting, navigateToQuizResultView: $navigateToQuizResultView, playerExperience: 10, playerMoney: 10, elapsedTime: 1)
     }
 }

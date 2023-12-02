@@ -379,9 +379,9 @@ struct TimeBeginnerList: View {
         _isPresenting = isPresenting
         _shuffledQuizList = State(initialValue: timeBeginnerList.shuffled())
     }
-
+    @StateObject var sharedInterstitial = Interstitial()
     var body: some View {
-        QuizView(quizzes: shuffledQuizList, quizLevel: .timeBeginner, authManager: authManager, audioManager: audioManager, isPresenting: $isPresenting)
+        QuizView(quizzes: shuffledQuizList, quizLevel: .timeBeginner, authManager: authManager, audioManager: audioManager, isPresenting: $isPresenting, interstitial: sharedInterstitial)
     }
 }
 

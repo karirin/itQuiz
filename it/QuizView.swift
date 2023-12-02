@@ -8,19 +8,7 @@
     import SwiftUI
     import AVFoundation
 
-    enum QuizLevel {
-        case beginner
-        case intermediate
-        case advanced
-        case network
-        case security
-        case database
-        case daily
-        case god
-        case timeBeginner
-        case timeIntermediate
-        case timeAdvanced
-    }
+
 
 struct ViewPositionKey1: PreferenceKey {
     static var defaultValue: [CGRect] = []
@@ -68,6 +56,7 @@ struct ViewPositionKey3: PreferenceKey {
         @State private var showModal: Bool = false
         @State private var showTutorial: Bool = false
         @State private var quizResults: [QuizResult] = []
+        @State private var answerCount: Int = 0
         @State private var correctAnswerCount: Int = 0
         @State private var countdownValue: Int = 3
         @State private var showCountdown: Bool = true
@@ -109,6 +98,7 @@ struct ViewPositionKey3: PreferenceKey {
         @State private var endTime: Date?
         @State private var elapsedTime: TimeInterval?
         @State private var navigateToQuizResult = false
+        @ObservedObject var interstitial: Interstitial
         
         var currentQuiz: QuizQuestion {
             quizzes[currentQuizIndex]
@@ -156,7 +146,7 @@ struct ViewPositionKey3: PreferenceKey {
             self.timer?.invalidate()
             
             // 3秒後に以下のコードブロックを実行
-            self.remainingSeconds = 30
+            self.remainingSeconds = 3000
             self.timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
                 if self.remainingSeconds > 0 {
                     self.remainingSeconds -= 1
@@ -174,6 +164,7 @@ struct ViewPositionKey3: PreferenceKey {
                 // 最後のモンスターが倒された場合、結果画面へ遷移
                 showCompletionMessage = true
                 timer?.invalidate()
+                RateManager.shared.updateQuizData(userId: authManager.currentUserId!, quizType: quizLevel, newCorrectAnswers: correctAnswerCount, newTotalAnswers: answerCount)
                 navigateToQuizResultView = true  //ここで結果画面への遷移フラグをtrueに
             } else if playerHP <= 0 {
                 showCompletionMessage = true
@@ -196,6 +187,7 @@ struct ViewPositionKey3: PreferenceKey {
         
         func answerSelectionAction(index: Int) {
             if !hasAnswered {
+                print("index:\(index)")
                 self.selectedAnswerIndex = index
                 self.timer?.invalidate() // 回答を選択したらタイマーを止める
                 
@@ -208,6 +200,9 @@ struct ViewPositionKey3: PreferenceKey {
                         self.showAttackImage = true
                         //                                        }
                         correctAnswerCount += 1 // 正解の場合、正解数をインクリメント
+                        answerCount += 1
+                        print("correctAnswerCount:\(correctAnswerCount)")
+                        print("AnswerCount:\(answerCount)")
                         //                                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                         monsterHP -= userAttack
                         if monsterHP <= 0 {
@@ -230,6 +225,7 @@ struct ViewPositionKey3: PreferenceKey {
                         moveToNextQuiz()
                     }
                 } else {
+                    answerCount += 1
                     audioManager.playUnCorrectSound()
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                         audioManager.playMonsterAttackSound()
@@ -240,7 +236,7 @@ struct ViewPositionKey3: PreferenceKey {
                         moveToNextQuiz()
                     }
                 }
-                
+//                answerCount += 1
                 let result = QuizResult(
                     question: currentQuiz.question,
                     userAnswer: currentQuiz.choices[index],
@@ -392,9 +388,16 @@ struct ViewPositionKey3: PreferenceKey {
                     ScrollView{
                         VStack{
                             
-                            AnswerSelectionView(choices: currentQuiz.choices) { index in
+                            AnswerSelectionView(choices: currentQuiz.choices, correctAnswerIndex: hasAnswered ? currentQuiz.correctAnswerIndex : nil) { index in
                                 answerSelectionAction(index: index)
                             }
+
+//            AnswerSelectionView(choices: currentQuiz.choices) { index in
+//                                            answerSelectionAction(index: index)
+//                                        }
+            .onAppear{
+                print("AnswerSelectionView currentQuiz.choices:\(currentQuiz.choices)")
+            }
                             .frame(maxWidth: .infinity)
                             .shadow(radius: 1)
                             .background(GeometryReader { geometry in
@@ -406,9 +409,10 @@ struct ViewPositionKey3: PreferenceKey {
                             if showCompletionMessage {
                                 // QuizView.swift
                                 if quizLevel == .timeBeginner {
-                                    NavigationLink("", destination: QuizResultView(results: quizResults, authManager: authManager, isPresenting: $isPresenting, playerExperience: playerExperience, playerMoney: playerMoney, elapsedTime: self.elapsedTime ?? 0).navigationBarBackButtonHidden(true), isActive: $navigateToQuizResultView)
+                                    
+                                    NavigationLink("", destination: QuizResultView(results: quizResults, authManager: authManager, isPresenting: $isPresenting, navigateToQuizResultView: $navigateToQuizResultView, playerExperience: playerExperience, playerMoney: playerMoney, elapsedTime: self.elapsedTime ?? 0).navigationBarBackButtonHidden(true), isActive: $navigateToQuizResultView)
                                 }else{
-                                    NavigationLink("", destination: QuizResultView(results: quizResults, authManager: authManager, isPresenting: $isPresenting, playerExperience: playerExperience, playerMoney: playerMoney, elapsedTime: 0).navigationBarBackButtonHidden(true), isActive: $navigateToQuizResultView)
+                                    NavigationLink("", destination: QuizResultView(results: quizResults, authManager: authManager, isPresenting: $isPresenting, navigateToQuizResultView: $navigateToQuizResultView, playerExperience: playerExperience, playerMoney: playerMoney, elapsedTime: 0).navigationBarBackButtonHidden(true), isActive: $navigateToQuizResultView)
                                 }
                                 
                             }
@@ -667,6 +671,11 @@ struct ViewPositionKey3: PreferenceKey {
                 }
             }
             .onAppear {
+//                print("interstitial.interstitialAdLoaded:\(interstitial.interstitialAdLoaded)")
+//                if !interstitial.interstitialAdLoaded {
+//                    print("onAppear interstitial.interstitialAdLoaded")
+//                    interstitial.presentInterstitial()
+//                }
                 startCountdown()
                 self.monsterType = 1 // すぐに1に戻す
                 authManager.fetchUserInfo { (name, avator, money, hp, attack, tutorialNum) in
@@ -709,6 +718,13 @@ struct ViewPositionKey3: PreferenceKey {
                     self.navigateToQuizResult = true
                     // ここで経過時間を表示または保存する
                     print("経過時間: \(self.elapsedTime!) 秒")
+                    authManager.saveElapsedTime(category: quizLevel.description, elapsedTime: elapsedTime!) { success in
+                        if success {
+                            print("経過時間を保存しました。")
+                        } else {
+                            print("経過時間の保存に失敗しました。")
+                        }
+                    }
                 }
             }
             .onChange(of: selectedAnswerIndex) { newValue in

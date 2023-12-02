@@ -703,9 +703,9 @@ struct TimeIntermediateList: View {
         _shuffledQuizList = State(initialValue:
                 TimeIntermediateList.shuffled())
     }
-
+    @StateObject var sharedInterstitial = Interstitial()
     var body: some View {
-        QuizView(quizzes: shuffledQuizList, quizLevel: .timeIntermediate, authManager: authManager,audioManager: audioManager,isPresenting: $isPresenting)
+        QuizView(quizzes: shuffledQuizList, quizLevel: .timeIntermediate, authManager: authManager,audioManager: audioManager,isPresenting: $isPresenting, interstitial: sharedInterstitial)
     }
 }
 

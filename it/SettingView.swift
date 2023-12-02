@@ -56,6 +56,15 @@ struct SettingView: View {
                                 .foregroundColor(Color(.systemGray4))
                         }
                     }
+                    
+                    NavigationLink(destination: SubscriptionView()) {
+                        HStack {
+                            Text("広告を非表示にする")
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .foregroundColor(Color(.systemGray4))
+                        }
+                    }
                 }
             }
             .listStyle(GroupedListStyle())

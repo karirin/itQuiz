@@ -21,7 +21,8 @@ struct RootView: View {
                 SignUp()
             } else {
 //                ContentView(isPresentingQuizBeginnerList: .constant(false), isPresentingAvatarList: .constant(false))
-                ContentView()
+//                ContentView()
+                TopView()
             }
         }
         .onAppear {

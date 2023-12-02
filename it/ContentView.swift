@@ -32,6 +32,8 @@ struct ContentView: View {
     @State private var isPresentingAvatarList: Bool = false
     @State private var isPresentingSettingView: Bool = false
     @State private var isPresentingTimeAttakView: Bool = false
+    @State private var isPresentingIllustratedView: Bool = false
+    @State private var isPresentingPentagonView: Bool = false
     @State private var audioPlayerKettei: AVAudioPlayer?
     @ObservedObject var audioManager = AudioManager.shared
     @State private var showTutorial = true
@@ -41,9 +43,19 @@ struct ContentView: View {
     @State private var isLoading: Bool = true
     @State private var isShowingLoginBonus = false
     @State private var showLoginModal: Bool = false
+    @ObservedObject var interstitial = Interstitial()
     
     var body: some View {
         NavigationView {
+//            Button(action: {
+//                     interstitial.presentInterstitial()
+//                 }) {
+//                     Text(interstitial.interstitialAdLoaded ? "インタースティシャル広告表示" : "読み込み中...")
+//                 }
+//                 .onAppear() {
+//                     interstitial.loadInterstitial()
+//                 }
+//                 .disabled(!interstitial.interstitialAdLoaded)
             ZStack{
                 if isLoading {
                     // ローディングインジケータの表示
@@ -234,12 +246,44 @@ struct ContentView: View {
                                     .onTapGesture {
                                         audioManager.playSound()
                                     }
+//                                    Button(action: {
+//                                        // 画面遷移のトリガーをオンにする
+//                                        self.isPresentingTimeAttakView = true
+//                                        audioManager.playSound()
+//                                    }) {
+//                                        Image("タイムアタック")
+//                                            .resizable()
+//                                            .frame(height:70)
+//                                            .padding(.horizontal)
+//                                    }
+                                    
+                                    .shadow(radius: 3)
+                                    .onTapGesture {
+                                        audioManager.playSound()
+                                    }
+                                    
                                     Button(action: {
                                         // 画面遷移のトリガーをオンにする
-                                        self.isPresentingTimeAttakView = true
+                                        self.isPresentingIllustratedView = true
                                         audioManager.playSound()
                                     }) {
-                                        Image("タイムアタック")
+                                        Image("おとも図鑑")
+                                            .resizable()
+                                            .frame(height:70)
+                                            .padding(.horizontal)
+                                    }
+                                    
+                                    .shadow(radius: 3)
+                                    .onTapGesture {
+                                        audioManager.playSound()
+                                    }
+                                    
+                                    Button(action: {
+                                        // 画面遷移のトリガーをオンにする
+                                        self.isPresentingPentagonView = true
+                                        audioManager.playSound()
+                                    }) {
+                                        Image("おとも図鑑")
                                             .resizable()
                                             .frame(height:70)
                                             .padding(.horizontal)
@@ -255,9 +299,11 @@ struct ContentView: View {
                                         NavigationLink("", destination: QuizManagerView(isPresenting: $isPresentingQuizList), isActive: $isPresentingQuizList)
                                         NavigationLink("", destination: AvatarListView(isPresenting: .constant(false)), isActive: $isPresentingAvatarList)
                                     }
-                                    NavigationLink("", destination: GachaView(), isActive: $isPresentingGachaView)
+                                    NavigationLink("", destination: GachaManagerView(isPresenting: .constant(false)), isActive: $isPresentingGachaView)
                                     NavigationLink("", destination: QuizManagerTimerView(isPresenting: $isPresentingQuizList), isActive: $isPresentingTimeAttakView)
                                     NavigationLink("", destination: SettingView().navigationBarBackButtonHidden(true), isActive: $isPresentingSettingView)
+                                    NavigationLink("", destination: IllustratedView(isPresenting: .constant(false)).navigationBarBackButtonHidden(true), isActive: $isPresentingIllustratedView)
+                                    NavigationLink("", destination:  PentagonView(authManager: authManager).navigationBarBackButtonHidden(true), isActive: $isPresentingPentagonView)
                                 }
                             }
                             //                            .padding(.horizontal,5)
@@ -328,6 +374,9 @@ struct ContentView: View {
         .navigationViewStyle(StackNavigationViewStyle())
         .frame(maxWidth: .infinity,maxHeight: .infinity)
         .onAppear {
+//            if !interstitial.interstitialAdLoaded {
+//                interstitial.loadInterstitial()
+//            }
             // 1. lastClickedDateを取得
             authManager.fetchLastClickedDate(userId: authManager.currentUserId ?? "") { lastDate in
                 if let lastDate = lastDate {
@@ -391,6 +440,13 @@ struct ContentView: View {
         .sheet(isPresented: $isShowingLoginBonus) {
             LoginBonusView()
         }
+        .onChange(of: showLoginModal) { userMoney in
+            print("showLoginModal")
+            authManager.getUserMoney { userMoney in
+                print(userMoney)
+                self.userMoney = userMoney
+            }
+        }
             .onChange(of: isPresentingQuizList) { isPresenting in
                 fetchUserInfoIfNeeded(isPresenting: isPresenting)
                 authManager.fetchUserExperienceAndLevel()
@@ -399,6 +455,13 @@ struct ContentView: View {
                 fetchUserInfoIfNeeded(isPresenting: isPresenting)
                 authManager.fetchUserExperienceAndLevel()
             }
+//            .onChange(of: interstitial.interstitialAdLoaded) { isLoaded in
+//                print("isLoaded:\(isLoaded)")
+//                if isLoaded {
+//                    interstitial.presentInterstitial()
+//                }
+//            }
+
             .background(Color("purple2").opacity(0.6))  // ここで背景色を設定
             .edgesIgnoringSafeArea(.all)  // 画面の端まで背景色を伸ばす
             }

@@ -23,6 +23,16 @@ FOUNDATION_EXPORT GADMaxAdContentRating _Nonnull const GADMaxAdContentRatingMatu
 /// Add this constant to the testDevices property's array to receive test ads on the simulator.
 FOUNDATION_EXPORT NSString *_Nonnull const GADSimulatorID;
 
+/// Publisher privacy treatment personalization states.
+typedef NS_ENUM(NSInteger, GADPublisherPrivacyPersonalizationState) {
+  /// Indicates that ad requests should receive the default publisher privacy treatment.
+  GADPublisherPrivacyPersonalizationStateDefault = 0,
+  /// Indicates that ad requests should receive personalized publisher privacy treatment.
+  GADPublisherPrivacyPersonalizationStateEnabled = 1,
+  /// Indicates that ad requests should receive non-personalized publisher privacy treatment.
+  GADPublisherPrivacyPersonalizationStateDisabled = 2,
+};
+
 /// Request configuration. The settings in this class will apply to all ad requests.
 @interface GADRequestConfiguration : NSObject
 
@@ -72,6 +82,12 @@ FOUNDATION_EXPORT NSString *_Nonnull const GADSimulatorID;
 /// Controls whether the Google Mobile Ads SDK Same App Key is enabled. The value set persists
 /// across app sessions. The key is enabled by default.
 - (void)setSameAppKeyEnabled:(BOOL)enabled;
+
+#pragma mark - Publisher Privacy Treatment
+
+/// This property lets you specify the personalization treatment that applies to subsequent ad
+/// requests.
+@property(nonatomic) GADPublisherPrivacyPersonalizationState publisherPrivacyPersonalizationState;
 
 #pragma mark - Deprecated
 

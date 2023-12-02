@@ -369,9 +369,9 @@ struct QuizNetworkList: View {
         _isPresenting = isPresenting
         _shuffledQuizList = State(initialValue: QuizNetworkList.shuffled())
     }
-
+    @StateObject var sharedInterstitial = Interstitial()
     var body: some View {
-        QuizView(quizzes: shuffledQuizList, quizLevel: .network, authManager: authManager,audioManager: audioManager,isPresenting: $isPresenting)
+        QuizView(quizzes: shuffledQuizList, quizLevel: .network, authManager: authManager,audioManager: audioManager,isPresenting: $isPresenting, interstitial: sharedInterstitial)
     }
 }
 

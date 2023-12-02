@@ -32,6 +32,14 @@ func fontSize(for text: String) -> CGFloat {
 struct AnswerSelectionView: View {
     let choices: [String]
     var action: (Int) -> Void
+    var correctAnswerIndex: Int? // 正解の選択肢のインデックス
+    @EnvironmentObject var appState: AppState
+    
+    init(choices: [String], correctAnswerIndex: Int?, action: @escaping (Int) -> Void) {
+        self.choices = choices
+        self.correctAnswerIndex = correctAnswerIndex
+        self.action = action
+    }
 
     var body: some View {
             VStack {
@@ -43,6 +51,8 @@ struct AnswerSelectionView: View {
                     Spacer()
                     Button(action: {
                         self.action(index)
+                        print("answer correctAnswerIndex:\(correctAnswerIndex)")
+                        print("answer index:\(index)")
                     }) {
                         Text(self.choices[index])
                             .font(.system(size: fontSize(for: self.choices[index])))
@@ -53,7 +63,8 @@ struct AnswerSelectionView: View {
                             .frame(maxWidth: .infinity)
                         //                        .padding(16)
                             .padding()
-                            .background(Color.white)
+                            .background(index == correctAnswerIndex ? Color("lightYelleow") : Color.white)
+//                            .background(index == correctAnswerIndex ? Color.red : Color.white)
                         //                        .foregroundColor(.black)
                             .foregroundColor(Color("fontGray"))
                             .cornerRadius(8)
@@ -63,17 +74,24 @@ struct AnswerSelectionView: View {
                     .padding(.horizontal)
                     .padding(.vertical, 2)
                 }
-                
+                .onAppear{
+                    print("answer correctAnswerIndex:\(correctAnswerIndex)")
+                    print("answer index:\(index)")
+                }
                 
                 Spacer()
                 Spacer()
+//                if appState.isBannerVisible {
+                    BannerView()
+                        .frame(height: 60)
+//                }
             }
         }
 }
 
 struct AnswerSelectionView_Previews: PreviewProvider {
     static var previews: some View {
-        AnswerSelectionView(choices: ["選択肢1あああああああああああああああああああああああああああああああああああああああああああああああああああああああ", "選択肢2", "選択肢3"]) { index in
+        AnswerSelectionView(choices: ["選択肢1あああああああああああああああああああああああああああああああああああああああああああああああああああああああ", "選択肢2", "選択肢3"], correctAnswerIndex: 1) { index in
             print("選択肢 \(index + 1) がタップされました")
         }
     }

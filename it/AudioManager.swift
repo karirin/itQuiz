@@ -58,10 +58,10 @@ class AudioManager: ObservableObject {
         if let soundURL = Bundle.main.url(forResource: "ホームに戻る", withExtension: "mp3") {
             audioReturnPlayer = AVPlayer(url: soundURL)
         }
-        if let soundURL = Bundle.main.url(forResource: "倒した", withExtension: "mp3") {
+        if let soundURL = Bundle.main.url(forResource: "倒れる", withExtension: "mp3") {
             audioDownPlayer = AVPlayer(url: soundURL)
         }
-        if let soundURL = Bundle.main.url(forResource: "レベルアップ回復", withExtension: "mp3") {
+        if let soundURL = Bundle.main.url(forResource: "レベルアップ", withExtension: "mp3") {
             audioLevelUpPlayer = AVPlayer(url: soundURL)
         }
         if let soundURL = Bundle.main.url(forResource: "ゲームクリア", withExtension: "mp3") {

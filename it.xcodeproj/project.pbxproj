@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		260000022AB5EEC900342CAE /* QuizBeginnerList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260000012AB5EEC900342CAE /* QuizBeginnerList.swift */; };
-		260B56152ACADF7500E7785C /* おとも切り替え.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 260B56142ACADF7400E7785C /* おとも切り替え.mp3 */; };
 		260B56172ACB1CA200E7785C /* SpotlightView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260B56162ACB1CA200E7785C /* SpotlightView.swift */; };
 		260B56192ACB1CBE00E7785C /* SpotlightView1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260B56182ACB1CBE00E7785C /* SpotlightView1.swift */; };
 		260E44132AB572DC00FBB487 /* itApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260E44122AB572DC00FBB487 /* itApp.swift */; };
@@ -18,8 +17,12 @@
 		260E44212AB5958300FBB487 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 260E44202AB5958300FBB487 /* GoogleService-Info.plist */; };
 		260E44232AB5963A00FBB487 /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260E44222AB5963A00FBB487 /* AuthManager.swift */; };
 		260E44252AB59A7900FBB487 /* QuizView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260E44242AB59A7900FBB487 /* QuizView.swift */; };
-		264199282AC025AD002013B9 /* sound.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 264199272AC025AD002013B9 /* sound.mp3 */; };
-		2641992A2AC1E996002013B9 /* ガチャる.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 264199292AC1E995002013B9 /* ガチャる.mp3 */; };
+		262F0FEE2B178F03004C0C47 /* Banner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 262F0FED2B178F02004C0C47 /* Banner.swift */; };
+		262F0FF02B18B6C8004C0C47 /* PentagonShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 262F0FEF2B18B6C8004C0C47 /* PentagonShape.swift */; };
+		262F0FF22B18C72A004C0C47 /* RateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 262F0FF12B18C72A004C0C47 /* RateManager.swift */; };
+		262F0FF42B1ADB85004C0C47 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 262F0FF32B1ADB85004C0C47 /* StoreKit.framework */; };
+		262F0FF62B1ADBC5004C0C47 /* SubscriptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 262F0FF52B1ADBC5004C0C47 /* SubscriptionView.swift */; };
+		263C6AC32AFD1DC400564FF2 /* RareGachaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 263C6AC22AFD1DC300564FF2 /* RareGachaView.swift */; };
 		2641992C2AC2572F002013B9 /* AvatarListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2641992B2AC2572F002013B9 /* AvatarListView.swift */; };
 		264552092ADC085200827D42 /* TimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 264552082ADC085200827D42 /* TimerView.swift */; };
 		264F19152AF2824700B6FB10 /* RankingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 264F19142AF2824700B6FB10 /* RankingView.swift */; };
@@ -30,15 +33,18 @@
 		265FA3992AF672BB00F3E0EF /* TimeAdvancedList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 265FA3982AF672BB00F3E0EF /* TimeAdvancedList.swift */; };
 		266A07282AC6E10200B85D4E /* ProgressBar3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 266A07272AC6E10200B85D4E /* ProgressBar3.swift */; };
 		266A072A2AC6FBC800B85D4E /* AnswerSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 266A07292AC6FBC800B85D4E /* AnswerSelectionView.swift */; };
-		266A072C2AC7242600B85D4E /* キャンセル.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 266A072B2AC7242500B85D4E /* キャンセル.mp3 */; };
-		267E708D2AD6E2E800EA7AA2 /* ゲームオーバー.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 267E708B2AD6E2E800EA7AA2 /* ゲームオーバー.mp3 */; };
-		267E708E2AD6E2E800EA7AA2 /* ゲームクリア.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 267E708C2AD6E2E800EA7AA2 /* ゲームクリア.mp3 */; };
+		267283092AFA7A5D00549219 /* ゲームクリア.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 267283082AFA7A5D00549219 /* ゲームクリア.mp3 */; };
+		2672830B2AFA7A8E00549219 /* 倒れる.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 2672830A2AFA7A8E00549219 /* 倒れる.mp3 */; };
+		2672830F2AFA7C7400549219 /* レベルアップ.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 2672830E2AFA7C7400549219 /* レベルアップ.mp3 */; };
+		267283112AFA7CB600549219 /* ゲームオーバー.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 267283102AFA7CB600549219 /* ゲームオーバー.mp3 */; };
+		267283132AFA84C600549219 /* IllustratedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 267283122AFA84C600549219 /* IllustratedView.swift */; };
+		267743662B16371800043010 /* Interstitial.swift in Sources */ = {isa = PBXBuildFile; fileRef = 267743652B16371800043010 /* Interstitial.swift */; };
+		267743682B16FFAB00043010 /* QuizHtmlCssView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 267743672B16FFAB00043010 /* QuizHtmlCssView.swift */; };
 		267E70902AD6FD0200EA7AA2 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 267E708F2AD6FD0200EA7AA2 /* LoadingView.swift */; };
 		268C3B9B2ABCA63300282BEE /* QuizAdvancedList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 268C3B9A2ABCA63200282BEE /* QuizAdvancedList.swift */; };
 		268C3B9D2ABCA95D00282BEE /* QuizNetworkList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 268C3B9C2ABCA95D00282BEE /* QuizNetworkList.swift */; };
 		268C3BA62ABD638200282BEE /* TermsOfServiceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 268C3BA32ABD638200282BEE /* TermsOfServiceView.swift */; };
 		268C3BA72ABD638200282BEE /* PrivacyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 268C3BA42ABD638200282BEE /* PrivacyView.swift */; };
-		268C3BAB2ABDA3AC00282BEE /* soundKettei.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 268C3BAA2ABDA3AC00282BEE /* soundKettei.mp3 */; };
 		269304562AD061F000982840 /* QuizDatabaseList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269304552AD061F000982840 /* QuizDatabaseList.swift */; };
 		269A87882AB7757C00F33C9E /* QuizResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269A87872AB7757C00F33C9E /* QuizResultView.swift */; };
 		269A878A2AB86FC900F33C9E /* GachaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269A87892AB86FC900F33C9E /* GachaView.swift */; };
@@ -47,32 +53,34 @@
 		269B1C312ADAE43500C3E82B /* QuizDailyList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269B1C302ADAE43500C3E82B /* QuizDailyList.swift */; };
 		269D44E22AB60D6800CAA91A /* SignUp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269D44E12AB60D6800CAA91A /* SignUp.swift */; };
 		26A026DE2ABDD1EB00119F2B /* TopView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26A026DD2ABDD1EA00119F2B /* TopView.swift */; };
-		26A026E02ABDE27D00119F2B /* 正解.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 26A026DF2ABDE27C00119F2B /* 正解.mp3 */; };
-		26A026E42ABDE67800119F2B /* 味方攻撃.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 26A026E32ABDE67800119F2B /* 味方攻撃.mp3 */; };
-		26A026E62ABE014200119F2B /* 不正解.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 26A026E52ABE014200119F2B /* 不正解.mp3 */; };
-		26A026E82ABE03FE00119F2B /* 敵攻撃.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 26A026E72ABE03FE00119F2B /* 敵攻撃.mp3 */; };
-		26A026EA2ABE0C8500119F2B /* カウントダウン.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 26A026E92ABE0C8500119F2B /* カウントダウン.mp3 */; };
 		26A026EC2ABF16E600119F2B /* AudioManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26A026EB2ABF16E600119F2B /* AudioManager.swift */; };
 		26A25D4C2AB9613A006B368F /* AVKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26A25D4B2AB9613A006B368F /* AVKit.framework */; };
 		26A25D4E2AB99235006B368F /* QuizIntermediateList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26A25D4D2AB99235006B368F /* QuizIntermediateList.swift */; };
 		26A25D502AB9FB1A006B368F /* TitleListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26A25D4F2AB9FB1A006B368F /* TitleListView.swift */; };
 		26A25D522ABAFD82006B368F /* QuizManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26A25D512ABAFD82006B368F /* QuizManagerView.swift */; };
 		26AA130C2ACD74660035F5F4 /* ModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26AA130B2ACD74660035F5F4 /* ModalView.swift */; };
-		26AA130E2ACDA9060035F5F4 /* ホームに戻る.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 26AA130D2ACDA9050035F5F4 /* ホームに戻る.mp3 */; };
-		26AA13102ACDD4B30035F5F4 /* 倒した.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 26AA130F2ACDD4B30035F5F4 /* 倒した.mp3 */; };
-		26AA13142ACFECD20035F5F4 /* レベルアップ回復.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 26AA13132ACFECD10035F5F4 /* レベルアップ回復.mp3 */; };
 		26AA13162AD019BD0035F5F4 /* QuizSecurityList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26AA13152AD019BD0035F5F4 /* QuizSecurityList.swift */; };
 		26ADE3422ADC382F009BDF48 /* SettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26ADE3412ADC382F009BDF48 /* SettingView.swift */; };
 		26B5BEF42AB6CFA600056E79 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26B5BEF32AB6CFA600056E79 /* RootView.swift */; };
 		26B9BA1D2AEFDEFD00AC7C40 /* RewardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26B9BA1C2AEFDEFD00AC7C40 /* RewardView.swift */; };
 		26B9BA1F2AF0091C00AC7C40 /* QuizGodList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26B9BA1E2AF0091C00AC7C40 /* QuizGodList.swift */; };
 		26B9BA232AF2647300AC7C40 /* LoginModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26B9BA222AF2647300AC7C40 /* LoginModalView.swift */; };
+		26C1A1CA2AF75304006161E0 /* おとも切り替え.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 26C1A1BA2AF75304006161E0 /* おとも切り替え.mp3 */; };
+		26C1A1CC2AF75304006161E0 /* 味方攻撃.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 26C1A1BC2AF75304006161E0 /* 味方攻撃.mp3 */; };
+		26C1A1CD2AF75304006161E0 /* キャンセル.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 26C1A1BD2AF75304006161E0 /* キャンセル.mp3 */; };
+		26C1A1D02AF75304006161E0 /* sound.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 26C1A1C02AF75304006161E0 /* sound.mp3 */; };
+		26C1A1D22AF75304006161E0 /* カウントダウン.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 26C1A1C22AF75304006161E0 /* カウントダウン.mp3 */; };
+		26C1A1D42AF75304006161E0 /* 正解.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 26C1A1C42AF75304006161E0 /* 正解.mp3 */; };
+		26C1A1D62AF75304006161E0 /* 不正解.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 26C1A1C62AF75304006161E0 /* 不正解.mp3 */; };
+		26C1A1D72AF75304006161E0 /* 敵攻撃.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 26C1A1C72AF75304006161E0 /* 敵攻撃.mp3 */; };
+		26C1A1D82AF75304006161E0 /* ホームに戻る.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 26C1A1C82AF75304006161E0 /* ホームに戻る.mp3 */; };
+		26C1A1D92AF75304006161E0 /* soundKettei.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 26C1A1C92AF75304006161E0 /* soundKettei.mp3 */; };
+		26D0C36E2AFE6F0600C6AF07 /* GachaManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26D0C36D2AFE6F0500C6AF07 /* GachaManagerView.swift */; };
 		E853D050BCB03C7E80A63918 /* Pods_it.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E16B2CC5D533F92BAD9A8A1F /* Pods_it.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		260000012AB5EEC900342CAE /* QuizBeginnerList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizBeginnerList.swift; sourceTree = "<group>"; };
-		260B56142ACADF7400E7785C /* おとも切り替え.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "おとも切り替え.mp3"; path = "../../../Downloads/おとも切り替え.mp3"; sourceTree = "<group>"; };
 		260B56162ACB1CA200E7785C /* SpotlightView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotlightView.swift; sourceTree = "<group>"; };
 		260B56182ACB1CBE00E7785C /* SpotlightView1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotlightView1.swift; sourceTree = "<group>"; };
 		260E440F2AB572DC00FBB487 /* it.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = it.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -83,8 +91,12 @@
 		260E44202AB5958300FBB487 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		260E44222AB5963A00FBB487 /* AuthManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthManager.swift; sourceTree = "<group>"; };
 		260E44242AB59A7900FBB487 /* QuizView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizView.swift; sourceTree = "<group>"; };
-		264199272AC025AD002013B9 /* sound.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = sound.mp3; path = "../../../Downloads/名称未設定フォルダ/sound.mp3"; sourceTree = "<group>"; };
-		264199292AC1E995002013B9 /* ガチャる.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "ガチャる.mp3"; path = "../../../Downloads/ガチャる.mp3"; sourceTree = "<group>"; };
+		262F0FED2B178F02004C0C47 /* Banner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Banner.swift; sourceTree = "<group>"; };
+		262F0FEF2B18B6C8004C0C47 /* PentagonShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PentagonShape.swift; sourceTree = "<group>"; };
+		262F0FF12B18C72A004C0C47 /* RateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RateManager.swift; sourceTree = "<group>"; };
+		262F0FF32B1ADB85004C0C47 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		262F0FF52B1ADBC5004C0C47 /* SubscriptionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionView.swift; sourceTree = "<group>"; };
+		263C6AC22AFD1DC300564FF2 /* RareGachaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RareGachaView.swift; sourceTree = "<group>"; };
 		2641992B2AC2572F002013B9 /* AvatarListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarListView.swift; sourceTree = "<group>"; };
 		264552082ADC085200827D42 /* TimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerView.swift; sourceTree = "<group>"; };
 		264F19142AF2824700B6FB10 /* RankingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RankingView.swift; sourceTree = "<group>"; };
@@ -95,16 +107,19 @@
 		265FA3982AF672BB00F3E0EF /* TimeAdvancedList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeAdvancedList.swift; sourceTree = "<group>"; };
 		266A07272AC6E10200B85D4E /* ProgressBar3.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressBar3.swift; sourceTree = "<group>"; };
 		266A07292AC6FBC800B85D4E /* AnswerSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnswerSelectionView.swift; sourceTree = "<group>"; };
-		266A072B2AC7242500B85D4E /* キャンセル.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "キャンセル.mp3"; path = "../../../Downloads/キャンセル.mp3"; sourceTree = "<group>"; };
+		267283082AFA7A5D00549219 /* ゲームクリア.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "ゲームクリア.mp3"; path = "../../../Downloads/ゲームクリア.mp3"; sourceTree = "<group>"; };
+		2672830A2AFA7A8E00549219 /* 倒れる.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "倒れる.mp3"; path = "../../../Downloads/倒れる.mp3"; sourceTree = "<group>"; };
+		2672830E2AFA7C7400549219 /* レベルアップ.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "レベルアップ.mp3"; path = "../../../Downloads/レベルアップ.mp3"; sourceTree = "<group>"; };
+		267283102AFA7CB600549219 /* ゲームオーバー.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "ゲームオーバー.mp3"; path = "../../../Downloads/ゲームオーバー.mp3"; sourceTree = "<group>"; };
+		267283122AFA84C600549219 /* IllustratedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IllustratedView.swift; sourceTree = "<group>"; };
+		267743652B16371800043010 /* Interstitial.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Interstitial.swift; sourceTree = "<group>"; };
+		267743672B16FFAB00043010 /* QuizHtmlCssView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizHtmlCssView.swift; sourceTree = "<group>"; };
 		267E708A2AD5ACDF00EA7AA2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		267E708B2AD6E2E800EA7AA2 /* ゲームオーバー.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "ゲームオーバー.mp3"; path = "../../../Downloads/ゲームオーバー.mp3"; sourceTree = "<group>"; };
-		267E708C2AD6E2E800EA7AA2 /* ゲームクリア.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "ゲームクリア.mp3"; path = "../../../Downloads/ゲームクリア.mp3"; sourceTree = "<group>"; };
 		267E708F2AD6FD0200EA7AA2 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
 		268C3B9A2ABCA63200282BEE /* QuizAdvancedList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizAdvancedList.swift; sourceTree = "<group>"; };
 		268C3B9C2ABCA95D00282BEE /* QuizNetworkList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizNetworkList.swift; sourceTree = "<group>"; };
 		268C3BA32ABD638200282BEE /* TermsOfServiceView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TermsOfServiceView.swift; path = ../../sabusuku/sabusuku/TermsOfServiceView.swift; sourceTree = "<group>"; };
 		268C3BA42ABD638200282BEE /* PrivacyView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PrivacyView.swift; path = ../../sabusuku/sabusuku/PrivacyView.swift; sourceTree = "<group>"; };
-		268C3BAA2ABDA3AC00282BEE /* soundKettei.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = soundKettei.mp3; path = ../../../Downloads/soundKettei.mp3; sourceTree = "<group>"; };
 		269304552AD061F000982840 /* QuizDatabaseList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizDatabaseList.swift; sourceTree = "<group>"; };
 		269A87872AB7757C00F33C9E /* QuizResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizResultView.swift; sourceTree = "<group>"; };
 		269A87892AB86FC900F33C9E /* GachaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GachaView.swift; sourceTree = "<group>"; };
@@ -113,26 +128,29 @@
 		269B1C302ADAE43500C3E82B /* QuizDailyList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizDailyList.swift; sourceTree = "<group>"; };
 		269D44E12AB60D6800CAA91A /* SignUp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignUp.swift; sourceTree = "<group>"; };
 		26A026DD2ABDD1EA00119F2B /* TopView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopView.swift; sourceTree = "<group>"; };
-		26A026DF2ABDE27C00119F2B /* 正解.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "正解.mp3"; path = "../../../Downloads/正解.mp3"; sourceTree = "<group>"; };
-		26A026E32ABDE67800119F2B /* 味方攻撃.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "味方攻撃.mp3"; path = "../../../Downloads/味方攻撃.mp3"; sourceTree = "<group>"; };
-		26A026E52ABE014200119F2B /* 不正解.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "不正解.mp3"; path = "../../../Downloads/不正解.mp3"; sourceTree = "<group>"; };
-		26A026E72ABE03FE00119F2B /* 敵攻撃.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "敵攻撃.mp3"; path = "../../../Downloads/敵攻撃.mp3"; sourceTree = "<group>"; };
-		26A026E92ABE0C8500119F2B /* カウントダウン.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "カウントダウン.mp3"; path = "../../../Downloads/Countdown03-mp3/カウントダウン.mp3"; sourceTree = "<group>"; };
 		26A026EB2ABF16E600119F2B /* AudioManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioManager.swift; sourceTree = "<group>"; };
 		26A25D4B2AB9613A006B368F /* AVKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVKit.framework; path = System/Library/Frameworks/AVKit.framework; sourceTree = SDKROOT; };
 		26A25D4D2AB99235006B368F /* QuizIntermediateList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizIntermediateList.swift; sourceTree = "<group>"; };
 		26A25D4F2AB9FB1A006B368F /* TitleListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleListView.swift; sourceTree = "<group>"; };
 		26A25D512ABAFD82006B368F /* QuizManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizManagerView.swift; sourceTree = "<group>"; };
 		26AA130B2ACD74660035F5F4 /* ModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModalView.swift; sourceTree = "<group>"; };
-		26AA130D2ACDA9050035F5F4 /* ホームに戻る.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "ホームに戻る.mp3"; path = "../../../Downloads/ホームに戻る.mp3"; sourceTree = "<group>"; };
-		26AA130F2ACDD4B30035F5F4 /* 倒した.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "倒した.mp3"; path = "../../../Downloads/倒した.mp3"; sourceTree = "<group>"; };
-		26AA13132ACFECD10035F5F4 /* レベルアップ回復.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "レベルアップ回復.mp3"; path = "../../../Downloads/レベルアップ回復.mp3"; sourceTree = "<group>"; };
 		26AA13152AD019BD0035F5F4 /* QuizSecurityList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizSecurityList.swift; sourceTree = "<group>"; };
 		26ADE3412ADC382F009BDF48 /* SettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingView.swift; sourceTree = "<group>"; };
 		26B5BEF32AB6CFA600056E79 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		26B9BA1C2AEFDEFD00AC7C40 /* RewardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardView.swift; sourceTree = "<group>"; };
 		26B9BA1E2AF0091C00AC7C40 /* QuizGodList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizGodList.swift; sourceTree = "<group>"; };
 		26B9BA222AF2647300AC7C40 /* LoginModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginModalView.swift; sourceTree = "<group>"; };
+		26C1A1BA2AF75304006161E0 /* おとも切り替え.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "おとも切り替え.mp3"; path = "../../../Downloads/おとも切り替え.mp3"; sourceTree = "<group>"; };
+		26C1A1BC2AF75304006161E0 /* 味方攻撃.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "味方攻撃.mp3"; path = "../../../Downloads/味方攻撃.mp3"; sourceTree = "<group>"; };
+		26C1A1BD2AF75304006161E0 /* キャンセル.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "キャンセル.mp3"; path = "../../../Downloads/キャンセル.mp3"; sourceTree = "<group>"; };
+		26C1A1C02AF75304006161E0 /* sound.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = sound.mp3; path = ../../../Downloads/sound.mp3; sourceTree = "<group>"; };
+		26C1A1C22AF75304006161E0 /* カウントダウン.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "カウントダウン.mp3"; path = "../../../Downloads/カウントダウン.mp3"; sourceTree = "<group>"; };
+		26C1A1C42AF75304006161E0 /* 正解.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "正解.mp3"; path = "../../../Downloads/正解.mp3"; sourceTree = "<group>"; };
+		26C1A1C62AF75304006161E0 /* 不正解.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "不正解.mp3"; path = "../../../Downloads/不正解.mp3"; sourceTree = "<group>"; };
+		26C1A1C72AF75304006161E0 /* 敵攻撃.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "敵攻撃.mp3"; path = "../../../Downloads/敵攻撃.mp3"; sourceTree = "<group>"; };
+		26C1A1C82AF75304006161E0 /* ホームに戻る.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "ホームに戻る.mp3"; path = "../../../Downloads/ホームに戻る.mp3"; sourceTree = "<group>"; };
+		26C1A1C92AF75304006161E0 /* soundKettei.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = soundKettei.mp3; path = ../../../Downloads/soundKettei.mp3; sourceTree = "<group>"; };
+		26D0C36D2AFE6F0500C6AF07 /* GachaManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GachaManagerView.swift; sourceTree = "<group>"; };
 		B872405D7B916C9F1628DFCC /* Pods-it.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-it.debug.xcconfig"; path = "Target Support Files/Pods-it/Pods-it.debug.xcconfig"; sourceTree = "<group>"; };
 		E16B2CC5D533F92BAD9A8A1F /* Pods_it.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_it.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB46333AF02BB87CB42728DB /* Pods-it.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-it.release.xcconfig"; path = "Target Support Files/Pods-it/Pods-it.release.xcconfig"; sourceTree = "<group>"; };
@@ -143,6 +161,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				262F0FF42B1ADB85004C0C47 /* StoreKit.framework in Frameworks */,
 				26A25D4C2AB9613A006B368F /* AVKit.framework in Frameworks */,
 				E853D050BCB03C7E80A63918 /* Pods_it.framework in Frameworks */,
 			);
@@ -182,6 +201,7 @@
 				267E708F2AD6FD0200EA7AA2 /* LoadingView.swift */,
 				26A026DD2ABDD1EA00119F2B /* TopView.swift */,
 				26A25D512ABAFD82006B368F /* QuizManagerView.swift */,
+				26D0C36D2AFE6F0500C6AF07 /* GachaManagerView.swift */,
 				265FA3962AF6543B00F3E0EF /* QuizManagerTimerView.swift */,
 				260E44242AB59A7900FBB487 /* QuizView.swift */,
 				264552082ADC085200827D42 /* TimerView.swift */,
@@ -191,7 +211,9 @@
 				266A07272AC6E10200B85D4E /* ProgressBar3.swift */,
 				269A878D2AB87CBA00F33C9E /* MemoView.swift */,
 				269A87872AB7757C00F33C9E /* QuizResultView.swift */,
+				262F0FED2B178F02004C0C47 /* Banner.swift */,
 				260000012AB5EEC900342CAE /* QuizBeginnerList.swift */,
+				267743672B16FFAB00043010 /* QuizHtmlCssView.swift */,
 				265FA3922AF5502200F3E0EF /* TimeBeginnerList.swift */,
 				265FA3942AF5FEF600F3E0EF /* TimeIntermediateList.swift */,
 				265FA3982AF672BB00F3E0EF /* TimeAdvancedList.swift */,
@@ -205,7 +227,10 @@
 				260E44222AB5963A00FBB487 /* AuthManager.swift */,
 				26A25D4F2AB9FB1A006B368F /* TitleListView.swift */,
 				2641992B2AC2572F002013B9 /* AvatarListView.swift */,
+				267283122AFA84C600549219 /* IllustratedView.swift */,
 				269A87892AB86FC900F33C9E /* GachaView.swift */,
+				263C6AC22AFD1DC300564FF2 /* RareGachaView.swift */,
+				267743652B16371800043010 /* Interstitial.swift */,
 				268C3BA42ABD638200282BEE /* PrivacyView.swift */,
 				268C3BA32ABD638200282BEE /* TermsOfServiceView.swift */,
 				26ADE3412ADC382F009BDF48 /* SettingView.swift */,
@@ -214,22 +239,24 @@
 				26A026EB2ABF16E600119F2B /* AudioManager.swift */,
 				260B56162ACB1CA200E7785C /* SpotlightView.swift */,
 				260B56182ACB1CBE00E7785C /* SpotlightView1.swift */,
-				264199272AC025AD002013B9 /* sound.mp3 */,
-				26AA13132ACFECD10035F5F4 /* レベルアップ回復.mp3 */,
-				268C3BAA2ABDA3AC00282BEE /* soundKettei.mp3 */,
-				26AA130D2ACDA9050035F5F4 /* ホームに戻る.mp3 */,
-				264199292AC1E995002013B9 /* ガチャる.mp3 */,
-				266A072B2AC7242500B85D4E /* キャンセル.mp3 */,
-				26AA130F2ACDD4B30035F5F4 /* 倒した.mp3 */,
-				267E708B2AD6E2E800EA7AA2 /* ゲームオーバー.mp3 */,
-				267E708C2AD6E2E800EA7AA2 /* ゲームクリア.mp3 */,
-				260B56142ACADF7400E7785C /* おとも切り替え.mp3 */,
-				26A026E32ABDE67800119F2B /* 味方攻撃.mp3 */,
-				26A026E72ABE03FE00119F2B /* 敵攻撃.mp3 */,
-				26A026DF2ABDE27C00119F2B /* 正解.mp3 */,
-				26A026E52ABE014200119F2B /* 不正解.mp3 */,
-				26A026E92ABE0C8500119F2B /* カウントダウン.mp3 */,
+				262F0FF12B18C72A004C0C47 /* RateManager.swift */,
+				262F0FEF2B18B6C8004C0C47 /* PentagonShape.swift */,
+				262F0FF52B1ADBC5004C0C47 /* SubscriptionView.swift */,
 				260E44162AB572DE00FBB487 /* Assets.xcassets */,
+				26C1A1C02AF75304006161E0 /* sound.mp3 */,
+				26C1A1C92AF75304006161E0 /* soundKettei.mp3 */,
+				26C1A1BA2AF75304006161E0 /* おとも切り替え.mp3 */,
+				26C1A1C22AF75304006161E0 /* カウントダウン.mp3 */,
+				267283082AFA7A5D00549219 /* ゲームクリア.mp3 */,
+				26C1A1BD2AF75304006161E0 /* キャンセル.mp3 */,
+				2672830E2AFA7C7400549219 /* レベルアップ.mp3 */,
+				26C1A1C82AF75304006161E0 /* ホームに戻る.mp3 */,
+				267283102AFA7CB600549219 /* ゲームオーバー.mp3 */,
+				26C1A1C42AF75304006161E0 /* 正解.mp3 */,
+				26C1A1C72AF75304006161E0 /* 敵攻撃.mp3 */,
+				2672830A2AFA7A8E00549219 /* 倒れる.mp3 */,
+				26C1A1C62AF75304006161E0 /* 不正解.mp3 */,
+				26C1A1BC2AF75304006161E0 /* 味方攻撃.mp3 */,
 				260E44202AB5958300FBB487 /* GoogleService-Info.plist */,
 				260E44182AB572DE00FBB487 /* Preview Content */,
 			);
@@ -247,6 +274,7 @@
 		3D2C0D6B4B9B75CD0FF123E4 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				262F0FF32B1ADB85004C0C47 /* StoreKit.framework */,
 				26A25D4B2AB9613A006B368F /* AVKit.framework */,
 				E16B2CC5D533F92BAD9A8A1F /* Pods_it.framework */,
 			);
@@ -322,23 +350,22 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				26A026EA2ABE0C8500119F2B /* カウントダウン.mp3 in Resources */,
-				267E708D2AD6E2E800EA7AA2 /* ゲームオーバー.mp3 in Resources */,
-				26AA13142ACFECD20035F5F4 /* レベルアップ回復.mp3 in Resources */,
-				26A026E42ABDE67800119F2B /* 味方攻撃.mp3 in Resources */,
-				26A026E82ABE03FE00119F2B /* 敵攻撃.mp3 in Resources */,
-				26AA130E2ACDA9060035F5F4 /* ホームに戻る.mp3 in Resources */,
-				267E708E2AD6E2E800EA7AA2 /* ゲームクリア.mp3 in Resources */,
+				2672830B2AFA7A8E00549219 /* 倒れる.mp3 in Resources */,
+				26C1A1D72AF75304006161E0 /* 敵攻撃.mp3 in Resources */,
 				260E441A2AB572DE00FBB487 /* Preview Assets.xcassets in Resources */,
-				264199282AC025AD002013B9 /* sound.mp3 in Resources */,
-				260B56152ACADF7500E7785C /* おとも切り替え.mp3 in Resources */,
-				266A072C2AC7242600B85D4E /* キャンセル.mp3 in Resources */,
-				26AA13102ACDD4B30035F5F4 /* 倒した.mp3 in Resources */,
-				268C3BAB2ABDA3AC00282BEE /* soundKettei.mp3 in Resources */,
-				2641992A2AC1E996002013B9 /* ガチャる.mp3 in Resources */,
-				26A026E62ABE014200119F2B /* 不正解.mp3 in Resources */,
-				26A026E02ABDE27D00119F2B /* 正解.mp3 in Resources */,
+				26C1A1D82AF75304006161E0 /* ホームに戻る.mp3 in Resources */,
+				26C1A1D42AF75304006161E0 /* 正解.mp3 in Resources */,
+				26C1A1D22AF75304006161E0 /* カウントダウン.mp3 in Resources */,
+				267283112AFA7CB600549219 /* ゲームオーバー.mp3 in Resources */,
+				26C1A1CA2AF75304006161E0 /* おとも切り替え.mp3 in Resources */,
+				2672830F2AFA7C7400549219 /* レベルアップ.mp3 in Resources */,
+				267283092AFA7A5D00549219 /* ゲームクリア.mp3 in Resources */,
+				26C1A1D62AF75304006161E0 /* 不正解.mp3 in Resources */,
+				26C1A1D02AF75304006161E0 /* sound.mp3 in Resources */,
+				26C1A1CD2AF75304006161E0 /* キャンセル.mp3 in Resources */,
+				26C1A1D92AF75304006161E0 /* soundKettei.mp3 in Resources */,
 				260E44172AB572DE00FBB487 /* Assets.xcassets in Resources */,
+				26C1A1CC2AF75304006161E0 /* 味方攻撃.mp3 in Resources */,
 				260E44212AB5958300FBB487 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -394,14 +421,18 @@
 			files = (
 				26B5BEF42AB6CFA600056E79 /* RootView.swift in Sources */,
 				265FA3992AF672BB00F3E0EF /* TimeAdvancedList.swift in Sources */,
+				262F0FF62B1ADBC5004C0C47 /* SubscriptionView.swift in Sources */,
 				264F19152AF2824700B6FB10 /* RankingView.swift in Sources */,
 				260000022AB5EEC900342CAE /* QuizBeginnerList.swift in Sources */,
+				267283132AFA84C600549219 /* IllustratedView.swift in Sources */,
 				269A87882AB7757C00F33C9E /* QuizResultView.swift in Sources */,
 				260B56192ACB1CBE00E7785C /* SpotlightView1.swift in Sources */,
 				264F19172AF3B1A900B6FB10 /* RewardModalView.swift in Sources */,
 				2641992C2AC2572F002013B9 /* AvatarListView.swift in Sources */,
 				26ADE3422ADC382F009BDF48 /* SettingView.swift in Sources */,
+				262F0FF22B18C72A004C0C47 /* RateManager.swift in Sources */,
 				269D44E22AB60D6800CAA91A /* SignUp.swift in Sources */,
+				267743662B16371800043010 /* Interstitial.swift in Sources */,
 				264552092ADC085200827D42 /* TimerView.swift in Sources */,
 				268C3B9B2ABCA63300282BEE /* QuizAdvancedList.swift in Sources */,
 				260B56172ACB1CA200E7785C /* SpotlightView.swift in Sources */,
@@ -414,6 +445,7 @@
 				26A25D502AB9FB1A006B368F /* TitleListView.swift in Sources */,
 				26B9BA1D2AEFDEFD00AC7C40 /* RewardView.swift in Sources */,
 				26AA13162AD019BD0035F5F4 /* QuizSecurityList.swift in Sources */,
+				263C6AC32AFD1DC400564FF2 /* RareGachaView.swift in Sources */,
 				260E44252AB59A7900FBB487 /* QuizView.swift in Sources */,
 				26AA130C2ACD74660035F5F4 /* ModalView.swift in Sources */,
 				266A072A2AC6FBC800B85D4E /* AnswerSelectionView.swift in Sources */,
@@ -421,6 +453,7 @@
 				260E44232AB5963A00FBB487 /* AuthManager.swift in Sources */,
 				269304562AD061F000982840 /* QuizDatabaseList.swift in Sources */,
 				269A878C2AB873CC00F33C9E /* GachaAnimationView.swift in Sources */,
+				267743682B16FFAB00043010 /* QuizHtmlCssView.swift in Sources */,
 				26A026EC2ABF16E600119F2B /* AudioManager.swift in Sources */,
 				267E70902AD6FD0200EA7AA2 /* LoadingView.swift in Sources */,
 				265FA3952AF5FEF600F3E0EF /* TimeIntermediateList.swift in Sources */,
@@ -431,8 +464,11 @@
 				26B9BA232AF2647300AC7C40 /* LoginModalView.swift in Sources */,
 				265FA3932AF5502200F3E0EF /* TimeBeginnerList.swift in Sources */,
 				269A878E2AB87CBA00F33C9E /* MemoView.swift in Sources */,
+				262F0FF02B18B6C8004C0C47 /* PentagonShape.swift in Sources */,
 				268C3B9D2ABCA95D00282BEE /* QuizNetworkList.swift in Sources */,
 				268C3BA62ABD638200282BEE /* TermsOfServiceView.swift in Sources */,
+				26D0C36E2AFE6F0600C6AF07 /* GachaManagerView.swift in Sources */,
+				262F0FEE2B178F03004C0C47 /* Banner.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -560,7 +596,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1.5;
+				CURRENT_PROJECT_VERSION = 1.8;
 				DEVELOPMENT_ASSET_PATHS = "\"it/Preview Content\"";
 				DEVELOPMENT_TEAM = F3XS565TSX;
 				ENABLE_PREVIEWS = YES;
@@ -572,11 +608,12 @@
 				INFOPLIST_KEY_UIStatusBarStyle = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.5;
+				MARKETING_VERSION = 1.8;
 				PRODUCT_BUNDLE_IDENTIFIER = "Swift-Beginners-app.it";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -592,7 +629,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1.5;
+				CURRENT_PROJECT_VERSION = 1.8;
 				DEVELOPMENT_ASSET_PATHS = "\"it/Preview Content\"";
 				DEVELOPMENT_TEAM = F3XS565TSX;
 				ENABLE_PREVIEWS = YES;
@@ -604,11 +641,12 @@
 				INFOPLIST_KEY_UIStatusBarStyle = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.5;
+				MARKETING_VERSION = 1.8;
 				PRODUCT_BUNDLE_IDENTIFIER = "Swift-Beginners-app.it";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;

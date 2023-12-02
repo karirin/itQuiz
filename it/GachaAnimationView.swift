@@ -48,15 +48,26 @@ struct GachaAnimationView: View {
         case .superRare:
             videoName = "superRare"
         case .ultraRare:
+            videoName = "RultraRare"
+        case .Rrare:
+            videoName = "Rrare"
+        case .RsuperRare:
+            videoName = "RsuperRare"
+        case .RultraRare:
             videoName = "ultraRare"
+        case .legendRare:
+            videoName = "legendRare"
         default:
             videoName = "normal"
         }
 
         let asset = NSDataAsset(name: videoName)
+        print("videoName")
+        print(videoName)
         let videoUrl = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("\(videoName).mp4")
         try? asset?.data.write(to: videoUrl, options: [.atomic])
         let playerItem = AVPlayerItem(url: videoUrl)
+//        print("playerItem:\(playerItem)")
         return AVPlayer(playerItem: playerItem)
     }
 

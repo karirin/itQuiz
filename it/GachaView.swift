@@ -20,35 +20,88 @@ struct Item {
 enum Rarity: Int {
     case normal = 40
     case rare = 30
+    case Rrare = 45
     case superRare = 20
+    case RsuperRare = 35
     case ultraRare = 10
+    case RultraRare = 19
+    case legendRare = 1
     
     var displayString: String {
         switch self {
         case .normal:
-            return "ノーマル" // 任意の文字列を返す
-        case .rare:
+            return "ノーマル"
+        case .rare, .Rrare:
             return "レア"
-        case .superRare:
+        case .superRare, .RsuperRare:
             return "スーパーレア"
-        case .ultraRare:
+        case .ultraRare, .RultraRare:
             return "ウルトラレア"
+        case .legendRare:
+            return "レジェンドレア"
         }
     }
 }
+    
+    var items: [Item]
+    var mode: GachaMode
+    
+    init(mode: GachaMode) {
+        self.mode = mode
+        switch mode {
+        case .normal:
+            self.items = [
+                Item(name: "ネッキー", attack: 10,probability: 25, health: 20, rarity: .normal),
+                Item(name: "ピョン吉", attack: 15,probability: 25, health: 15, rarity: .normal),
+                Item(name: "ルイーカ", attack: 20,probability: 25, health: 10, rarity: .normal),
+                Item(name: "もりこう", attack: 20,probability: 25, health: 100, rarity: .normal),
+                Item(name: "うっさん", attack: 25,probability: 25, health: 150, rarity: .normal),
+                Item(name: "キリキリン", attack: 30,probability: 25, health: 200, rarity: .normal),
+                Item(name: "カゲロウ", attack: 35,probability: 10, health: 220, rarity: .rare),
+                Item(name: "ライム", attack: 40,probability: 10, health: 240, rarity: .rare),
+                Item(name: "ラオン", attack: 45,probability: 10, health: 260, rarity: .rare),
+                Item(name: "レッドドラゴン", attack: 47,probability: 5, health: 280, rarity: .superRare),
+                Item(name: "ブルードラゴン", attack: 48,probability: 5, health: 285, rarity: .superRare),
+                Item(name: "レインボードラゴン", attack: 50, probability: 3,health: 300, rarity: .ultraRare)
+            ]
+        case .rare:
+            self.items = [
+                Item(name: "忍太", attack: 20,probability: 25, health: 210, rarity: .Rrare),
+                Item(name: "ぴょこん", attack: 20,probability: 25, health: 215, rarity: .Rrare),
+                Item(name: "かみ蔵", attack: 20,probability: 25, health: 220, rarity: .Rrare),
+                Item(name: "キャット夫人", attack: 25,probability: 25, health: 225, rarity: .Rrare),
+                Item(name: "ミッチー", attack: 30,probability: 25, health: 240, rarity: .Rrare),
+                Item(name: "ライム兄", attack: 40,probability: 10, health: 250, rarity: .Rrare),
+                Item(name: "幸福のパンダ", attack: 47,probability: 5, health: 260, rarity: .Rrare),
+                Item(name: "英雄デル", attack: 50,probability: 10, health: 300, rarity: .RsuperRare),
+                Item(name: "覚醒 ライム", attack: 56,probability: 10, health: 300, rarity: .RsuperRare),
+                Item(name: "七福神 玉", attack: 72,probability: 5, health: 350, rarity: .RultraRare),
+                Item(name: "七福神 福天丸", attack: 75,probability: 3, health: 380, rarity: .RultraRare),
+                Item(name: "七福神 金満徳", attack: 100,probability: 3, health: 500, rarity: .legendRare)
+            ]
+        }
+    }
 
-var items: [Item] = [
-    Item(name: "もりこう", attack: 20,probability: 25, health: 100, rarity: .normal),
-    Item(name: "うっさん", attack: 25,probability: 25, health: 150, rarity: .normal),
-    Item(name: "キリキリン", attack: 30,probability: 25, health: 200, rarity: .normal),
-    Item(name: "カゲロウ", attack: 35,probability: 10, health: 220, rarity: .rare),
-    Item(name: "ライム", attack: 40,probability: 10, health: 240, rarity: .rare),
-    Item(name: "ラオン", attack: 45,probability: 10, health: 260, rarity: .rare),
-    Item(name: "レッドドラゴン", attack: 47,probability: 5, health: 280, rarity: .superRare),
-    Item(name: "ブルードラゴン", attack: 48,probability: 5, health: 285, rarity: .superRare),
-    Item(name: "レインボードラゴン", attack: 50, probability: 3,health: 300, rarity: .ultraRare)
-]
+//var items: [Item] = [
+//    Item(name: "ネッキー", attack: 10,probability: 25, health: 20, rarity: .normal),
+//    Item(name: "ピョン吉", attack: 15,probability: 25, health: 15, rarity: .normal),
+//    Item(name: "ルイーカ", attack: 20,probability: 25, health: 10, rarity: .normal),
+//    Item(name: "もりこう", attack: 20,probability: 25, health: 100, rarity: .normal),
+//    Item(name: "うっさん", attack: 25,probability: 25, health: 150, rarity: .normal),
+//    Item(name: "キリキリン", attack: 30,probability: 25, health: 200, rarity: .normal),
+//    Item(name: "カゲロウ", attack: 35,probability: 10, health: 220, rarity: .rare),
+//    Item(name: "ライム", attack: 40,probability: 10, health: 240, rarity: .rare),
+//    Item(name: "ラオン", attack: 45,probability: 10, health: 260, rarity: .rare),
+//    Item(name: "レッドドラゴン", attack: 47,probability: 5, health: 280, rarity: .superRare),
+//    Item(name: "ブルードラゴン", attack: 48,probability: 5, health: 285, rarity: .superRare),
+//    Item(name: "レインボードラゴン", attack: 50, probability: 3,health: 300, rarity: .ultraRare)
+//]
 
+    enum GachaMode {
+        case normal
+        case rare
+    }
+    
 // itemsリストをシャッフルする関数
   func shuffleItems() {
       items.shuffle()
@@ -82,7 +135,7 @@ var items: [Item] = [
 struct GachaView: View {
     @State private var obtainedItem: GachaManager.Item? = nil
     @State private var obtainedRareItem: GachaManager.Item? = nil
-    private let gachaManager = GachaManager()
+    private let gachaManager = GachaManager(mode: .normal)
     @State private var animationFinished: Bool = false
     @State private var showAnimation: Bool = false
     @State private var showResult: Bool = true
@@ -118,8 +171,8 @@ struct GachaView: View {
                             Image("\(item.rarity.displayString)")
                                 .resizable()
                                 .frame(width: 70,height:70)
-                                .padding(.trailing,280)
-                                .padding(.bottom,100)
+                                .padding(.trailing,230)
+                                .padding(.bottom,40)
                             Text("\(item.name)")
                                 .foregroundColor(Color("fontGray"))
                                 .fontWeight(.bold)
@@ -185,7 +238,7 @@ struct GachaView: View {
                         }
                         .disabled(!isGachaButtonDisabled)
                         
-                        Image("コイン300")
+                        Image("300コイン")
                             .resizable()
                             .frame(maxWidth:150,maxHeight:50)
                     }
@@ -198,7 +251,7 @@ struct GachaView: View {
                         }) {
                             Image("獲得")
                                 .resizable()
-                                .frame(maxWidth:80,maxHeight:80)
+                                .frame(maxWidth:110,maxHeight:110)
                         }
                         .onAppear() {
                             reward.LoadReward()
@@ -249,7 +302,7 @@ struct GachaView: View {
                             }
                             .shadow(radius: 10)
                             .disabled(!isGachaButtonDisabled)
-                            Image("コイン300")
+                            Image("300コイン")
                                 .resizable()
                                 .frame(maxWidth:150,maxHeight:50)
                         }
@@ -262,7 +315,7 @@ struct GachaView: View {
                         }) {
                             Image("獲得")
                                 .resizable()
-                                .frame(maxWidth:80,maxHeight:80)
+                                .frame(maxWidth:110,maxHeight:110)
                         }
                         .onAppear() {
                             reward.LoadReward()
@@ -358,19 +411,6 @@ struct GachaView: View {
            }
         
        }
-
-    func colorForRarity(_ rarity: GachaManager.Rarity) -> Color {
-        switch rarity {
-        case .normal:
-            return .gray
-        case .rare:
-            return .green
-        case .superRare:
-            return .purple
-        case .ultraRare:
-            return .purple
-        }
-    }
 }
 
 struct GachaView_Previews: PreviewProvider {

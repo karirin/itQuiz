@@ -50,6 +50,7 @@ class AuthManager: ObservableObject {
     @Published var money: Int = 0
     @Published var avatars: [Avatar] = []
     @Published var didLevelUp: Bool = false
+    @Published var userAvatars: [Avatar] = []
     @State private var earnedTitles: [Title] = []
     
     init() {
@@ -363,10 +364,6 @@ class AuthManager: ObservableObject {
         guard let userId = user?.uid else { return }
         
         let userRef = Database.database().reference().child("users").child(userId)
-        print("userId")
-        print(userId)
-        print("userRef")
-        print(userRef)
         userRef.observeSingleEvent(of: .value) { (snapshot) in
             if let data = snapshot.value as? [String: Any] {
                 print("data['level']")
@@ -542,6 +539,34 @@ class AuthManager: ObservableObject {
     }
     
     func decreaseUserMoney(by amount: Int = 300, completion: @escaping (Bool) -> Void) {
+        guard let userId = user?.uid else { return }
+        
+        let userRef = Database.database().reference().child("users").child(userId)
+        
+        // 現在のuserMoneyを取得
+        userRef.observeSingleEvent(of: .value) { (snapshot) in
+            if let data = snapshot.value as? [String: Any] {
+                var currentMoney = data["userMoney"] as? Int ?? 0
+                
+                // userMoneyからamountを引く
+                currentMoney -= amount
+                
+                // 新しいuserMoneyの値をデータベースに保存
+                let userData: [String: Any] = ["userMoney": currentMoney]
+                userRef.updateChildValues(userData) { (error, ref) in
+                    if let error = error {
+                        print("Failed to update userMoney:", error.localizedDescription)
+                        completion(false)
+                    } else {
+                        print("Successfully updated userMoney.")
+                        completion(true)
+                    }
+                }
+            }
+        }
+    }
+    
+    func decreaseRareUserMoney(by amount: Int = 600, completion: @escaping (Bool) -> Void) {
         guard let userId = user?.uid else { return }
         
         let userRef = Database.database().reference().child("users").child(userId)
