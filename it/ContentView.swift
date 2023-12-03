@@ -77,21 +77,22 @@ struct ContentView: View {
                                 .foregroundColor(Color("fontGray"))
                             Text(" \(userMoney)")
                                 .foregroundColor(Color("fontGray"))
-                            Spacer()
-                            Spacer()
+//                            Spacer()
+//                            Spacer()
                             
-                            Button(action: {
-                                isPresentingSettingView = true
-                                audioManager.playSound()
-                            }) {
-                                Image(systemName: "gearshape.fill")
-                                    .resizable()
-                                    .frame(width: 40, height: 40)
-                            }
-                            .padding(.leading)
-                            .foregroundColor(Color("gray"))
+//                            Button(action: {
+//                                isPresentingSettingView = true
+//                                audioManager.playSound()
+//                            }) {
+//                                Image(systemName: "gearshape.fill")
+//                                    .resizable()
+//                                    .frame(width: 40, height: 40)
+//                            }
+//                            .padding(.leading)
+//                            .foregroundColor(Color("gray"))
                         }
                         .padding(.horizontal)
+                        .padding(.top)
                         //                ScrollView{
                         VStack{
                             ZStack{
@@ -187,6 +188,9 @@ struct ContentView: View {
                                         }
                                         //                                        .foregroundColor(.gray)
                                     }
+                                    .fullScreenCover(isPresented: $isPresentingQuizBeginnerList) {
+                                        QuizDailyList(isPresenting: $isPresentingQuizBeginnerList)
+                                                }
                                     .frame(maxWidth: .infinity)
                                     .disabled(!isButtonEnabled)
                                     .padding(.horizontal)
@@ -219,18 +223,18 @@ struct ContentView: View {
                                     
                                     .shadow(radius: 3)
                                     
-                                    Button(action: {
-                                        audioManager.playSound()
-                                        // 画面遷移のトリガーをオンにする
-                                        self.isPresentingAvatarList = true
-                                    }) {
-                                        Image("おとも一覧")
-                                            .resizable()
-                                            .frame(height:70)
-                                            .padding(.horizontal)
-                                    }
-                                    
-                                    .shadow(radius: 3)
+//                                    Button(action: {
+//                                        audioManager.playSound()
+//                                        // 画面遷移のトリガーをオンにする
+//                                        self.isPresentingAvatarList = true
+//                                    }) {
+//                                        Image("おとも一覧")
+//                                            .resizable()
+//                                            .frame(height:70)
+//                                            .padding(.horizontal)
+//                                    }
+//                                    
+//                                    .shadow(radius: 3)
                                     Button(action: {
                                         // 画面遷移のトリガーをオンにする
                                         self.isPresentingGachaView = true
@@ -278,32 +282,32 @@ struct ContentView: View {
                                         audioManager.playSound()
                                     }
                                     
-                                    Button(action: {
-                                        // 画面遷移のトリガーをオンにする
-                                        self.isPresentingPentagonView = true
-                                        audioManager.playSound()
-                                    }) {
-                                        Image("おとも図鑑")
-                                            .resizable()
-                                            .frame(height:70)
-                                            .padding(.horizontal)
-                                    }
-                                    
-                                    .shadow(radius: 3)
-                                    .onTapGesture {
-                                        audioManager.playSound()
-                                    }
+//                                    Button(action: {
+//                                        // 画面遷移のトリガーをオンにする
+//                                        self.isPresentingPentagonView = true
+//                                        audioManager.playSound()
+//                                    }) {
+//                                        Image("おとも図鑑")
+//                                            .resizable()
+//                                            .frame(height:70)
+//                                            .padding(.horizontal)
+//                                    }
+//                                    
+//                                    .shadow(radius: 3)
+//                                    .onTapGesture {
+//                                        audioManager.playSound()
+//                                    }
                                     
                                     Group{
-                                        NavigationLink("", destination: QuizDailyList(isPresenting: $isPresentingQuizList).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizBeginnerList)
-                                        NavigationLink("", destination: QuizManagerView(isPresenting: $isPresentingQuizList), isActive: $isPresentingQuizList)
-                                        NavigationLink("", destination: AvatarListView(isPresenting: .constant(false)), isActive: $isPresentingAvatarList)
+//                                        NavigationLink("", destination: QuizDailyList(isPresenting: $isPresentingQuizList).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizBeginnerList)
+                                        NavigationLink("", destination: QuizManagerView(isPresenting: $isPresentingQuizList).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizList)
+//                                        NavigationLink("", destination: AvatarListView(isPresenting: .constant(false)), isActive: $isPresentingAvatarList)
                                     }
                                     NavigationLink("", destination: GachaManagerView(isPresenting: .constant(false)), isActive: $isPresentingGachaView)
-                                    NavigationLink("", destination: QuizManagerTimerView(isPresenting: $isPresentingQuizList), isActive: $isPresentingTimeAttakView)
-                                    NavigationLink("", destination: SettingView().navigationBarBackButtonHidden(true), isActive: $isPresentingSettingView)
+//                                    NavigationLink("", destination: QuizManagerTimerView(isPresenting: $isPresentingQuizList), isActive: $isPresentingTimeAttakView)
+//                                    NavigationLink("", destination: SettingView().navigationBarBackButtonHidden(true), isActive: $isPresentingSettingView)
                                     NavigationLink("", destination: IllustratedView(isPresenting: .constant(false)).navigationBarBackButtonHidden(true), isActive: $isPresentingIllustratedView)
-                                    NavigationLink("", destination:  PentagonView(authManager: authManager).navigationBarBackButtonHidden(true), isActive: $isPresentingPentagonView)
+//                                    NavigationLink("", destination:  PentagonView(authManager: authManager).navigationBarBackButtonHidden(true), isActive: $isPresentingPentagonView)
                                 }
                             }
                             //                            .padding(.horizontal,5)
@@ -320,7 +324,7 @@ struct ContentView: View {
                         LoginModalView(audioManager: audioManager, isPresented: $showLoginModal)
                     }
                 }
-                if tutorialNum == 1 {
+                if tutorialNum == 1{
                     GeometryReader { geometry in
                         Color.black.opacity(0.5)
                             .overlay(
@@ -337,7 +341,7 @@ struct ContentView: View {
                         Spacer()
                             .frame(height: buttonRect.minY - bubbleHeight)
                         VStack(alignment: .trailing, spacing: .zero) {
-                            Text("「問題を解く」をクリックしてください。")
+                            Text("「ダンジョン一覧」をクリックしてください。")
                                 .font(.system(size: 24.0))
                                 .padding(.all, 16.0)
                                 .background(Color.white)

@@ -84,18 +84,41 @@ struct PentagonGraphShape: Shape {
     }
 }
 
+//struct PentagonGraphLabelView: View {
+//    var label: String
+//    var index: Int
+//    var radius: CGFloat
+//
+//    var body: some View {
+//        let angle = (2 * CGFloat.pi) / 7 * CGFloat(index) - .pi / 2
+//        let x = cos(angle) * radius - 0
+//        let y = sin(angle) * radius
+//
+//        return Image("\(label)")
+//            .resizable()
+//            .frame(width:40,height:40)
+//            .position(x: x + radius + 30, y: y + radius + 5)
+//    }
+//}
+
 struct PentagonGraphLabelView: View {
     var label: String
     var index: Int
     var radius: CGFloat
 
     var body: some View {
-        let angle = (2 * CGFloat.pi) / 7 * CGFloat(index) - .pi / 2
-        let x = cos(angle) * radius
-        let y = sin(angle) * radius
+        GeometryReader { geometry in
+            let angle = (2 * CGFloat.pi) / CGFloat(QuizLevel.allCases.count) * CGFloat(index) - .pi / 2
+            let center = CGPoint(x: geometry.size.width / 2, y: geometry.size.height / 2)
+            let labelRadius = radius - 20 // ラベルのために半径を少し短くする
+            let x = center.x + labelRadius * cos(angle) // ラベルの幅の半分を引く
+            let y = center.y + labelRadius * sin(angle) // ラベルの高さの半分を引く
 
-        return Text(label)
-            .position(x: x + radius + 30, y: y + radius + 10)
+            Image("\(label)")
+                .resizable()
+                .frame(width: 40, height: 40)
+                .position(x: x, y: y)
+        }
     }
 }
 
@@ -156,7 +179,7 @@ struct PentagonGraphView: View {
                            )
 
                     ForEach(Array(QuizLevel.allCases.enumerated()), id: \.offset) { (i, _) in
-                        PentagonGraphLabelView(label: labels[i], index: i, radius: 170.0)
+                        PentagonGraphLabelView(label: labels[i], index: i, radius: 180.0)
                     }
                     // 目盛りの数字を表示する
                     ForEach(scaleNumbers, id: \.self) { scaleValue in
@@ -188,10 +211,15 @@ struct PentagonView: View {
     @Environment(\.presentationMode) var presentationMode
     var body: some View {
         VStack{
+            HStack{
+                Spacer()
+                Text("ダンジョン別の正答率")
+                    .font(.system(size: 20))
+                Spacer()
+            }
+            .padding(.top)
             PentagonGraphView(userId: authManager.currentUserId!, labels: ["初級", "中級", "上級", "神級", "ネットワーク", "セキュリティ","データベース"])
             VStack(spacing: 0) {
-//                Text("ダンジョン別　正答率")
-//                    .font(.system(size: 24))
                 ScrollView{
                     ForEach(QuizLevel.allCases, id: \.self) { level in
                         if let quizDataForLevel = quizData[level] {

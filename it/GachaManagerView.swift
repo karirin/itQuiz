@@ -44,13 +44,14 @@ struct GachaManagerView: View {
                     .frame(height: 130)
                 Spacer()
                     .frame(height:30)
-                HStack{
-                    Image("300コイン")
-                        .resizable()
-                        .frame(maxWidth:150,maxHeight:50)
-                    Spacer()
-                }
-                .padding(.leading)
+                ScrollView{
+                    HStack{
+                        Image("300コイン")
+                            .resizable()
+                            .frame(maxWidth:150,maxHeight:50)
+                        Spacer()
+                    }
+                    .padding(.leading)
                     Button(action: {
                         audioManager.playSound()
                         // 画面遷移のトリガーをオンにする
@@ -66,14 +67,14 @@ struct GachaManagerView: View {
                     .padding(.bottom)
                     .shadow(radius: 10)
                     
-                
-                HStack{
-                    Image("600コイン")
-                        .resizable()
-                        .frame(maxWidth:150,maxHeight:50)
-                    Spacer()
-                }
-                .padding(.leading)
+                    
+                    HStack{
+                        Image("600コイン")
+                            .resizable()
+                            .frame(maxWidth:150,maxHeight:50)
+                        Spacer()
+                    }
+                    .padding(.leading)
                     Button(action: {
                         audioManager.playSound()
                         self.isPresentingQuizIntermediate = true
@@ -88,9 +89,10 @@ struct GachaManagerView: View {
                     .padding(.bottom)
                     .shadow(radius: 10)
                     
-                Spacer()
-                NavigationLink("", destination: GachaView().navigationBarBackButtonHidden(true), isActive: $isPresentingQuizBeginner) // 適切な遷移先に変更してください
-                NavigationLink("", destination: RareGachaView().navigationBarBackButtonHidden(true), isActive: $isPresentingQuizIntermediate) // 適切な遷移先に変更してください
+                    Spacer()
+                    NavigationLink("", destination: GachaView().navigationBarBackButtonHidden(true), isActive: $isPresentingQuizBeginner) // 適切な遷移先に変更してください
+                    NavigationLink("", destination: RareGachaView().navigationBarBackButtonHidden(true), isActive: $isPresentingQuizIntermediate) // 適切な遷移先に変更してください
+                }
             }
         .onTapGesture {
             audioManager.playSound()

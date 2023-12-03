@@ -24,9 +24,9 @@ struct ModalView: View {
         ZStack {
             VStack(spacing: 10) {
                 Button(action: {
-//                    isPresenting = false
+                    isPresenting = false
 //                    if isDaily {
-                        isContentView = true
+//                        isContentView = true
 //                    }
                     audioManager.playReturnSound()
                 }) {
@@ -40,7 +40,7 @@ struct ModalView: View {
                         .cornerRadius(8)
                         .shadow(radius: 1)
                 }
-                NavigationLink("", destination: ContentView().navigationBarBackButtonHidden(true), isActive: $isContentView)
+                NavigationLink("", destination: QuizManagerView(isPresenting: .constant(false)).navigationBarBackButtonHidden(true), isActive: $isContentView)
                 
 //                Button(action: {
 //                    audioManager.toggleSound()

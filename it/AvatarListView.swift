@@ -36,6 +36,13 @@ struct AvatarListView: View {
 
     var body: some View {
         VStack {
+            HStack{
+                Spacer()
+                Text("おとも一覧")
+                    .font(.system(size: 20))
+                Spacer()
+            }
+            .padding()
             // 選択されたアイテムを大きく表示
             if let selected = selectedItem {
                 VStack {

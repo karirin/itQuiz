@@ -1039,7 +1039,8 @@ struct ViewPositionKey3: PreferenceKey {
             }
             }
         }
-            .navigationViewStyle(StackNavigationViewStyle())
+//            .navigationViewStyle(StackNavigationViewStyle())
+            .navigationBarBackButtonHidden(true)
 
     }
 }

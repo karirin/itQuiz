@@ -39,6 +39,7 @@ struct QuizResultView: View {
 //    @Environment(\.rootPresentationMode) private var rootPresentationMode: Binding<RootPresentationMode>
     @State private var isHidden = false
     @ObservedObject var interstitial = Interstitial()
+    @Environment(\.presentationMode) var presentationMode
 
     // QuizResultView.swift
     init(results: [QuizResult], authManager: AuthManager, isPresenting: Binding<Bool>, navigateToQuizResultView: Binding<Bool>, playerExperience: Int, playerMoney: Int, elapsedTime: TimeInterval) {
@@ -57,41 +58,41 @@ struct QuizResultView: View {
         NavigationView{
                 VStack{
 //                    Spacer()
-                    HStack{
-//                        NavigationLink(destination: ContentView(isPresentingQuizBeginnerList: .constant(false), isPresentingAvatarList: .constant(false)).navigationBarBackButtonHidden(true)) {
-//                        NavigationLink(destination: ContentView().navigationBarBackButtonHidden(true)) {
-                            Button(action: {
-                                audioManager.playCancelSound()
+//                    HStack{
+////                        NavigationLink(destination: ContentView(isPresentingQuizBeginnerList: .constant(false), isPresentingAvatarList: .constant(false)).navigationBarBackButtonHidden(true)) {
+////                        NavigationLink(destination: ContentView().navigationBarBackButtonHidden(true)) {
+//                            Button(action: {
+//                                audioManager.playCancelSound()
 //                                self.isPresenting = false
-                                isContentView = true
-//                                self.rootPresentationMode.wrappedValue.dismissToRoot()
-                                // ここで画面遷移を行います。
-                            }) {
-                                HStack {
-                                    Image(systemName: "chevron.left")
-                                        .foregroundColor(.gray)
-                                    Text("戻る")
-                                        .background(Color.white)
-                                        .foregroundColor(.gray)
-                                }
-                                .foregroundColor(Color("fontGray"))
-                            }
+////                                isContentView = true
+////                                self.rootPresentationMode.wrappedValue.dismissToRoot()
+//                                // ここで画面遷移を行います。
+//                            }) {
+//                                HStack {
+//                                    Image(systemName: "chevron.left")
+//                                        .foregroundColor(.gray)
+//                                    Text("戻る")
+//                                        .background(Color.white)
+//                                        .foregroundColor(.gray)
+//                                }
+//                                .foregroundColor(Color("fontGray"))
+//                            }
+////                        }
+//                        .padding(.leading)
+//                        Spacer()
+//                        Text("クイズ結果")
+//                        Spacer()
+//                        HStack{
+//                            Image(systemName: "chevron.left")
+//                                .foregroundColor(.gray)
+//                            Text("戻る")
+//                                .background(Color.white)
+//                                .foregroundColor(.gray)
 //                        }
-                        .padding(.leading)
-                        Spacer()
-                        Text("クイズ結果")
-                        Spacer()
-                        HStack{
-                            Image(systemName: "chevron.left")
-                                .foregroundColor(.gray)
-                            Text("戻る")
-                                .background(Color.white)
-                                .foregroundColor(.gray)
-                        }
-                        .padding(.trailing)
-                        .opacity(0)
-                    }
-                    .foregroundColor(Color("fontGray"))
+//                        .padding(.trailing)
+//                        .opacity(0)
+//                    }
+//                    .foregroundColor(Color("fontGray"))
 //                    Spacer()
                         if elapsedTime != 0 {
 //                            Spacer()
@@ -245,6 +246,23 @@ struct QuizResultView: View {
                 }
             }
             .background(Color("Color2"))
+            .navigationBarBackButtonHidden(true)
+            .navigationBarItems(leading: Button(action: {
+//                self.presentationMode.wrappedValue.dismiss()
+                isPresenting = false
+                audioManager.playCancelSound()
+            }) {
+                Image(systemName: "chevron.left")
+                    .foregroundColor(Color("fontGray"))
+                Text("戻る")
+                    .foregroundColor(Color("fontGray"))
+            })
+            .toolbar {
+                    ToolbarItem(placement: .principal) {
+                        Text("クイズ結果")
+                            .font(.system(size: 20)) // ここでフォントサイズを指定
+                    }
+                }
             if showModal {
                 ExperienceModalView(showModal: $showModal, addedExperience: playerExperience, addedMoney: playerMoney, authManager: authManager)
             }
@@ -262,6 +280,7 @@ struct QuizResultView: View {
         formatter.zeroFormattingBehavior = .pad
         return formatter.string(from: duration) ?? ""
     }
+
 }
 
 struct ExperienceModalView: View {
