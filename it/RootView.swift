@@ -11,6 +11,7 @@ struct RootView: View {
     @ObservedObject var authManager: AuthManager
     @State static private var showExperienceModalPreview = false
     @State private var isUserExists: Bool? = nil
+    @StateObject var appState = AppState()
 
     var body: some View {
         Group {
@@ -23,6 +24,7 @@ struct RootView: View {
 //                ContentView(isPresentingQuizBeginnerList: .constant(false), isPresentingAvatarList: .constant(false))
 //                ContentView()
                 TopView()
+                    .environmentObject(appState)
             }
         }
         .onAppear {

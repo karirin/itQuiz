@@ -25,14 +25,14 @@ struct TitleListView: View {
                 Text(title.description).font(.subheadline)
             }
         }
-        .onAppear(perform: loadTitles)
+//        .onAppear(perform: loadTitles)
     }
 
-    func loadTitles() {
-        authManager.fetchEarnedTitles { titles in
-            self.earnedTitles = titles
-        }
-    }
+//    func loadTitles() {
+//        $authManager.fetchEarnedTitles { titles in
+//            self.earnedTitles = titles
+//        }
+//    }
 }
 
 

@@ -50,6 +50,34 @@ class RateManager {
         })
     }
     
+    func updateAnswerData(userId: String, quizType: QuizLevel, newTotalAnswers: Int) {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+//        let currentDate = dateFormatter.string(from: Date())
+        let currentDate = "2023-12-08"
+
+        // 各日付ごとに別々のレコードを作成するための参照
+        let dateRef = db.child("answers").child(userId).child(quizType.description).child(currentDate)
+
+        dateRef.observeSingleEvent(of: .value, with: { snapshot in
+            var totalAnswers = newTotalAnswers
+
+            // その日付で既にデータがある場合は、新しい値を加算する
+            if let currentTotal = snapshot.value as? Int {
+                totalAnswers += currentTotal
+            }
+
+            // データベースを更新
+            dateRef.setValue(totalAnswers) { error, _ in
+                if let error = error {
+                    print("Error updating quiz data: \(error.localizedDescription)")
+                } else {
+                    print("Quiz data updated successfully.")
+                }
+            }
+        })
+    }
+    
     func fetchQuizData(userId: String, completion: @escaping ([QuizLevel: QuizData]) -> Void) {
             let ratesRef = db.child("rates").child(userId)
 

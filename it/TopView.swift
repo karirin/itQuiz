@@ -20,6 +20,7 @@ struct TopView: View {
     static let samplePaymentDates: [Date] = [Date()]
     @State private var isPresentingAvatarList: Bool = false
     @State private var isPresentingQuizList: Bool = false
+    @State private var flag: Bool = false
     @ObservedObject var authManager = AuthManager.shared
     @State private var buttonRect: CGRect = .zero
     @State private var bubbleHeight: CGFloat = 0.0
@@ -53,7 +54,7 @@ struct TopView: View {
                                 Image(systemName: "square.grid.2x2")
                                 Text("おとも一覧")
                             }
-                        PentagonView(authManager: authManager)
+                    PentagonView(authManager: authManager, flag: .constant(false))
                             .tabItem {
                                 Image(systemName: "chart.pie")
                                 Text("分析")

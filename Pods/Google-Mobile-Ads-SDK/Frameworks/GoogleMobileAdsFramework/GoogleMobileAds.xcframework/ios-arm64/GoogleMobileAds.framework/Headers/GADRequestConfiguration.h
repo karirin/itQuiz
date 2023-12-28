@@ -21,7 +21,8 @@ FOUNDATION_EXPORT GADMaxAdContentRating _Nonnull const GADMaxAdContentRatingTeen
 FOUNDATION_EXPORT GADMaxAdContentRating _Nonnull const GADMaxAdContentRatingMatureAudience;
 
 /// Add this constant to the testDevices property's array to receive test ads on the simulator.
-FOUNDATION_EXPORT NSString *_Nonnull const GADSimulatorID;
+FOUNDATION_EXPORT NSString *_Nonnull const GADSimulatorID GAD_DEPRECATED_MSG_ATTRIBUTE(
+    "Deprecated. Simulators are already in test mode by default.");
 
 /// Publisher privacy treatment personalization states.
 typedef NS_ENUM(NSInteger, GADPublisherPrivacyPersonalizationState) {
@@ -79,9 +80,9 @@ typedef NS_ENUM(NSInteger, GADPublisherPrivacyPersonalizationState) {
 /// in termination of your Google account.
 @property(nonatomic, nullable, copy) NSNumber *tagForChildDirectedTreatment;
 
-/// Controls whether the Google Mobile Ads SDK Same App Key is enabled. The value set persists
-/// across app sessions. The key is enabled by default.
-- (void)setSameAppKeyEnabled:(BOOL)enabled;
+/// Controls whether the Google Mobile Ads SDK publisher first-party ID, formerly known as the same
+/// app key, is enabled. The value set persists across app sessions. The key is enabled by default.
+- (void)setPublisherFirstPartyIDEnabled:(BOOL)enabled;
 
 #pragma mark - Publisher Privacy Treatment
 
@@ -90,6 +91,12 @@ typedef NS_ENUM(NSInteger, GADPublisherPrivacyPersonalizationState) {
 @property(nonatomic) GADPublisherPrivacyPersonalizationState publisherPrivacyPersonalizationState;
 
 #pragma mark - Deprecated
+
+/// Controls whether the Google Mobile Ads SDK Same App Key is enabled. The value set persists
+/// across app sessions. The key is enabled by default.
+- (void)setSameAppKeyEnabled:(BOOL)enabled
+    GAD_DEPRECATED_MSG_ATTRIBUTE(
+        "This method is deprecated. Use the setPublisherFirstPartyIDEnabled: method instead.");
 
 /// This method lets you specify whether the user is under the age of consent.
 /// https://developers.google.com/admob/ios/targeting#users_under_the_age_of_consent.
@@ -119,7 +126,7 @@ typedef NS_ENUM(NSInteger, GADPublisherPrivacyPersonalizationState) {
 /// termination of your Google account.
 - (void)tagForChildDirectedTreatment:(BOOL)childDirectedTreatment
     GAD_DEPRECATED_MSG_ATTRIBUTE(
-        "This method is deprecated. Use the tagForChildDirectedTreatment property instead. "
-        "PCalling this method internally sets the property.");
+        "This method is deprecated. Use the tagForChildDirectedTreatment property instead. Calling "
+        "this method internally sets the property.");
 
 @end

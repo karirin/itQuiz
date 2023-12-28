@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		260000022AB5EEC900342CAE /* QuizBeginnerList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260000012AB5EEC900342CAE /* QuizBeginnerList.swift */; };
+		26071BF42B2B4BC60012B836 /* ModalExplanationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26071BF32B2B4BC60012B836 /* ModalExplanationView.swift */; };
 		260B56172ACB1CA200E7785C /* SpotlightView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260B56162ACB1CA200E7785C /* SpotlightView.swift */; };
 		260B56192ACB1CBE00E7785C /* SpotlightView1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260B56182ACB1CBE00E7785C /* SpotlightView1.swift */; };
 		260E44132AB572DC00FBB487 /* itApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260E44122AB572DC00FBB487 /* itApp.swift */; };
@@ -76,11 +77,13 @@
 		26C1A1D82AF75304006161E0 /* ホームに戻る.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 26C1A1C82AF75304006161E0 /* ホームに戻る.mp3 */; };
 		26C1A1D92AF75304006161E0 /* soundKettei.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 26C1A1C92AF75304006161E0 /* soundKettei.mp3 */; };
 		26D0C36E2AFE6F0600C6AF07 /* GachaManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26D0C36D2AFE6F0500C6AF07 /* GachaManagerView.swift */; };
+		26F0EC2E2B1E870900A3E36D /* QuizJavaScriptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F0EC2D2B1E870900A3E36D /* QuizJavaScriptView.swift */; };
 		E853D050BCB03C7E80A63918 /* Pods_it.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E16B2CC5D533F92BAD9A8A1F /* Pods_it.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		260000012AB5EEC900342CAE /* QuizBeginnerList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizBeginnerList.swift; sourceTree = "<group>"; };
+		26071BF32B2B4BC60012B836 /* ModalExplanationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModalExplanationView.swift; sourceTree = "<group>"; };
 		260B56162ACB1CA200E7785C /* SpotlightView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotlightView.swift; sourceTree = "<group>"; };
 		260B56182ACB1CBE00E7785C /* SpotlightView1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotlightView1.swift; sourceTree = "<group>"; };
 		260E440F2AB572DC00FBB487 /* it.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = it.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -151,6 +154,7 @@
 		26C1A1C82AF75304006161E0 /* ホームに戻る.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "ホームに戻る.mp3"; path = "../../../Downloads/ホームに戻る.mp3"; sourceTree = "<group>"; };
 		26C1A1C92AF75304006161E0 /* soundKettei.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = soundKettei.mp3; path = ../../../Downloads/soundKettei.mp3; sourceTree = "<group>"; };
 		26D0C36D2AFE6F0500C6AF07 /* GachaManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GachaManagerView.swift; sourceTree = "<group>"; };
+		26F0EC2D2B1E870900A3E36D /* QuizJavaScriptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizJavaScriptView.swift; sourceTree = "<group>"; };
 		B872405D7B916C9F1628DFCC /* Pods-it.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-it.debug.xcconfig"; path = "Target Support Files/Pods-it/Pods-it.debug.xcconfig"; sourceTree = "<group>"; };
 		E16B2CC5D533F92BAD9A8A1F /* Pods_it.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_it.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB46333AF02BB87CB42728DB /* Pods-it.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-it.release.xcconfig"; path = "Target Support Files/Pods-it/Pods-it.release.xcconfig"; sourceTree = "<group>"; };
@@ -204,6 +208,7 @@
 				26D0C36D2AFE6F0500C6AF07 /* GachaManagerView.swift */,
 				265FA3962AF6543B00F3E0EF /* QuizManagerTimerView.swift */,
 				260E44242AB59A7900FBB487 /* QuizView.swift */,
+				26071BF32B2B4BC60012B836 /* ModalExplanationView.swift */,
 				264552082ADC085200827D42 /* TimerView.swift */,
 				26AA130B2ACD74660035F5F4 /* ModalView.swift */,
 				26B9BA222AF2647300AC7C40 /* LoginModalView.swift */,
@@ -214,6 +219,7 @@
 				262F0FED2B178F02004C0C47 /* Banner.swift */,
 				260000012AB5EEC900342CAE /* QuizBeginnerList.swift */,
 				267743672B16FFAB00043010 /* QuizHtmlCssView.swift */,
+				26F0EC2D2B1E870900A3E36D /* QuizJavaScriptView.swift */,
 				265FA3922AF5502200F3E0EF /* TimeBeginnerList.swift */,
 				265FA3942AF5FEF600F3E0EF /* TimeIntermediateList.swift */,
 				265FA3982AF672BB00F3E0EF /* TimeAdvancedList.swift */,
@@ -429,11 +435,13 @@
 				260B56192ACB1CBE00E7785C /* SpotlightView1.swift in Sources */,
 				264F19172AF3B1A900B6FB10 /* RewardModalView.swift in Sources */,
 				2641992C2AC2572F002013B9 /* AvatarListView.swift in Sources */,
+				26F0EC2E2B1E870900A3E36D /* QuizJavaScriptView.swift in Sources */,
 				26ADE3422ADC382F009BDF48 /* SettingView.swift in Sources */,
 				262F0FF22B18C72A004C0C47 /* RateManager.swift in Sources */,
 				269D44E22AB60D6800CAA91A /* SignUp.swift in Sources */,
 				267743662B16371800043010 /* Interstitial.swift in Sources */,
 				264552092ADC085200827D42 /* TimerView.swift in Sources */,
+				26071BF42B2B4BC60012B836 /* ModalExplanationView.swift in Sources */,
 				268C3B9B2ABCA63300282BEE /* QuizAdvancedList.swift in Sources */,
 				260B56172ACB1CA200E7785C /* SpotlightView.swift in Sources */,
 				269A878A2AB86FC900F33C9E /* GachaView.swift in Sources */,
@@ -596,7 +604,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1.8;
+				CURRENT_PROJECT_VERSION = 2.0;
 				DEVELOPMENT_ASSET_PATHS = "\"it/Preview Content\"";
 				DEVELOPMENT_TEAM = F3XS565TSX;
 				ENABLE_PREVIEWS = YES;
@@ -613,7 +621,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.8;
+				MARKETING_VERSION = 2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "Swift-Beginners-app.it";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -629,7 +637,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1.8;
+				CURRENT_PROJECT_VERSION = 2.0;
 				DEVELOPMENT_ASSET_PATHS = "\"it/Preview Content\"";
 				DEVELOPMENT_TEAM = F3XS565TSX;
 				ENABLE_PREVIEWS = YES;
@@ -646,7 +654,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.8;
+				MARKETING_VERSION = 2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "Swift-Beginners-app.it";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;

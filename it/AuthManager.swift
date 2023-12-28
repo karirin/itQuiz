@@ -51,7 +51,7 @@ class AuthManager: ObservableObject {
     @Published var avatars: [Avatar] = []
     @Published var didLevelUp: Bool = false
     @Published var userAvatars: [Avatar] = []
-    @State private var earnedTitles: [Title] = []
+//    @State private var earnedTitles: [Title] = []
     
     init() {
         user = Auth.auth().currentUser
@@ -325,7 +325,12 @@ class AuthManager: ObservableObject {
         }
         
         let userRef = Database.database().reference().child("users").child(userId)
-        userRef.observeSingleEvent(of: .value) { (snapshot) in
+        userRef.observeSingleEvent(of: .value) { (snapshot, errorString) in
+            if let errorString = errorString {
+                // Handle the error here
+                onFailure(NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: errorString]))
+                return
+            }
             if let data = snapshot.value as? [String: Any] {
                 var currentExperience = data["experience"] as? Int ?? 0
                 var currentLevel = data["level"] as? Int ?? 1
@@ -346,7 +351,7 @@ class AuthManager: ObservableObject {
                     } else {
                         self.experience = currentExperience
                         self.level = currentLevel
-                        self.saveEarnedTitles()
+//                        self.saveEarnedTitles()
                         onSuccess()
                     }
                 }
@@ -453,51 +458,51 @@ class AuthManager: ObservableObject {
     }
 
 
-    func checkForTitles(completion: @escaping ([Title]) -> Void) {
-        guard let userId = user?.uid else {
-            completion([])
-            return
-        }
-        
-        let userRef = Database.database().reference().child("users").child(userId)
-        userRef.observeSingleEvent(of: .value) { (snapshot) in
-            if let data = snapshot.value as? [String: Any], let userLevel = data["level"] as? Int {
-                var earnedTitles: [Title] = []
-
-//                print("userLevel:\(userLevel)")
-                if userLevel >= 3 {
-                    earnedTitles.append(Title(name: "レベル３達成", condition: "レベル3に到達", description: "レベル3に到達した証"))
-                }
-                if userLevel >= 10 {
-                    earnedTitles.append(Title(name: "初級レベルクリア", condition: "初級レベルのクイズを全てクリア", description: "初級レベルのクイズを全てクリアした証"))
-                }
-
-                completion(earnedTitles)
-            } else {
-                completion([])
-            }
-        }
-    }
+//    func checkForTitles(completion: @escaping ([Title]) -> Void) {
+//        guard let userId = user?.uid else {
+//            completion([])
+//            return
+//        }
+//        
+//        let userRef = Database.database().reference().child("users").child(userId)
+//        userRef.observeSingleEvent(of: .value) { (snapshot) in
+//            if let data = snapshot.value as? [String: Any], let userLevel = data["level"] as? Int {
+//                var earnedTitles: [Title] = []
+//
+////                print("userLevel:\(userLevel)")
+//                if userLevel >= 3 {
+//                    earnedTitles.append(Title(name: "レベル３達成", condition: "レベル3に到達", description: "レベル3に到達した証"))
+//                }
+//                if userLevel >= 10 {
+//                    earnedTitles.append(Title(name: "初級レベルクリア", condition: "初級レベルのクイズを全てクリア", description: "初級レベルのクイズを全てクリアした証"))
+//                }
+//
+//                completion(earnedTitles)
+//            } else {
+//                completion([])
+//            }
+//        }
+//    }
     
-    func fetchEarnedTitles(completion: @escaping ([Title]) -> Void) {
-        guard let userId = user?.uid else { return }
-        let userRef = Database.database().reference().child("users").child(userId).child("titles")
-        userRef.observeSingleEvent(of: .value) { (snapshot) in
-            var fetchedTitles: [Title] = []
-            if let titlesData = snapshot.value as? [String] {
-                self.checkForTitles { availableTitles in
-                    for titleName in titlesData {
-                        if let title = availableTitles.first(where: { $0.name == titleName }) {
-                            fetchedTitles.append(title)
-                        }
-                    }
-                    completion(fetchedTitles)
-                }
-            } else {
-                completion([])
-            }
-        }
-    }
+//    func fetchEarnedTitles(completion: @escaping ([Title]) -> Void) {
+//        guard let userId = user?.uid else { return }
+//        let userRef = Database.database().reference().child("users").child(userId).child("titles")
+//        userRef.observeSingleEvent(of: .value) { (snapshot) in
+//            var fetchedTitles: [Title] = []
+//            if let titlesData = snapshot.value as? [String] {
+//                self.checkForTitles { availableTitles in
+//                    for titleName in titlesData {
+//                        if let title = availableTitles.first(where: { $0.name == titleName }) {
+//                            fetchedTitles.append(title)
+//                        }
+//                    }
+//                    completion(fetchedTitles)
+//                }
+//            } else {
+//                completion([])
+//            }
+//        }
+//    }
     
     func updateStatsUponLevelUp() {
         guard let userId = user?.uid else { return }
@@ -518,18 +523,18 @@ class AuthManager: ObservableObject {
         }
     }
     
-    private func saveEarnedTitles() {
-        guard let userId = user?.uid else { return }
-        let userRef = Database.database().reference().child("users").child(userId).child("titles")
-        
-        checkForTitles { titles in
-            var titlesData: [String] = []
-            for title in titles {
-                titlesData.append(title.name)
-            }
-            userRef.setValue(titlesData)
-        }
-    }
+//    private func saveEarnedTitles() {
+//        guard let userId = user?.uid else { return }
+//        let userRef = Database.database().reference().child("users").child(userId).child("titles")
+//        
+//        checkForTitles { titles in
+//            var titlesData: [String] = []
+//            for title in titles {
+//                titlesData.append(title.name)
+//            }
+//            userRef.setValue(titlesData)
+//        }
+//    }
     
     func checkIfUserIdExists(userId: String, completion: @escaping (Bool) -> Void) {
         let userRef = Database.database().reference().child("users").child(userId)

@@ -226,10 +226,6 @@ struct QuizResultView: View {
                       }
                   }
                 .onAppear {
-//                    if !interstitial.interstitialAdLoaded {
-//                        print("onAppear interstitial.presentInterstitial()")
-//                        interstitial.presentInterstitial()
-//                    }
                     if elapsedTime != 0 {
                         authManager.saveElapsedTime(category: "Beginner", elapsedTime: elapsedTime) { success in
                             if success {

@@ -37,6 +37,7 @@ struct itApp: App {
             RootView(authManager: authManager)
 //            RewardView()
 //            GachaView()
+//            Interstitial1()
         }
     }
 }

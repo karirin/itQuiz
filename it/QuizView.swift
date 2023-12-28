@@ -79,6 +79,7 @@ struct ViewPositionKey3: PreferenceKey {
         @State private var playerMoney: Int = 0
         @State private var shakeEffect: Bool = false
         @State private var showAttackImage: Bool = false
+        @State var showExplanationModal: Bool = false
         @State private var showMonsterDownImage: Bool = false
         @State private var showIncorrectBackground: Bool = false
         @State private var hasAnswered: Bool = false
@@ -99,6 +100,7 @@ struct ViewPositionKey3: PreferenceKey {
         @State private var elapsedTime: TimeInterval?
         @State private var navigateToQuizResult = false
         @ObservedObject var interstitial: Interstitial
+        @StateObject var appState = AppState()
         
         var currentQuiz: QuizQuestion {
             quizzes[currentQuizIndex]
@@ -146,7 +148,7 @@ struct ViewPositionKey3: PreferenceKey {
             self.timer?.invalidate()
             
             // 3秒後に以下のコードブロックを実行
-            self.remainingSeconds = 3000
+            self.remainingSeconds = 30
             self.timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
                 if self.remainingSeconds > 0 {
                     self.remainingSeconds -= 1
@@ -165,6 +167,7 @@ struct ViewPositionKey3: PreferenceKey {
                 showCompletionMessage = true
                 timer?.invalidate()
                 RateManager.shared.updateQuizData(userId: authManager.currentUserId!, quizType: quizLevel, newCorrectAnswers: correctAnswerCount, newTotalAnswers: answerCount)
+                RateManager.shared.updateAnswerData(userId: authManager.currentUserId!, quizType: quizLevel,  newTotalAnswers: answerCount)
                 navigateToQuizResultView = true  //ここで結果画面への遷移フラグをtrueに
             } else if playerHP <= 0 {
                 showCompletionMessage = true
@@ -172,10 +175,18 @@ struct ViewPositionKey3: PreferenceKey {
                 playerExperience = 5
                 playerMoney = 5
                 navigateToQuizResultView = true  //ここで結果画面への遷移フラグをtrueに
+            } else if self.remainingSeconds == 0 {
+                        currentQuizIndex += 1
+            // showExplanationModal = true
+            // currentQuizIndex += 1    selectedAnswerIndex = nil
+            startTimer()
+            hasAnswered = false
             } else if currentQuizIndex + 1 < quizzes.count { // 最大問題数を超えていないかチェック
-                currentQuizIndex += 1
-                selectedAnswerIndex = nil
-                startTimer()
+                //                currentQuizIndex += 1
+//                selectedAnswerIndex = nil    
+                showExplanationModal = true
+                //                selectedAnswerIndex = nil
+                startTimer()    // startTimer()
                 hasAnswered = false
             } else {
                 // すべての問題が終了した場合、結果画面へ遷移
@@ -404,6 +415,10 @@ struct ViewPositionKey3: PreferenceKey {
                                 Color.clear.preference(key: ViewPositionKey1.self, value: [geometry.frame(in: .global)])
                             })
                             
+                            if appState.isBannerVisible {
+                                BannerView()
+                                    .frame(height: 60)
+                            }
                             Spacer()
                             
                             if showCompletionMessage {
@@ -437,6 +452,22 @@ struct ViewPositionKey3: PreferenceKey {
                 }
                 .onPreferenceChange(ViewPositionKey3.self) { positions in
                     self.buttonRect3 = positions.first ?? .zero
+                }
+                if showExplanationModal {
+                    ZStack {
+                        Color.black.opacity(0.7).edgesIgnoringSafeArea(.all)
+                        if let selectedIndex = selectedAnswerIndex, selectedIndex < currentQuiz.choices.count {
+                            ModalExplanationView(
+                                isPresented: $showExplanationModal,
+                                selectedAnswerIndex: $selectedAnswerIndex, audioManager: audioManager, question: quizzes[currentQuizIndex].question, userAnswer: currentQuiz.choices[selectedIndex],
+                                correctAnswer: quizzes[currentQuizIndex].choices[quizzes[currentQuizIndex].correctAnswerIndex],
+                                explanation: quizzes[currentQuizIndex].explanation, currentQuizIndex: $currentQuizIndex,
+                                pauseTimer:pauseTimer, startTimer: startTimer
+                            )
+                        }else{
+                            Text("test")
+                        }
+                    }
                 }
                 if showHomeModal {
                     ZStack {
@@ -648,7 +679,7 @@ struct ViewPositionKey3: PreferenceKey {
         }
             
             .onTapGesture {
-                audioManager.playSound()
+//                audioManager.playSound()
                 if showCountdown == false {
                     if tutorialNum == 3 {
                         tutorialNum = 4
@@ -1036,7 +1067,31 @@ struct ViewPositionKey3: PreferenceKey {
                 default:
                     monsterHP = 1000
                 }
-            }
+                case .incorrectAnswer:
+                    monsterBackground = "incorrectAnswerBackground"
+                    playerExperience = 0
+                    playerMoney = 0
+                    if playerHP <= 0 {
+                        playerExperience = 5
+                        playerMoney = 5
+                    }
+                    switch newMonsterType {
+                    case 1:
+                        monsterHP = 10
+                        monsterUnderHP = 10
+                        monsterAttack = 0
+                    case 2:
+                        monsterHP = 10
+                        monsterUnderHP = 10
+                        monsterAttack = 0
+                    case 3:
+                        monsterHP = 10
+                        monsterUnderHP = 10
+                        monsterAttack = 0
+                    default:
+                        monsterHP = 10
+                    }
+                }
             }
         }
 //            .navigationViewStyle(StackNavigationViewStyle())

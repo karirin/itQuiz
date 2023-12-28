@@ -16,6 +16,7 @@ enum QuizLevel {
     case database
     case daily
     case god
+    case incorrectAnswer
     case timeBeginner
     case timeIntermediate
     case timeAdvanced
@@ -38,6 +39,8 @@ enum QuizLevel {
             return "daily"
         case .god:
             return "god"
+        case .incorrectAnswer:
+            return "incorrectAnswer"
         case .timeBeginner:
             return "timeBeginner"
         case .timeIntermediate:
@@ -60,7 +63,7 @@ struct PentagonGraphShape: Shape {
 
     func path(in rect: CGRect) -> Path {
         let center = CGPoint(x: rect.midX, y: rect.midY)
-        let baseRadius = min(rect.width, rect.height) / 2 - 50
+        let baseRadius = min(rect.width, rect.height) / 2 - 10
         let angle = (2 * CGFloat.pi) / 7
 
         var path = Path()
@@ -101,31 +104,61 @@ struct PentagonGraphShape: Shape {
 //    }
 //}
 
+//struct PentagonGraphLabelView: View {
+//    var label: String
+//    var index: Int
+//    var radius: CGFloat
+//
+//    var body: some View {
+//        GeometryReader { geometry in
+//            let angle = (2 * CGFloat.pi) / CGFloat(QuizLevel.allCases.count) * CGFloat(index) - .pi / 2
+//            let center = CGPoint(x: geometry.size.width / 2, y: geometry.size.height / 2)
+//            let labelRadius = radius - 20 // ラベルのために半径を少し短くする
+//            let x = center.x + labelRadius * cos(angle) // ラベルの幅の半分を引く
+//            let y = center.y + labelRadius * sin(angle) // ラベルの高さの半分を引く
+//
+//            Image("\(label)")
+//                .resizable()
+//                .frame(width: 40, height: 40)
+//                .position(x: x, y: y)
+//        }
+//    }
+//}
+
 struct PentagonGraphLabelView: View {
     var label: String
     var index: Int
-    var radius: CGFloat
+    // radius パラメータを削除して、ビューのサイズに基づいて計算するようにします
 
     var body: some View {
         GeometryReader { geometry in
             let angle = (2 * CGFloat.pi) / CGFloat(QuizLevel.allCases.count) * CGFloat(index) - .pi / 2
             let center = CGPoint(x: geometry.size.width / 2, y: geometry.size.height / 2)
-            let labelRadius = radius - 20 // ラベルのために半径を少し短くする
-            let x = center.x + labelRadius * cos(angle) // ラベルの幅の半分を引く
-            let y = center.y + labelRadius * sin(angle) // ラベルの高さの半分を引く
+            // ビューのサイズに基づいて radius を計算します
+            let radius = min(geometry.size.width, geometry.size.height) / 2 * 1.13 // 85% をラベルの配置に使用します
+
+            let x = center.x + radius * cos(angle) - 20
+            let y = center.y + radius * sin(angle) - 20
 
             Image("\(label)")
                 .resizable()
                 .frame(width: 40, height: 40)
-                .position(x: x, y: y)
+                // ラベルの中心が正しい位置に来るように調整します
+//                .offset(x: radius * cos(angle) + 178, y: radius * sin(angle) + 155)
+//                .offset(x: radius * cos(angle) + 0, y: radius * sin(angle) + 0)
+                .offset(x:x,y:y)
+                // position ではなく offset を使って配置することで、
+                // より詳細な位置調整が可能になります
         }
+        
     }
 }
+
 
 struct PentagonGraphBackgroundShape: Shape {
     func path(in rect: CGRect) -> Path {
         let center = CGPoint(x: rect.midX, y: rect.midY)
-        let radius = min(rect.width, rect.height) / 2 - 30
+        let radius = min(rect.width, rect.height) / 2 - 10
         let angle = (2 * CGFloat.pi) / 7
 
         // ここから追加
@@ -162,9 +195,9 @@ struct PentagonGraphView: View {
     
     var body: some View {
             GeometryReader { geometry in
-                let graphCenter = CGPoint(x: geometry.size.width / 2, y: geometry.size.height / 2 - 160)
+                let graphCenter = CGPoint(x: geometry.size.width / 2, y: geometry.size.height / 2 - 170)
                 // graphRadiusの最大値を100とするための計算
-                let graphRadius = min(geometry.size.width, geometry.size.height) / 2 - 30
+                let graphRadius = min(geometry.size.width, geometry.size.height) / 2 - 10
                 let maxScaleValue: CGFloat = 100 // スケールの最大値
                 let scaleFactor = graphRadius / maxScaleValue // スケールファクター
 
@@ -179,7 +212,7 @@ struct PentagonGraphView: View {
                            )
 
                     ForEach(Array(QuizLevel.allCases.enumerated()), id: \.offset) { (i, _) in
-                        PentagonGraphLabelView(label: labels[i], index: i, radius: 180.0)
+                        PentagonGraphLabelView(label: labels[i], index: i)
                     }
                     // 目盛りの数字を表示する
                     ForEach(scaleNumbers, id: \.self) { scaleValue in
@@ -192,7 +225,7 @@ struct PentagonGraphView: View {
                         // Text Viewを使って数字を表示
                         Text("\(Int(scaleValue))") // "%.1f" から整数に変更
                             .position(numberPosition)
-                            .offset(x: -20, y: 170) // Textの位置を適宜調整
+                            .offset(x: -25, y: 170) // Textの位置を適宜調整
                     }
                 }
                 .onAppear {
@@ -209,6 +242,7 @@ struct PentagonView: View {
     @State private var quizData = [QuizLevel: QuizData]()
     @ObservedObject var audioManager = AudioManager.shared
     @Environment(\.presentationMode) var presentationMode
+    @Binding var flag: Bool
     var body: some View {
         VStack{
             HStack{
@@ -219,7 +253,18 @@ struct PentagonView: View {
             }
             .padding(.top)
             PentagonGraphView(userId: authManager.currentUserId!, labels: ["初級", "中級", "上級", "神級", "ネットワーク", "セキュリティ","データベース"])
+                .padding(.top,30)
             VStack(spacing: 0) {
+                HStack{
+                    Image("beginnerMonster1")
+                        .resizable()
+                        .frame(width:30,height:30)
+                    Text("ダンジョンの種類")
+                    Spacer()
+                    Text("正答率")
+                }
+                .font(.system(size: 20))
+                .padding()
                 ScrollView{
                     ForEach(QuizLevel.allCases, id: \.self) { level in
                         if let quizDataForLevel = quizData[level] {
@@ -238,9 +283,17 @@ struct PentagonView: View {
                     }
                 }
             }
+            .padding(.top)
         }
         .onAppear {
             print("currentuser:\(authManager.currentUserId)")
+            RateManager.shared.fetchQuizData(userId: authManager.currentUserId!) { data in
+                self.quizData = data
+                print("self.quizData:\(self.quizData)")
+            }
+            self.flag = true
+        }
+        .onChange(of: flag) { flag in
             RateManager.shared.fetchQuizData(userId: authManager.currentUserId!) { data in
                 self.quizData = data
                 print("self.quizData:\(self.quizData)")
@@ -270,6 +323,6 @@ struct PentagonShape_Previews: PreviewProvider {
     static var previews: some View {
 //        PentagonGraphView(userId: "VQ0MZw8snHSY23rOXbhN9wxORF42", labels: ["初級", "中級", "上級", "ネットワーク", "セキュリティ","データベース", "デイリー", "神級", "初級(タイムアタック)", "中級(タイムアタック)", "上級(タイムアタック)"])
 //        PentagonGraphView(userId: "VQ0MZw8snHSY23rOXbhN9wxORF42", labels: ["初級", "中級", "上級", "神級", "ネットワーク", "セキュリティ","データベース"])
-        PentagonView(authManager: dummyAuthManager)
+        PentagonView(authManager: dummyAuthManager, flag: .constant(false))
     }
 }

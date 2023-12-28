@@ -264,7 +264,7 @@ struct GachaView: View {
                 } else {
                     Image("ガチャ")
                         .resizable()
-                        .frame(maxWidth:350,maxHeight:280)
+                        .frame(width: frameSize().width, height: frameSize().height)
                     Spacer()
                     HStack{
                         Spacer()
@@ -293,11 +293,11 @@ struct GachaView: View {
                                 if(isGachaButtonDisabled){
                                     Image("ガチャる")
                                         .resizable()
-                                        .frame(width:210,height:100)
+                                        .frame(width: frameSize2().width, height: frameSize2().height)
                                 }else{
                                     Image("ガチャる白黒")
                                         .resizable()
-                                        .frame(width:210,height:100)
+                                        .frame(width: frameSize2().width, height: frameSize2().height)
                                 }
                             }
                             .shadow(radius: 10)
@@ -315,7 +315,7 @@ struct GachaView: View {
                         }) {
                             Image("獲得")
                                 .resizable()
-                                .frame(maxWidth:110,maxHeight:110)
+                                .frame(width: frameSize3().width, height: frameSize3().height)
                         }
                         .onAppear() {
                             reward.LoadReward()
@@ -327,7 +327,7 @@ struct GachaView: View {
                     Spacer()
                     Image("卵レア度")
                         .resizable()
-                        .frame(maxWidth:350 , maxHeight:120)
+                        .frame(width: frameSize4().width, height: frameSize4().height)
                 }
                 Spacer()
             }
@@ -411,6 +411,49 @@ struct GachaView: View {
            }
         
        }
+    func isIPad() -> Bool {
+        return UIDevice.current.userInterfaceIdiom == .pad
+    }
+    // フレームサイズを調整する関数
+    func frameSize() -> CGSize {
+        if isIPad() {
+            // iPadの場合のサイズ
+            return CGSize(width: 700, height: 560)
+        } else {
+            // iPhoneやその他のデバイスの場合のサイズ
+            return CGSize(width: 350, height: 280)
+        }
+    }
+    
+    func frameSize2() -> CGSize {
+        if isIPad() {
+            // iPadの場合のサイズ
+            return CGSize(width: 450, height: 260)
+        } else {
+            // iPhoneやその他のデバイスの場合のサイズ
+            return CGSize(width: 210, height: 100)
+        }
+    }
+    
+    func frameSize3() -> CGSize {
+        if isIPad() {
+            // iPadの場合のサイズ
+            return CGSize(width: 300, height: 300)
+        } else {
+            // iPhoneやその他のデバイスの場合のサイズ
+            return CGSize(width: 110, height: 110)
+        }
+    }
+    
+    func frameSize4() -> CGSize {
+        if isIPad() {
+            // iPadの場合のサイズ
+            return CGSize(width: 800, height: 300)
+        } else {
+            // iPhoneやその他のデバイスの場合のサイズ
+            return CGSize(width: 350, height: 120)
+        }
+    }
 }
 
 struct GachaView_Previews: PreviewProvider {

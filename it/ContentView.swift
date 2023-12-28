@@ -164,49 +164,49 @@ struct ContentView: View {
                             
                             VStack{
                                 ScrollView{
-                                    Button(action: {
-                                        if isButtonEnabled {
-                                            if let userId = authManager.currentUserId {
-                                                authManager.saveLastClickedDate(userId: userId) { success in
-                                                    lastClickedDate = Date()
-                                                    isButtonEnabled = false
-                                                }
-                                            }
-                                        }
-                                        audioManager.playKetteiSound()
-                                        // 画面遷移のトリガーをオンにする
-                                        self.isPresentingQuizBeginnerList = true
-                                    }) {
-                                        if isButtonEnabled {
-                                            Image("デイリー")
-                                                .resizable()
-                                                .frame(height:70)
-                                        }else{
-                                            Image("白黒デイリー")
-                                                .resizable()
-                                                .frame(height:70)
-                                        }
-                                        //                                        .foregroundColor(.gray)
-                                    }
-                                    .fullScreenCover(isPresented: $isPresentingQuizBeginnerList) {
-                                        QuizDailyList(isPresenting: $isPresentingQuizBeginnerList)
-                                                }
-                                    .frame(maxWidth: .infinity)
-                                    .disabled(!isButtonEnabled)
-                                    .padding(.horizontal)
-                                    //                            .padding(.bottom)
-                                    
-                                    .shadow(radius: 3)
-                                    .onTapGesture {
-                                        if isButtonEnabled {
-                                            if let userId = authManager.currentUserId {
-                                                authManager.saveLastClickedDate(userId: userId) { success in
-                                                    lastClickedDate = Date()
-                                                    isButtonEnabled = false
-                                                }
-                                            }
-                                        }
-                                    }
+//                                    Button(action: {
+//                                        if isButtonEnabled {
+//                                            if let userId = authManager.currentUserId {
+//                                                authManager.saveLastClickedDate(userId: userId) { success in
+//                                                    lastClickedDate = Date()
+//                                                    isButtonEnabled = false
+//                                                }
+//                                            }
+//                                        }
+//                                        audioManager.playKetteiSound()
+//                                        // 画面遷移のトリガーをオンにする
+//                                        self.isPresentingQuizBeginnerList = true
+//                                    }) {
+//                                        if isButtonEnabled {
+//                                            Image("デイリー")
+//                                                .resizable()
+//                                                .frame(height:70)
+//                                        }else{
+//                                            Image("白黒デイリー")
+//                                                .resizable()
+//                                                .frame(height:70)
+//                                        }
+//                                        //                                        .foregroundColor(.gray)
+//                                    }
+//                                    .fullScreenCover(isPresented: $isPresentingQuizBeginnerList) {
+//                                        QuizDailyList(isPresenting: $isPresentingQuizBeginnerList)
+//                                                }
+//                                    .frame(maxWidth: .infinity)
+//                                    .disabled(!isButtonEnabled)
+//                                    .padding(.horizontal)
+//                                    //                            .padding(.bottom)
+//                                    
+//                                    .shadow(radius: 3)
+//                                    .onTapGesture {
+//                                        if isButtonEnabled {
+//                                            if let userId = authManager.currentUserId {
+//                                                authManager.saveLastClickedDate(userId: userId) { success in
+//                                                    lastClickedDate = Date()
+//                                                    isButtonEnabled = false
+//                                                }
+//                                            }
+//                                        }
+//                                    }
                                     Button(action: {
                                         audioManager.playSound()
                                         // 画面遷移のトリガーをオンにする

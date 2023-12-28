@@ -49,7 +49,7 @@ struct QuizManagerView: View {
                                     //                        Image("IT基礎知識の問題の初級")
                                     Image("選択肢1")
                                         .resizable()
-                                        .frame(height: 70)
+                                        .frame(height: isIPad() ? 200 : 70)
                                 }
                                 .frame(maxWidth: .infinity)
                                 .padding(.horizontal)
@@ -68,7 +68,7 @@ struct QuizManagerView: View {
                                 //                    Image("IT基礎知識の問題の中級")
                                 Image("選択肢2")
                                     .resizable()
-                                    .frame(height: 70)
+                                    .frame(height: isIPad() ? 200 : 70)
                             }
                             .frame(maxWidth: .infinity)
                             .padding(.horizontal)
@@ -85,7 +85,7 @@ struct QuizManagerView: View {
                                 //                    Image("IT基礎知識の問題の上級")
                                 Image("選択肢3")
                                     .resizable()
-                                    .frame(height: 70)
+                                    .frame(height: isIPad() ? 200 : 70)
                             }
                             .frame(maxWidth: .infinity)
                             .padding(.horizontal)
@@ -101,7 +101,7 @@ struct QuizManagerView: View {
                                 //                    Image("データベース系の問題")
                                 Image("選択肢7")
                                     .resizable()
-                                    .frame(height: 70)
+                                    .frame(height: isIPad() ? 200 : 70)
                             }
                             .frame(maxWidth: .infinity)
                             .padding(.horizontal)
@@ -118,7 +118,7 @@ struct QuizManagerView: View {
                                 //                    Image("ネットワーク系の問題")
                                 Image("選択肢4")
                                     .resizable()
-                                    .frame(height: 70)
+                                    .frame(height: isIPad() ? 200 : 70)
                             }
                             .frame(maxWidth: .infinity)
                             .padding(.horizontal)
@@ -136,7 +136,7 @@ struct QuizManagerView: View {
                                 //                    Image("セキュリティ系の問題")
                                 Image("選択肢5")
                                     .resizable()
-                                    .frame(height: 70)
+                                    .frame(height: isIPad() ? 200 : 70)
                             }
                             .frame(maxWidth: .infinity)
                             .padding(.horizontal)
@@ -154,7 +154,7 @@ struct QuizManagerView: View {
                                 //                    Image("データベース系の問題")
                                 Image("選択肢6")
                                     .resizable()
-                                    .frame(height: 70)
+                                    .frame(height: isIPad() ? 200 : 70)
                             }
                             .frame(maxWidth: .infinity)
                             .padding(.horizontal)
@@ -284,8 +284,11 @@ struct QuizManagerView: View {
                     }
                 }
             }
+        .navigationViewStyle(StackNavigationViewStyle())
         }
-        
+    func isIPad() -> Bool {
+        return UIDevice.current.userInterfaceIdiom == .pad
+    }
     }
 
 
