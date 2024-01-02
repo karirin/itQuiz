@@ -262,74 +262,76 @@ struct GachaView: View {
                     }
                     Spacer()
                 } else {
-                    Image("ガチャ")
-                        .resizable()
-                        .frame(width: frameSize().width, height: frameSize().height)
-                    Spacer()
-                    HStack{
+                    ScrollView{
+                        Image("ガチャ")
+                            .resizable()
+                            .frame(width: frameSize().width, height: frameSize().height)
                         Spacer()
-                        VStack{
-                            Button(action: {
-                                self.showResult = false
-                                authManager.decreaseUserMoney { success in
-                                    if success {
-                                        print("User money decreased successfully.")
-                                    } else {
-                                        print("Failed to decrease user money.")
+                        HStack{
+                            Spacer()
+                            VStack{
+                                Button(action: {
+                                    self.showResult = false
+                                    authManager.decreaseUserMoney { success in
+                                        if success {
+                                            print("User money decreased successfully.")
+                                        } else {
+                                            print("Failed to decrease user money.")
+                                        }
+                                    }
+                                    self.showAnimation = true
+                                    self.gachaManager.shuffleItems()
+                                    //                            self.obtainedItem = self.gachaManager.drawGacha()
+                                    self.obtainedRareItem = self.gachaManager.drawGacha()
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                                        self.showResult = true
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                                            self.obtainedItem = self.obtainedRareItem
+                                            animationFinished = true
+                                        }
+                                    }
+                                }) {
+                                    if(isGachaButtonDisabled){
+                                        Image("ガチャる")
+                                            .resizable()
+                                            .frame(width: frameSize2().width, height: frameSize2().height)
+                                    }else{
+                                        Image("ガチャる白黒")
+                                            .resizable()
+                                            .frame(width: frameSize2().width, height: frameSize2().height)
                                     }
                                 }
-                                self.showAnimation = true
-                                self.gachaManager.shuffleItems()
-    //                            self.obtainedItem = self.gachaManager.drawGacha()
-                                self.obtainedRareItem = self.gachaManager.drawGacha()
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                                    self.showResult = true
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
-                                        self.obtainedItem = self.obtainedRareItem
-                                        animationFinished = true
-                                    }
+                                .shadow(radius: 10)
+                                .disabled(!isGachaButtonDisabled)
+                                Image("300コイン")
+                                    .resizable()
+                                    .frame(maxWidth:150,maxHeight:50)
+                            }
+                            Spacer()
+                            Button(action: {
+                                reward.ShowReward()
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                    self.showLoginModal = true
                                 }
                             }) {
-                                if(isGachaButtonDisabled){
-                                    Image("ガチャる")
-                                        .resizable()
-                                        .frame(width: frameSize2().width, height: frameSize2().height)
-                                }else{
-                                    Image("ガチャる白黒")
-                                        .resizable()
-                                        .frame(width: frameSize2().width, height: frameSize2().height)
-                                }
+                                Image("獲得")
+                                    .resizable()
+                                    .frame(width: frameSize3().width, height: frameSize3().height)
                             }
+                            .onAppear() {
+                                reward.LoadReward()
+                            }
+                            //                        .disabled(!reward.rewardLoaded)
                             .shadow(radius: 10)
-                            .disabled(!isGachaButtonDisabled)
-                            Image("300コイン")
-                                .resizable()
-                                .frame(maxWidth:150,maxHeight:50)
+                            Spacer()
                         }
                         Spacer()
-                        Button(action: {
-                            reward.ShowReward()
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                self.showLoginModal = true
-                            }
-                        }) {
-                            Image("獲得")
-                                .resizable()
-                                .frame(width: frameSize3().width, height: frameSize3().height)
-                        }
-                        .onAppear() {
-                            reward.LoadReward()
-                        }
-//                        .disabled(!reward.rewardLoaded)
-                        .shadow(radius: 10)
-                        Spacer()
+                        Image("卵レア度")
+                            .resizable()
+                            .frame(width: frameSize4().width, height: frameSize4().height)
                     }
                     Spacer()
-                    Image("卵レア度")
-                        .resizable()
-                        .frame(width: frameSize4().width, height: frameSize4().height)
                 }
-                Spacer()
             }
             if showLoginModal {
                 ZStack {

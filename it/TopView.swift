@@ -27,6 +27,8 @@ struct TopView: View {
     
     var body: some View {
         ZStack{
+                Image("背景")
+                                .resizable()
             VStack {
                 TabView {
                     HStack{
@@ -55,6 +57,7 @@ struct TopView: View {
                                 Text("おとも一覧")
                             }
                     PentagonView(authManager: authManager, flag: .constant(false))
+//                    GraphManagerView()
                             .tabItem {
                                 Image(systemName: "chart.pie")
                                 Text("分析")

@@ -7,8 +7,15 @@
 
     import SwiftUI
     import AVFoundation
+import Firebase
 
-
+struct IncorrectAnswer {
+var userId: String
+var quizQuestion: String
+var choices: [String]
+var correctAnswerIndex: Int
+var explanation: String
+}
 
 struct ViewPositionKey1: PreferenceKey {
     static var defaultValue: [CGRect] = []
@@ -57,9 +64,11 @@ struct ViewPositionKey3: PreferenceKey {
         @State private var showTutorial: Bool = false
         @State private var quizResults: [QuizResult] = []
         @State private var answerCount: Int = 0
+        @State private var incorrectCount: Int = 0
+        @State private var incorrectAnswerCount: Int = 0
         @State private var correctAnswerCount: Int = 0
         @State private var countdownValue: Int = 3
-        @State private var showCountdown: Bool = true
+        @State private var showCountdown: Bool = false
         @State private var playerHP: Int = 1000
         @State private var playerMaxHP: Int = 1000
         @State private var monsterHP: Int = 3000
@@ -142,6 +151,15 @@ struct ViewPositionKey3: PreferenceKey {
                 }
             }
         }
+        
+        
+        func fetchNumberOfIncorrectAnswers(userId: String, completion: @escaping (Int) -> Void) {
+        let ref = Database.database().reference().child("IncorrectAnswers").child(userId)
+        ref.observeSingleEvent(of: .value) { snapshot in
+        let count = snapshot.childrenCount // 子ノードの数を取得
+        completion(Int(count))
+        }
+        }
 
         func startTimer() {
             // 現在のタイマーを止める
@@ -161,7 +179,7 @@ struct ViewPositionKey3: PreferenceKey {
         }
         
         // 次の問題へ移る処理
-        func moveToNextQuiz() {
+        func moveToNextQuiz() {  
             if monsterType == 3 && monsterHP <= 0 {
                 // 最後のモンスターが倒された場合、結果画面へ遷移
                 showCompletionMessage = true
@@ -211,11 +229,14 @@ struct ViewPositionKey3: PreferenceKey {
                         self.showAttackImage = true
                         //                                        }
                         correctAnswerCount += 1 // 正解の場合、正解数をインクリメント
+                        incorrectCount -= 1
                         answerCount += 1
                         print("correctAnswerCount:\(correctAnswerCount)")
                         print("AnswerCount:\(answerCount)")
                         //                                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                        monsterHP -= userAttack
+                        if quizLevel != .incorrectAnswer {
+                            monsterHP -= userAttack
+                        }
                         if monsterHP <= 0 {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                                 audioManager.playDownSound()
@@ -232,10 +253,23 @@ struct ViewPositionKey3: PreferenceKey {
                             timer?.invalidate()
                         }
                     }
+                    if quizLevel == .incorrectAnswer {
+                    removeCorrectAnswer(for: authManager.currentUserId!, questionId: currentQuiz.id!)
+                    }
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                         moveToNextQuiz()
                     }
                 } else {
+                    let incorrectAnswer = IncorrectAnswer(
+                    userId: authManager.currentUserId!,
+                    quizQuestion: currentQuiz.question,
+                    choices: currentQuiz.choices,
+                    correctAnswerIndex: currentQuiz.correctAnswerIndex, explanation: currentQuiz.explanation
+                    )
+                    // incorrectAnswer以外のクイズなら不正解の問題をincorrectAnswerテーブルに保存する
+                    if quizLevel != .incorrectAnswer {
+                    saveIncorrectAnswer(incorrectAnswer)
+                    }
                     answerCount += 1
                     audioManager.playUnCorrectSound()
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -258,6 +292,27 @@ struct ViewPositionKey3: PreferenceKey {
                 quizResults.append(result)
                 self.showAttackImage = false
                 hasAnswered = true
+            }
+        }
+        func saveIncorrectAnswer(_ answer: IncorrectAnswer) {
+        // ユーザーIDを親ノードとして設定
+        let ref = Database.database().reference().child("IncorrectAnswers").child(answer.userId).childByAutoId()
+        ref.setValue([
+        "quizQuestion": answer.quizQuestion,
+        "choices": answer.choices,
+        "correctAnswerIndex": answer.correctAnswerIndex,
+        "explanation": answer.explanation
+        ])
+        }
+        
+        func removeCorrectAnswer(for userId: String, questionId: String) {
+            let ref = Database.database().reference().child("IncorrectAnswers").child(userId).child(questionId)
+            ref.removeValue { error, _ in
+                if let error = error {
+                    print("Error removing correct answer: \(error.localizedDescription)")
+                } else {
+                    print("Correct answer removed successfully.")
+                }
             }
         }
         
@@ -297,17 +352,17 @@ struct ViewPositionKey3: PreferenceKey {
                     Spacer()
                     VStack{
                         ZStack {
-                                VStack{
-                                    Text(currentQuiz.question)
-                                        .font(.headline)
-                                        .frame(height: tutorialNum == 0 ? 70 : nil)
-                                        .padding(.horizontal)
-                                        .foregroundColor(Color("fontGray"))
-                                    
-                                }.background(GeometryReader { geometry in
-                                    Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
-                                })//
+                            VStack{
+                                Text(currentQuiz.question)
+                                    .font(.headline)
+                                    .frame(height: tutorialNum == 0 ? 70 : nil)
+                                    .padding(.horizontal)
+                                    .foregroundColor(Color("fontGray"))
                                 
+                            }.background(GeometryReader { geometry in
+                                Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
+                            })//
+                            
                             // 正解の場合の赤い円
                             if let selected = selectedAnswerIndex, selected == currentQuiz.correctAnswerIndex {
                                 Circle()
@@ -358,43 +413,54 @@ struct ViewPositionKey3: PreferenceKey {
                                 }
                             }
                         }
-                        VStack{
-                            HStack{
-                                ProgressBar3(value: Double(monsterHP), maxValue: Double(monsterUnderHP), color: Color("hpMonsterColor"))
-                                    .frame(height: 20)
-                                Text("\(monsterHP)/\(monsterUnderHP)")
-                                    .foregroundColor(Color("fontGray"))
-                            }
-                            .padding(.horizontal)
-                            ZStack{
-                                // 味方キャラのHP
+                        if quizLevel != .incorrectAnswer {
+                            VStack{
                                 HStack{
-                                    Image(avator.isEmpty ? "defaultIcon" : (avator.first?["name"] as? String) ?? "")
-                                        .resizable()
-                                        .frame(width: 30,height:30)
-                                    ProgressBar3(value: Double(playerHP), maxValue: Double(self.userMaxHp), color: Color("hpUserColor"))
+                                    ProgressBar3(value: Double(monsterHP), maxValue: Double(monsterUnderHP), color: Color("hpMonsterColor"))
                                         .frame(height: 20)
-                                    Text("\(playerHP)/\(self.userMaxHp)")
+                                    Text("\(monsterHP)/\(monsterUnderHP)")
                                         .foregroundColor(Color("fontGray"))
                                 }
                                 .padding(.horizontal)
-                                // 味方がダメージをくらう
-                                if let selected = selectedAnswerIndex, selected != currentQuiz.correctAnswerIndex {
-                                    if showAttackImage{
-    //                                    Image("\(quizLevel)MonsterAttack\(monsterType)")
-                                        Image("beginnerMonsterAttack\(monsterType)")
+                                ZStack{
+                                    // 味方キャラのHP
+                                    HStack{
+                                        Image(avator.isEmpty ? "defaultIcon" : (avator.first?["name"] as? String) ?? "")
                                             .resizable()
-                                            .frame(width:30,height:30)
+                                            .frame(width: 30,height:30)
+                                        ProgressBar3(value: Double(playerHP), maxValue: Double(self.userMaxHp), color: Color("hpUserColor"))
+                                            .frame(height: 20)
+                                        Text("\(playerHP)/\(self.userMaxHp)")
+                                            .foregroundColor(Color("fontGray"))
+                                    }
+                                    .padding(.horizontal)
+                                    // 味方がダメージをくらう
+                                    if let selected = selectedAnswerIndex, selected != currentQuiz.correctAnswerIndex {
+                                        if showAttackImage{
+                                            //                                    Image("\(quizLevel)MonsterAttack\(monsterType)")
+                                            Image("beginnerMonsterAttack\(monsterType)")
+                                                .resizable()
+                                                .frame(width:30,height:30)
+                                        }
                                     }
                                 }
                             }
-                        }
                             .background(GeometryReader { geometry in
                                 Color.clear.preference(key: ViewPositionKey2.self, value: [geometry.frame(in: .global)])
                             })
-                            
-                            
+                        } else {
+                            HStack {
+                                VStack{
+                                    Text("問題数")
+                                    Text("\(incorrectCount)")
+                                        .font(.system(size: 24))
+                                }
+                                ProgressBar3(value: Double(incorrectCount), maxValue: Double(self.incorrectAnswerCount), color: Color("loading"))
+                                    .frame(height: 20)
+                            }
+                            .padding()
                         }
+                    }
                     Spacer()
                     ScrollView{
                         VStack{
@@ -465,7 +531,8 @@ struct ViewPositionKey3: PreferenceKey {
                                 pauseTimer:pauseTimer, startTimer: startTimer
                             )
                         }else{
-                            Text("test")
+                            ModalReturnView(
+                            isPresented: $showExplanationModal, pauseTimer:pauseTimer, startTimer: startTimer)
                         }
                     }
                 }
@@ -728,15 +795,20 @@ struct ViewPositionKey3: PreferenceKey {
                         self.playerHP = self.userHp
                     }
                     if self.tutorialNum == 0 {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+//                        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
                             startTimer() // Viewが表示されたときにタイマーを開始
-                        }
+//                        }
                     }
                 }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    audioManager.playCountdownSound()
-                }
                 self.startTime = Date()
+                fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
+                self.incorrectAnswerCount = count
+                incorrectCount = count
+                }
+                if quizLevel == .incorrectAnswer {
+                userAttack = 0
+                }
+                print("userAttack:\(userAttack)")
             }
             .onDisappear {
                 // QuizViewが閉じるときの時刻を記録する
@@ -1103,5 +1175,6 @@ struct ViewPositionKey3: PreferenceKey {
 struct QuizView_Previews: PreviewProvider {
     static var previews: some View {
         QuizBeginnerList(isPresenting: .constant(false))
+//        QuizIncorrectAnswerListView(isPresenting: .constant(false))
     }
 }

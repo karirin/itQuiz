@@ -69,7 +69,6 @@ struct ContentView: View {
                                 .foregroundColor(Color("fontGray"))
                             Text("\(userName)")
                                 .foregroundColor(Color("fontGray"))
-                            Spacer()
                             Image("コイン")
                                 .resizable()
                                 .frame(width:20,height:20)
@@ -77,6 +76,8 @@ struct ContentView: View {
                                 .foregroundColor(Color("fontGray"))
                             Text(" \(userMoney)")
                                 .foregroundColor(Color("fontGray"))
+                            Spacer()
+                            HelpView()
 //                            Spacer()
 //                            Spacer()
                             
@@ -96,10 +97,11 @@ struct ContentView: View {
                         //                ScrollView{
                         VStack{
                             ZStack{
+                                
                                 Image("image")
                                     .resizable()
-                                    .frame(height:120)
-                                    .padding(.top,40)
+                                    .frame(height:200)
+                                    .padding(.top,10)
                                     .opacity(0.5)
                                 Image(avatar.isEmpty ? "defaultIcon" : (avatar.first?["name"] as? String) ?? "")
                                 //                            Image("ぴょん吉")

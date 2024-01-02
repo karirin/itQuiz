@@ -7,13 +7,6 @@
 
 import SwiftUI
 
-struct QuizQuestion {
-    var question: String
-    var choices: [String]
-    var correctAnswerIndex: Int
-    var explanation: String
-}
-
 struct QuizBeginnerList: View {
     @Binding var isPresenting: Bool
 //    let quizBeginnerList: [QuizQuestion] = [

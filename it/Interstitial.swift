@@ -21,7 +21,8 @@ class Interstitial: NSObject, GADFullScreenContentDelegate, ObservableObject {
 
     // リワード広告の読み込み
     func loadInterstitial() {
-        GADInterstitialAd.load(withAdUnitID: "ca-app-pub-3940256099942544/4411468910", request: GADRequest()) { [self] (ad, error) in
+//        GADInterstitialAd.load(withAdUnitID: "ca-app-pub-4898800212808837/3001013957", request: GADRequest()) { [self] (ad, error) in
+        GADInterstitialAd.load(withAdUnitID: "ca-app-pub-3940256099942544/4411468910", request: GADRequest()) { (ad, error) in
             if let _ = error {
                 print("😭: 読み込みに失敗しました")
                 print("広告の読み込みに失敗しました: \(error!.localizedDescription)")
@@ -30,8 +31,9 @@ class Interstitial: NSObject, GADFullScreenContentDelegate, ObservableObject {
             }
             print("😍: 読み込みに成功しましたああ")
             self.interstitialAdLoaded = true
+            print("self.interstitialAdLoaded:\(self.interstitialAdLoaded)")
             self.flag = true
-            print("flag:\(flag)")
+            print("flag:\(self.flag)")
             self.interstitialAd = ad
             self.interstitialAd?.fullScreenContentDelegate = self
         }
@@ -42,7 +44,7 @@ class Interstitial: NSObject, GADFullScreenContentDelegate, ObservableObject {
         let root = UIApplication.shared.windows.first?.rootViewController
         if let ad = interstitialAd {
             ad.present(fromRootViewController: root!)
-            self.interstitialAdLoaded = false
+//            self.interstitialAdLoaded = false
         } else {
             print("😭: 広告の準備ができていませんでした")
             self.interstitialAdLoaded = false
@@ -59,7 +61,7 @@ class Interstitial: NSObject, GADFullScreenContentDelegate, ObservableObject {
     // 表示通知
     func adWillPresentFullScreenContent(_ ad: GADFullScreenPresentingAd) {
         print("インタースティシャル広告を表示しました")
-        self.interstitialAdLoaded = false // 広告表示時に false に設定
+//        self.interstitialAdLoaded = false // 広告表示時に false に設定
     }
 
     func adDidDismissFullScreenContent(_ ad: GADFullScreenPresentingAd) {

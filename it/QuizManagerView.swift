@@ -7,6 +7,7 @@
 
 import SwiftUI
 import AVFoundation
+import Firebase
 
 struct QuizManagerView: View {
     @State private var isIntermediateQuizActive: Bool = false
@@ -22,6 +23,7 @@ struct QuizManagerView: View {
     @State private var isPresentingQuizSecurity: Bool = false
     @State private var isPresentingQuizDatabase: Bool = false
     @State private var isPresentingQuizGod: Bool = false
+    @State private var isPresentingQuizIncorrectAnswer: Bool = false
     @State private var isSoundOn: Bool = true
     @ObservedObject var audioManager = AudioManager.shared
     @Environment(\.presentationMode) var presentationMode
@@ -29,6 +31,8 @@ struct QuizManagerView: View {
     @State private var tutorialNum: Int = 0
     @State private var buttonRect: CGRect = .zero
     @State private var bubbleHeight: CGFloat = 0.0
+    @State private var isIncorrectAnswersEmpty: Bool = true
+
     
     init(isPresenting: Binding<Bool>) {
         _isPresenting = isPresenting
@@ -41,6 +45,81 @@ struct QuizManagerView: View {
             ZStack{
                     ScrollView{
                         VStack {
+                            HStack {
+                                Text(" ")
+                                    .background(.gray)
+                                    .frame(width:10,height: 20)
+                                Text("過去に不正解した問題だけを解くことができます")
+                                    .font(.system(size: 16))
+                            }
+//                            .padding(.horizontal,0)
+                            .padding(.bottom)
+                            Button(action: {
+                                audioManager.playKetteiSound()
+                                // 画面遷移のトリガーをオンにする
+                                self.isPresentingQuizIncorrectAnswer = true
+                            }) {
+                                //                        Image("IT基礎知識の問題の初級")
+                                if isIncorrectAnswersEmpty == true {
+                                Image("白黒選択肢0")
+                                    .resizable()
+                                    .frame(height: 70)
+                                }else{
+                                    Image("選択肢0")
+                                        .resizable()
+                                        .frame(height: 70)
+                                }
+                            }
+                            .disabled(isIncorrectAnswersEmpty)
+                            .frame(maxWidth: .infinity)
+                            .padding(.horizontal)
+                            .padding(.bottom)
+                            .shadow(radius: 3)
+                            .fullScreenCover(isPresented: $isPresentingQuizIncorrectAnswer) {
+                                QuizIncorrectAnswerListView(isPresenting: $isPresentingQuizIncorrectAnswer)
+                                        }
+                            .onChange(of: isPresentingQuizBeginner) { isPresenting in
+                                    fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
+                                }
+                            }
+                            .onChange(of: isPresentingQuizIncorrectAnswer) { isPresenting in
+                                    fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
+                                }
+                            }
+                            .onChange(of: isPresentingQuizIntermediate) { isPresenting in
+                                    fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
+                                }
+                            }
+                            .onChange(of: isPresentingQuizAdvanced) { isPresenting in
+                                    fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
+                                }
+                            }
+                            .onChange(of: isPresentingQuizGod) { isPresenting in
+                                    fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
+                                }
+                            }
+                            .onChange(of: isPresentingQuizNetwork) { isPresenting in
+                                    fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
+                                }
+                            }
+                            .onChange(of: isPresentingQuizSecurity) { isPresenting in
+                                    fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
+                                }
+                            }
+                            .onChange(of: isPresentingQuizDatabase) { isPresenting in
+                                    fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
+                                }
+                            }
+                        
+                            HStack {
+                                Text(" ")
+                                    .background(.gray)
+                                    .frame(width:10,height: 20)
+                                Text("問題の難易度、種類別で解くことができます　　")
+                                    .font(.system(size: 16))
+                            }
+//                            .padding(.horizontal)
+                            .padding(.bottom)
                                 Button(action: {
                                     audioManager.playKetteiSound()
                                     // 画面遷移のトリガーをオンにする
@@ -54,7 +133,7 @@ struct QuizManagerView: View {
                                 .frame(maxWidth: .infinity)
                                 .padding(.horizontal)
                                 .padding(.bottom)
-                                .shadow(radius: 5)
+                                .shadow(radius: 3)
                                 .fullScreenCover(isPresented: $isPresentingQuizBeginner) {
                                                 QuizBeginnerList(isPresenting: $isPresentingQuizBeginner)
                                             }
@@ -123,7 +202,7 @@ struct QuizManagerView: View {
                             .frame(maxWidth: .infinity)
                             .padding(.horizontal)
                             .padding(.bottom)
-                            .shadow(radius: 3)
+                            .shadow(radius: 1)
                             .fullScreenCover(isPresented: $isPresentingQuizNetwork) {
                                             QuizNetworkList(isPresenting: $isPresentingQuizNetwork)
                                         }
@@ -165,18 +244,6 @@ struct QuizManagerView: View {
                                         }
                             
                         }
-//                        VStack{
-//                            Group{
-////                                NavigationLink("", destination: QuizDatabaseList(isPresenting: $isPresenting).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizDatabase) // 適切な遷移先に変更してください
-//////                                NavigationLink("", destination: QuizBeginnerList(isPresenting: $isPresenting).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizBeginner) // 適切な遷移先に変更してください
-////                                NavigationLink("", destination: QuizIntermediateList(isPresenting: $isPresenting).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizIntermediate) // 適切な遷移先に変更してください
-////                                NavigationLink("", destination: QuizAdvancedList(isPresenting: $isPresenting).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizAdvanced)
-////                                NavigationLink("", destination: QuizSecurityList(isPresenting: $isPresenting).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizSecurity) // 適切な遷移先に変更してください
-////                                
-////                                NavigationLink("", destination: QuizNetworkList(isPresenting: $isPresenting).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizNetwork)
-////                                NavigationLink("", destination: QuizGodList(isPresenting: $isPresenting).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizGod)
-//                            }
-//                        }
                         
                     }
                     .padding(.top,-30)
@@ -235,6 +302,10 @@ struct QuizManagerView: View {
             .frame(maxWidth:.infinity,maxHeight: .infinity)
             .background(Color("Color2"))
             .onAppear {
+                fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
+//                self.incorrectAnswerCount = count
+//                incorrectCount = count
+                }
                 authManager.fetchUserInfo { (name, avatar, money, hp, attack, tutorialNum) in
                     if let fetchedTutorialNum = tutorialNum {
                         self.tutorialNum = fetchedTutorialNum
@@ -288,6 +359,17 @@ struct QuizManagerView: View {
         }
     func isIPad() -> Bool {
         return UIDevice.current.userInterfaceIdiom == .pad
+    }
+    
+    func fetchNumberOfIncorrectAnswers(userId: String, completion: @escaping (Int) -> Void) {
+    let ref = Database.database().reference().child("IncorrectAnswers").child(userId)
+    ref.observeSingleEvent(of: .value) { snapshot in
+        
+    let count = snapshot.childrenCount // 子ノードの数を取得
+    completion(Int(count))
+        print("count:\(count)")
+        self.isIncorrectAnswersEmpty = (count == 0)
+    }
     }
     }
 
