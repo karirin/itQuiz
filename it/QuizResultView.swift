@@ -168,6 +168,8 @@ struct QuizResultView: View {
                                         
                                         
                         } else {
+//                            Text("正解")
+//                                .foregroundColor(Color("fontGray1"))
                         ScrollView{
                             ForEach(results, id: \.question) { result in
                                 VStack(alignment: .leading,spacing: 20) {
@@ -175,11 +177,13 @@ struct QuizResultView: View {
                                         Image(systemName:result.isCorrect ? "circle" : "xmark")
                                             .foregroundColor(result.isCorrect ? .red : .blue)
                                             .opacity(0.7)
-                                        Text(result.isCorrect ? "正解" : "不正解")
+//                                        Text(result.isCorrect ? "正解" : "不正解")
+                                        Text("正解")
                                     }
                                     .font(.system(size:24))
                                     Text(result.question)
-                                    Text("あなたの回答: \(result.userAnswer)")
+//                                    Text("あなたの回答: \(result.userAnswer)")
+                                    Text("あなたの回答")
                                     Text("正解: \(result.correctAnswer)")
                                     Text("解説: \(result.explanation)")
                                 }.padding()
@@ -192,7 +196,7 @@ struct QuizResultView: View {
                             }
                             .padding(5)
                         }
-                        .foregroundColor(Color("fontGray"))
+                        .foregroundColor(Color("fontGray1"))
                     }
 //                    Spacer()
                 }
@@ -228,6 +232,8 @@ struct QuizResultView: View {
                 .onAppear {
                     if !interstitial.interstitialAdLoaded {
                         interstitial.loadInterstitial()
+                    } else if !interstitial.wasAdDismissed {
+                        interstitial.presentInterstitial()
                     }
                     if elapsedTime != 0 {
                         authManager.saveElapsedTime(category: "Beginner", elapsedTime: elapsedTime) { success in
@@ -252,9 +258,9 @@ struct QuizResultView: View {
                 audioManager.playCancelSound()
             }) {
                 Image(systemName: "chevron.left")
-                    .foregroundColor(Color("fontGray"))
+                    .foregroundColor(Color("fontGray1"))
                 Text("戻る")
-                    .foregroundColor(Color("fontGray"))
+                    .foregroundColor(Color("fontGray1"))
             })
             .toolbar {
                     ToolbarItem(placement: .principal) {
@@ -460,6 +466,6 @@ struct QuizResultView_Previews: PreviewProvider {
         let authManager = AuthManager() // 適切なダミーまたはモックオブジェクトで置き換えてください
 
         // プレビュー用にビューを初期化
-        QuizResultView(results: dummyResults, authManager: authManager, isPresenting: $isPresenting, navigateToQuizResultView: $navigateToQuizResultView, playerExperience: 10, playerMoney: 10, elapsedTime: 1)
+        QuizResultView(results: dummyResults, authManager: authManager, isPresenting: $isPresenting, navigateToQuizResultView: $navigateToQuizResultView, playerExperience: 10, playerMoney: 10, elapsedTime: 0)
     }
 }

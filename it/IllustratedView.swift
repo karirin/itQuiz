@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Firebase
 
 struct IllustratedView: View {
     let items = ["もりこう","ライム", "レッドドラゴン", "レインボードラゴン"]
@@ -167,77 +168,6 @@ struct IllustratedView: View {
                     }
                 }
             }
-//            ScrollView {
-//                LazyVGrid(columns: columns, spacing: 0) {
-//                    ForEach(authManager.avatars, id: \.name) { avatar in
-//                        VStack{
-//                            ZStack{
-//                                if avatar.usedFlag == 1 {
-//                                                Color("Color")
-//                                                    .frame(width: 100, height: 100)
-//                                                    .cornerRadius(8)
-//                                            }
-//                                Button(action: {
-//                                    // ここにおともを切り替えるコードを書く
-//                                    self.switchingAvatar = avatar
-//                                    if selectedItem == avatar {
-//                                        // 2回目のタップでアラートを表示
-//                                        self.switchingAvatar = avatar
-//                                        self.showingAlert2 = true
-//                                    }
-//                                    selectedItem = avatar
-//                                    audioManager.playSound()
-//                                }) {
-//                                    Image(avatar.name) // avatarのnameを使用
-//                                        .resizable()
-//                                        .aspectRatio(contentMode: .fit)
-//                                        .frame(width: 100, height: 100)
-//                                        .padding(5)
-//                                        .cornerRadius(8)
-//                                }
-//                                VStack {
-//                                    Spacer()
-//                                    HStack {
-//                                        Spacer()
-//                                        Image("クロス")
-//                                            .resizable()
-//                                            .frame(width: 20, height: 20)
-//                                        Text("\(avatar.count)")
-//                                            .font(.system(size:38))
-//                                            .foregroundColor(Color("fontGray"))
-//                                    }
-//                                    .padding(.trailing,5)
-//                                }
-//                            }
-//                            
-//                            .overlay(
-//                                RoundedRectangle(cornerRadius: 10)
-//                                    .stroke((selectedItem?.name == avatar.name) ? Color.gray : Color.clear, lineWidth: 4)
-//                            )
-//                        }
-//                        .alert(isPresented: $showingAlert2) {
-//                            Alert(
-//                                title: Text("おともを切り替えますか？"),
-//                                primaryButton: .default(Text("はい"), action: {
-//                                    // はいを選択した場合、usedFlagを更新
-//                                    if let switchingAvatar = switchingAvatar {
-//                                        authManager.switchAvatar(to: switchingAvatar) { success in
-//                                            if success {
-//                                                print("Avatar successfully added!")
-//                                            } else {
-//                                                print("Failed to add avatar.")
-//                                            }
-//                                        }
-//                                    }
-//                                    audioManager.playChangeSound()
-//                                }),
-//                                secondaryButton: .cancel(Text("キャンセル"))
-//                            )
-//                        }
-//                        .padding()
-//                    }
-//                }
-//            }
             ScrollView {
                         LazyVGrid(columns: columns, spacing: 20) {
                             ForEach(allItems) { item in
@@ -256,10 +186,6 @@ struct IllustratedView: View {
                                                 .padding(5)
                                                 .cornerRadius(8)
                                         }
-//                                        Image(item.name)
-//                                            .resizable()
-//                                            .aspectRatio(contentMode: .fit)
-//                                            .frame(width: 100, height: 100)
                                     } else {
                                         // ユーザーが持っていないアバターのシルエットを表示
                                         Button(action: {

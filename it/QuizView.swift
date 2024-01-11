@@ -74,12 +74,14 @@ struct ViewPositionKey3: PreferenceKey {
         @State private var monsterHP: Int = 3000
         @State private var monsterUnderHP: Int = 30
         @State private var monsterAttack: Int = 30
+        @State var showAlert: Bool = false
         @State private var userName: String = ""
         @State private var avator: [[String: Any]] = []
         @State private var monsterBackground: String = ""
         @State private var userMoney: Int = 0
         @State private var userHp: Int = 100
         @State private var userMaxHp: Int = 100
+        @State private var userFlag: Int = 0
         @State private var avatarHp: Int = 100
         @State private var userAttack: Int = 30
         @State private var tutorialNum: Int = 0
@@ -110,6 +112,7 @@ struct ViewPositionKey3: PreferenceKey {
         @State private var navigateToQuizResult = false
         @ObservedObject var interstitial: Interstitial
         @StateObject var appState = AppState()
+        
         
         var currentQuiz: QuizQuestion {
             quizzes[currentQuizIndex]
@@ -143,7 +146,6 @@ struct ViewPositionKey3: PreferenceKey {
                     } else {
                         timer.invalidate()
                         showCountdown = false
-                        showTutorial = true
                         if tutorialNum != 3 {
                             startTimer()
                         }
@@ -179,32 +181,41 @@ struct ViewPositionKey3: PreferenceKey {
         }
         
         // 次の問題へ移る処理
-        func moveToNextQuiz() {  
+        func moveToNextQuiz() {
+            print("moveToNextQuiz - currentQuizIndex: \(currentQuizIndex), selectedAnswerIndex: \(String(describing: selectedAnswerIndex))")
             if monsterType == 3 && monsterHP <= 0 {
                 // 最後のモンスターが倒された場合、結果画面へ遷移
                 showCompletionMessage = true
                 timer?.invalidate()
                 RateManager.shared.updateQuizData(userId: authManager.currentUserId!, quizType: quizLevel, newCorrectAnswers: correctAnswerCount, newTotalAnswers: answerCount)
                 RateManager.shared.updateAnswerData(userId: authManager.currentUserId!, quizType: quizLevel,  newTotalAnswers: answerCount)
-                navigateToQuizResultView = true  //ここで結果画面への遷移フラグをtrueに
+                navigateToQuizResultView = true //ここで結果画面への遷移フラグをtrueに
             } else if playerHP <= 0 {
                 showCompletionMessage = true
                 timer?.invalidate()
                 playerExperience = 5
                 playerMoney = 5
                 navigateToQuizResultView = true  //ここで結果画面への遷移フラグをtrueに
+                
             } else if self.remainingSeconds == 0 {
-                        currentQuizIndex += 1
-            // showExplanationModal = true
-            // currentQuizIndex += 1    selectedAnswerIndex = nil
-            startTimer()
-            hasAnswered = false
+                currentQuizIndex += 1
+//               showExplanationModal = true
+               selectedAnswerIndex = nil
+               startTimer()
+               hasAnswered = false
             } else if currentQuizIndex + 1 < quizzes.count { // 最大問題数を超えていないかチェック
-                //                currentQuizIndex += 1
-//                selectedAnswerIndex = nil    
-                showExplanationModal = true
-                //                selectedAnswerIndex = nil
-                startTimer()    // startTimer()
+                print("self.remainingSeconds:\(self.remainingSeconds)")
+//                currentQuizIndex += 1
+                print("a userFlag:\(userFlag)")
+                if userFlag == 0 {
+                    showExplanationModal = true
+                } else {
+                    currentQuizIndex += 1
+                   selectedAnswerIndex = nil
+                    startTimer()
+                }
+//                selectedAnswerIndex = nil
+//                startTimer()
                 hasAnswered = false
             } else {
                 // すべての問題が終了した場合、結果画面へ遷移
@@ -455,6 +466,7 @@ struct ViewPositionKey3: PreferenceKey {
                                     Text("\(incorrectCount)")
                                         .font(.system(size: 24))
                                 }
+                                .foregroundColor(Color("fontGray"))
                                 ProgressBar3(value: Double(incorrectCount), maxValue: Double(self.incorrectAnswerCount), color: Color("loading"))
                                     .frame(height: 20)
                             }
@@ -473,6 +485,8 @@ struct ViewPositionKey3: PreferenceKey {
 //                                            answerSelectionAction(index: index)
 //                                        }
             .onAppear{
+                
+                showTutorial = true
                 print("AnswerSelectionView currentQuiz.choices:\(currentQuiz.choices)")
             }
                             .frame(maxWidth: .infinity)
@@ -482,8 +496,8 @@ struct ViewPositionKey3: PreferenceKey {
                             })
                             
                             if appState.isBannerVisible {
-                                BannerView()
-                                    .frame(height: 60)
+//                                BannerView()
+//                                    .frame(height: 60)
                             }
                             Spacer()
                             
@@ -525,10 +539,10 @@ struct ViewPositionKey3: PreferenceKey {
                         if let selectedIndex = selectedAnswerIndex, selectedIndex < currentQuiz.choices.count {
                             ModalExplanationView(
                                 isPresented: $showExplanationModal,
-                                selectedAnswerIndex: $selectedAnswerIndex, audioManager: audioManager, question: quizzes[currentQuizIndex].question, userAnswer: currentQuiz.choices[selectedIndex],
+                                selectedAnswerIndex: $selectedAnswerIndex, showAlert: $showAlert, audioManager: audioManager , question: quizzes[currentQuizIndex].question, userAnswer: currentQuiz.choices[selectedIndex],
                                 correctAnswer: quizzes[currentQuizIndex].choices[quizzes[currentQuizIndex].correctAnswerIndex],
                                 explanation: quizzes[currentQuizIndex].explanation, currentQuizIndex: $currentQuizIndex,
-                                pauseTimer:pauseTimer, startTimer: startTimer
+                                userFlag: $userFlag, pauseTimer:pauseTimer, startTimer: startTimer
                             )
                         }else{
                             ModalReturnView(
@@ -540,7 +554,7 @@ struct ViewPositionKey3: PreferenceKey {
                     ZStack {
                         Color.black.opacity(0.7)
                             .edgesIgnoringSafeArea(.all)
-                        ModalView(isSoundOn: $isSoundOn, isPresented: $showHomeModal, isPresenting: $isPresenting, audioManager: audioManager, showHomeModal: $showHomeModal,tutorialNum: $tutorialNum,pauseTimer:pauseTimer,resumeTimer: resumeTimer)
+                        ModalView(isSoundOn: $isSoundOn, isPresented: $showHomeModal, isPresenting: $isPresenting, audioManager: audioManager, showHomeModal: $showHomeModal,tutorialNum: $tutorialNum,pauseTimer:pauseTimer,resumeTimer: resumeTimer, userFlag: $userFlag)
                     }
                 }
                 if tutorialNum == 3 && showTutorial == true {
@@ -808,8 +822,12 @@ struct ViewPositionKey3: PreferenceKey {
                 if quizLevel == .incorrectAnswer {
                 userAttack = 0
                 }
-                print("userAttack:\(userAttack)")
-            }
+                authManager.fetchUserFlag()
+                print("onAppear authManager.userFlag:\(authManager.userFlag)")
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                    userFlag = authManager.userFlag
+                    print("onAppear userFlag:\(userFlag)")
+                }            }
             .onDisappear {
                 // QuizViewが閉じるときの時刻を記録する
                 // ただし、playerExperienceとplayerMoneyが5以外の時だけ
@@ -830,6 +848,21 @@ struct ViewPositionKey3: PreferenceKey {
                     }
                 }
             }
+            .alert(isPresented: $showAlert) {
+                  Alert(
+                      title: Text("通知"),
+                      message: Text("設定画面で切り替える事ができます"),
+                      dismissButton: .default(Text("OK"), action: {
+  //                        isPresented = false
+                          resumeTimer()
+                          selectedAnswerIndex = nil
+                      })
+                  )
+              }
+            .onChange(of: userFlag) { flag in
+                          print("onchange userFlag:\(userFlag)")
+          //                userFlag = authManager.userFlag
+                      }
             .onChange(of: selectedAnswerIndex) { newValue in
                 if let selected = newValue, selected != currentQuiz.correctAnswerIndex {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {

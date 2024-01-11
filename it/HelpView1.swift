@@ -22,7 +22,7 @@ struct HelpView: View {
                 }, label:  {
                     Image(systemName: "questionmark.circle")
                         .cornerRadius(30.0)
-                        .foregroundColor(Color("lightYelleow"))
+                        .foregroundColor(Color("fontGray"))
                         .font(.system(size: 40))
                     
                 })
@@ -58,7 +58,7 @@ struct SwipeableView: View {
             
             CustomPageIndicator2(numberOfPages: 2, currentPage: $selectedTab)
                 .padding(.bottom)
-        }
+        }.background(Color("Color2"))
     }
 }
 
@@ -101,7 +101,7 @@ struct FirstView: View {
                 .opacity(0)
                 Spacer()
             }
-            .background(Color("lightYelleow"))
+            .background(Color("fontGray"))
             .foregroundColor(.white)
             Spacer()
             Image("トップ画面チュートリアル")
@@ -141,6 +141,7 @@ struct FirstView: View {
             }.padding()
                 .padding(.bottom,20)
             }
+        .foregroundColor(Color("fontGray"))
     }
 }
 
@@ -168,7 +169,7 @@ struct SecondView: View {
                 .opacity(0)
                 Spacer()
             }
-            .background(Color("lightYelleow"))
+            .background(Color("fontGray"))
             .foregroundColor(.white)
             HStack{
                 Text("各メニュー説明")
@@ -187,7 +188,7 @@ struct SecondView: View {
                     .frame(height:70)
                     .padding(.horizontal)
                 Text("ガチャを回すことがで新しいおともを手に入れることができます")
-                    .padding(.horizontal,5)
+                    .padding(.horizontal)
                 Image("おとも図鑑")
                     .resizable()
                     .frame(height:70)
@@ -217,6 +218,7 @@ struct SecondView: View {
                 Spacer()
             }
         }
+        .foregroundColor(Color("fontGray"))
     }
 }
 

@@ -44,6 +44,7 @@ class Interstitial: NSObject, GADFullScreenContentDelegate, ObservableObject {
         let root = UIApplication.shared.windows.first?.rootViewController
         if let ad = interstitialAd {
             ad.present(fromRootViewController: root!)
+//            self.wasAdDismissed = true
 //            self.interstitialAdLoaded = false
         } else {
             print("😭: 広告の準備ができていませんでした")

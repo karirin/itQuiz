@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import AppVersionMonitorSwiftUI
 
 struct ViewPositionKey5: PreferenceKey {
     static var defaultValue: [CGRect] = []
@@ -24,6 +25,7 @@ struct TopView: View {
     @ObservedObject var authManager = AuthManager.shared
     @State private var buttonRect: CGRect = .zero
     @State private var bubbleHeight: CGFloat = 0.0
+    @State var isAlert: Bool = false
     
     var body: some View {
         ZStack{
@@ -58,6 +60,7 @@ struct TopView: View {
                             }
                     PentagonView(authManager: authManager, flag: .constant(false))
 //                    GraphManagerView()
+//                    PentagonView(authManager: authManager, flag: .constant(false))
                             .tabItem {
                                 Image(systemName: "chart.pie")
                                 Text("分析")
@@ -70,6 +73,22 @@ struct TopView: View {
                 }
             }
         }
+//        .alert(isPresented: $isAlert) {
+//                    Alert(title: Text("お知らせ"), message: Text("最新バージョンがあります"), dismissButton: .default(Text("OK")) {
+//                        // TODO: ここでAppStoreを開く
+//                    })
+//                }
+//                .appVersionMonitor(id: ) { status in
+//                    switch status {
+//                    case .updateAvailable:
+//                        isAlert = true
+//                        print("アップデートがあります")
+//                    case .updateUnavailable:
+//                        print("アップデートがありません")
+//                    case .failure(let error):
+//                        print("エラーが発生しました: \(error)")
+//                    }
+//                }
     }
 }
 

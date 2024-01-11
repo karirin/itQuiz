@@ -10,9 +10,10 @@ pod 'Firebase/Auth'
 pod 'Firebase/Firestore'
 pod 'Firebase/Storage'
 pod 'Firebase/Database'
-pod 'Charts'
 pod 'FSCalendar'
 pod 'Google-Mobile-Ads-SDK'
+pod 'Firebase/Analytics'
+pod 'Firebase/Messaging'
 end
 
 post_install do |installer|
@@ -24,3 +25,4 @@ post_install do |installer|
           end
    end
 end
+

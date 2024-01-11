@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Firebase
 
 class GachaManager {
 
@@ -146,6 +147,9 @@ struct GachaView: View {
     @ObservedObject var audioManager = AudioManager.shared
     @ObservedObject var reward = Reward()
     @State private var showLoginModal: Bool = false
+    @State private var otomo10flag: Bool = false
+    @State private var otomo20flag: Bool = false
+    @State private var otomoallflag: Bool = false
 //    @State private var isShowingActivityIndicator: Bool = false
 
     var body: some View {
@@ -340,6 +344,12 @@ struct GachaView: View {
                     RewardModalView(audioManager: audioManager, isPresented: $showLoginModal)
                 }
             }
+            if otomo10flag {
+                ModalTittleView(showLevelUpModal: $otomo10flag, authManager: authManager, tittleNumber: .constant(01))
+            }
+            if otomo20flag {
+                ModalTittleView(showLevelUpModal: $otomo20flag, authManager: authManager, tittleNumber: .constant(02))
+            }
         }
         .onAppear {
             authManager.getUserMoney { userMoney in
@@ -361,6 +371,25 @@ struct GachaView: View {
                     isGachaButtonDisabled = false
                 }else{
                     isGachaButtonDisabled = true
+                }
+            }
+            countAvatarsForUser(userId: authManager.currentUserId!) { avatarCount in
+                print("ユーザーのアバターの数: \(avatarCount)")
+                if avatarCount > 9 {
+                    authManager.checkTitles(userId: authManager.currentUserId!, title: "おとも１０種類制覇") { exists in
+                        if !exists {
+                            otomo10flag = true
+                            authManager.saveTitleForUser(userId: authManager.currentUserId!, title: "おとも１０種類制覇")
+                        }
+                    }
+                }
+                if avatarCount > 19 {
+                    authManager.checkTitles(userId: authManager.currentUserId!, title: "おとも２０種類制覇") { exists in
+                        if !exists {
+                            otomo20flag = true
+                            authManager.saveTitleForUser(userId: authManager.currentUserId!, title: "おとも２０種類制覇")
+                        }
+                    }
                 }
             }
         }
@@ -456,6 +485,17 @@ struct GachaView: View {
             return CGSize(width: 350, height: 120)
         }
     }
+    
+    func countAvatarsForUser(userId: String, completion: @escaping (Int) -> Void) {
+        let avatarsRef = Database.database().reference().child("users").child(userId).child("avatars")
+
+        avatarsRef.observeSingleEvent(of: .value, with: { snapshot in
+            // アバターの数をカウント
+            let avatarCount = snapshot.childrenCount
+            completion(Int(avatarCount))
+        })
+    }
+
 }
 
 struct GachaView_Previews: PreviewProvider {

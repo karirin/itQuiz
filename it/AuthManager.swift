@@ -16,11 +16,6 @@ struct Avatar: Equatable {
     var count: Int
 }
 
-//struct User {
-//    var userName: String
-//    var avatars: [Avatar]
-//}
-
 class User: Identifiable {
     var id: String
     var userName: String
@@ -30,8 +25,9 @@ class User: Identifiable {
     var userMoney: Int
     var userHp: Int
     var userAttack: Int
+    var userFlag: Int
 
-    init(id: String, userName: String, level: Int, experience: Int, avatars: [[String: Any]], userMoney: Int, userHp: Int, userAttack: Int) {
+    init(id: String, userName: String, level: Int, experience: Int, avatars: [[String: Any]], userMoney: Int, userHp: Int, userAttack: Int, userFlag: Int) {
         self.id = id
         self.userName = userName
         self.level = level
@@ -40,6 +36,7 @@ class User: Identifiable {
         self.userMoney = userMoney
         self.userHp = userHp
         self.userAttack = userAttack
+        self.userFlag = userFlag
     }
 }
 
@@ -48,10 +45,10 @@ class AuthManager: ObservableObject {
     @Published var experience: Int = 0
     @Published var level: Int = 1
     @Published var money: Int = 0
+    @Published var userFlag: Int = 0
     @Published var avatars: [Avatar] = []
     @Published var didLevelUp: Bool = false
     @Published var userAvatars: [Avatar] = []
-//    @State private var earnedTitles: [Title] = []
     
     init() {
         user = Auth.auth().currentUser
@@ -153,7 +150,7 @@ class AuthManager: ObservableObject {
         guard let userId = user?.uid else { return }
         
         let userRef = Database.database().reference().child("users").child(userId)
-        let userData: [String: Any] = ["userName": userName, "userMoney": 0, "userHp": 100, "userAttack": 20, "tutorialNum": 1]
+        let userData: [String: Any] = ["userName": userName, "userMoney": 0, "userHp": 100, "userAttack": 20, "tutorialNum": 1, "userFlag": 0]
         
         userRef.setValue(userData) { (error, ref) in
             if let error = error {
@@ -318,32 +315,83 @@ class AuthManager: ObservableObject {
 //        }
 //    }
     
+//    func addExperience(points: Int, onSuccess: @escaping () -> Void, onFailure: @escaping (Error?) -> Void) {
+//        guard let userId = user?.uid else {
+//            onFailure(nil)
+//            return
+//        }
+//        
+//        let userRef = Database.database().reference().child("users").child(userId)
+//        userRef.observeSingleEvent(of: .value) { (snapshot, errorString) in
+//            if let errorString = errorString {
+//                // Handle the error here
+//                onFailure(NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: errorString]))
+//                return
+//            }
+//            if let data = snapshot.value as? [String: Any] {
+//                var currentExperience = data["experience"] as? Int ?? 0
+//                var currentLevel = data["level"] as? Int ?? 1
+//                
+//                currentExperience += points
+//                
+//                while currentExperience >= currentLevel * 100 {
+//                    currentExperience -= currentLevel * 100
+//                    currentLevel += 1
+//                    self.didLevelUp = true
+//                    self.updateStatsUponLevelUp()
+//                }
+//                
+//                let updatedData: [String: Any] = ["experience": currentExperience, "level": currentLevel]
+//                userRef.updateChildValues(updatedData) { (error, ref) in
+//                    if let error = error {
+//                        onFailure(error)
+//                    } else {
+//                        self.experience = currentExperience
+//                        self.level = currentLevel
+////                        self.saveEarnedTitles()
+//                        onSuccess()
+//                    }
+//                }
+//            } else {
+//                onFailure(nil)
+//            }
+//        }
+//    }
+    
     func addExperience(points: Int, onSuccess: @escaping () -> Void, onFailure: @escaping (Error?) -> Void) {
         guard let userId = user?.uid else {
             onFailure(nil)
             return
         }
-        
+
         let userRef = Database.database().reference().child("users").child(userId)
         userRef.observeSingleEvent(of: .value) { (snapshot, errorString) in
             if let errorString = errorString {
-                // Handle the error here
                 onFailure(NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: errorString]))
                 return
             }
             if let data = snapshot.value as? [String: Any] {
                 var currentExperience = data["experience"] as? Int ?? 0
                 var currentLevel = data["level"] as? Int ?? 1
-                
+
                 currentExperience += points
-                
+
                 while currentExperience >= currentLevel * 100 {
                     currentExperience -= currentLevel * 100
                     currentLevel += 1
                     self.didLevelUp = true
                     self.updateStatsUponLevelUp()
+
+                    if currentLevel == 3 {
+                        // レベル3に達した場合、称号を保存
+                        self.saveTitleForUser(userId: userId, title: "レベル３")
+                    } else if currentLevel == 5 {
+                        self.saveTitleForUser(userId: userId, title: "レベル５")
+                    } else if currentLevel == 10 {
+                        self.saveTitleForUser(userId: userId, title: "レベル10")
+                    }
                 }
-                
+
                 let updatedData: [String: Any] = ["experience": currentExperience, "level": currentLevel]
                 userRef.updateChildValues(updatedData) { (error, ref) in
                     if let error = error {
@@ -351,12 +399,37 @@ class AuthManager: ObservableObject {
                     } else {
                         self.experience = currentExperience
                         self.level = currentLevel
-//                        self.saveEarnedTitles()
                         onSuccess()
                     }
                 }
             } else {
                 onFailure(nil)
+            }
+        }
+    }
+    
+    func checkTitles(userId: String, title: String, completion: @escaping (Bool) -> Void) {
+        let titlesRef = Database.database().reference().child("titles").child(userId)
+
+        titlesRef.observeSingleEvent(of: .value, with: { snapshot in
+            if let titlesData = snapshot.value as? [String: Bool] {
+                // 指定された称号が存在するかチェックし、その結果を返す
+                completion(titlesData[title] ?? false)
+            } else {
+                // `titles` データが存在しない場合は false を返す
+                completion(false)
+            }
+        })
+    }
+
+    
+    func saveTitleForUser(userId: String, title: String) {
+        let titleRef = Database.database().reference().child("titles").child(userId)
+        // 辞書形式でデータを追加する
+        let titleData = [title: true] // または任意の値
+        titleRef.updateChildValues(titleData) { error, ref in
+            if let error = error {
+                print("Error saving title: \(error)")
             }
         }
     }
@@ -371,10 +444,22 @@ class AuthManager: ObservableObject {
         let userRef = Database.database().reference().child("users").child(userId)
         userRef.observeSingleEvent(of: .value) { (snapshot) in
             if let data = snapshot.value as? [String: Any] {
-                print("data['level']")
-                print(data["level"])
                 self.experience = data["experience"] as? Int ?? 0
                 self.level = data["level"] as? Int ?? 1
+            }
+        }
+    }
+    
+    func fetchUserFlag() {
+        guard let userId = user?.uid else { return }
+        
+        let userRef = Database.database().reference().child("users").child(userId)
+        userRef.observeSingleEvent(of: .value) { (snapshot) in
+            if let data = snapshot.value as? [String: Any] {
+                print("data:\(data)")
+//                self.experience = data["experience"] as? Int ?? 0
+                self.userFlag = data["userFlag"] as? Int ?? 0
+                print("self.userFlag:\(self.userFlag)")
             }
         }
     }
@@ -612,6 +697,17 @@ class AuthManager: ObservableObject {
         }
     }
     
+    func updateUserFlag(userId: String, userFlag: Int) {
+        let userRef = Database.database().reference().child("users").child(userId)
+        userRef.updateChildValues(["userFlag": userFlag]) { error, _ in
+            if let error = error {
+                print("Error updating userFlag: \(error)")
+            } else {
+                print("userFlag successfully updated")
+            }
+        }
+    }
+    
     func saveElapsedTime(category: String, elapsedTime: TimeInterval, completion: @escaping (Bool) -> Void) {
         guard let userId = user?.uid else {
             completion(false) // ユーザーIDがnilの場合、失敗としてfalseを返す
@@ -635,7 +731,42 @@ class AuthManager: ObservableObject {
             completion(true) // 保存に成功した場合、trueを返す
         }
     }
+    
+    struct QuizTotal {
+        var totalAnswers: Int
+    }
+    
+    func fetchTotalAnswersData(userId: String, completion: @escaping ([QuizLevel: QuizTotal], Int) -> Void) {
+        let answersRef = Database.database().reference().child("answers").child(userId)
 
+        answersRef.observeSingleEvent(of: .value, with: { snapshot in
+            var totalData = [QuizLevel: QuizTotal]()
+            var totalAnswers = 0 // 全体の回答数の合計を格納する変数
+
+            // 各クイズレベルでループ
+            for level in QuizLevel.allCases {
+                var totalAnswersForLevel = 0
+
+                // 指定されたレベルの日付別データにアクセス
+                let levelSnapshot = snapshot.childSnapshot(forPath: level.description)
+                if levelSnapshot.exists() {
+                    for dateChild in levelSnapshot.children {
+                        if let dateSnapshot = dateChild as? DataSnapshot,
+                           let answersCount = dateSnapshot.value as? Int {
+                            totalAnswersForLevel += answersCount
+                        }
+                    }
+                }
+
+                totalData[level] = QuizTotal(totalAnswers: totalAnswersForLevel)
+                totalAnswers += totalAnswersForLevel // 合計回答数に加算
+            }
+
+            print("totalData:\(totalData)")
+            print("Total Answers for all levels: \(totalAnswers)") // 全レベルの合計回答数を出力
+            completion(totalData, totalAnswers) // コンプリーションハンドラーに合計回答数も渡す
+        })
+    }
 
 }
 

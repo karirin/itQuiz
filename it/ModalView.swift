@@ -19,20 +19,21 @@ struct ModalView: View {
     @State private var isDaily: Bool = false
     var pauseTimer: () -> Void
     var resumeTimer: () -> Void
+    @Binding var userFlag: Int
     
     var body: some View {
         ZStack {
             VStack(spacing: 10) {
                 Button(action: {
                     isPresenting = false
-//                    if isDaily {
-//                        isContentView = true
-//                    }
+                    if isDaily {
+                        isContentView = true
+                    }
                     audioManager.playReturnSound()
                 }) {
                     HStack{
                         Image(systemName: "house.fill")
-                        Text("ホームに戻る")
+                        Text("ホームに戻る　")
                             
                     }.padding(20)
                         .foregroundColor(.black)
@@ -42,26 +43,32 @@ struct ModalView: View {
                 }
                 NavigationLink("", destination: QuizManagerView(isPresenting: .constant(false)).navigationBarBackButtonHidden(true), isActive: $isContentView)
                 
-//                Button(action: {
-//                    audioManager.toggleSound()
-//                    isSoundOn.toggle()
-//                    audioManager.playSound()
-//                }) {
-//                    HStack {
-//                        if isSoundOn {
-//                            Image(systemName: "speaker.slash")
-//                            Text("　音声オフ　")
-//                        } else {
-//                            Image(systemName: "speaker.wave.2")
-//                            Text("　音声オン　")
-//                        }
-//                    }
-//                        .padding(20)
-//                        .foregroundColor(.black)
-//                        .background(Color.white)
-//                        .cornerRadius(8)
-//                        .shadow(radius: 1)
-//                }
+                Button(action: {
+                    isSoundOn.toggle()
+                    audioManager.playSound()
+                    if userFlag == 0 {
+                        userFlag = 1
+                        authManager.updateUserFlag(userId: authManager.currentUserId!, userFlag: 1)
+                    }else{
+                        userFlag = 0
+                        authManager.updateUserFlag(userId: authManager.currentUserId!, userFlag: 0)
+                    }
+                }) {
+                    HStack {
+                        if isSoundOn {
+                            Image(systemName: "eye.slash")
+                            Text("解説画面非表示")
+                        } else {
+                            Image(systemName: "eye")
+                            Text("解説画面表示　")
+                        }
+                    }
+                        .padding(20)
+                        .foregroundColor(.black)
+                        .background(Color.white)
+                        .cornerRadius(8)
+                        .shadow(radius: 1)
+                }
                 
                 Button(action: {
                     showHomeModal = false
@@ -72,13 +79,14 @@ struct ModalView: View {
                 }) {
                     HStack {
                         Image(systemName: "questionmark.circle")
-                        Text("　ヘルプ　　")
+                        Text("ヘルプ 　　　　")
                     }
                         .padding(20)
                         .foregroundColor(.black)
                         .background(Color.white)
                         .cornerRadius(8)
                         .shadow(radius: 1)
+                        .padding(.top,20)
                 }
             }
             .padding(50)
@@ -106,13 +114,19 @@ struct ModalView: View {
         }
         .onAppear {
             pauseTimer() // モーダルが表示されたときにタイマーを一時停止
+            if userFlag == 0 {
+                isSoundOn = true
+            } else {
+                isSoundOn = false
+            }
         }
     }
 }
 
-//struct ModalView_Previews: PreviewProvider {
+//struct ModalView1_Previews: PreviewProvider {
 //    @State static private var isPresenting = true
 //    static var previews: some View {
 //        ModalView(isSoundOn: .constant(true), isPresented: .constant(true), isPresenting: $isPresenting, audioManager: AudioManager.shared)
+////ModalView()
 //    }
 //}

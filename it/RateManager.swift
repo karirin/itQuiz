@@ -53,8 +53,8 @@ class RateManager {
     func updateAnswerData(userId: String, quizType: QuizLevel, newTotalAnswers: Int) {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
-//        let currentDate = dateFormatter.string(from: Date())
-        let currentDate = "2023-12-08"
+        let currentDate = dateFormatter.string(from: Date())
+//        let currentDate = "2023-12-08"
 
         // 各日付ごとに別々のレコードを作成するための参照
         let dateRef = db.child("answers").child(userId).child(quizType.description).child(currentDate)

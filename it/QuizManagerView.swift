@@ -51,6 +51,7 @@ struct QuizManagerView: View {
                                     .frame(width:10,height: 20)
                                 Text("過去に不正解した問題だけを解くことができます")
                                     .font(.system(size: 16))
+                                    .foregroundColor(Color("fontGray"))
                             }
 //                            .padding(.horizontal,0)
                             .padding(.bottom)
@@ -117,6 +118,7 @@ struct QuizManagerView: View {
                                     .frame(width:10,height: 20)
                                 Text("問題の難易度、種類別で解くことができます　　")
                                     .font(.system(size: 16))
+                                    .foregroundColor(Color("fontGray"))
                             }
 //                            .padding(.horizontal)
                             .padding(.bottom)
