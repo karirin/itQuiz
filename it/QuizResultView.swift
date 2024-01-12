@@ -230,6 +230,7 @@ struct QuizResultView: View {
                       }
                   }
                 .onAppear {
+                    print("!interstitial.wasAdDismissed:\(!interstitial.wasAdDismissed)")
                     if !interstitial.interstitialAdLoaded {
                         interstitial.loadInterstitial()
                     } else if !interstitial.wasAdDismissed {
