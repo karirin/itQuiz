@@ -23,12 +23,13 @@
 		1820AE232B518D8D00BBA679 /* レベルアップ.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1820AE152B518D8D00BBA679 /* レベルアップ.mp3 */; };
 		1820AE282B518E4700BBA679 /* PrivacyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1820AE262B518E4700BBA679 /* PrivacyView.swift */; };
 		1820AE292B518E4700BBA679 /* TermsOfServiceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1820AE272B518E4700BBA679 /* TermsOfServiceView.swift */; };
+		18F95C462B51AB7200F8DBBB /* TittlesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18F95C452B51AB7200F8DBBB /* TittlesView.swift */; };
+		18F95C482B51AB7800F8DBBB /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18F95C472B51AB7800F8DBBB /* ContentView.swift */; };
 		260000022AB5EEC900342CAE /* QuizBeginnerList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260000012AB5EEC900342CAE /* QuizBeginnerList.swift */; };
 		26071BF42B2B4BC60012B836 /* ModalExplanationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26071BF32B2B4BC60012B836 /* ModalExplanationView.swift */; };
 		260B56172ACB1CA200E7785C /* SpotlightView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260B56162ACB1CA200E7785C /* SpotlightView.swift */; };
 		260B56192ACB1CBE00E7785C /* SpotlightView1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260B56182ACB1CBE00E7785C /* SpotlightView1.swift */; };
 		260E44132AB572DC00FBB487 /* itApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260E44122AB572DC00FBB487 /* itApp.swift */; };
-		260E44152AB572DC00FBB487 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260E44142AB572DC00FBB487 /* ContentView.swift */; };
 		260E44172AB572DE00FBB487 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 260E44162AB572DE00FBB487 /* Assets.xcassets */; };
 		260E441A2AB572DE00FBB487 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 260E44192AB572DE00FBB487 /* Preview Assets.xcassets */; };
 		260E44212AB5958300FBB487 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 260E44202AB5958300FBB487 /* GoogleService-Info.plist */; };
@@ -107,13 +108,14 @@
 		1820AE152B518D8D00BBA679 /* レベルアップ.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "レベルアップ.mp3"; path = "../../../Downloads/it 効果音/レベルアップ.mp3"; sourceTree = "<group>"; };
 		1820AE262B518E4700BBA679 /* PrivacyView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PrivacyView.swift; path = "../../名称未設定フォルダ/PrivacyView.swift"; sourceTree = "<group>"; };
 		1820AE272B518E4700BBA679 /* TermsOfServiceView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TermsOfServiceView.swift; path = "../../名称未設定フォルダ/TermsOfServiceView.swift"; sourceTree = "<group>"; };
+		18F95C452B51AB7200F8DBBB /* TittlesView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TittlesView.swift; path = ../../../Downloads/TittlesView.swift; sourceTree = "<group>"; };
+		18F95C472B51AB7800F8DBBB /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ContentView.swift; path = ../../../Downloads/ContentView.swift; sourceTree = "<group>"; };
 		260000012AB5EEC900342CAE /* QuizBeginnerList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizBeginnerList.swift; sourceTree = "<group>"; };
 		26071BF32B2B4BC60012B836 /* ModalExplanationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModalExplanationView.swift; sourceTree = "<group>"; };
 		260B56162ACB1CA200E7785C /* SpotlightView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotlightView.swift; sourceTree = "<group>"; };
 		260B56182ACB1CBE00E7785C /* SpotlightView1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotlightView1.swift; sourceTree = "<group>"; };
 		260E440F2AB572DC00FBB487 /* it.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = it.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		260E44122AB572DC00FBB487 /* itApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = itApp.swift; sourceTree = "<group>"; };
-		260E44142AB572DC00FBB487 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		260E44162AB572DE00FBB487 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		260E44192AB572DE00FBB487 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		260E44202AB5958300FBB487 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
@@ -220,7 +222,6 @@
 				26B9BA1C2AEFDEFD00AC7C40 /* RewardView.swift */,
 				26B5BEF32AB6CFA600056E79 /* RootView.swift */,
 				266A07292AC6FBC800B85D4E /* AnswerSelectionView.swift */,
-				260E44142AB572DC00FBB487 /* ContentView.swift */,
 				264F19142AF2824700B6FB10 /* RankingView.swift */,
 				267E708F2AD6FD0200EA7AA2 /* LoadingView.swift */,
 				26A026DD2ABDD1EA00119F2B /* TopView.swift */,
@@ -255,7 +256,9 @@
 				2641992B2AC2572F002013B9 /* AvatarListView.swift */,
 				267283122AFA84C600549219 /* IllustratedView.swift */,
 				269A87892AB86FC900F33C9E /* GachaView.swift */,
+				18F95C452B51AB7200F8DBBB /* TittlesView.swift */,
 				263C6AC22AFD1DC300564FF2 /* RareGachaView.swift */,
+				18F95C472B51AB7800F8DBBB /* ContentView.swift */,
 				267743652B16371800043010 /* Interstitial.swift */,
 				1820AE262B518E4700BBA679 /* PrivacyView.swift */,
 				1820AE272B518E4700BBA679 /* TermsOfServiceView.swift */,
@@ -480,19 +483,20 @@
 				268C3B9B2ABCA63300282BEE /* QuizAdvancedList.swift in Sources */,
 				260B56172ACB1CA200E7785C /* SpotlightView.swift in Sources */,
 				2650137F2B3FE04B006B81D6 /* HelpView1.swift in Sources */,
+				18F95C462B51AB7200F8DBBB /* TittlesView.swift in Sources */,
 				26266B2D2B4A5395007B5964 /* GraphManagerView.swift in Sources */,
 				26266B2F2B4A53F8007B5964 /* BarChartView.swift in Sources */,
 				269A878A2AB86FC900F33C9E /* GachaView.swift in Sources */,
 				265FA3972AF6543B00F3E0EF /* QuizManagerTimerView.swift in Sources */,
 				26A026DE2ABDD1EB00119F2B /* TopView.swift in Sources */,
 				26A25D4E2AB99235006B368F /* QuizIntermediateList.swift in Sources */,
-				260E44152AB572DC00FBB487 /* ContentView.swift in Sources */,
 				269B1C312ADAE43500C3E82B /* QuizDailyList.swift in Sources */,
 				26A25D502AB9FB1A006B368F /* TitleListView.swift in Sources */,
 				1820AE282B518E4700BBA679 /* PrivacyView.swift in Sources */,
 				26B9BA1D2AEFDEFD00AC7C40 /* RewardView.swift in Sources */,
 				26AA13162AD019BD0035F5F4 /* QuizSecurityList.swift in Sources */,
 				263C6AC32AFD1DC400564FF2 /* RareGachaView.swift in Sources */,
+				18F95C482B51AB7800F8DBBB /* ContentView.swift in Sources */,
 				260E44252AB59A7900FBB487 /* QuizView.swift in Sources */,
 				26AA130C2ACD74660035F5F4 /* ModalView.swift in Sources */,
 				266A072A2AC6FBC800B85D4E /* AnswerSelectionView.swift in Sources */,

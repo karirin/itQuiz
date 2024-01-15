@@ -54,6 +54,7 @@ struct ModalExplanationView: View {
                               .background(Color.white)
                               .cornerRadius(20)
                               .shadow(radius: 10)
+                              .padding(.trailing,15)
       //                        .padding(5)
                           }
                       VStack{

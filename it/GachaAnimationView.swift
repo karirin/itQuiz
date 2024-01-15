@@ -48,13 +48,13 @@ struct GachaAnimationView: View {
         case .superRare:
             videoName = "superRare"
         case .ultraRare:
-            videoName = "RultraRare"
+            videoName = "ultraRare"
         case .Rrare:
             videoName = "Rrare"
         case .RsuperRare:
             videoName = "RsuperRare"
         case .RultraRare:
-            videoName = "ultraRare"
+            videoName = "RultraRare"
         case .legendRare:
             videoName = "legendRare"
         default:

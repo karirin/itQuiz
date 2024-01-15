@@ -16,10 +16,15 @@ struct QuizResult {
     var showExplanation: Bool = false
 }
 
+struct QuizTotal {
+    var totalAnswers: Int
+}
+
 struct QuizResultView: View {
 //    var results: [QuizResult]
     @State private var showModal = true
     @State private var showLevelUpModal = false
+    @State private var showTittleModal = false
     @State private var showMemoView = false
     @State private var currentMemo = ""
     @State private var selectedQuestion = ""
@@ -33,6 +38,12 @@ struct QuizResultView: View {
     @State var results: [QuizResult]
     @State private var isShow: Bool = true
     @State private var flag: Bool = false
+    @State private var level3flag: Bool = false
+    @State private var level5flag: Bool = false
+    @State private var level10flag: Bool = false
+    @State private var answer30flag: Bool = false
+    @State private var answer50flag: Bool = false
+    @State private var answer100flag: Bool = false
 //    @Int var elapsedTime = 1
     @Binding var isPresenting: Bool
     @Binding var navigateToQuizResultView: Bool
@@ -230,6 +241,61 @@ struct QuizResultView: View {
                       }
                   }
                 .onAppear {
+                    authManager.fetchUserExperienceAndLevel()
+                      DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                          if authManager.level > 2 {
+                              authManager.checkTitles(userId: authManager.currentUserId!, title: "レベル３") { exists in
+                                  if !exists {
+                                      level3flag = true
+                                      authManager.saveTitleForUser(userId: authManager.currentUserId!, title: "レベル３")
+                                  }
+                              }
+                          }
+                          if authManager.level > 4 {
+                              authManager.checkTitles(userId: authManager.currentUserId!, title: "レベル５") { exists in
+                                  if !exists {
+                                      level5flag = true
+                                      authManager.saveTitleForUser(userId: authManager.currentUserId!, title: "レベル５")
+                                  }
+                              }
+                          }
+                          if authManager.level > 9 {
+                              authManager.checkTitles(userId: authManager.currentUserId!, title: "レベル１０") { exists in
+                                  if !exists {
+                                      level10flag = true
+                                      authManager.saveTitleForUser(userId: authManager.currentUserId!, title: "レベル１０")
+                                  }
+                              }
+                          }
+                          authManager.fetchTotalAnswersData(userId: authManager.currentUserId!) { (totalData, totalAnswers) in
+                          // ここでtotalDataやtotalAnswersを使用する
+                          if totalAnswers > 30 {
+                              authManager.checkTitles(userId: authManager.currentUserId!, title: "回答数３０") { exists in
+                                  if !exists {
+                                      answer30flag = true
+                                      authManager.saveTitleForUser(userId: authManager.currentUserId!, title: "回答数３０")
+                                  }
+                              }
+                          }
+                          if totalAnswers > 50 {
+                              authManager.checkTitles(userId: authManager.currentUserId!, title: "回答数５０") { exists in
+                                  if !exists {
+                                      answer50flag = true
+                                      authManager.saveTitleForUser(userId: authManager.currentUserId!, title: "回答数５０")
+                                  }
+                              }
+                          }
+                          if totalAnswers > 100 {
+                              authManager.checkTitles(userId: authManager.currentUserId!, title: "回答数１００") { exists in
+                                  if !exists {
+                                      answer100flag = true
+                                      authManager.saveTitleForUser(userId: authManager.currentUserId!, title: "回答数１００")
+                                  }
+                              }
+                          }
+                          }
+                      }
+                    print("!interstitial.interstitialAdLoaded:\(!interstitial.interstitialAdLoaded)")
                     print("!interstitial.wasAdDismissed:\(!interstitial.wasAdDismissed)")
                     if !interstitial.interstitialAdLoaded {
                         interstitial.loadInterstitial()
@@ -274,6 +340,24 @@ struct QuizResultView: View {
             }
             if showLevelUpModal {
                 LevelUpModalView(showLevelUpModal: $showLevelUpModal, authManager: authManager)
+            }
+            if answer30flag {
+                ModalTittleView(showLevelUpModal: $answer30flag, authManager: authManager, tittleNumber: .constant(30))
+            }
+            if answer50flag {
+                ModalTittleView(showLevelUpModal: $answer50flag, authManager: authManager, tittleNumber: .constant(50))
+            }
+            if answer100flag {
+                ModalTittleView(showLevelUpModal: $answer100flag, authManager: authManager, tittleNumber: .constant(100))
+            }
+            if level3flag {
+                ModalTittleView(showLevelUpModal: $level3flag, authManager: authManager, tittleNumber: .constant(3))
+            }
+            if level5flag {
+                ModalTittleView(showLevelUpModal: $level5flag, authManager: authManager, tittleNumber: .constant(5))
+            }
+            if level10flag {
+                ModalTittleView(showLevelUpModal: $level10flag, authManager: authManager, tittleNumber: .constant(10))
             }
             NavigationLink("", destination: ContentView().navigationBarBackButtonHidden(true), isActive: $isContentView)
         }
