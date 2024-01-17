@@ -241,6 +241,7 @@ struct QuizResultView: View {
                       }
                   }
                 .onAppear {
+                    print("onAppear")
                     authManager.fetchUserExperienceAndLevel()
                       DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                           if authManager.level > 2 {
@@ -295,8 +296,8 @@ struct QuizResultView: View {
                           }
                           }
                       }
-                    print("!interstitial.interstitialAdLoaded:\(!interstitial.interstitialAdLoaded)")
-                    print("!interstitial.wasAdDismissed:\(!interstitial.wasAdDismissed)")
+                    print("onAppear !interstitial.interstitialAdLoaded:\(!interstitial.interstitialAdLoaded)")
+                    print("onAppear !interstitial.wasAdDismissed:\(!interstitial.wasAdDismissed)")
                     if !interstitial.interstitialAdLoaded {
                         interstitial.loadInterstitial()
                     } else if !interstitial.wasAdDismissed {
@@ -305,9 +306,9 @@ struct QuizResultView: View {
                     if elapsedTime != 0 {
                         authManager.saveElapsedTime(category: "Beginner", elapsedTime: elapsedTime) { success in
                             if success {
-                                print("経過時間を保存しました。")
+                                print("経過時間を保存しました。＠＠＠＠＠＠＠＠＠＠")
                             } else {
-                                print("経過時間の保存に失敗しました。")
+                                print("経過時間の保存に失敗しました。＠＠＠＠＠＠＠＠＠＠")
                             }
                         }
                     }

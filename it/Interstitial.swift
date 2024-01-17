@@ -22,18 +22,19 @@ class Interstitial: NSObject, GADFullScreenContentDelegate, ObservableObject {
     // リワード広告の読み込み
     func loadInterstitial() {
 //        GADInterstitialAd.load(withAdUnitID: "ca-app-pub-4898800212808837/3001013957", request: GADRequest()) { [self] (ad, error) in
+        print("loadInterstitial")
         GADInterstitialAd.load(withAdUnitID: "ca-app-pub-3940256099942544/4411468910", request: GADRequest()) { (ad, error) in
             if let _ = error {
-                print("😭: 読み込みに失敗しました")
-                print("広告の読み込みに失敗しました: \(error!.localizedDescription)")
+                print("loadInterstitial 😭: 読み込みに失敗しました")
+                print("loadInterstitial 広告の読み込みに失敗しました: \(error!.localizedDescription)")
                 self.interstitialAdLoaded = false
                 return
             }
-            print("😍: 読み込みに成功しましたああ")
+            print("loadInterstitial 😍: 読み込みに成功しましたああ")
             self.interstitialAdLoaded = true
-            print("self.interstitialAdLoaded:\(self.interstitialAdLoaded)")
+            print("loadInterstitial self.interstitialAdLoaded:\(self.interstitialAdLoaded)")
             self.flag = true
-            print("flag:\(self.flag)")
+            print("loadInterstitial flag:\(self.flag)")
             self.interstitialAd = ad
             self.interstitialAd?.fullScreenContentDelegate = self
         }
