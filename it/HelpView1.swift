@@ -20,11 +20,13 @@ struct HelpView: View {
                 Button(action: {
                     self.isSheetPresented = true
                 }, label:  {
-                    Image(systemName: "questionmark.circle")
-                        .cornerRadius(30.0)
-                        .foregroundColor(Color("fontGray"))
-                        .font(.system(size: 40))
-                    
+//                    Image(systemName: "questionmark.circle")
+//                        .cornerRadius(30.0)
+//                        .foregroundColor(Color("fontGray"))
+//                        .font(.system(size: 40))
+                    Image("ハテナ")
+                        .resizable()
+                        .frame(width:50,height: 50)
                 })
                 
                 
@@ -178,44 +180,59 @@ struct SecondView: View {
             }
             .padding(.leading)
             ScrollView{
-                Image("ダンジョン一覧")
-                    .resizable()
-                    .frame(height:70)
-                    .padding(.horizontal)
+                VStack{
+                HStack{
+                    Image("ダンジョンボタン")
+                        .resizable()
+                        .frame(width:70, height:70)
+                        .padding(.horizontal)
+                    Spacer()
+                }
                 Text("難易度、種類別のクイズを選ぶことができます　")
-                Image("ガチャトップ")
-                    .resizable()
-                    .frame(height:70)
-                    .padding(.horizontal)
+                
+                HStack{
+                    Image("ガチャボタン")
+                        .resizable()
+                        .frame(width:200, height:70)
+                        .padding(.horizontal)
+                    Spacer()
+                }
                 Text("ガチャを回すことがで新しいおともを手に入れることができます")
-                    .padding(.horizontal)
-                Image("おとも図鑑")
-                    .resizable()
-                    .frame(height:70)
-                    .padding(.horizontal)
-                Text("手に入れたおともを確認することができます　　")
+                
                 HStack{
-                    Image(systemName: "square.grid.2x2")
+                    Image("おとも図鑑ボタン")
                         .resizable()
-                        .frame(width:30, height:30)
-                    Text("おとも一覧")
-                        .font(.system(size: 24))
+                        .frame(width:200, height:70)
+                        .padding(.horizontal)
                     Spacer()
-                }.padding(.horizontal)
-                    .padding(.top,5)
-                Text("選択中のおともを変えることができます　　　　")
-                HStack{
-                    Image(systemName: "chart.pie")
-                        .resizable()
-                        .frame(width:30, height:30)
-                    Text("分析")
-                        .font(.system(size: 24))
-                    Spacer()
-                }.padding(.horizontal)
-                    .padding(.top,5)
-                Text("日々の回答数や正答率をグラフで確認することができます")
-                    .padding(.horizontal)
-                Spacer()
+                }
+                Text("手に入れたおともを確認することができます")
+                
+                        HStack{
+                            Image(systemName: "square.grid.2x2")
+                                .resizable()
+                                .frame(width:30, height:30)
+                            Text("おとも一覧")
+                                .font(.system(size: 24))
+                            Spacer()
+                        }
+                        .padding(.leading)
+                        .padding(.top)
+                        Text("選択中のおともを変えることができます　　　　　　　　　　　　　　")
+                            .padding(.leading)
+                        HStack{
+                            Image(systemName: "chart.pie")
+                                .resizable()
+                                .frame(width:30, height:30)
+                            Text("分析")
+                                .font(.system(size: 24))
+                            Spacer()
+                        }.padding(.leading).padding(.top)
+                        Text("日々の回答数や正答率をグラフで確認することができます")
+                            .padding(.leading)
+                    }
+            
+                .padding(.horizontal)
             }
         }
         .foregroundColor(Color("fontGray"))
@@ -300,8 +317,8 @@ struct FourthView: View {
 
 struct HelpView_Previews: PreviewProvider {
     static var previews: some View {
-        HelpView()
+//        HelpView()
 //    FirstView()
-//        SecondView()
+        SecondView()
     }
 }

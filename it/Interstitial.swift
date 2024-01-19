@@ -31,8 +31,9 @@ class Interstitial: NSObject, GADFullScreenContentDelegate, ObservableObject {
                 return
             }
             print("loadInterstitial 😍: 読み込みに成功しましたああ")
+            print("loadInterstitial self.interstitialAdLoaded1:\(self.interstitialAdLoaded)")
             self.interstitialAdLoaded = true
-            print("loadInterstitial self.interstitialAdLoaded:\(self.interstitialAdLoaded)")
+            print("loadInterstitial self.interstitialAdLoaded2:\(self.interstitialAdLoaded)")
             self.flag = true
             print("loadInterstitial flag:\(self.flag)")
             self.interstitialAd = ad

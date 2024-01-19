@@ -43,15 +43,15 @@ struct TopView: View {
                             Text("ホーム")
                                 .padding()
                         }
-//                        ZStack {
-//                            QuizManagerView(isPresenting: .constant(false))
-//                        }
-//                        .tabItem {
-//                            Image(systemName: "map")
-//                            //                        .resizable()
-//                                .frame(width:1,height:1)
-//                            Text("ダンジョン")
-//                        }
+                        ZStack {
+                            QuizManagerTabView(isPresenting: .constant(false))
+                        }
+                        .tabItem {
+                            Image(systemName: "map")
+                            //                        .resizable()
+                                .frame(width:1,height:1)
+                            Text("ダンジョン")
+                        }
                         
                         AvatarListView(isPresenting: $isPresentingAvatarList)
                             .tabItem {
