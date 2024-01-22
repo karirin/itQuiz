@@ -6,12 +6,14 @@
 //
 
 import SwiftUI
+import StoreKit
 
 struct RootView: View {
     @ObservedObject var authManager: AuthManager
     @State static private var showExperienceModalPreview = false
     @State private var isUserExists: Bool? = nil
     @StateObject var appState = AppState()
+    @Environment(\.requestReview) var requestReview
 
     var body: some View {
         Group {
@@ -25,6 +27,9 @@ struct RootView: View {
 //                ContentView()
                 TopView()
                     .environmentObject(appState)
+                    .onAppear{
+                            requestReview()
+                    }
             }
         }
         .onAppear {

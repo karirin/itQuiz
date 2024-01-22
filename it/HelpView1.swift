@@ -114,19 +114,19 @@ struct FirstView: View {
                 HStack{
                     Image("レベル").resizable()
                         .frame(width:20,height:20)
-                    Text("：ユーザーのレベルを表示しています")
+                    Text("：ユーザーのレベルになります")
                     Spacer()
                 }
                 HStack{
                     Image("ハート").resizable()
                         .frame(width:20,height:20)
-                    Text("：ユーザーの体力を表示しています")
+                    Text("：ユーザーの体力になります")
                     Spacer()
                 }
                 HStack{
                 Image("ソード").resizable()
                     .frame(width:20,height:20)
-                    Text("：ユーザーの攻撃力を表示しています")
+                    Text("：ユーザーの攻撃力になります")
                     Spacer()
                 }
                 HStack{
@@ -139,7 +139,7 @@ struct FirstView: View {
                     }
                     Spacer()
                 }
-                Text("選択中のおともの体力と攻撃力がプラスされていることを表示しています")
+                Text("選択中のおともの体力と攻撃力がプラスされていることを表しています")
             }.padding()
                 .padding(.bottom,20)
             }
@@ -207,6 +207,15 @@ struct SecondView: View {
                     Spacer()
                 }
                 Text("手に入れたおともを確認することができます")
+                    
+                HStack{
+                    Image("称号ボタン")
+                        .resizable()
+                        .frame(width:200, height:70)
+                        .padding(.horizontal)
+                    Spacer()
+                }
+                Text("手に入れた称号を確認することができます")
                 
                         HStack{
                             Image(systemName: "square.grid.2x2")
@@ -229,7 +238,7 @@ struct SecondView: View {
                             Spacer()
                         }.padding(.leading).padding(.top)
                         Text("日々の回答数や正答率をグラフで確認することができます")
-                            .padding(.leading)
+                            .padding(.leading,11)
                     }
             
                 .padding(.horizontal)
@@ -317,8 +326,8 @@ struct FourthView: View {
 
 struct HelpView_Previews: PreviewProvider {
     static var previews: some View {
-//        HelpView()
+        HelpView()
 //    FirstView()
-        SecondView()
+//        SecondView()
     }
 }

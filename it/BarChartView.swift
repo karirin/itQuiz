@@ -30,6 +30,13 @@ struct BarChartView: View {
     @ObservedObject var audioManager = AudioManager.shared
     @Environment(\.presentationMode) var presentationMode
     
+    // 表示用の DateFormatter
+    private var displayFormatter: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MM-dd" // 日付の表示形式を月日に設定
+        return formatter
+    }
+    
     var body: some View {
         NavigationView{
             VStack{
@@ -42,6 +49,15 @@ struct BarChartView: View {
                             )
                         }
                     }
+//                    .chartXAxis {
+//                        AxisMarks(values: .stride(by: .day)) { value in
+//                            AxisGridLine() // AxisMarkを返す
+//                            if let dateValue = value.as(Date.self), shouldDisplayLabel(for: dateValue) {
+//                                let dateString = displayFormatter.string(from: dateValue)
+//                                AxisValueLabel(dateString) // AxisMarkを返す
+//                            }
+//                        }
+//                    }
                     .chartXAxis {
                         AxisMarks(values: .stride(by: .day)) { value in
                             AxisGridLine() // AxisMarkを返す
@@ -166,12 +182,12 @@ struct BarChartView: View {
         return ""
     }
     
-    // 表示用の DateFormatter
-    private var displayFormatter: DateFormatter {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "d"
-        return formatter
-    }
+//    // 表示用の DateFormatter
+//    private var displayFormatter: DateFormatter {
+//        let formatter = DateFormatter()
+//        formatter.dateFormat = "d"
+//        return formatter
+//    }
     
     func shouldDisplayLabel(for date: Date) -> Bool {
         print("shouldDisplayLabel")

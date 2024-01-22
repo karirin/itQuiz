@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SignUp: View {
     @ObservedObject private var authManager = AuthManager.shared
-    @State private var userName: String = "りょうや"
+    @State private var userName: String = ""
     @State private var showImagePicker: Bool = false
 
     var body: some View {

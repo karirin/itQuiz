@@ -32,6 +32,7 @@ struct QuizManagerView: View {
     @State private var buttonRect: CGRect = .zero
     @State private var bubbleHeight: CGFloat = 0.0
     @State private var isIncorrectAnswersEmpty: Bool = true
+    @ObservedObject var reward = Reward()
 
     
     init(isPresenting: Binding<Bool>) {
@@ -50,7 +51,7 @@ struct QuizManagerView: View {
                                     .background(.gray)
                                     .frame(width:10,height: 20)
                                 Text("過去に不正解した問題だけを解くことができます")
-                                    .font(.system(size: 16))
+                                    .font(.system(size: 15))
                                     .foregroundColor(Color("fontGray"))
                             }
 //                            .padding(.horizontal,0)
@@ -117,11 +118,26 @@ struct QuizManagerView: View {
                                     .background(.gray)
                                     .frame(width:10,height: 20)
                                 Text("問題の難易度、種類別で解くことができます　　")
-                                    .font(.system(size: 16))
+                                    .font(.system(size: 15))
                                     .foregroundColor(Color("fontGray"))
                             }
-//                            .padding(.horizontal)
+                            .padding(.horizontal)
                             .padding(.bottom)
+                            Button(action: {
+                                reward.ExAndMoReward()
+//                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+//                                    self.showLoginModal = true
+//                                }
+                            }) {
+                                Image("獲得")
+                                    .resizable()
+                                    .frame(maxWidth:110,maxHeight:110)
+                            }
+                            .onAppear() {
+                                reward.LoadReward()
+                            }
+    //                        .disabled(!reward.rewardLoaded)
+                            .shadow(radius: 10)
                                 Button(action: {
                                     audioManager.playKetteiSound()
                                     // 画面遷移のトリガーをオンにする
@@ -354,6 +370,7 @@ struct QuizManagerView: View {
                     ToolbarItem(placement: .principal) {
                         Text("ダンジョン一覧")
                             .font(.system(size: 20)) // ここでフォントサイズを指定
+                            .foregroundStyle(Color("fontGray"))
                     }
                 }
             }

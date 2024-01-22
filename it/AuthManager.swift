@@ -49,6 +49,7 @@ class AuthManager: ObservableObject {
     @Published var avatars: [Avatar] = []
     @Published var didLevelUp: Bool = false
     @Published var userAvatars: [Avatar] = []
+    @Published var rewardFlag: Int = 1
     
     init() {
         user = Auth.auth().currentUser
@@ -450,6 +451,17 @@ class AuthManager: ObservableObject {
         }
     }
     
+    func fetchUserRewardFlag() {
+        guard let userId = user?.uid else { return }
+        
+        let userRef = Database.database().reference().child("users").child(userId)
+        userRef.observeSingleEvent(of: .value) { (snapshot) in
+            if let data = snapshot.value as? [String: Any] {
+                self.rewardFlag = data["rewardFlag"] as? Int ?? 1
+            }
+        }
+    }
+    
     func fetchUserFlag() {
         guard let userId = user?.uid else { return }
         
@@ -702,6 +714,17 @@ class AuthManager: ObservableObject {
         userRef.updateChildValues(["userFlag": userFlag]) { error, _ in
             if let error = error {
                 print("Error updating userFlag: \(error)")
+            } else {
+                print("userFlag successfully updated")
+            }
+        }
+    }
+    
+    func updateRewardFlag(userId: String, userFlag: Int) {
+        let userRef = Database.database().reference().child("users").child(userId)
+        userRef.updateChildValues(["rewardFlag": userFlag]) { error, _ in
+            if let error = error {
+                print("Error updating rewardFlag: \(error)")
             } else {
                 print("userFlag successfully updated")
             }

@@ -50,7 +50,7 @@ struct QuizManagerTabView: View {
                                     .background(.gray)
                                     .frame(width:10,height: 20)
                                 Text("過去に不正解した問題だけを解くことができます")
-                                    .font(.system(size: 16))
+                                    .font(.system(size: 15))
                                     .foregroundColor(Color("fontGray"))
                             }
 //                            .padding(.horizontal,0)
@@ -117,10 +117,10 @@ struct QuizManagerTabView: View {
                                     .background(.gray)
                                     .frame(width:10,height: 20)
                                 Text("問題の難易度、種類別で解くことができます　　")
-                                    .font(.system(size: 16))
+                                    .font(.system(size: 15))
                                     .foregroundColor(Color("fontGray"))
                             }
-//                            .padding(.horizontal)
+                            .padding(.horizontal)
                             .padding(.bottom)
                                 Button(action: {
                                     audioManager.playKetteiSound()
@@ -355,6 +355,7 @@ struct QuizManagerTabView: View {
                         Text("ダンジョン一覧")
                             .font(.system(size: 20)) // ここでフォントサイズを指定
                             .padding(.top)
+                            .foregroundStyle(Color("fontGray"))
                     }
                 }
             }

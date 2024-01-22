@@ -49,7 +49,8 @@ struct QuizResultView: View {
     @Binding var navigateToQuizResultView: Bool
 //    @Environment(\.rootPresentationMode) private var rootPresentationMode: Binding<RootPresentationMode>
     @State private var isHidden = false
-    @ObservedObject var interstitial = Interstitial()
+//    @ObservedObject var interstitial = Interstitial()
+    @StateObject var interstitial = Interstitial()
     @Environment(\.presentationMode) var presentationMode
 
     // QuizResultView.swift
@@ -220,19 +221,19 @@ struct QuizResultView: View {
                         }
                     }
                 }
-                .onChange(of: elapsedTime) { newValue in
-                    print("onChange")
-                    print(elapsedTime)
-                    if elapsedTime != 0 {
-                        authManager.saveElapsedTime(category: "Beginner", elapsedTime: elapsedTime) { success in
-                            if success {
-                                print("経過時間を保存しました。")
-                            } else {
-                                print("経過時間の保存に失敗しました。")
-                            }
-                        }
-                    }
-                }
+//                .onChange(of: elapsedTime) { newValue in
+//                    print("onChange")
+//                    print(elapsedTime)
+//                    if elapsedTime != 0 {
+//                        authManager.saveElapsedTime(category: "Beginner", elapsedTime: elapsedTime) { success in
+//                            if success {
+//                                print("経過時間を保存しました。")
+//                            } else {
+//                                print("経過時間の保存に失敗しました。")
+//                            }
+//                        }
+//                    }
+//                }
                 .onChange(of: interstitial.interstitialAdLoaded) { isLoaded in
                     print("onChange isLoaded:\(isLoaded)")
                     print("onChange interstitial.wasAdDismissed:\(interstitial.wasAdDismissed)")
@@ -298,20 +299,20 @@ struct QuizResultView: View {
                       }
                     print("onAppear !interstitial.interstitialAdLoaded:\(!interstitial.interstitialAdLoaded)")
                     print("onAppear !interstitial.wasAdDismissed:\(!interstitial.wasAdDismissed)")
-                    if !interstitial.interstitialAdLoaded {
-                        interstitial.loadInterstitial()
-                    } else if !interstitial.wasAdDismissed {
-                        interstitial.presentInterstitial()
-                    }
-                    if elapsedTime != 0 {
-                        authManager.saveElapsedTime(category: "Beginner", elapsedTime: elapsedTime) { success in
-                            if success {
-                                print("経過時間を保存しました。＠＠＠＠＠＠＠＠＠＠")
-                            } else {
-                                print("経過時間の保存に失敗しました。＠＠＠＠＠＠＠＠＠＠")
-                            }
-                        }
-                    }
+//                    if !interstitial.interstitialAdLoaded {
+//                        interstitial.loadInterstitial()
+//                    } else if !interstitial.wasAdDismissed {
+//                        interstitial.presentInterstitial()
+//                    }
+//                    if elapsedTime != 0 {
+//                        authManager.saveElapsedTime(category: "Beginner", elapsedTime: elapsedTime) { success in
+//                            if success {
+//                                print("経過時間を保存しました。＠＠＠＠＠＠＠＠＠＠")
+//                            } else {
+//                                print("経過時間の保存に失敗しました。＠＠＠＠＠＠＠＠＠＠")
+//                            }
+//                        }
+//                    }
                 }
 
                 if showMemoView {
