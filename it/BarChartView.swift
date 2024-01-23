@@ -49,15 +49,15 @@ struct BarChartView: View {
                             )
                         }
                     }
-//                    .chartXAxis {
-//                        AxisMarks(values: .stride(by: .day)) { value in
-//                            AxisGridLine() // AxisMarkを返す
-//                            if let dateValue = value.as(Date.self), shouldDisplayLabel(for: dateValue) {
-//                                let dateString = displayFormatter.string(from: dateValue)
-//                                AxisValueLabel(dateString) // AxisMarkを返す
-//                            }
+//               .chartXAxis {
+//                    AxisMarks(values: .stride(by: .day)) { value in
+//                        AxisGridLine()
+//                        if let dateValue = value.as(Date.self), shouldDisplayLabel(for: dateValue) {
+//                            let dateString = displayFormatter.string(from: dateValue)
+//                            AxisValueLabel(dateString) // ここで日付をx軸に表示
 //                        }
 //                    }
+//                }
                     .chartXAxis {
                         AxisMarks(values: .stride(by: .day)) { value in
                             AxisGridLine() // AxisMarkを返す

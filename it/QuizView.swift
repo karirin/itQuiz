@@ -817,6 +817,7 @@ struct ViewPositionKey3: PreferenceKey {
                 }
                 self.startTime = Date()
                 authManager.fetchUserRewardFlag()
+                
                 fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
                 self.incorrectAnswerCount = count
                 incorrectCount = count
@@ -890,8 +891,8 @@ struct ViewPositionKey3: PreferenceKey {
                     }
                 } else {
                     DispatchQueue.global(qos: .background).async {
-                        authManager.addExperience(points: playerExperience * rewardFlag, onSuccess: {
-                            print("addExperience \(rewardFlag)")
+                        authManager.addExperience(points: playerExperience * authManager.rewardFlag, onSuccess: {
+                            print("addExperience \(authManager.rewardFlag)")
                         }, onFailure: { error in
                             // 失敗した時の処理をここに書きます。`error`は失敗の原因を示す情報が含まれている可能性があります。
                         })

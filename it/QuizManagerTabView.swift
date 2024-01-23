@@ -32,7 +32,7 @@ struct QuizManagerTabView: View {
     @State private var buttonRect: CGRect = .zero
     @State private var bubbleHeight: CGFloat = 0.0
     @State private var isIncorrectAnswersEmpty: Bool = true
-
+    @ObservedObject var reward = Reward()
     
     init(isPresenting: Binding<Bool>) {
         _isPresenting = isPresenting
@@ -239,7 +239,7 @@ struct QuizManagerTabView: View {
                             }
                             .frame(maxWidth: .infinity)
                             .padding(.horizontal)
-                            .padding(.bottom)
+                            .padding(.bottom,120)
                             .shadow(radius: 3)
                             .fullScreenCover(isPresented: $isPresentingQuizDatabase) {
                                             QuizDatabaseList(isPresenting: $isPresentingQuizDatabase)
@@ -249,6 +249,36 @@ struct QuizManagerTabView: View {
                         
                     }
                     .padding(.top,-30)
+                    .overlay(
+                        ZStack {
+                            Spacer()
+                            HStack {
+                                Spacer()
+                                VStack{
+                                    Spacer()
+                                    HStack {
+                                        Spacer()
+                                        Button(action: {
+//                                                self.showAnotherView_post = true
+                                            reward.ExAndMoReward()
+                                        }, label: {
+                                            Image("倍ボタン")
+                                                .resizable()
+                                                .frame(width: 150, height: 100)
+                                        })
+                                            .shadow(radius: 5)
+                                            .background(GeometryReader { geometry in
+                                                Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
+                                            })
+                                            .padding()
+//                                                .fullScreenCover(isPresented: $showAnotherView_post, content: {
+//                                                    RewardRegistrationView()
+//                                                })
+                                    }
+                                }
+                            }
+                        }
+                    )
                 .onPreferenceChange(ViewPositionKey.self) { positions in
                     self.buttonRect = positions.first ?? .zero
                 }

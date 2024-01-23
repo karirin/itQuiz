@@ -33,7 +33,7 @@ struct QuizManagerView: View {
     @State private var bubbleHeight: CGFloat = 0.0
     @State private var isIncorrectAnswersEmpty: Bool = true
     @ObservedObject var reward = Reward()
-
+    @State private var showLoginModal: Bool = false
     
     init(isPresenting: Binding<Bool>) {
         _isPresenting = isPresenting
@@ -123,21 +123,6 @@ struct QuizManagerView: View {
                             }
                             .padding(.horizontal)
                             .padding(.bottom)
-                            Button(action: {
-                                reward.ExAndMoReward()
-//                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-//                                    self.showLoginModal = true
-//                                }
-                            }) {
-                                Image("獲得")
-                                    .resizable()
-                                    .frame(maxWidth:110,maxHeight:110)
-                            }
-                            .onAppear() {
-                                reward.LoadReward()
-                            }
-    //                        .disabled(!reward.rewardLoaded)
-                            .shadow(radius: 10)
                                 Button(action: {
                                     audioManager.playKetteiSound()
                                     // 画面遷移のトリガーをオンにする
@@ -255,18 +240,57 @@ struct QuizManagerView: View {
                             }
                             .frame(maxWidth: .infinity)
                             .padding(.horizontal)
-                            .padding(.bottom)
+                            .padding(.bottom,120)
                             .shadow(radius: 3)
                             .fullScreenCover(isPresented: $isPresentingQuizDatabase) {
                                             QuizDatabaseList(isPresenting: $isPresentingQuizDatabase)
                                         }
                             
                         }
-                        
                     }
                     .padding(.top,-30)
+                    .overlay(
+                        ZStack {
+                            Spacer()
+                            HStack {
+                                Spacer()
+                                VStack{
+                                    Spacer()
+                                    HStack {
+                                        Spacer()
+                                        Button(action: {
+//                                                self.showAnotherView_post = true
+                                            reward.ExAndMoReward()
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                                self.showLoginModal = true
+                                            }
+                                        }, label: {
+                                            Image("倍ボタン")
+                                                .resizable()
+                                                .frame(width: 150, height: 100)
+                                        })
+                                            .shadow(radius: 5)
+                                            .background(GeometryReader { geometry in
+                                                Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
+                                            })
+                                            .padding()
+//                                                .fullScreenCover(isPresented: $showAnotherView_post, content: {
+//                                                    RewardRegistrationView()
+//                                                })
+                                    }
+                                }
+                            }
+                        }
+                    )
                 .onPreferenceChange(ViewPositionKey.self) { positions in
                     self.buttonRect = positions.first ?? .zero
+                }
+                if showLoginModal {
+                    ZStack {
+                        Color.black.opacity(0.7)
+                            .edgesIgnoringSafeArea(.all)
+                        RewardTimesModal(audioManager: audioManager, isPresented: $showLoginModal)
+                    }
                 }
                 if tutorialNum == 2 {
                     GeometryReader { geometry in
@@ -320,6 +344,7 @@ struct QuizManagerView: View {
             .frame(maxWidth:.infinity,maxHeight: .infinity)
             .background(Color("Color2"))
             .onAppear {
+                reward.LoadReward()
                 fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
 //                self.incorrectAnswerCount = count
 //                incorrectCount = count

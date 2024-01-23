@@ -24,6 +24,7 @@
 		1820AE282B518E4700BBA679 /* PrivacyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1820AE262B518E4700BBA679 /* PrivacyView.swift */; };
 		1820AE292B518E4700BBA679 /* TermsOfServiceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1820AE272B518E4700BBA679 /* TermsOfServiceView.swift */; };
 		18E818532B595C0800595669 /* QuizManagerTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E818522B595C0800595669 /* QuizManagerTabView.swift */; };
+		18E818572B5EBDFC00595669 /* RewardTimesModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E818562B5EBDFC00595669 /* RewardTimesModal.swift */; };
 		18F95C462B51AB7200F8DBBB /* TittlesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18F95C452B51AB7200F8DBBB /* TittlesView.swift */; };
 		18F95C482B51AB7800F8DBBB /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18F95C472B51AB7800F8DBBB /* ContentView.swift */; };
 		260000022AB5EEC900342CAE /* QuizBeginnerList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260000012AB5EEC900342CAE /* QuizBeginnerList.swift */; };
@@ -110,6 +111,7 @@
 		1820AE262B518E4700BBA679 /* PrivacyView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PrivacyView.swift; path = "../../名称未設定フォルダ/PrivacyView.swift"; sourceTree = "<group>"; };
 		1820AE272B518E4700BBA679 /* TermsOfServiceView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TermsOfServiceView.swift; path = "../../名称未設定フォルダ/TermsOfServiceView.swift"; sourceTree = "<group>"; };
 		18E818522B595C0800595669 /* QuizManagerTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizManagerTabView.swift; sourceTree = "<group>"; };
+		18E818562B5EBDFC00595669 /* RewardTimesModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardTimesModal.swift; sourceTree = "<group>"; };
 		18F95C452B51AB7200F8DBBB /* TittlesView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TittlesView.swift; path = ../../../Downloads/TittlesView.swift; sourceTree = "<group>"; };
 		18F95C472B51AB7800F8DBBB /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ContentView.swift; path = ../../../Downloads/ContentView.swift; sourceTree = "<group>"; };
 		260000012AB5EEC900342CAE /* QuizBeginnerList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizBeginnerList.swift; sourceTree = "<group>"; };
@@ -237,6 +239,7 @@
 				26AA130B2ACD74660035F5F4 /* ModalView.swift */,
 				26B9BA222AF2647300AC7C40 /* LoginModalView.swift */,
 				264F19162AF3B1A900B6FB10 /* RewardModalView.swift */,
+				18E818562B5EBDFC00595669 /* RewardTimesModal.swift */,
 				266A07272AC6E10200B85D4E /* ProgressBar3.swift */,
 				269A878D2AB87CBA00F33C9E /* MemoView.swift */,
 				269A87872AB7757C00F33C9E /* QuizResultView.swift */,
@@ -493,6 +496,7 @@
 				269A878A2AB86FC900F33C9E /* GachaView.swift in Sources */,
 				265FA3972AF6543B00F3E0EF /* QuizManagerTimerView.swift in Sources */,
 				26A026DE2ABDD1EB00119F2B /* TopView.swift in Sources */,
+				18E818572B5EBDFC00595669 /* RewardTimesModal.swift in Sources */,
 				26A25D4E2AB99235006B368F /* QuizIntermediateList.swift in Sources */,
 				269B1C312ADAE43500C3E82B /* QuizDailyList.swift in Sources */,
 				26A25D502AB9FB1A006B368F /* TitleListView.swift in Sources */,

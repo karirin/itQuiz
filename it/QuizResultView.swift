@@ -299,11 +299,11 @@ struct QuizResultView: View {
                       }
                     print("onAppear !interstitial.interstitialAdLoaded:\(!interstitial.interstitialAdLoaded)")
                     print("onAppear !interstitial.wasAdDismissed:\(!interstitial.wasAdDismissed)")
-//                    if !interstitial.interstitialAdLoaded {
-//                        interstitial.loadInterstitial()
-//                    } else if !interstitial.wasAdDismissed {
-//                        interstitial.presentInterstitial()
-//                    }
+                    if !interstitial.interstitialAdLoaded {
+                        interstitial.loadInterstitial()
+                    } else if !interstitial.wasAdDismissed {
+                        interstitial.presentInterstitial()
+                    }
 //                    if elapsedTime != 0 {
 //                        authManager.saveElapsedTime(category: "Beginner", elapsedTime: elapsedTime) { success in
 //                            if success {
@@ -426,9 +426,10 @@ struct ExperienceModalView: View {
             }
             .foregroundColor(Color("fontGray"))
             .onAppear {
+                authManager.fetchUserFlag()
                 withAnimation {
-                    currentExperience += Double(addedExperience)
-                    currentMoney += Double(addedMoney)
+                    currentExperience += Double(addedExperience) * Double(authManager.rewardFlag)
+                    currentMoney += Double(addedMoney) * Double(authManager.rewardFlag)
                 }
                 if currentExperience != 5 {
                     audioManager.playGameClearSound()
