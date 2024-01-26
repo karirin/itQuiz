@@ -605,6 +605,23 @@ struct ViewPositionKey3: PreferenceKey {
                             Spacer()
                         }
                         .ignoresSafeArea()
+                    VStack{
+                        Spacer()
+                        HStack{
+                            Button(action: {
+                                tutorialNum = 0 // タップでチュートリアルを終了
+                                authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { success in
+                                       // データベースのアップデートが成功したかどうかをハンドリング
+                                   }
+                            }) {
+                                Image("スキップ")
+                                    .resizable()
+                                    .frame(width:200,height:60)
+                            }
+                            Spacer()
+                        }
+                        .padding()
+                    }
                 }
                 if tutorialNum == 4 && showTutorial == true{
                     GeometryReader { geometry in
@@ -653,6 +670,24 @@ struct ViewPositionKey3: PreferenceKey {
                     Spacer()
                 }
                 .ignoresSafeArea()
+                    VStack{
+                            HStack{
+                                Button(action: {
+                                    tutorialNum = 0 // タップでチュートリアルを終了
+                                    authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { success in
+                                           // データベースのアップデートが成功したかどうかをハンドリング
+                                       }
+                                }) {
+                                    Image("スキップ")
+                                        .resizable()
+                                        .frame(width:200,height:60)
+                                        .padding(.top,20)
+                                }
+                                Spacer()
+                            }
+                            .padding(.leading)
+                            Spacer()
+                        }
                 }
                 if tutorialNum == 5 && showTutorial == true{
                     GeometryReader { geometry in
@@ -699,6 +734,24 @@ struct ViewPositionKey3: PreferenceKey {
                     Spacer()
                 }
                 .ignoresSafeArea()
+                    VStack{
+                        Spacer()
+                    HStack{
+                        Button(action: {
+                            tutorialNum = 0 // タップでチュートリアルを終了
+                            authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { success in
+                                   // データベースのアップデートが成功したかどうかをハンドリング
+                               }
+                        }) {
+                            Image("スキップ")
+                                .resizable()
+                                .frame(width:200,height:60)
+                                .padding(.top,20)
+                        }
+                        Spacer()
+                    }
+                    .padding()
+                }
                 }
                 if tutorialNum == 6 && showTutorial == true{
                     GeometryReader { geometry in
@@ -745,6 +798,24 @@ struct ViewPositionKey3: PreferenceKey {
                     Spacer()
                 }
                 .ignoresSafeArea()
+                    VStack{
+                        Spacer()
+                    HStack{
+                        Button(action: {
+                            tutorialNum = 0 // タップでチュートリアルを終了
+                            authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { success in
+                                   // データベースのアップデートが成功したかどうかをハンドリング
+                               }
+                        }) {
+                            Image("スキップ")
+                                .resizable()
+                                .frame(width:200,height:60)
+                                
+                        }
+                        Spacer()
+                    }
+                    .padding()
+                }
                 }
                 if showCountdown {
                        ZStack {
@@ -790,6 +861,7 @@ struct ViewPositionKey3: PreferenceKey {
 //                    interstitial.presentInterstitial()
 //                }
                 startCountdown()
+
                 self.monsterType = 1 // すぐに1に戻す
                 authManager.fetchUserInfo { (name, avator, money, hp, attack, tutorialNum) in
                     self.userName = name ?? ""
@@ -813,6 +885,11 @@ struct ViewPositionKey3: PreferenceKey {
 //                        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
                             startTimer() // Viewが表示されたときにタイマーを開始
 //                        }
+                    }
+                    if self.tutorialNum == 2 {
+                        authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { success in
+                            // データベースのアップデートが成功したかどうかをハンドリング
+                        }
                     }
                 }
                 self.startTime = Date()

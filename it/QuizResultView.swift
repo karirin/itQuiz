@@ -49,8 +49,8 @@ struct QuizResultView: View {
     @Binding var navigateToQuizResultView: Bool
 //    @Environment(\.rootPresentationMode) private var rootPresentationMode: Binding<RootPresentationMode>
     @State private var isHidden = false
-//    @ObservedObject var interstitial = Interstitial()
-    @StateObject var interstitial = Interstitial()
+    @ObservedObject var interstitial = Interstitial()
+//    @StateObject var interstitial = Interstitial()
     @Environment(\.presentationMode) var presentationMode
 
     // QuizResultView.swift
@@ -297,13 +297,16 @@ struct QuizResultView: View {
                           }
                           }
                       }
-                    print("onAppear !interstitial.interstitialAdLoaded:\(!interstitial.interstitialAdLoaded)")
-                    print("onAppear !interstitial.wasAdDismissed:\(!interstitial.wasAdDismissed)")
-                    if !interstitial.interstitialAdLoaded {
-                        interstitial.loadInterstitial()
-                    } else if !interstitial.wasAdDismissed {
-                        interstitial.presentInterstitial()
-                    }
+//                    print("onAppear !interstitial.interstitialAdLoaded:\(!interstitial.interstitialAdLoaded)")
+//                    print("onAppear !interstitial.wasAdDismissed:\(!interstitial.wasAdDismissed)")
+//                    if !interstitial.interstitialAdLoaded {
+//                        interstitial.loadInterstitial()
+//                    } else if !interstitial.wasAdDismissed {
+//                        interstitial.presentInterstitial()
+//                    }
+                    interstitial.loadInterstitial(completion: { isLoaded in
+                        self.interstitial.presentInterstitial()
+                    })
 //                    if elapsedTime != 0 {
 //                        authManager.saveElapsedTime(category: "Beginner", elapsedTime: elapsedTime) { success in
 //                            if success {

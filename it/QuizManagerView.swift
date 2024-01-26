@@ -48,10 +48,10 @@ struct QuizManagerView: View {
                         VStack {
                             HStack {
                                 Text(" ")
+                                    .frame(width:isIPad() ? 10 : 5,height: isIPad() ? 40 : 15)
                                     .background(.gray)
-                                    .frame(width:10,height: 20)
-                                Text("過去に不正解した問題だけを解くことができます")
-                                    .font(.system(size: 15))
+                                Text(" 過去に不正解した問題だけを解くことができます")
+                                    .font(.system(size: isIPad() ? 40 : 15))
                                     .foregroundColor(Color("fontGray"))
                             }
 //                            .padding(.horizontal,0)
@@ -65,11 +65,11 @@ struct QuizManagerView: View {
                                 if isIncorrectAnswersEmpty == true {
                                 Image("白黒選択肢0")
                                     .resizable()
-                                    .frame(height: 70)
+                                    .frame(height: isIPad() ? 200 : 70)
                                 }else{
                                     Image("選択肢0")
                                         .resizable()
-                                        .frame(height: 70)
+                                        .frame(height: isIPad() ? 200 : 70)
                                 }
                             }
                             .disabled(isIncorrectAnswersEmpty)
@@ -115,10 +115,10 @@ struct QuizManagerView: View {
                         
                             HStack {
                                 Text(" ")
+                                    .frame(width:isIPad() ? 10 : 5,height: isIPad() ? 40 : 15)
                                     .background(.gray)
-                                    .frame(width:10,height: 20)
-                                Text("問題の難易度、種類別で解くことができます　　")
-                                    .font(.system(size: 15))
+                                Text(" 問題の難易度、種類別で解くことができます　　")
+                                    .font(.system(size: isIPad() ? 40 : 15))
                                     .foregroundColor(Color("fontGray"))
                             }
                             .padding(.horizontal)
@@ -257,7 +257,6 @@ struct QuizManagerView: View {
                                 VStack{
                                     Spacer()
                                     HStack {
-                                        Spacer()
                                         Button(action: {
 //                                                self.showAnotherView_post = true
                                             reward.ExAndMoReward()
@@ -273,10 +272,12 @@ struct QuizManagerView: View {
                                             .background(GeometryReader { geometry in
                                                 Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
                                             })
-                                            .padding()
+                                            .padding(.bottom)
 //                                                .fullScreenCover(isPresented: $showAnotherView_post, content: {
 //                                                    RewardRegistrationView()
 //                                                })
+                                        
+                                            Spacer()
                                     }
                                 }
                             }
@@ -332,14 +333,34 @@ struct QuizManagerView: View {
                         Spacer()
                     }
                     .ignoresSafeArea()
+                    VStack{
+                        HStack{
+                            Button(action: {
+                                tutorialNum = 0 // タップでチュートリアルを終了
+                                authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { success in
+                                }
+                            }) {
+                                Image("スキップ")
+                                    .resizable()
+                                    .frame(width:200,height:60)
+                                    .padding(.leading)
+                            }
+                            Spacer()
+                        }
+                        Spacer()
+                    }
                 }
+                    
             }
+            
             .onTapGesture {
-                audioManager.playSound()
-                tutorialNum = 0
-                authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 3) { success in
-                       // データベースのアップデートが成功したかどうかをハンドリング
-                   }
+                if tutorialNum == 2 {
+                        audioManager.playSound()
+                    tutorialNum = 0
+                    authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 3) { success in
+                        // データベースのアップデートが成功したかどうかをハンドリング
+                    }
+                }
             }
             .frame(maxWidth:.infinity,maxHeight: .infinity)
             .background(Color("Color2"))

@@ -21,9 +21,9 @@ class Interstitial: NSObject, GADFullScreenContentDelegate, ObservableObject {
 
     // リワード広告の読み込み
     func loadInterstitial() {
-//        GADInterstitialAd.load(withAdUnitID: "ca-app-pub-4898800212808837/3001013957", request: GADRequest()) { [self] (ad, error) in
+        GADInterstitialAd.load(withAdUnitID: "ca-app-pub-4898800212808837/3001013957", request: GADRequest()) { [self] (ad, error) in
         print("loadInterstitial")
-        GADInterstitialAd.load(withAdUnitID: "ca-app-pub-3940256099942544/4411468910", request: GADRequest()) { (ad, error) in
+//        GADInterstitialAd.load(withAdUnitID: "ca-app-pub-3940256099942544/4411468910", request: GADRequest()) { (ad, error) in
             if let _ = error {
                 print("loadInterstitial 😭: 読み込みに失敗しました")
                 print("loadInterstitial 広告の読み込みに失敗しました: \(error!.localizedDescription)")

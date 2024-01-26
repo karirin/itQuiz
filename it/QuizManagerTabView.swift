@@ -33,6 +33,7 @@ struct QuizManagerTabView: View {
     @State private var bubbleHeight: CGFloat = 0.0
     @State private var isIncorrectAnswersEmpty: Bool = true
     @ObservedObject var reward = Reward()
+    @State private var showLoginModal: Bool = false
     
     init(isPresenting: Binding<Bool>) {
         _isPresenting = isPresenting
@@ -47,10 +48,10 @@ struct QuizManagerTabView: View {
                         VStack {
                             HStack {
                                 Text(" ")
+                                    .frame(width:isIPad() ? 10 : 5,height: isIPad() ? 40 : 15)
                                     .background(.gray)
-                                    .frame(width:10,height: 20)
-                                Text("過去に不正解した問題だけを解くことができます")
-                                    .font(.system(size: 15))
+                                Text(" 過去に不正解した問題だけを解くことができます")
+                                    .font(.system(size: isIPad() ? 40 : 15))
                                     .foregroundColor(Color("fontGray"))
                             }
 //                            .padding(.horizontal,0)
@@ -64,11 +65,11 @@ struct QuizManagerTabView: View {
                                 if isIncorrectAnswersEmpty == true {
                                 Image("白黒選択肢0")
                                     .resizable()
-                                    .frame(height: 70)
+                                    .frame(height: isIPad() ? 200 : 70)
                                 }else{
                                     Image("選択肢0")
                                         .resizable()
-                                        .frame(height: 70)
+                                        .frame(height: isIPad() ? 200 : 70)
                                 }
                             }
                             .disabled(isIncorrectAnswersEmpty)
@@ -114,10 +115,10 @@ struct QuizManagerTabView: View {
                         
                             HStack {
                                 Text(" ")
+                                    .frame(width:isIPad() ? 10 : 5,height: isIPad() ? 40 : 15)
                                     .background(.gray)
-                                    .frame(width:10,height: 20)
-                                Text("問題の難易度、種類別で解くことができます　　")
-                                    .font(.system(size: 15))
+                                Text(" 問題の難易度、種類別で解くことができます　　")
+                                    .font(.system(size: isIPad() ? 40 : 15))
                                     .foregroundColor(Color("fontGray"))
                             }
                             .padding(.horizontal)
@@ -257,10 +258,12 @@ struct QuizManagerTabView: View {
                                 VStack{
                                     Spacer()
                                     HStack {
-                                        Spacer()
                                         Button(action: {
 //                                                self.showAnotherView_post = true
                                             reward.ExAndMoReward()
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                                self.showLoginModal = true
+                                            }
                                         }, label: {
                                             Image("倍ボタン")
                                                 .resizable()
@@ -270,10 +273,11 @@ struct QuizManagerTabView: View {
                                             .background(GeometryReader { geometry in
                                                 Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
                                             })
-                                            .padding()
+                                            .padding(.bottom)
 //                                                .fullScreenCover(isPresented: $showAnotherView_post, content: {
 //                                                    RewardRegistrationView()
 //                                                })
+                                            Spacer()
                                     }
                                 }
                             }
@@ -282,54 +286,13 @@ struct QuizManagerTabView: View {
                 .onPreferenceChange(ViewPositionKey.self) { positions in
                     self.buttonRect = positions.first ?? .zero
                 }
-                if tutorialNum == 2 {
-                    GeometryReader { geometry in
-                        Color.black.opacity(0.5)
-                        // スポットライトの領域をカットアウ
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                                    .frame(width: buttonRect.width - 20, height: buttonRect.height)
-                                    .position(x: buttonRect.midX, y: buttonRect.midY-10)
-                                    .blendMode(.destinationOut)
-                            )
-                            .ignoresSafeArea()
-                            .compositingGroup()
-                            .background(.clear)
+                if showLoginModal {
+                    ZStack {
+                        Color.black.opacity(0.7)
+                            .edgesIgnoringSafeArea(.all)
+                        RewardTimesModal(audioManager: audioManager, isPresented: $showLoginModal)
                     }
-                    VStack {
-                        Spacer()
-                            .frame(height: buttonRect.minY + bubbleHeight)
-                        VStack(alignment: .trailing, spacing: .zero) {
-                            Image("上矢印")
-                                .resizable()
-                                .frame(width: 20, height: 20)
-                                .padding(.trailing, 306.0)
-                            Text("「IT基礎知識の問題（初級）」をクリックしてください。")
-                                .font(.system(size: 24.0))
-                                .padding(.all, 16.0)
-                                .background(Color.white)
-                                .cornerRadius(4.0)
-                                .padding(.horizontal, 16)
-                                .foregroundColor(Color("fontGray"))
-                        }
-                        .background(GeometryReader { geometry in
-                            Path { _ in
-                                DispatchQueue.main.async {
-                                    self.bubbleHeight = geometry.size.height - 40
-                                }
-                            }
-                        })
-                        Spacer()
-                    }
-                    .ignoresSafeArea()
                 }
-            }
-            .onTapGesture {
-                audioManager.playSound()
-                tutorialNum = 0
-                authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 3) { success in
-                       // データベースのアップデートが成功したかどうかをハンドリング
-                   }
             }
             .frame(maxWidth:.infinity,maxHeight: .infinity)
             .background(Color("Color2"))
