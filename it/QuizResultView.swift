@@ -189,8 +189,7 @@ struct QuizResultView: View {
                                         Image(systemName:result.isCorrect ? "circle" : "xmark")
                                             .foregroundColor(result.isCorrect ? .red : .blue)
                                             .opacity(0.7)
-//                                        Text(result.isCorrect ? "正解" : "不正解")
-                                        Text("正解")
+                                        Text(result.isCorrect ? "正解" : "不正解")
                                     }
                                     .font(.system(size:24))
                                     Text(result.question)
@@ -297,16 +296,16 @@ struct QuizResultView: View {
                           }
                           }
                       }
-//                    print("onAppear !interstitial.interstitialAdLoaded:\(!interstitial.interstitialAdLoaded)")
-//                    print("onAppear !interstitial.wasAdDismissed:\(!interstitial.wasAdDismissed)")
+                    print("onAppear !interstitial.interstitialAdLoaded:\(!interstitial.interstitialAdLoaded)")
+                    print("onAppear !interstitial.wasAdDismissed:\(!interstitial.wasAdDismissed)")
 //                    if !interstitial.interstitialAdLoaded {
 //                        interstitial.loadInterstitial()
 //                    } else if !interstitial.wasAdDismissed {
 //                        interstitial.presentInterstitial()
 //                    }
                     interstitial.loadInterstitial(completion: { isLoaded in
-                        self.interstitial.presentInterstitial()
-                    })
+                                            self.interstitial.presentInterstitial()
+                                        })
 //                    if elapsedTime != 0 {
 //                        authManager.saveElapsedTime(category: "Beginner", elapsedTime: elapsedTime) { success in
 //                            if success {
