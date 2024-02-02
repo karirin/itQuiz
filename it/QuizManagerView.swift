@@ -34,6 +34,7 @@ struct QuizManagerView: View {
     @State private var isIncorrectAnswersEmpty: Bool = true
     @ObservedObject var reward = Reward()
     @State private var showLoginModal: Bool = false
+    @State private var isButtonClickable: Bool = false
     
     init(isPresenting: Binding<Bool>) {
         _isPresenting = isPresenting
@@ -269,6 +270,7 @@ struct QuizManagerView: View {
                                                 .frame(width: 150, height: 100)
                                         })
                                             .shadow(radius: 5)
+                                            .disabled(!isButtonClickable)
                                             .background(GeometryReader { geometry in
                                                 Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
                                             })
@@ -369,6 +371,9 @@ struct QuizManagerView: View {
                 fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
 //                self.incorrectAnswerCount = count
 //                incorrectCount = count
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) { // 1秒後に
+                    self.isButtonClickable = true // ボタンをクリック可能に設定
                 }
                 authManager.fetchUserInfo { (name, avatar, money, hp, attack, tutorialNum) in
                     if let fetchedTutorialNum = tutorialNum {

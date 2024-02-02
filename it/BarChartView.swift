@@ -26,48 +26,74 @@ struct BarChartView: View {
     // サンプルデータの作成
     let sampleData = createSampleData()
     @State private var currentDate = Date()
-    @State var data: [DailyData]
+    @State var data: [DailyData] = []
     @ObservedObject var audioManager = AudioManager.shared
     @Environment(\.presentationMode) var presentationMode
     
-    // 表示用の DateFormatter
     private var displayFormatter: DateFormatter {
         let formatter = DateFormatter()
-        formatter.dateFormat = "MM-dd" // 日付の表示形式を月日に設定
+        formatter.dateFormat = "M/d" // 月-日の形式に変更
+        formatter.locale = Locale(identifier: "ja_JP") // ロケールを日本に設定
         return formatter
     }
     
+    private var yearMonthFormatter: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy年 M月" // 「2024年 1月」のような形式
+        formatter.locale = Locale(identifier: "ja_JP")
+        return formatter
+    }
+    
+    private var fullDateFormatter: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "M月 d日" // 「2024年 1月 1日」の形式
+        formatter.locale = Locale(identifier: "ja_JP") // ロケールを日本に設定
+        return formatter
+    }
+
+    func formattedDate(from dateString: String) -> String {
+        if let date = dateFormatter.date(from: dateString) {
+            return fullDateFormatter.string(from: date)
+        }
+        return ""
+    }
+
     var body: some View {
         NavigationView{
             VStack{
+                HStack{
+                    Spacer()
+                    Image(systemName: "chevron.left")
+                    Spacer()
+                        .frame(width:20)
+                    Text(yearMonthFormatter.string(from: currentDate)) // currentDateをフォーマットして表示
+                                .font(.system(size: 20))
+                    Spacer()
+                        .frame(width:20)
+                    Image(systemName: "chevron.right")
+                    Spacer()
+                }
                 VStack{
                     Chart {
                         ForEach(data, id: \.date) { dailyData in
                             BarMark(
-                                x: .value("Date", self.displayDate(from: dailyData.date)),
+                                x: .value("Date", dailyData.date),
                                 y: .value("Count", dailyData.count)
                             )
                         }
                     }
-//               .chartXAxis {
-//                    AxisMarks(values: .stride(by: .day)) { value in
-//                        AxisGridLine()
-//                        if let dateValue = value.as(Date.self), shouldDisplayLabel(for: dateValue) {
-//                            let dateString = displayFormatter.string(from: dateValue)
-//                            AxisValueLabel(dateString) // ここで日付をx軸に表示
-//                        }
-//                    }
-//                }
                     .chartXAxis {
-                        AxisMarks(values: .stride(by: .day)) { value in
-                            AxisGridLine() // AxisMarkを返す
-                            if let dateValue = value.as(Date.self), shouldDisplayLabel(for: dateValue) {
-                                let dateString = displayFormatter.string(from: dateValue)
-                                AxisValueLabel(dateString) // AxisMarkを返す
+                        AxisMarks(position: .bottom, values: .automatic) { value in
+                            if let dateStr = value.as(String.self),
+                               let date = dateFormatter.date(from: dateStr),
+                               Calendar.current.component(.day, from: date) % 3 == 0 { // 日付が5の倍数であるかをチェック
+
+                                AxisValueLabel(displayFormatter.string(from: date))
+                            } else {
+                                AxisValueLabel("") // 5の倍数でない場合はラベルを空にする
                             }
                         }
                     }
-                    
                     .gesture(
                         DragGesture()
                             .onEnded { gesture in
@@ -84,9 +110,12 @@ struct BarChartView: View {
                     
                     .onAppear {
                         fetchData(userId: authManager.currentUserId!,for: currentDate)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                            print("data:\(data)")
+                        }
                     }
                 }
-                .frame(height:300)
+                .frame(height:200)
                 .padding()
                 Spacer()
                 HStack{
@@ -105,7 +134,7 @@ struct BarChartView: View {
                         if item.count != 0 {
                             VStack{
                                 HStack {
-                                    Text(item.date)
+                                    Text(formattedDate(from: item.date)) // ここを更新
                                         .font(.system(size: 26))
                                     Spacer()
                                     Text("\(item.count)")
@@ -137,6 +166,7 @@ struct BarChartView: View {
                         }
                 )
             }
+            .background(Color("Color2"))
         }
         .navigationBarBackButtonHidden(true)
         .navigationBarItems(leading: Button(action: {
@@ -182,7 +212,7 @@ struct BarChartView: View {
         return ""
     }
     
-//    // 表示用の DateFormatter
+    // 表示用の DateFormatter
 //    private var displayFormatter: DateFormatter {
 //        let formatter = DateFormatter()
 //        formatter.dateFormat = "d"

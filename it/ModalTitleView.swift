@@ -157,6 +157,7 @@ struct ModalTittleView: View {
         )
         .onAppear{
             authManager.fetchUserExperienceAndLevel()
+            audioManager.playTittleSound()
         }
     }
 }

@@ -41,55 +41,60 @@ class Interstitial: NSObject, GADFullScreenContentDelegate, ObservableObject {
 //        }
 //    }
 
-    func loadInterstitial(completion: @escaping (Bool) -> Void) {
-        GADInterstitialAd.load(withAdUnitID: "ca-app-pub-4898800212808837/3001013957", request: GADRequest()) { [weak self] (ad, error) in
-            guard let self = self else { return }
-
-            if let error = error {
-                print("広告の読み込みに失敗しました: \(error.localizedDescription)")
-                completion(false)
-                return
-            }
-
-            self.interstitialAd = ad
-            self.interstitialAd?.fullScreenContentDelegate = self
-            print("広告の読み込みに成功しました")
-            completion(true)
+    func loadInterstitial() {
+      GADInterstitialAd.load(
+        withAdUnitID: "ca-app-pub-3940256099942544/4411468910", request: GADRequest()
+      ) { ad, error in
+        if let error = error {
+          return print("Failed to load ad with error: \(error.localizedDescription)")
         }
+
+        self.interstitialAd = ad
+      }
     }
 
     // インタースティシャル広告の表示
-    func presentInterstitial() {
-        let root = UIApplication.shared.windows.first?.rootViewController
-        if let ad = interstitialAd {
-            ad.present(fromRootViewController: root!)
-//            self.wasAdDismissed = true
+//    func presentInterstitial() {
+//        let root = UIApplication.shared.windows.first?.rootViewController
+//        if let ad = interstitialAd {
+//            ad.present(fromRootViewController: root!)
+////            self.wasAdDismissed = true
+////            self.interstitialAdLoaded = false
+//        } else {
+//            print("😭: 広告の準備ができていませんでした")
 //            self.interstitialAdLoaded = false
-        } else {
-            print("😭: 広告の準備ができていませんでした")
-            self.interstitialAdLoaded = false
-            self.loadInterstitial { isLoaded in
-                if isLoaded {
-                    print("広告が正常にロードされました")
-                    // 必要に応じて広告を表示するなど、次のステップを実行
-                } else {
-                    print("広告のロードに失敗しました")
-                }
-            }
-        }
+//            self.loadInterstitial { isLoaded in
+//                if isLoaded {
+//                    print("広告が正常にロードされました")
+//                    // 必要に応じて広告を表示するなど、次のステップを実行
+//                } else {
+//                    print("広告のロードに失敗しました")
+//                }
+//            }
+//        }
+//    }
+    
+    func presentInterstitial(from viewController: UIViewController) {
+      guard let fullScreenAd = loadInterstitial else {
+        return print("Ad wasn't ready")
+      }
+
+      fullScreenAd.present(fromRootViewController: viewController)
     }
+    
+    func adDidRecordImpression(_ ad: GADFullScreenPresentingAd) {
+      print("\(#function) called")
+    }
+
+    func adDidRecordClick(_ ad: GADFullScreenPresentingAd) {
+      print("\(#function) called")
+    }
+    
     // 失敗通知
     func ad(_ ad: GADFullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
         print("インタースティシャル広告の表示に失敗しました")
         self.interstitialAdLoaded = false
-        self.loadInterstitial { isLoaded in
-            if isLoaded {
-                print("広告が正常にロードされました")
-                // 必要に応じて広告を表示するなど、次のステップを実行
-            } else {
-                print("広告のロードに失敗しました")
-            }
-        }
+        self.loadInterstitial()
     }
 
     // 表示通知
@@ -106,6 +111,18 @@ class Interstitial: NSObject, GADFullScreenContentDelegate, ObservableObject {
     }
 }
 
+struct AdViewControllerRepresentable: UIViewControllerRepresentable {
+  let viewController = UIViewController()
+
+  func makeUIViewController(context: Context) -> some UIViewController {
+    return viewController
+  }
+
+  func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
+    // No implementation needed. Nothing to update.
+  }
+}
+
 struct Interstitial1: View {
     
         @ObservedObject var interstitial = Interstitial()
@@ -113,23 +130,23 @@ struct Interstitial1: View {
         VStack{
             Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
         }        
-        .onAppear {
-            if !interstitial.interstitialAdLoaded {
-                interstitial.loadInterstitial { isLoaded in
-                    if isLoaded {
-                        print("広告が正常にロードされました")
-                        // 必要に応じて広告を表示するなど、次のステップを実行
-                    } else {
-                        print("広告のロードに失敗しました")
-                    }
-                }
-            }
-        }
-        .onChange(of: interstitial.interstitialAdLoaded) { isLoaded in
-            if isLoaded {
-                interstitial.presentInterstitial()
-            }
-        }
+//        .onAppear {
+//            if !interstitial.interstitialAdLoaded {
+//                interstitial.loadInterstitial { isLoaded in
+//                    if isLoaded {
+//                        print("広告が正常にロードされました")
+//                        // 必要に応じて広告を表示するなど、次のステップを実行
+//                    } else {
+//                        print("広告のロードに失敗しました")
+//                    }
+//                }
+//            }
+//        }
+//        .onChange(of: interstitial.interstitialAdLoaded) { isLoaded in
+//            if isLoaded {
+//                interstitial.presentInterstitial()
+//            }
+//        }
     }
 }
 

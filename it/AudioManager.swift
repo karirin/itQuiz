@@ -24,6 +24,7 @@ class AudioManager: ObservableObject {
     var audioLevelUpPlayer: AVPlayer?
     var audioGameClearPlayer: AVPlayer?
     var audioGameOverPlayer: AVPlayer?
+    var audioTittlePlayer: AVPlayer?
 
     @Published var isMuted: Bool = false
 
@@ -69,6 +70,9 @@ class AudioManager: ObservableObject {
         }
         if let soundURL = Bundle.main.url(forResource: "ゲームオーバー", withExtension: "mp3") {
             audioGameOverPlayer = AVPlayer(url: soundURL)
+        }
+        if let soundURL = Bundle.main.url(forResource: "称号", withExtension: "mp3") {
+            audioTittlePlayer = AVPlayer(url: soundURL)
         }
     }
     
@@ -152,5 +156,9 @@ class AudioManager: ObservableObject {
     func playGameOverSound() {
         audioGameOverPlayer?.seek(to: CMTime.zero) // 再生位置を先頭に戻す
         audioGameOverPlayer?.play()
+    }
+    func playTittleSound() {
+        audioTittlePlayer?.seek(to: CMTime.zero) // 再生位置を先頭に戻す
+        audioTittlePlayer?.play()
     }
 }

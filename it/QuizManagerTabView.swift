@@ -34,6 +34,7 @@ struct QuizManagerTabView: View {
     @State private var isIncorrectAnswersEmpty: Bool = true
     @ObservedObject var reward = Reward()
     @State private var showLoginModal: Bool = false
+    @State private var isButtonClickable: Bool = false
     
     init(isPresenting: Binding<Bool>) {
         _isPresenting = isPresenting
@@ -270,6 +271,7 @@ struct QuizManagerTabView: View {
                                                 .frame(width: 150, height: 100)
                                         })
                                             .shadow(radius: 5)
+                                            .disabled(!isButtonClickable)
                                             .background(GeometryReader { geometry in
                                                 Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
                                             })
@@ -297,6 +299,9 @@ struct QuizManagerTabView: View {
             .frame(maxWidth:.infinity,maxHeight: .infinity)
             .background(Color("Color2"))
             .onAppear {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) { // 1秒後に
+                    self.isButtonClickable = true // ボタンをクリック可能に設定
+                }
                 fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
 //                self.incorrectAnswerCount = count
 //                incorrectCount = count

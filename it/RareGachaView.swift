@@ -100,6 +100,7 @@ struct RareGachaView: View {
     @ObservedObject var reward = Reward()
     @State private var showLoginModal: Bool = false
 //    @State private var isShowingActivityIndicator: Bool = false
+    @State private var isButtonClickable: Bool = false
 
     var body: some View {
         ZStack{
@@ -199,7 +200,7 @@ struct RareGachaView: View {
                         Spacer()
                         Button(action: {
                             reward.ShowReward()
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                                 self.showLoginModal = true
                             }
                         }) {
@@ -207,7 +208,11 @@ struct RareGachaView: View {
                                 .resizable()
                                 .frame(maxWidth:110,maxHeight:110)
                         }
-                        .onAppear() {
+                        .disabled(!isButtonClickable)
+                            .onAppear() {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { // 1秒後に
+                                                    self.isButtonClickable = true // ボタンをクリック可能に設定
+                                                }
                             reward.LoadReward()
                         }
                         //                        .disabled(!reward.rewardLoaded)
@@ -265,7 +270,7 @@ struct RareGachaView: View {
                             Spacer()
                             Button(action: {
                                 reward.ShowReward()
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                DispatchQueue.main.asyncAfter(deadline: .now() +        1.0) {
                                     self.showLoginModal = true
                                 }
                             }) {
@@ -273,7 +278,11 @@ struct RareGachaView: View {
                                     .resizable()
                                     .frame(maxWidth:110,maxHeight:110)
                             }
-                            .onAppear() {
+                            .disabled(!isButtonClickable)
+                                .onAppear() {
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { // 1秒後に
+                                                        self.isButtonClickable = true // ボタンをクリック可能に設定
+                                                    }
                                 reward.LoadReward()
                             }
                             //                        .disabled(!reward.rewardLoaded)

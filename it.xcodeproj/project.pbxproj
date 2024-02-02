@@ -13,7 +13,6 @@
 		1820AE192B518D8D00BBA679 /* 倒れる.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1820AE0B2B518D8C00BBA679 /* 倒れる.mp3 */; };
 		1820AE1A2B518D8D00BBA679 /* ゲームオーバー.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1820AE0C2B518D8C00BBA679 /* ゲームオーバー.mp3 */; };
 		1820AE1B2B518D8D00BBA679 /* おとも切り替え.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1820AE0D2B518D8C00BBA679 /* おとも切り替え.mp3 */; };
-		1820AE1C2B518D8D00BBA679 /* sound.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1820AE0E2B518D8D00BBA679 /* sound.mp3 */; };
 		1820AE1D2B518D8D00BBA679 /* キャンセル.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1820AE0F2B518D8D00BBA679 /* キャンセル.mp3 */; };
 		1820AE1E2B518D8D00BBA679 /* soundKettei.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1820AE102B518D8D00BBA679 /* soundKettei.mp3 */; };
 		1820AE1F2B518D8D00BBA679 /* 不正解.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1820AE112B518D8D00BBA679 /* 不正解.mp3 */; };
@@ -23,6 +22,8 @@
 		1820AE232B518D8D00BBA679 /* レベルアップ.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1820AE152B518D8D00BBA679 /* レベルアップ.mp3 */; };
 		1820AE282B518E4700BBA679 /* PrivacyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1820AE262B518E4700BBA679 /* PrivacyView.swift */; };
 		1820AE292B518E4700BBA679 /* TermsOfServiceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1820AE272B518E4700BBA679 /* TermsOfServiceView.swift */; };
+		18BD10B62B6B5DEE00ABB28F /* 称号.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18BD10B52B6B5DEE00ABB28F /* 称号.mp3 */; };
+		18BD10B82B6B601500ABB28F /* sound.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18BD10B72B6B601500ABB28F /* sound.mp3 */; };
 		18E818532B595C0800595669 /* QuizManagerTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E818522B595C0800595669 /* QuizManagerTabView.swift */; };
 		18E818572B5EBDFC00595669 /* RewardTimesModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E818562B5EBDFC00595669 /* RewardTimesModal.swift */; };
 		18F95C462B51AB7200F8DBBB /* TittlesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18F95C452B51AB7200F8DBBB /* TittlesView.swift */; };
@@ -100,7 +101,6 @@
 		1820AE0B2B518D8C00BBA679 /* 倒れる.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "倒れる.mp3"; path = "../../../Downloads/it 効果音/倒れる.mp3"; sourceTree = "<group>"; };
 		1820AE0C2B518D8C00BBA679 /* ゲームオーバー.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "ゲームオーバー.mp3"; path = "../../../Downloads/it 効果音/ゲームオーバー.mp3"; sourceTree = "<group>"; };
 		1820AE0D2B518D8C00BBA679 /* おとも切り替え.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "おとも切り替え.mp3"; path = "../../../Downloads/it 効果音/おとも切り替え.mp3"; sourceTree = "<group>"; };
-		1820AE0E2B518D8D00BBA679 /* sound.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = sound.mp3; path = "../../../Downloads/it 効果音/sound.mp3"; sourceTree = "<group>"; };
 		1820AE0F2B518D8D00BBA679 /* キャンセル.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "キャンセル.mp3"; path = "../../../Downloads/it 効果音/キャンセル.mp3"; sourceTree = "<group>"; };
 		1820AE102B518D8D00BBA679 /* soundKettei.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = soundKettei.mp3; path = "../../../Downloads/it 効果音/soundKettei.mp3"; sourceTree = "<group>"; };
 		1820AE112B518D8D00BBA679 /* 不正解.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "不正解.mp3"; path = "../../../Downloads/it 効果音/不正解.mp3"; sourceTree = "<group>"; };
@@ -110,6 +110,8 @@
 		1820AE152B518D8D00BBA679 /* レベルアップ.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "レベルアップ.mp3"; path = "../../../Downloads/it 効果音/レベルアップ.mp3"; sourceTree = "<group>"; };
 		1820AE262B518E4700BBA679 /* PrivacyView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PrivacyView.swift; path = "../../名称未設定フォルダ/PrivacyView.swift"; sourceTree = "<group>"; };
 		1820AE272B518E4700BBA679 /* TermsOfServiceView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TermsOfServiceView.swift; path = "../../名称未設定フォルダ/TermsOfServiceView.swift"; sourceTree = "<group>"; };
+		18BD10B52B6B5DEE00ABB28F /* 称号.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "称号.mp3"; path = "../../../Downloads/称号.mp3"; sourceTree = "<group>"; };
+		18BD10B72B6B601500ABB28F /* sound.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = sound.mp3; path = ../../../Downloads/sound.mp3; sourceTree = "<group>"; };
 		18E818522B595C0800595669 /* QuizManagerTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizManagerTabView.swift; sourceTree = "<group>"; };
 		18E818562B5EBDFC00595669 /* RewardTimesModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardTimesModal.swift; sourceTree = "<group>"; };
 		18F95C452B51AB7200F8DBBB /* TittlesView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TittlesView.swift; path = ../../../Downloads/TittlesView.swift; sourceTree = "<group>"; };
@@ -225,10 +227,10 @@
 				260E44122AB572DC00FBB487 /* itApp.swift */,
 				26B9BA1C2AEFDEFD00AC7C40 /* RewardView.swift */,
 				26B5BEF32AB6CFA600056E79 /* RootView.swift */,
+				26A026DD2ABDD1EA00119F2B /* TopView.swift */,
 				266A07292AC6FBC800B85D4E /* AnswerSelectionView.swift */,
 				264F19142AF2824700B6FB10 /* RankingView.swift */,
 				267E708F2AD6FD0200EA7AA2 /* LoadingView.swift */,
-				26A026DD2ABDD1EA00119F2B /* TopView.swift */,
 				26A25D512ABAFD82006B368F /* QuizManagerView.swift */,
 				18E818522B595C0800595669 /* QuizManagerTabView.swift */,
 				26D0C36D2AFE6F0500C6AF07 /* GachaManagerView.swift */,
@@ -285,10 +287,10 @@
 				26266B2C2B4A5395007B5964 /* GraphManagerView.swift */,
 				26266B2E2B4A53F8007B5964 /* BarChartView.swift */,
 				260E44162AB572DE00FBB487 /* Assets.xcassets */,
-				1820AE0E2B518D8D00BBA679 /* sound.mp3 */,
 				1820AE102B518D8D00BBA679 /* soundKettei.mp3 */,
 				1820AE0D2B518D8C00BBA679 /* おとも切り替え.mp3 */,
 				1820AE0A2B518D8C00BBA679 /* カウントダウン.mp3 */,
+				18BD10B72B6B601500ABB28F /* sound.mp3 */,
 				1820AE0F2B518D8D00BBA679 /* キャンセル.mp3 */,
 				1820AE0C2B518D8C00BBA679 /* ゲームオーバー.mp3 */,
 				1820AE142B518D8D00BBA679 /* ホームに戻る.mp3 */,
@@ -296,6 +298,7 @@
 				1820AE132B518D8D00BBA679 /* 敵攻撃.mp3 */,
 				1820AE082B518D8C00BBA679 /* ゲームクリア.mp3 */,
 				1820AE092B518D8C00BBA679 /* 正解.mp3 */,
+				18BD10B52B6B5DEE00ABB28F /* 称号.mp3 */,
 				1820AE0B2B518D8C00BBA679 /* 倒れる.mp3 */,
 				1820AE112B518D8D00BBA679 /* 不正解.mp3 */,
 				1820AE122B518D8D00BBA679 /* 味方攻撃.mp3 */,
@@ -409,8 +412,9 @@
 				1820AE1B2B518D8D00BBA679 /* おとも切り替え.mp3 in Resources */,
 				1820AE1D2B518D8D00BBA679 /* キャンセル.mp3 in Resources */,
 				1820AE232B518D8D00BBA679 /* レベルアップ.mp3 in Resources */,
-				1820AE1C2B518D8D00BBA679 /* sound.mp3 in Resources */,
+				18BD10B62B6B5DEE00ABB28F /* 称号.mp3 in Resources */,
 				1820AE182B518D8D00BBA679 /* カウントダウン.mp3 in Resources */,
+				18BD10B82B6B601500ABB28F /* sound.mp3 in Resources */,
 				1820AE222B518D8D00BBA679 /* ホームに戻る.mp3 in Resources */,
 				260E44172AB572DE00FBB487 /* Assets.xcassets in Resources */,
 				1820AE1A2B518D8D00BBA679 /* ゲームオーバー.mp3 in Resources */,
@@ -658,7 +662,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2.8;
+				CURRENT_PROJECT_VERSION = 2.9;
 				DEVELOPMENT_ASSET_PATHS = "\"it/Preview Content\"";
 				DEVELOPMENT_TEAM = F3XS565TSX;
 				ENABLE_PREVIEWS = YES;
@@ -675,7 +679,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.8;
+				MARKETING_VERSION = 2.9;
 				PRODUCT_BUNDLE_IDENTIFIER = "Swift-Beginners-app.it";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -691,7 +695,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2.8;
+				CURRENT_PROJECT_VERSION = 2.9;
 				DEVELOPMENT_ASSET_PATHS = "\"it/Preview Content\"";
 				DEVELOPMENT_TEAM = F3XS565TSX;
 				ENABLE_PREVIEWS = YES;
@@ -708,7 +712,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.8;
+				MARKETING_VERSION = 2.9;
 				PRODUCT_BUNDLE_IDENTIFIER = "Swift-Beginners-app.it";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;

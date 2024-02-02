@@ -245,13 +245,6 @@ struct PentagonView: View {
     @Binding var flag: Bool
     var body: some View {
         VStack{
-            HStack{
-                Spacer()
-                Text("ダンジョン別の正答率")
-                    .font(.system(size: 20))
-                Spacer()
-            }
-            .padding(.top)
             PentagonGraphView(userId: authManager.currentUserId!, labels: ["初級", "中級", "上級", "神級", "ネットワーク", "セキュリティ","データベース"])
                 .padding(.top,30)
             VStack(spacing: 0) {
@@ -263,7 +256,7 @@ struct PentagonView: View {
                     Spacer()
                     Text("正答率")
                 }
-                .font(.system(size: 20))
+                .font(.system(size: 18))
                 .padding()
                 ScrollView{
                     ForEach(QuizLevel.allCases, id: \.self) { level in
@@ -272,9 +265,10 @@ struct PentagonView: View {
                                 HStack{
                                     Image("\(level.description)選択肢")
                                         .resizable()
-                                        .frame(height: 60)
+                                        .frame(width: 200,height: 40)
+                                    Spacer()
                                     Text("\(quizDataForLevel.correctPerRate, specifier: "%.0f")%")
-                                        .font(.system(size: 24))
+                                        .font(.system(size: 22))
                                 }
                                 .padding(.horizontal)
                             Divider()
@@ -284,7 +278,7 @@ struct PentagonView: View {
                 }
             }
             .padding(.top)
-        }
+        }.background(Color("Color2"))
         .onAppear {
             print("currentuser:\(authManager.currentUserId)")
             RateManager.shared.fetchQuizData(userId: authManager.currentUserId!) { data in

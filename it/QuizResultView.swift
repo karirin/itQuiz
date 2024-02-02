@@ -49,9 +49,10 @@ struct QuizResultView: View {
     @Binding var navigateToQuizResultView: Bool
 //    @Environment(\.rootPresentationMode) private var rootPresentationMode: Binding<RootPresentationMode>
     @State private var isHidden = false
-    @ObservedObject var interstitial = Interstitial()
+    private let interstitial = Interstitial()
 //    @StateObject var interstitial = Interstitial()
     @Environment(\.presentationMode) var presentationMode
+    private let adViewControllerRepresentable = AdViewControllerRepresentable()
 
     // QuizResultView.swift
     init(results: [QuizResult], authManager: AuthManager, isPresenting: Binding<Bool>, navigateToQuizResultView: Binding<Bool>, playerExperience: Int, playerMoney: Int, elapsedTime: TimeInterval) {
@@ -211,6 +212,12 @@ struct QuizResultView: View {
                     }
 //                    Spacer()
                 }
+                .background {
+                        // Add the adViewControllerRepresentable to the background so it
+                        // doesn't influence the placement of other views in the view hierarchy.
+                        adViewControllerRepresentable
+                          .frame(width: .zero, height: .zero)
+                      }
                 .onChange(of: authManager.didLevelUp) { newValue in
                     if newValue {
                         // レベルアップ通知を表示した後、フラグをリセット
@@ -233,14 +240,15 @@ struct QuizResultView: View {
 //                        }
 //                    }
 //                }
-                .onChange(of: interstitial.interstitialAdLoaded) { isLoaded in
-                    print("onChange isLoaded:\(isLoaded)")
-                    print("onChange interstitial.wasAdDismissed:\(interstitial.wasAdDismissed)")
-                      if isLoaded && !interstitial.wasAdDismissed {
-                          interstitial.presentInterstitial()
-                      }
-                  }
+//                .onChange(of: interstitial.interstitialAdLoaded) { isLoaded in
+//                    print("onChange isLoaded:\(isLoaded)")
+//                    print("onChange interstitial.wasAdDismissed:\(interstitial.wasAdDismissed)")
+//                      if isLoaded && !interstitial.wasAdDismissed {
+//                          interstitial.presentInterstitial()
+//                      }
+//                  }
                 .onAppear {
+                    interstitial.loadInterstitial()
                     print("onAppear")
                     authManager.fetchUserExperienceAndLevel()
                       DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -303,9 +311,9 @@ struct QuizResultView: View {
 //                    } else if !interstitial.wasAdDismissed {
 //                        interstitial.presentInterstitial()
 //                    }
-                    interstitial.loadInterstitial(completion: { isLoaded in
-                                            self.interstitial.presentInterstitial()
-                                        })
+//                    interstitial.loadInterstitial(completion: { isLoaded in
+//                                            self.interstitial.presentInterstitial()
+//                                        })
 //                    if elapsedTime != 0 {
 //                        authManager.saveElapsedTime(category: "Beginner", elapsedTime: elapsedTime) { success in
 //                            if success {

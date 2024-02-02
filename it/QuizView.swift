@@ -497,8 +497,8 @@ struct ViewPositionKey3: PreferenceKey {
                             })
                             
                             if appState.isBannerVisible {
-                                BannerView()
-                                    .frame(height: 60)
+//                                BannerView()
+//                                    .frame(height: 60)
                             }
                             Spacer()
                             
@@ -934,7 +934,7 @@ struct ViewPositionKey3: PreferenceKey {
                       message: Text("設定画面で切り替える事ができます"),
                       dismissButton: .default(Text("OK"), action: {
   //                        isPresented = false
-                          resumeTimer()
+                          startTimer()
                           selectedAnswerIndex = nil
                       })
                   )
@@ -973,7 +973,7 @@ struct ViewPositionKey3: PreferenceKey {
                         }, onFailure: { error in
                             // 失敗した時の処理をここに書きます。`error`は失敗の原因を示す情報が含まれている可能性があります。
                         })
-                        authManager.addMoney(amount: playerMoney)
+                        authManager.addMoney(amount: playerMoney * authManager.rewardFlag)
                         DispatchQueue.main.async {
                             // ここでUIの更新を行います。
                         }

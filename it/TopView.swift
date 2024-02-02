@@ -58,8 +58,8 @@ struct TopView: View {
                                 Image(systemName: "square.grid.2x2")
                                 Text("おとも一覧")
                             }
-                    PentagonView(authManager: authManager, flag: .constant(false))
-//                    GraphManagerView()
+//                    PentagonView(authManager: authManager, flag: .constant(false))
+                    GraphManagerView()
 //                    PentagonView(authManager: authManager, flag: .constant(false))
                             .tabItem {
                                 Image(systemName: "chart.pie")

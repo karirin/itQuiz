@@ -1,0 +1,21 @@
+{
+  "images" : [
+    {
+      "filename" : "各ダンジョンでの正答率をペンタゴグラフで表示 苦手分野が一目でわかる.png",
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
+      "idiom" : "universal",
+      "scale" : "3x"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

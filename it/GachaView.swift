@@ -150,6 +150,7 @@ struct GachaView: View {
     @State private var otomo10flag: Bool = false
     @State private var otomo20flag: Bool = false
     @State private var otomoallflag: Bool = false
+    @State private var isButtonClickable: Bool = false
 //    @State private var isShowingActivityIndicator: Bool = false
 
     var body: some View {
@@ -257,7 +258,11 @@ struct GachaView: View {
                                 .resizable()
                                 .frame(maxWidth:110,maxHeight:110)
                         }
+                        .disabled(!isButtonClickable)
                         .onAppear() {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { // 1秒後に
+                                                self.isButtonClickable = true // ボタンをクリック可能に設定
+                                            }
                             reward.LoadReward()
                         }
 //                        .disabled(!reward.rewardLoaded)
@@ -322,7 +327,11 @@ struct GachaView: View {
                                     .resizable()
                                     .frame(width: frameSize3().width, height: frameSize3().height)
                             }
-                            .onAppear() {
+                            .disabled(!isButtonClickable)
+                                .onAppear() {
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { // 1秒後に
+                                                        self.isButtonClickable = true // ボタンをクリック可能に設定
+                                                    }
                                 reward.LoadReward()
                             }
                             //                        .disabled(!reward.rewardLoaded)
