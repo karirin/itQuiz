@@ -294,21 +294,21 @@ struct PentagonView: View {
             }
         }
         .navigationBarBackButtonHidden(true)
-        .navigationBarItems(leading: Button(action: {
-            self.presentationMode.wrappedValue.dismiss()
-            audioManager.playCancelSound()
-        }) {
-            Image(systemName: "chevron.left")
-                .foregroundColor(.gray)
-            Text("戻る")
-                .foregroundColor(Color("fontGray"))
-        })
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                Text("ダンジョン別の正答率")
-                    .font(.system(size: 20)) // ここでフォントサイズを指定
-            }
-        }
+//        .navigationBarItems(leading: Button(action: {
+//            self.presentationMode.wrappedValue.dismiss()
+//            audioManager.playCancelSound()
+//        }) {
+//            Image(systemName: "chevron.left")
+//                .foregroundColor(.gray)
+//            Text("戻る")
+//                .foregroundColor(Color("fontGray"))
+//        })
+//        .toolbar {
+//            ToolbarItem(placement: .principal) {
+//                Text("ダンジョン別の正答率")
+//                    .font(.system(size: 20)) // ここでフォントサイズを指定
+//            }
+//        }
     }
 }
 

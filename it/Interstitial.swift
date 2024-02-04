@@ -75,7 +75,7 @@ class Interstitial: NSObject, GADFullScreenContentDelegate, ObservableObject {
 //    }
     
     func presentInterstitial(from viewController: UIViewController) {
-      guard let fullScreenAd = loadInterstitial else {
+      guard let fullScreenAd = interstitialAd else {
         return print("Ad wasn't ready")
       }
 
@@ -124,24 +124,22 @@ struct AdViewControllerRepresentable: UIViewControllerRepresentable {
 }
 
 struct Interstitial1: View {
-    
+    private let adViewControllerRepresentable = AdViewControllerRepresentable()
         @ObservedObject var interstitial = Interstitial()
     var body: some View {
         VStack{
             Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
-        }        
-//        .onAppear {
-//            if !interstitial.interstitialAdLoaded {
-//                interstitial.loadInterstitial { isLoaded in
-//                    if isLoaded {
-//                        print("広告が正常にロードされました")
-//                        // 必要に応じて広告を表示するなど、次のステップを実行
-//                    } else {
-//                        print("広告のロードに失敗しました")
-//                    }
-//                }
-//            }
-//        }
+                .background {
+                        // Add the adViewControllerRepresentable to the background so it
+                        // doesn't influence the placement of other views in the view hierarchy.
+                        adViewControllerRepresentable
+                          .frame(width: .zero, height: .zero)
+                      }
+        }
+        .onAppear {
+            interstitial.loadInterstitial()
+            interstitial.presentInterstitial(from: adViewControllerRepresentable.viewController)
+        }
 //        .onChange(of: interstitial.interstitialAdLoaded) { isLoaded in
 //            if isLoaded {
 //                interstitial.presentInterstitial()

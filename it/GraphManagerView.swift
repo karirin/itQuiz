@@ -29,60 +29,24 @@ struct GraphManagerView: View {
     @State private var buttonRect: CGRect = .zero
     @State private var bubbleHeight: CGFloat = 0.0
     let sampleData = createSampleData()
-    
-//    init(isPresenting: Binding<Bool>) {
-//        _isPresenting = isPresenting
-//        _lastClickedDate = State(initialValue: Date())
-//    }
-
+    let list: [String] = ["正答率", "回答数(月間)"]
+    @State private var selectedTab: Int = 1
 
     var body: some View {
-        NavigationView{
-            VStack {
-                Spacer()
-                Image("グラフ説明")
-                    .resizable()
-                    .frame(height: 300)
-                Spacer()
-                    Button(action: {
-                        audioManager.playSound()
-                        // 画面遷移のトリガーをオンにする
-                        self.isPresentingQuizBeginner = true
-                    }) {
-                        //                        Image("IT基礎知識の問題の初級")
-                        Image("グラフ選択肢1")
-                            .resizable()
-                            .frame(height: 70)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.horizontal)
-                    .padding(.bottom)
-                    .shadow(radius: 10)
-                    
-                    Spacer()
-                    Button(action: {
-                        audioManager.playSound()
-                        self.isPresentingQuizIntermediate = true
-                    }) {
-                        //                    Image("IT基礎知識の問題の中級")
-                        Image("グラフ選択肢2")
-                            .resizable()
-                            .frame(height: 70)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.horizontal)
-                    .padding(.bottom)
-                    .shadow(radius: 10)
-                    
-                    Spacer()
-                    NavigationLink("", destination: PentagonView(authManager: authManager, flag: .constant(false)).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizBeginner) // 適切な遷移先に変更してください
-                    NavigationLink("", destination: BarChartView(authManager: authManager, data: sampleData).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizIntermediate) // 適切な遷移先に変更してください
-                }
+            VStack{
+                
+                    TopTabView(list: list, selectedTab: $selectedTab)
+                TabView(selection: $selectedTab,
+                                    content: {
+                    PentagonView(authManager: authManager, flag: .constant(false))
+                        .padding(.top)
+                                    .tag(0)
+                    BarChartView(authManager: authManager, data: sampleData)
+                        .navigationViewStyle(StackNavigationViewStyle())
+                                    .tag(1)
+                            })
+                            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
             }
-            //        .onTapGesture {
-            //            audioManager.playSound()
-            //        }
-        
         .frame(maxWidth:.infinity,maxHeight: .infinity)
         .background(Color("Color2"))
         .onAppear {
@@ -100,16 +64,6 @@ struct GraphManagerView: View {
                 audioPlayerKettei?.volume = 1.0
             }
         }
-        .navigationBarBackButtonHidden(true)
-        .navigationBarItems(leading: Button(action: {
-            self.presentationMode.wrappedValue.dismiss()
-            audioManager.playCancelSound()
-        }) {
-            Image(systemName: "chevron.left")
-                .foregroundColor(Color("fontGray"))
-            Text("戻る")
-                .foregroundColor(Color("fontGray"))
-        })
     }
     static func createSampleData() -> [DailyData] {
         let dateFormatter = DateFormatter()
@@ -121,7 +75,6 @@ struct GraphManagerView: View {
         ]
     }
 }
-
 
 struct GraphManagerView_Previews: PreviewProvider {
     static var previews: some View {

@@ -250,6 +250,7 @@ struct QuizResultView: View {
                 .onAppear {
                     interstitial.loadInterstitial()
                     print("onAppear")
+                    interstitial.presentInterstitial(from: adViewControllerRepresentable.viewController)
                     authManager.fetchUserExperienceAndLevel()
                       DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                           if authManager.level > 2 {
