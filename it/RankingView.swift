@@ -16,6 +16,9 @@ class RankingViewModel: ObservableObject {
     @ObservedObject var authManager = AuthManager.shared
     @Published var currentUserRank: Int?
     @Published var currentUserLevelRank: Int?
+    @Published var userAvatarCounts: [UserAvatarCount] = []
+    @Published var currentUserAvatarRank: Int?
+
     
     init() {
         fetchUsers()
@@ -158,8 +161,51 @@ class RankingViewModel: ObservableObject {
         })
     }
 
+    func fetchUsersByAvatarCount() {
+        let usersRef = Database.database().reference().child("users")
+        usersRef.observeSingleEvent(of: .value, with: { snapshot in
+            var userAvatarCounts: [UserAvatarCount] = []
 
+            guard let usersData = snapshot.value as? [String: [String: Any]] else {
+                print("Error: Could not parse users data")
+                return
+            }
 
+            for (userId, data) in usersData {
+                if let userName = data["userName"] as? String,
+                   let avatarsData = data["avatars"] as? [String: [String: Any]] {
+                    var totalAvatarCount = 0 // アバターの合計数を保持する変数
+                    var usedAvatarName: String? = nil // 使用中のアバター名
+
+                    // アバターデータをループして合計を計算
+                    for (_, avatarData) in avatarsData {
+                        if let count = avatarData["count"] as? Int {
+                            totalAvatarCount += count // 各アバターのcountを合算
+                        }
+                        if avatarData["usedFlag"] as? Int == 1, usedAvatarName == nil {
+                            usedAvatarName = avatarData["name"] as? String // 使用中のアバター名を設定
+                        }
+                    }
+
+                    let userAvatarCount = UserAvatarCount(
+                        userId: userId,
+                        userName: userName,
+                        avatarCount: totalAvatarCount,
+                        avatarName: usedAvatarName ?? "defaultAvatar" // 使用中のアバター名がない場合はデフォルト名を使用
+                    )
+                    userAvatarCounts.append(userAvatarCount)
+                }
+            }
+
+            // アバター数が多い順にソート
+            self.userAvatarCounts = userAvatarCounts.sorted(by: { $0.avatarCount > $1.avatarCount })
+            
+            // ログインユーザーの順位を計算
+            if let currentUserIndex = self.userAvatarCounts.firstIndex(where: { $0.userId == self.authManager.currentUserId }) {
+                self.currentUserAvatarRank = currentUserIndex + 1
+            }
+        })
+    }
     
     func showMoreUsers() {
         displayedUserCount = 10  // 表示するユーザー数を10に更新
@@ -172,51 +218,67 @@ struct LevelRankingView: View {
     @State private var rankNum: Int = 0
     
     var body: some View {
-        ScrollView{
-            VStack {
-                ForEach(Array(viewModel.users.prefix(viewModel.displayedUserCount).enumerated()), id: \.element.id) { index, user in
-                    
-                    HStack {
-                        // ユーザーのランキングを表示
-                        if (index==0||index==1||index==2){
-                            Image("\(index)")
-                                .resizable()
-                                .frame(width:50,height:50)
-                                .padding(.trailing)
-                        }else{
-                            Text("\(index + 1)位")
-                                .font(.system(size:40))
-                                .padding(.trailing, 5)
-                        }
-                        ForEach(user.avatars.indices, id: \.self) { index in
-                            let avatarData = user.avatars[index]
-                            //                                // 辞書から値を取り出し、適切にキャストします。
-                            if let name = avatarData["name"] as? String, let usedFlag = avatarData["usedFlag"] as? Int, usedFlag == 1 {
-                                Image(name)
+        if viewModel.userAnswerDataList.isEmpty {
+            // データがまだ読み込まれていない場合の表示
+            VStack{
+            ActivityIndicator()
+        }
+            .background(Color("Color2"))
+            .frame(maxWidth: .infinity,maxHeight: .infinity)
+        } else {
+            ScrollView{
+                VStack {
+                    ForEach(Array(viewModel.users.prefix(viewModel.displayedUserCount).enumerated()), id: \.element.id) { index, user in
+                        
+                        HStack {
+                            // ユーザーのランキングを表示
+                            if (index==0||index==1||index==2){
+                                Image("\(index)")
                                     .resizable()
                                     .frame(width:50,height:50)
+                                    .padding(.trailing)
+                            }else{
+                                if index != 9{
+                                    Text("\(index + 1)位")
+                                        .font(.system(size:40))
+                                        .padding(.trailing, 5)
+                                }else{
+                                    Text("\(index + 1)位")
+                                        .font(.system(size:30))
+                                        .padding(.trailing, 5)
+                                }
+                            }
+                            ForEach(user.avatars.indices, id: \.self) { index in
+                                let avatarData = user.avatars[index]
+                                //                                // 辞書から値を取り出し、適切にキャストします。
+                                if let name = avatarData["name"] as? String, let usedFlag = avatarData["usedFlag"] as? Int, usedFlag == 1 {
+                                    Image(name)
+                                        .resizable()
+                                        .frame(width:50,height:50)
+                                }
+                            }
+                            Text(user.userName)
+                                .font(.system(size: fontSize1(for: user.userName, isIPad: isIPad())))
+                            Spacer()
+                            VStack{
+                                //                            Spacer()
+                                Text("レベル: \(user.level)")
+                                    .font(.system(size:20))
                             }
                         }
-                        Text(user.userName)
-                            .font(.system(size: fontSize1(for: user.userName, isIPad: isIPad())))
-                        Spacer()
-                        VStack{
-                            //                            Spacer()
-                            Text("レベル: \(user.level)")
-                                .font(.system(size:20))
-                        }
+                        .padding(.horizontal)
+                        Divider()
                     }
-                    .padding(.horizontal)
-                    Divider()
-                }
-                if let currentUserLevelRank = viewModel.currentUserLevelRank {
-                    Text("あなたの順位: \(currentUserLevelRank)位")
-                        .font(.headline)
-                        .padding()
+                    if let currentUserLevelRank = viewModel.currentUserLevelRank {
+                        Text("あなたの順位: \(currentUserLevelRank)位")
+                            .font(.headline)
+                            .padding()
+                    }
                 }
             }
+            .background(Color("Color2"))
+            .foregroundColor(Color("fontGray"))
         }
-        .background(Color("Color2"))
     }
     func fontSize(for name: String) -> CGFloat {
         let baseFontSize: CGFloat = 24 // ベースとなるフォントサイズ
@@ -260,7 +322,6 @@ struct UserAnswerData {
     let avatarName: String // アバターの名前を保持するプロパティ
 }
 
-
 struct MonthlyAnswersRankingView: View {
     @ObservedObject var viewModel: RankingViewModel
     
@@ -289,9 +350,15 @@ struct MonthlyAnswersRankingView: View {
                                     .frame(width:50,height:50)
                                     .padding(.trailing)
                             }else{
-                                Text("\(index + 1)位")
-                                    .font(.system(size:40))
-                                    .padding(.trailing, 5)
+                                if index != 9{
+                                    Text("\(index + 1)位")
+                                        .font(.system(size:40))
+                                        .padding(.trailing, 5)
+                                }else{
+                                    Text("\(index + 1)位")
+                                        .font(.system(size:30))
+                                        .padding(.trailing, 5)
+                                }
                             }
                             // アバターの表示にはavatarNameを使用
                             Image(userAnswerData.avatarName)
@@ -309,17 +376,10 @@ struct MonthlyAnswersRankingView: View {
                     if let rank = viewModel.currentUserRank {
                        Text("あなたの順位: \(rank)位")
                            .font(.headline)
+                           .padding()
                    }
-                
-//                .onAppear{
-////                    print("viewModel.users.count\(viewModel.users.count)")
-//                    print("viewModel.userAnswerDataList.count:\(viewModel.userAnswerDataList.count)")
-//                }
             }
-//                .onAppear{
-//                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-//                        print(viewModel.userAnswerDataList)
-//                    }
+                .foregroundColor(Color("fontGray"))
                 }
         }
     }
@@ -352,11 +412,92 @@ print(text)
     }
 }
 
+struct UserAvatarCount {
+    let userId: String
+    let userName: String
+    let avatarCount: Int
+    let avatarName: String
+}
+
+struct AvatarRankingView: View {
+    @ObservedObject var viewModel: RankingViewModel
+    
+    var body: some View {
+        ScrollView {
+            ForEach(Array(viewModel.userAvatarCounts.prefix(10).enumerated()), id: \.element.userId) { index, userAvatarCount in
+                HStack {
+                    if (index==0||index==1||index==2){
+                        Image("\(index)")
+                            .resizable()
+                            .frame(width:50,height:50)
+                            .padding(.trailing)
+                    }else{
+                        if index != 9{
+                            Text("\(index + 1)位")
+                                .font(.system(size:40))
+                                .padding(.trailing, 5)
+                        }else{
+                            Text("\(index + 1)位")
+                                .font(.system(size:30))
+                                .padding(.trailing, 5)
+                        }
+                    }
+                    Image(userAvatarCount.avatarName)
+                        .resizable()
+                        .frame(width: 50, height: 50)
+                    Text(userAvatarCount.userName)
+                        .font(.system(size: fontSize(for: userAvatarCount.userName, isIPad: isIPad())))
+                    Spacer()
+                    Text("おとも：\(userAvatarCount.avatarCount)")
+                        .font(.system(size: 20))
+                }
+                .padding(.horizontal)
+                Divider()
+            }
+            if let rank = viewModel.currentUserAvatarRank {
+                Text("あなたの順位: \(rank)位")
+                    .font(.headline)
+                    .padding()
+            }
+        }
+        .foregroundColor(Color("fontGray"))
+        .onAppear {
+            viewModel.fetchUsersByAvatarCount()
+        }
+    }
+    func fontSize(for text: String, isIPad: Bool) -> CGFloat {
+        let baseFontSize: CGFloat = isIPad ? 28 : 24 // iPad用のベースフォントサイズを大きくする
+
+        let englishAlphabet = CharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+        let textCharacterSet = CharacterSet(charactersIn: text)
+print(text)
+        print(baseFontSize)
+        if englishAlphabet.isSuperset(of: textCharacterSet) {
+            return baseFontSize
+        } else {
+            if text.count >= 12 {
+                return baseFontSize - 14
+            } else if text.count >= 10 {
+                return baseFontSize - 12
+            } else if text.count >= 8 {
+                return baseFontSize - 10
+            } else if text.count >= 6 {
+                return baseFontSize - 8
+            } else if text.count >= 4 {
+                return baseFontSize
+            } else {
+                return baseFontSize + 4
+            }
+        }
+    }
+}
+
 struct TopTabView: View {
     let list: [String]
     @Binding var selectedTab: Int
 
     var body: some View {
+        
         HStack(spacing: 0) {
             ForEach(0 ..< list.count, id: \.self) { row in
                 Button(action: {
@@ -368,7 +509,7 @@ struct TopTabView: View {
                         HStack {
                             Text(list[row])
                                 .font(Font.system(size: 18, weight: .semibold))
-                                .foregroundColor(Color.primary)
+                                .foregroundColor(Color("fontGray"))
                         }
                         .frame(
                             width: (UIScreen.main.bounds.width / CGFloat(list.count)),
@@ -394,13 +535,12 @@ struct RankingView: View {
     @StateObject var viewModel = RankingViewModel()
     @ObservedObject var audioManager : AudioManager
     @Environment(\.presentationMode) var presentationMode
-    @State private var selectedTab: Int = 1
+    @State private var selectedTab: Int = 0
     @State private var canSwipe: Bool = false
-    let list: [String] = ["レベル", "回答数(月間)", "Test3"]
+    let list: [String] = ["レベル", "回答数(月間)", "おともの数"]
     
     var body: some View {
         NavigationView {
-
             VStack{
                 TopTabView(list: list, selectedTab: $selectedTab)
                
@@ -412,7 +552,8 @@ struct RankingView: View {
                     MonthlyAnswersRankingView(viewModel: viewModel)
                         .padding(.top)
                                     .tag(1)
-                                Text("ThirdView")
+                    AvatarRankingView(viewModel: viewModel)
+                        .padding(.top)
                                     .tag(2)
                             })
                             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
@@ -434,6 +575,7 @@ struct RankingView: View {
                 ToolbarItem(placement: .principal) {
                     Text("ランキング")
                         .font(.system(size: 20)) // ここでフォントサイズを指定
+                        .foregroundColor(Color("fontGray"))
                 }
             }
     }

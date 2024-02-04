@@ -497,8 +497,8 @@ struct ViewPositionKey3: PreferenceKey {
                             })
                             
                             if appState.isBannerVisible {
-//                                BannerView()
-//                                    .frame(height: 60)
+                                BannerView()
+                                    .frame(height: 60)
                             }
                             Spacer()
                             

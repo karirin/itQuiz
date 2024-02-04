@@ -40,6 +40,7 @@ struct AvatarListView: View {
                 Spacer()
                 Text("おとも一覧")
                     .font(.system(size: 20))
+                    .foregroundColor(Color("fontGray"))
                 Spacer()
             }
             .padding()

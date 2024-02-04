@@ -278,6 +278,8 @@ struct PentagonView: View {
                 }
             }
             .padding(.top)
+            
+            .foregroundColor(Color("fontGray"))
         }.background(Color("Color2"))
         .onAppear {
             print("currentuser:\(authManager.currentUserId)")

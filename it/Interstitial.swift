@@ -41,15 +41,31 @@ class Interstitial: NSObject, GADFullScreenContentDelegate, ObservableObject {
 //        }
 //    }
 
+//    func loadInterstitial() {
+//      GADInterstitialAd.load(
+//        withAdUnitID: "ca-app-pub-3940256099942544/4411468910", request: GADRequest()
+//      ) { ad, error in
+//        if let error = error {
+//          return print("Failed to load ad with error: \(error.localizedDescription)")
+//        }
+//
+//        self.interstitialAd = ad
+//      }
+//    }
+    
     func loadInterstitial() {
       GADInterstitialAd.load(
         withAdUnitID: "ca-app-pub-3940256099942544/4411468910", request: GADRequest()
-      ) { ad, error in
+      ) { [weak self] ad, error in
         if let error = error {
-          return print("Failed to load ad with error: \(error.localizedDescription)")
+          print("Failed to load ad with error: \(error.localizedDescription)")
+          self?.interstitialAdLoaded = false
+          return
         }
 
-        self.interstitialAd = ad
+        self?.interstitialAd = ad
+        self?.interstitialAd?.fullScreenContentDelegate = self
+        self?.interstitialAdLoaded = true
       }
     }
 

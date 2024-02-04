@@ -29,20 +29,32 @@ struct GraphManagerView: View {
     @State private var buttonRect: CGRect = .zero
     @State private var bubbleHeight: CGFloat = 0.0
     let sampleData = createSampleData()
-    let list: [String] = ["正答率", "回答数(月間)"]
-    @State private var selectedTab: Int = 1
+    let list: [String] = ["回答数(月間)","正答率"]
+    @State private var selectedTab: Int = 0
 
     var body: some View {
             VStack{
-                
+                VStack{
+                    HStack{
+                        Spacer()
+                        Text("グラフ")
+                            .font(.system(size: 20))
+                            .foregroundStyle(Color.gray)
+//                            .padding(.top)
+                        Spacer()
+                    }.frame(maxWidth: .infinity)
                     TopTabView(list: list, selectedTab: $selectedTab)
+                }
+                .background(Color.white)
                 TabView(selection: $selectedTab,
                                     content: {
-                    PentagonView(authManager: authManager, flag: .constant(false))
-                        .padding(.top)
+                    
+    BarChartView(authManager: authManager, data: sampleData)
+        .navigationViewStyle(StackNavigationViewStyle())
                                     .tag(0)
-                    BarChartView(authManager: authManager, data: sampleData)
-                        .navigationViewStyle(StackNavigationViewStyle())
+                    
+    PentagonView(authManager: authManager, flag: .constant(false))
+                        .padding(.top)
                                     .tag(1)
                             })
                             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))

@@ -248,9 +248,16 @@ struct QuizResultView: View {
 //                      }
 //                  }
                 .onAppear {
-                    interstitial.loadInterstitial()
+//                    interstitial.loadInterstitial()
+                    if interstitial.interstitialAdLoaded {
+                        if let rootViewController = UIApplication.shared.windows.first?.rootViewController {
+                            interstitial.presentInterstitial(from: rootViewController)
+                        }
+                    } else {
+                        print("広告はまだロードされていません。")
+                    }
                     print("onAppear")
-                    interstitial.presentInterstitial(from: adViewControllerRepresentable.viewController)
+//                    interstitial.presentInterstitial(from: adViewControllerRepresentable.viewController)
                     authManager.fetchUserExperienceAndLevel()
                       DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                           if authManager.level > 2 {

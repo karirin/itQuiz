@@ -242,6 +242,7 @@ Spacer()
                 ToolbarItem(placement: .principal) {
                     Text("おとも図鑑")
                         .font(.system(size: 20)) // ここでフォントサイズを指定
+                        .foregroundColor(Color("fontGray"))
                 }
             }
         }

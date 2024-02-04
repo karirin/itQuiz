@@ -73,13 +73,18 @@ struct BarChartView: View {
                 HStack{
                     Spacer()
                     Image(systemName: "chevron.left")
+                        .foregroundColor(Color("fontGray"))
                     Spacer()
                         .frame(width:20)
                     Text(yearMonthFormatter.string(from: currentDate)) // currentDateをフォーマットして表示
                                 .font(.system(size: 20))
+                    
+                    .foregroundColor(Color("fontGray"))
                     Spacer()
                         .frame(width:20)
                     Image(systemName: "chevron.right")
+                    
+                    .foregroundColor(Color("fontGray"))
                     Spacer()
                 }
                 .padding(.top)
@@ -91,8 +96,10 @@ struct BarChartView: View {
                     if !isDataAvailable {
                         VStack{
                             Text("\(Text(monthFormatter.string(from: currentDate)))はデータがありません")
-                                .font(.system(size: 30))
+                                .font(.system(size: 26))
                                 .padding()
+                            
+                            .foregroundColor(Color("fontGray"))
                             Image("ライムグラフ")
                                 .resizable()
                                 .frame(width:300,height:300)
@@ -141,10 +148,14 @@ struct BarChartView: View {
                                 Image(systemName: "calendar")
                                     .foregroundColor(.red)
                                 Text("日付")
+                                
+                                .foregroundColor(Color("fontGray"))
                                 Spacer()
                                 Image(systemName: "checkmark.square")
                                     .foregroundColor(.blue)
                                 Text("回答数")
+                                
+                                .foregroundColor(Color("fontGray"))
                             }
                             .font(.system(size: 24))
                             .padding(.horizontal)
@@ -168,6 +179,8 @@ struct BarChartView: View {
                                     }
                                 }
                             }
+                            
+                            .foregroundColor(Color("fontGray"))
                             .onAppear {
                                 fetchData(userId: authManager.currentUserId!,for: currentDate)
                             }
@@ -210,6 +223,10 @@ struct BarChartView: View {
 //                    .font(.system(size: 20)) // ここでフォントサイズを指定
 //            }
 //        }
+    }
+    
+    func isSmallDevice() -> Bool {
+        return UIScreen.main.bounds.width < 390
     }
     
     static func createSampleData() -> [DailyData] {
