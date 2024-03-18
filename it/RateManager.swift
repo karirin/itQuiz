@@ -95,5 +95,62 @@ class RateManager {
                 completion(quizData)
             })
         }
+    
+    func fetchITQuizData(userId: String, completion: @escaping ([QuizITLevel: QuizData]) -> Void) {
+            let ratesRef = db.child("rates").child(userId)
+
+            ratesRef.observeSingleEvent(of: .value, with: { snapshot in
+                var quizData = [QuizITLevel: QuizData]()
+print("snapshot:\(snapshot)")
+                print("QuizITLevel.allCases:\(QuizITLevel.allCases)")
+                for level in QuizITLevel.allCases {
+                    if let levelData = snapshot.childSnapshot(forPath: level.description).value as? [String: Int],
+                       let correct = levelData["correct"],
+                       let answer = levelData["answer"] {
+//                        print("test:\(levelData)")
+                        quizData[level] = QuizData(answer: answer, correct: correct)
+                        print("quizData1:\(quizData)")
+                    }
+                }
+
+                completion(quizData)
+            })
+        }
+    
+    func fetchInfoQuizData(userId: String, completion: @escaping ([QuizInfoLevel: QuizData]) -> Void) {
+            let ratesRef = db.child("rates").child(userId)
+
+            ratesRef.observeSingleEvent(of: .value, with: { snapshot in
+                var quizData = [QuizInfoLevel: QuizData]()
+
+                for level in QuizInfoLevel.allCases {
+                    if let levelData = snapshot.childSnapshot(forPath: level.description).value as? [String: Int],
+                       let correct = levelData["correct"],
+                       let answer = levelData["answer"] {
+                        quizData[level] = QuizData(answer: answer, correct: correct)
+                    }
+                }
+
+                completion(quizData)
+            })
+        }
+    
+    func fetchAppliedQuizData(userId: String, completion: @escaping ([QuizAppliedLevel: QuizData]) -> Void) {
+            let ratesRef = db.child("rates").child(userId)
+
+            ratesRef.observeSingleEvent(of: .value, with: { snapshot in
+                var quizData = [QuizAppliedLevel: QuizData]()
+
+                for level in QuizAppliedLevel.allCases {
+                    if let levelData = snapshot.childSnapshot(forPath: level.description).value as? [String: Int],
+                       let correct = levelData["correct"],
+                       let answer = levelData["answer"] {
+                        quizData[level] = QuizData(answer: answer, correct: correct)
+                    }
+                }
+
+                completion(quizData)
+            })
+        }
 }
 

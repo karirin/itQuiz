@@ -43,7 +43,6 @@ struct QuizManagerTabView: View {
 
 
     var body: some View {
-        NavigationView{
             ZStack{
                     ScrollView{
                         VStack {
@@ -57,6 +56,7 @@ struct QuizManagerTabView: View {
                             }
 //                            .padding(.horizontal,0)
                             .padding(.bottom)
+                            .padding(.top)
                             Button(action: {
                                 audioManager.playKetteiSound()
                                 // 画面遷移のトリガーをオンにする
@@ -250,7 +250,6 @@ struct QuizManagerTabView: View {
                         }
                         
                     }
-                    .padding(.top,-30)
                     .overlay(
                         ZStack {
                             Spacer()
@@ -268,7 +267,7 @@ struct QuizManagerTabView: View {
                                         }, label: {
                                             Image("倍ボタン")
                                                 .resizable()
-                                                .frame(width: 150, height: 100)
+                                                .frame(width: 110, height: 110)
                                         })
                                             .shadow(radius: 5)
                                             .disabled(!isButtonClickable)
@@ -299,7 +298,7 @@ struct QuizManagerTabView: View {
             .frame(maxWidth:.infinity,maxHeight: .infinity)
             .background(Color("Color2"))
             .onAppear {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) { // 1秒後に
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { // 1秒後に
                     self.isButtonClickable = true // ボタンをクリック可能に設定
                 }
                 fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
@@ -337,8 +336,6 @@ struct QuizManagerTabView: View {
                 } else {
                     audioPlayerKettei?.volume = 1.0
                 }
-            }
-            .navigationBarBackButtonHidden(true)
 //            .navigationBarItems(leading: Button(action: {
 //                self.presentationMode.wrappedValue.dismiss()
 //                audioManager.playCancelSound()
@@ -348,14 +345,14 @@ struct QuizManagerTabView: View {
 //                Text("戻る")
 //                    .foregroundColor(Color("fontGray"))
 //            })
-            .toolbar {
-                    ToolbarItem(placement: .principal) {
-                        Text("ダンジョン一覧")
-                            .font(.system(size: 20)) // ここでフォントサイズを指定
-                            .padding(.top)
-                            .foregroundStyle(Color("fontGray"))
-                    }
-                }
+//            .toolbar {
+//                    ToolbarItem(placement: .principal) {
+//                        Text("ダンジョン一覧")
+//                            .font(.system(size: 20)) // ここでフォントサイズを指定
+//                            .padding(.top)
+//                            .foregroundStyle(Color("fontGray"))
+//                    }
+//                }
             }
         .navigationViewStyle(StackNavigationViewStyle())
         }
@@ -375,10 +372,60 @@ struct QuizManagerTabView: View {
     }
     }
 
-
+struct ManagerTabView: View {
+    @Environment(\.presentationMode) var presentationMode
+    @State private var selectedTab: Int = 0
+    @State private var canSwipe: Bool = false
+//    @ObservedObject var viewModel: RankingViewModel
+    @ObservedObject var authManager = AuthManager.shared
+//    @ObservedObject var viewModel: QuizBeginnerStoryViewModel
+    let list: [String] = ["ダンジョン","資格取得の問題", "ランクマッチ"]
+    
+    var body: some View {
+        NavigationView {
+            VStack{
+                TopTabView(list: list, selectedTab: $selectedTab)
+               
+                TabView(selection: $selectedTab,
+                                    content: {
+                    QuizManagerTabView(isPresenting: .constant(false))
+                                    .tag(0)
+                    ManagerListView(isPresenting: .constant(false))
+                                    .tag(1)
+//                    Test(isPresenting: .constant(false), viewModel: QuizBeginnerStoryViewModel())
+                    RankMatchListView(authManager: authManager)
+//                    TopView()
+                        .padding(.top)
+                                    .tag(2)
+                            })
+                            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+//                LevelRankingView(viewModel: viewModel)
+            }
+            .background(Color("Color2"))
+        }
+        .navigationBarBackButtonHidden(true)
+//        .navigationBarItems(leading: Button(action: {
+//            self.presentationMode.wrappedValue.dismiss()
+//            audioManager.playCancelSound()
+//        }) {
+//            Image(systemName: "chevron.left")
+//                .foregroundColor(.gray)
+//            Text("戻る")
+//                .foregroundColor(Color("fontGray"))
+//        })
+//        .toolbar {
+//                ToolbarItem(placement: .principal) {
+//                    Text("ランキング")
+//                        .font(.system(size: 20)) // ここでフォントサイズを指定
+//                        .foregroundColor(Color("fontGray"))
+//                }
+//            }
+    }
+}
 
 struct QuizManagerTabView_Previews: PreviewProvider {
     static var previews: some View {
         QuizManagerTabView(isPresenting: .constant(false))
+//        ManagerTabView()
     }
 }

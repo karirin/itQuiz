@@ -1,0 +1,145 @@
+{
+  "identifier" : "D7209E2D",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+    {
+      "displayPrice" : "100",
+      "familyShareable" : false,
+      "internalID" : "90DCE7E8",
+      "localizations" : [
+        {
+          "description" : "1000コイン",
+          "displayName" : "1000コイン",
+          "locale" : "ja"
+        }
+      ],
+      "productID" : "eg.coin1000",
+      "referenceName" : "1000コイン",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "200",
+      "familyShareable" : false,
+      "internalID" : "D4E4EA80",
+      "localizations" : [
+        {
+          "description" : "4000コイン",
+          "displayName" : "4000コイン",
+          "locale" : "ja"
+        }
+      ],
+      "productID" : "eg.coin4000",
+      "referenceName" : "4000コイン",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "500",
+      "familyShareable" : false,
+      "internalID" : "BC113321",
+      "localizations" : [
+        {
+          "description" : "15000コイン",
+          "displayName" : "15000コイン",
+          "locale" : "ja"
+        }
+      ],
+      "productID" : "eg.coin15000",
+      "referenceName" : "15000コイン",
+      "type" : "Consumable"
+    }
+  ],
+  "settings" : {
+    "_failTransactionsEnabled" : false,
+    "_locale" : "en_US",
+    "_storefront" : "JPN",
+    "_storeKitErrors" : [
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Load Products"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Purchase"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Verification"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "App Store Sync"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Subscription Status"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "App Transaction"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Manage Subscriptions Sheet"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Refund Request Sheet"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Offer Code Redeem Sheet"
+      }
+    ]
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "054ABA2C",
+      "localizations" : [
+
+      ],
+      "name" : "Sub",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "2.00",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "8EAB9A82",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "広告非表示",
+              "displayName" : "広告非表示",
+              "locale" : "ja"
+            }
+          ],
+          "productID" : "IT",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "広告非表示プラン",
+          "subscriptionGroupID" : "054ABA2C",
+          "type" : "RecurringSubscription"
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 3,
+    "minor" : 0
+  }
+}

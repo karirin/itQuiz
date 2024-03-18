@@ -44,7 +44,7 @@ struct QuizIncorrectAnswerListView: View {
             fetchIncorrectAnswers(userId: authManager.currentUserId!) { quizList in
                 self.shuffledQuizList = quizList.shuffled()
                 print("self.shuffledQuizList")
-                print(self.shuffledQuizList)
+//                print(self.shuffledQuizList)
                 self.isDataLoaded = true // データロード完了
             }
 //            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {

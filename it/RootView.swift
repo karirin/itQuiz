@@ -12,7 +12,6 @@ struct RootView: View {
     @ObservedObject var authManager: AuthManager
     @State static private var showExperienceModalPreview = false
     @State private var isUserExists: Bool? = nil
-    @StateObject var appState = AppState()
     @Environment(\.requestReview) var requestReview
 
     var body: some View {
@@ -26,10 +25,9 @@ struct RootView: View {
 //                ContentView(isPresentingQuizBeginnerList: .constant(false), isPresentingAvatarList: .constant(false))
 //                ContentView()
                 TopView()
-                    .environmentObject(appState)
-                    .onAppear{
-                            requestReview()
-                    }
+//                    .onAppear{
+//                            requestReview()
+//                    }
             }
         }
         .onAppear {

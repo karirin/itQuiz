@@ -217,7 +217,7 @@ struct IllustratedView: View {
                 authManager.fetchAvatars {
                     for item in allItems {
                         let contains = authManager.avatars.contains(where: { $0.name == item.name })
-                        print("Contains \(item.name): \(contains)")
+//                        print("Contains \(item.name): \(contains)")
                     }
                 }
             }

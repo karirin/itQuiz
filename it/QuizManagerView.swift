@@ -43,20 +43,22 @@ struct QuizManagerView: View {
 
 
     var body: some View {
-        NavigationView{
+//        NavigationView{
             ZStack{
                     ScrollView{
                         VStack {
-                            HStack {
+                            HStack{
                                 Text(" ")
                                     .frame(width:isIPad() ? 10 : 5,height: isIPad() ? 40 : 15)
                                     .background(.gray)
-                                Text(" 過去に不正解した問題だけを解くことができます")
+                                Text("不正解した問題だけを解くことができます")
                                     .font(.system(size: isIPad() ? 40 : 15))
                                     .foregroundColor(Color("fontGray"))
+                                Spacer()
                             }
-//                            .padding(.horizontal,0)
+                            .padding(.leading,30)
                             .padding(.bottom)
+                            .padding(.top)
                             Button(action: {
                                 audioManager.playKetteiSound()
                                 // 画面遷移のトリガーをオンにする
@@ -114,14 +116,16 @@ struct QuizManagerView: View {
                                 }
                             }
                         
-                            HStack {
+                            HStack{
                                 Text(" ")
-                                    .frame(width:isIPad() ? 10 : 5,height: isIPad() ? 40 : 15)
+                                    .frame(width:isIPad() ? 10 : 5,height: isIPad() ? 40 : 20)
                                     .background(.gray)
-                                Text(" 問題の難易度、種類別で解くことができます　　")
-                                    .font(.system(size: isIPad() ? 40 : 15))
+                                Text("問題の種類を選ぶことができます")
+                                    .font(.system(size: isIPad() ? 40 : 16))
                                     .foregroundColor(Color("fontGray"))
+                                Spacer()
                             }
+                            .padding(.leading)
                             .padding(.horizontal)
                             .padding(.bottom)
                                 Button(action: {
@@ -249,7 +253,6 @@ struct QuizManagerView: View {
                             
                         }
                     }
-                    .padding(.top,-30)
                     .overlay(
                         ZStack {
                             Spacer()
@@ -267,7 +270,7 @@ struct QuizManagerView: View {
                                         }, label: {
                                             Image("倍ボタン")
                                                 .resizable()
-                                                .frame(width: 150, height: 100)
+                                                .frame(width: 110, height: 110)
                                         })
                                             .shadow(radius: 5)
                                             .disabled(!isButtonClickable)
@@ -302,7 +305,7 @@ struct QuizManagerView: View {
                             .overlay(
                                 RoundedRectangle(cornerRadius: 20, style: .continuous)
                                     .frame(width: buttonRect.width - 20, height: buttonRect.height)
-                                    .position(x: buttonRect.midX, y: buttonRect.midY-10)
+                                    .position(x: buttonRect.midX, y: isSmallDevice() ? buttonRect.midY-120 : buttonRect.midY-155)
                                     .blendMode(.destinationOut)
                             )
                             .ignoresSafeArea()
@@ -311,19 +314,26 @@ struct QuizManagerView: View {
                     }
                     VStack {
                         Spacer()
-                            .frame(height: buttonRect.minY + bubbleHeight)
+                            .frame(height:isSmallDevice() ? buttonRect.minY + bubbleHeight-50 : buttonRect.minY + bubbleHeight-90)
                         VStack(alignment: .trailing, spacing: .zero) {
-                            Image("上矢印")
-                                .resizable()
-                                .frame(width: 20, height: 20)
-                                .padding(.trailing, 306.0)
+//                            Image("上矢印")
+//                                .resizable()
+//                                .frame(width: 20, height: 20)
+//                                .padding(.trailing, 306.0)
                             Text("「IT基礎知識の問題（初級）」をクリックしてください。")
+                                .font(.callout)
+                                .padding(5)
                                 .font(.system(size: 24.0))
                                 .padding(.all, 16.0)
-                                .background(Color.white)
-                                .cornerRadius(4.0)
+                                .background(Color("Color2"))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 20)
+                                        .stroke(Color.gray, lineWidth: 15)
+                                )
+                                .cornerRadius(20)
                                 .padding(.horizontal, 16)
                                 .foregroundColor(Color("fontGray"))
+                                .shadow(radius: 10)
                         }
                         .background(GeometryReader { geometry in
                             Path { _ in
@@ -367,12 +377,13 @@ struct QuizManagerView: View {
             .frame(maxWidth:.infinity,maxHeight: .infinity)
             .background(Color("Color2"))
             .onAppear {
+//                print("isButtonClickable:\(isButtonClickable)")
                 reward.LoadReward()
                 fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
 //                self.incorrectAnswerCount = count
 //                incorrectCount = count
                 }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) { // 1秒後に
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { // 1秒後に
                     self.isButtonClickable = true // ボタンをクリック可能に設定
                 }
                 authManager.fetchUserInfo { (name, avatar, money, hp, attack, tutorialNum) in
@@ -407,24 +418,24 @@ struct QuizManagerView: View {
                     audioPlayerKettei?.volume = 1.0
                 }
             }
-            .navigationBarBackButtonHidden(true)
-            .navigationBarItems(leading: Button(action: {
-                self.presentationMode.wrappedValue.dismiss()
-                audioManager.playCancelSound()
-            }) {
-                Image(systemName: "chevron.left")
-                    .foregroundColor(Color("fontGray"))
-                Text("戻る")
-                    .foregroundColor(Color("fontGray"))
-            })
-            .toolbar {
-                    ToolbarItem(placement: .principal) {
-                        Text("ダンジョン一覧")
-                            .font(.system(size: 20)) // ここでフォントサイズを指定
-                            .foregroundStyle(Color("fontGray"))
-                    }
-                }
-            }
+//            .navigationBarBackButtonHidden(true)
+//            .navigationBarItems(leading: Button(action: {
+//                self.presentationMode.wrappedValue.dismiss()
+//                audioManager.playCancelSound()
+//            }) {
+//                Image(systemName: "chevron.left")
+//                    .foregroundColor(Color("fontGray"))
+//                Text("戻る")
+//                    .foregroundColor(Color("fontGray"))
+//            })
+//            .toolbar {
+//                    ToolbarItem(placement: .principal) {
+//                        Text("ダンジョン一覧")
+//                            .font(.system(size: 20)) // ここでフォントサイズを指定
+//                            .foregroundStyle(Color("fontGray"))
+//                    }
+//                }
+//            }
         .navigationViewStyle(StackNavigationViewStyle())
         }
     func isIPad() -> Bool {
@@ -441,12 +452,85 @@ struct QuizManagerView: View {
         self.isIncorrectAnswersEmpty = (count == 0)
     }
     }
+    func isSmallDevice() -> Bool {
+        return UIScreen.main.bounds.width < 390
     }
+    }
+
+struct ManagerView: View {
+    @ObservedObject var audioManager : AudioManager
+    @ObservedObject var authManager = AuthManager.shared
+    @Environment(\.presentationMode) var presentationMode
+    @State private var selectedTab: Int = 0
+    @State private var canSwipe: Bool = false
+    @ObservedObject var viewModel: RankingViewModel
+    
+    let list: [String] = ["ダンジョン", "資格別の問題", "ストーリー"]
+    
+    var body: some View {
+            VStack{
+                HStack{
+                    Button(action: {
+                        self.presentationMode.wrappedValue.dismiss()
+                        audioManager.playCancelSound()
+                    }) {
+                        Image(systemName: "chevron.left")
+                            .foregroundColor(.gray)
+                        
+                        Text("戻る")
+                            .foregroundColor(Color("fontGray"))
+                    }
+                    .padding(.bottom)
+                    Spacer()
+                }
+                .padding(.leading)
+                .background(.white)
+                TopTabView(list: list, selectedTab: $selectedTab)
+                    .padding(.top,-13)
+                TabView(selection: $selectedTab,
+                                    content: {
+                    QuizManagerView(isPresenting: .constant(false))
+                                    .tag(0)
+                    ManagerListView(isPresenting: .constant(false))
+                                    .tag(1)
+                    Test(isPresenting: .constant(false), viewModel: QuizBeginnerStoryViewModel())
+                        .padding(.top)
+//                                    .tag(2)
+//                    RankMatchListView(authManager: authManager)
+//                    TopView()
+                        .tag(2)
+                })
+                            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+//                LevelRankingView(viewModel: viewModel)
+            }
+            .background(Color("Color2"))
+//        }
+//        .navigationBarBackButtonHidden(true)
+//        .navigationBarItems(leading: Button(action: {
+//            self.presentationMode.wrappedValue.dismiss()
+//            audioManager.playCancelSound()
+//        }) {
+//            Image(systemName: "chevron.left")
+//                .foregroundColor(.gray)
+//            Text("戻る")
+//                .foregroundColor(Color("fontGray"))
+//        })
+//        .toolbar {
+//                ToolbarItem(placement: .principal) {
+//                    Text("ランキング")
+//                        .font(.system(size: 20)) // ここでフォントサイズを指定
+//                        .foregroundColor(Color("fontGray"))
+//                }
+//            }
+    }
+}
 
 
 
 struct QuizManagerView_Previews: PreviewProvider {
     static var previews: some View {
-        QuizManagerView(isPresenting: .constant(false))
+//        QuizManagerView(isPresenting: .constant(false))
+        ManagerView(audioManager: AudioManager(), viewModel: RankingViewModel())
+//        TopView()
     }
 }

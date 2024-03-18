@@ -55,6 +55,7 @@ struct ViewPositionKey3: PreferenceKey {
         @State private var selectedAnswerIndex: Int? = nil
         @State private var currentQuizIndex: Int = 0
         @State private var showCompletionMessage: Bool = false
+        @State private var showSubFlag: Bool = false
         @State private var remainingSeconds: Int = 30
         @State private var timer: Timer? = nil
         @State private var navigateToQuizResultView: Bool = false
@@ -82,6 +83,7 @@ struct ViewPositionKey3: PreferenceKey {
         @State private var userHp: Int = 100
         @State private var userMaxHp: Int = 100
         @State private var userFlag: Int = 0
+        @State private var userPreFlag: Int = 0
         @State private var avatarHp: Int = 100
         @State private var userAttack: Int = 30
         @State private var tutorialNum: Int = 0
@@ -111,6 +113,7 @@ struct ViewPositionKey3: PreferenceKey {
         @State private var elapsedTime: TimeInterval?
         @State private var navigateToQuizResult = false
         @ObservedObject var interstitial: Interstitial
+//        @EnvironmentObject var appState: AppState
         @StateObject var appState = AppState()
         @State private var rewardFlag: Int = 0
         
@@ -163,6 +166,27 @@ struct ViewPositionKey3: PreferenceKey {
         completion(Int(count))
         }
         }
+        func fetchNumberOfIncorrectITAnswers(userId: String, completion: @escaping (Int) -> Void) {
+        let ref = Database.database().reference().child("IncorrectITAnswers").child(userId)
+        ref.observeSingleEvent(of: .value) { snapshot in
+        let count = snapshot.childrenCount // 子ノードの数を取得
+        completion(Int(count))
+        }
+        }
+        func fetchNumberOfIncorrectInfoAnswers(userId: String, completion: @escaping (Int) -> Void) {
+        let ref = Database.database().reference().child("IncorrectInfoAnswers").child(userId)
+        ref.observeSingleEvent(of: .value) { snapshot in
+        let count = snapshot.childrenCount // 子ノードの数を取得
+        completion(Int(count))
+        }
+        }
+        func fetchNumberOfIncorrectAppliedAnswers(userId: String, completion: @escaping (Int) -> Void) {
+        let ref = Database.database().reference().child("IncorrectAppliedAnswers").child(userId)
+        ref.observeSingleEvent(of: .value) { snapshot in
+        let count = snapshot.childrenCount // 子ノードの数を取得
+        completion(Int(count))
+        }
+        }
 
         func startTimer() {
             // 現在のタイマーを止める
@@ -183,7 +207,7 @@ struct ViewPositionKey3: PreferenceKey {
         
         // 次の問題へ移る処理
         func moveToNextQuiz() {
-            print("moveToNextQuiz - currentQuizIndex: \(currentQuizIndex), selectedAnswerIndex: \(String(describing: selectedAnswerIndex))")
+//            print("moveToNextQuiz - currentQuizIndex: \(currentQuizIndex), selectedAnswerIndex: \(String(describing: selectedAnswerIndex))")
             if monsterType == 3 && monsterHP <= 0 {
                 // 最後のモンスターが倒された場合、結果画面へ遷移
                 showCompletionMessage = true
@@ -205,9 +229,9 @@ struct ViewPositionKey3: PreferenceKey {
                startTimer()
                hasAnswered = false
             } else if currentQuizIndex + 1 < quizzes.count { // 最大問題数を超えていないかチェック
-                print("self.remainingSeconds:\(self.remainingSeconds)")
+//                print("self.remainingSeconds:\(self.remainingSeconds)")
 //                currentQuizIndex += 1
-                print("a userFlag:\(userFlag)")
+//                print("a userFlag:\(userFlag)")
                 if userFlag == 0 {
                     showExplanationModal = true
                 } else {
@@ -228,7 +252,7 @@ struct ViewPositionKey3: PreferenceKey {
         
         func answerSelectionAction(index: Int) {
             if !hasAnswered {
-                print("index:\(index)")
+//                print("index:\(index)")
                 self.selectedAnswerIndex = index
                 self.timer?.invalidate() // 回答を選択したらタイマーを止める
                 
@@ -243,10 +267,10 @@ struct ViewPositionKey3: PreferenceKey {
                         correctAnswerCount += 1 // 正解の場合、正解数をインクリメント
                         incorrectCount -= 1
                         answerCount += 1
-                        print("correctAnswerCount:\(correctAnswerCount)")
-                        print("AnswerCount:\(answerCount)")
+//                        print("correctAnswerCount:\(correctAnswerCount)")
+//                        print("AnswerCount:\(answerCount)")
                         //                                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                        if quizLevel != .incorrectAnswer {
+                        if quizLevel != .incorrectAnswer && quizLevel != .incorrectITAnswer && quizLevel != .incorrectInfoAnswer && quizLevel != .incorrectAppliedAnswer {
                             monsterHP -= userAttack
                         }
                         if monsterHP <= 0 {
@@ -265,9 +289,15 @@ struct ViewPositionKey3: PreferenceKey {
                             timer?.invalidate()
                         }
                     }
-                    if quizLevel == .incorrectAnswer {
-                    removeCorrectAnswer(for: authManager.currentUserId!, questionId: currentQuiz.id!)
-                    }
+                    if quizLevel == .incorrectITAnswer{
+                        removeCorrectITAnswer(for: authManager.currentUserId!, questionId: currentQuiz.id!)
+                    }else if quizLevel == .incorrectInfoAnswer {
+                        removeCorrectInfoAnswer(for: authManager.currentUserId!, questionId: currentQuiz.id!)
+                    }else if quizLevel == .incorrectAppliedAnswer {
+                    removeCorrectAppliedAnswer(for: authManager.currentUserId!, questionId: currentQuiz.id!)
+                    }else if quizLevel == .incorrectAnswer {
+                        removeCorrectAnswer(for: authManager.currentUserId!, questionId: currentQuiz.id!)
+                        }
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                         moveToNextQuiz()
                     }
@@ -279,8 +309,26 @@ struct ViewPositionKey3: PreferenceKey {
                     correctAnswerIndex: currentQuiz.correctAnswerIndex, explanation: currentQuiz.explanation
                     )
                     // incorrectAnswer以外のクイズなら不正解の問題をincorrectAnswerテーブルに保存する
-                    if quizLevel != .incorrectAnswer {
-                    saveIncorrectAnswer(incorrectAnswer)
+                    if quizLevel != .incorrectAnswer && quizLevel != .incorrectITAnswer && quizLevel != .incorrectInfoAnswer && quizLevel != .incorrectAppliedAnswer {
+                        switch quizLevel {
+                        case .itBasic,.itStrategy,.itTechnology,.itManagement:
+                            saveIncorrectITAnswer(incorrectAnswer)
+                            break
+                        case .itBasic,.itStrategy,.itTechnology,.itManagement:
+                            saveIncorrectITAnswer(incorrectAnswer)
+                            break
+                            
+                        case .infoBasic,.infoStrategy,.infoTechnology,.infoManagement:
+                            saveIncorrectInfoAnswer(incorrectAnswer)
+                            break
+                            
+                        case .appliedBasic,.appliedStrategy,.appliedTechnology,.appliedManagement:
+                            saveIncorrectAppliedAnswer(incorrectAnswer)
+                            break
+                        default: 
+                            saveIncorrectAnswer(incorrectAnswer)
+                            break
+                        }
                     }
                     answerCount += 1
                     audioManager.playUnCorrectSound()
@@ -316,9 +364,69 @@ struct ViewPositionKey3: PreferenceKey {
         "explanation": answer.explanation
         ])
         }
+            func saveIncorrectITAnswer(_ answer: IncorrectAnswer) {
+            // ユーザーIDを親ノードとして設定
+            let ref = Database.database().reference().child("IncorrectITAnswers").child(answer.userId).childByAutoId()
+            ref.setValue([
+            "quizQuestion": answer.quizQuestion,
+            "choices": answer.choices,
+            "correctAnswerIndex": answer.correctAnswerIndex,
+            "explanation": answer.explanation
+            ])
+            }
+            func saveIncorrectInfoAnswer(_ answer: IncorrectAnswer) {
+            // ユーザーIDを親ノードとして設定
+            let ref = Database.database().reference().child("IncorrectInfoAnswers").child(answer.userId).childByAutoId()
+            ref.setValue([
+            "quizQuestion": answer.quizQuestion,
+            "choices": answer.choices,
+            "correctAnswerIndex": answer.correctAnswerIndex,
+            "explanation": answer.explanation
+            ])
+            }
+            func saveIncorrectAppliedAnswer(_ answer: IncorrectAnswer) {
+            // ユーザーIDを親ノードとして設定
+            let ref = Database.database().reference().child("IncorrectAppliedAnswers").child(answer.userId).childByAutoId()
+            ref.setValue([
+            "quizQuestion": answer.quizQuestion,
+            "choices": answer.choices,
+            "correctAnswerIndex": answer.correctAnswerIndex,
+            "explanation": answer.explanation
+            ])
+            }
         
         func removeCorrectAnswer(for userId: String, questionId: String) {
             let ref = Database.database().reference().child("IncorrectAnswers").child(userId).child(questionId)
+            ref.removeValue { error, _ in
+                if let error = error {
+                    print("Error removing correct answer: \(error.localizedDescription)")
+                } else {
+                    print("Correct answer removed successfully.")
+                }
+            }
+        }
+        func removeCorrectITAnswer(for userId: String, questionId: String) {
+            let ref = Database.database().reference().child("IncorrectITAnswers").child(userId).child(questionId)
+            ref.removeValue { error, _ in
+                if let error = error {
+                    print("Error removing correct answer: \(error.localizedDescription)")
+                } else {
+                    print("Correct answer removed successfully.")
+                }
+            }
+        }
+        func removeCorrectInfoAnswer(for userId: String, questionId: String) {
+            let ref = Database.database().reference().child("IncorrectInfoAnswers").child(userId).child(questionId)
+            ref.removeValue { error, _ in
+                if let error = error {
+                    print("Error removing correct answer: \(error.localizedDescription)")
+                } else {
+                    print("Correct answer removed successfully.")
+                }
+            }
+        }
+        func removeCorrectAppliedAnswer(for userId: String, questionId: String) {
+            let ref = Database.database().reference().child("IncorrectAppliedAnswers").child(userId).child(questionId)
             ref.removeValue { error, _ in
                 if let error = error {
                     print("Error removing correct answer: \(error.localizedDescription)")
@@ -367,7 +475,7 @@ struct ViewPositionKey3: PreferenceKey {
                             VStack{
                                 Text(currentQuiz.question)
                                     .font(.headline)
-                                    .frame(height: tutorialNum == 0 ? 70 : nil)
+                                    .frame(height: tutorialNum == 0 ? 120 : nil)
                                     .padding(.horizontal)
                                     .foregroundColor(Color("fontGray"))
                                 
@@ -395,7 +503,7 @@ struct ViewPositionKey3: PreferenceKey {
                         ZStack{
                             Image("\(monsterBackground)")
                                 .resizable()
-                                .frame(height:140)
+                                .frame(height:100)
                                 .opacity(1)
                             VStack() {
                                 //                            Spacer()
@@ -403,12 +511,12 @@ struct ViewPositionKey3: PreferenceKey {
                                     ZStack{
                                         Image("\(quizLevel)Monster\(monsterType)")
                                             .resizable()
-                                            .frame(width:100,height:100)
+                                            .frame(width:80,height:80)
                                         // 敵キャラを倒した
                                         if showMonsterDownImage && monsterHP <= 0 {
                                             Image("倒す")
                                                 .resizable()
-                                                .frame(width:130,height:130)
+                                                .frame(width:100,height:100)
                                         }
                                     }
                                     
@@ -425,7 +533,8 @@ struct ViewPositionKey3: PreferenceKey {
                                 }
                             }
                         }
-                        if quizLevel != .incorrectAnswer {
+                        if quizLevel != .incorrectAnswer && quizLevel != .incorrectITAnswer && quizLevel != .incorrectInfoAnswer && quizLevel != .incorrectAppliedAnswer {
+                            
                             VStack{
                                 HStack{
                                     ProgressBar3(value: Double(monsterHP), maxValue: Double(monsterUnderHP), color: Color("hpMonsterColor"))
@@ -488,7 +597,7 @@ struct ViewPositionKey3: PreferenceKey {
             .onAppear{
                 
                 showTutorial = true
-                print("AnswerSelectionView currentQuiz.choices:\(currentQuiz.choices)")
+//                print("AnswerSelectionView currentQuiz.choices:\(currentQuiz.choices)")
             }
                             .frame(maxWidth: .infinity)
                             .shadow(radius: 1)
@@ -496,9 +605,40 @@ struct ViewPositionKey3: PreferenceKey {
                                 Color.clear.preference(key: ViewPositionKey1.self, value: [geometry.frame(in: .global)])
                             })
                             
-                            if appState.isBannerVisible {
-                                BannerView()
-                                    .frame(height: 60)
+                           if userPreFlag != 1 {
+//                               ZStack{
+                                   BannerView()
+                                       .frame(height: 60)
+//                                   VStack{
+//                                       HStack{
+//                                           Spacer()
+//                                           Button(action: {
+//                                               showSubFlag = true
+//                                               audioManager.playSound()
+//                                               pauseTimer()
+//                                           }) {
+//                                               Text("広告を閉じる")
+//                                                   .font(.system(size:16)).fontWeight(.semibold)
+//                                                   .frame(height:20)
+//                                                   .padding(8)
+//                                                   .padding(.horizontal)
+//                                                   .foregroundColor(Color.white)
+//                                                   .background(Color("adColor"))
+//                                                   .cornerRadius(24)
+//                                                   .shadow(radius: 10)
+//                                           }
+////                                           .fullScreenCover(isPresented: $showSubFlag) {
+////                                               SubscriptionView(audioManager: audioManager)
+////                                                       }
+////                                           .onChange(of: showSubFlag) { flag in
+////                                               resumeTimer()
+////                                           }
+//                                       }
+//                                       Spacer()
+//                                   }
+//                                   .padding()
+//                                   .padding(.bottom,30)
+//                               }
                             }
                             Spacer()
                             
@@ -506,9 +646,9 @@ struct ViewPositionKey3: PreferenceKey {
                                 // QuizView.swift
                                 if quizLevel == .timeBeginner {
                                     
-                                    NavigationLink("", destination: QuizResultView(results: quizResults, authManager: authManager, isPresenting: $isPresenting, navigateToQuizResultView: $navigateToQuizResultView, playerExperience: playerExperience, playerMoney: playerMoney, elapsedTime: self.elapsedTime ?? 0).navigationBarBackButtonHidden(true), isActive: $navigateToQuizResultView)
+                                    NavigationLink("", destination: QuizResultView(results: quizResults, authManager: authManager, isPresenting: $isPresenting, navigateToQuizResultView: $navigateToQuizResultView, playerExperience: playerExperience, playerMoney: playerMoney, elapsedTime: self.elapsedTime ?? 0, quizLevel: quizLevel).navigationBarBackButtonHidden(true), isActive: $navigateToQuizResultView)
                                 }else{
-                                    NavigationLink("", destination: QuizResultView(results: quizResults, authManager: authManager, isPresenting: $isPresenting, navigateToQuizResultView: $navigateToQuizResultView, playerExperience: playerExperience, playerMoney: playerMoney, elapsedTime: 0).navigationBarBackButtonHidden(true), isActive: $navigateToQuizResultView)
+                                    NavigationLink("", destination: QuizResultView(results: quizResults, authManager: authManager, isPresenting: $isPresenting, navigateToQuizResultView: $navigateToQuizResultView, playerExperience: playerExperience, playerMoney: playerMoney, elapsedTime: 0, quizLevel: quizLevel).navigationBarBackButtonHidden(true), isActive: $navigateToQuizResultView)
                                 }
                                 
                             }
@@ -558,6 +698,13 @@ struct ViewPositionKey3: PreferenceKey {
                         ModalView(isSoundOn: $isSoundOn, isPresented: $showHomeModal, isPresenting: $isPresenting, audioManager: audioManager, showHomeModal: $showHomeModal,tutorialNum: $tutorialNum,pauseTimer:pauseTimer,resumeTimer: resumeTimer, userFlag: $userFlag)
                     }
                 }
+                if showSubFlag {
+                    ZStack {
+                        Color.black.opacity(0.7)
+                            .edgesIgnoringSafeArea(.all)
+                        SubModalView(isSoundOn: $isSoundOn, isPresented: $showSubFlag, isPresenting: $isPresenting, audioManager: audioManager, showHomeModal: $showHomeModal,pauseTimer:pauseTimer,resumeTimer: resumeTimer, userFlag: $userFlag)
+                    }
+                }
                 if tutorialNum == 3 && showTutorial == true {
                     GeometryReader { geometry in
                         Color.black.opacity(0.5)
@@ -576,22 +723,29 @@ struct ViewPositionKey3: PreferenceKey {
                     Spacer()
                         .frame(height: buttonRect.minY - bubbleHeight)
                         VStack(alignment: .trailing, spacing: .zero) {
-                            Image("上矢印")
-                                .resizable()
-                                .frame(width: 20, height: 20)
-                                .padding(.trailing, 206.0)
+//                            Image("上矢印")
+//                                .resizable()
+//                                .frame(width: 20, height: 20)
+//                                .padding(.trailing, 206.0)
                             Text("問題が出題されます。")
+                                .font(.callout)
+                                .padding(5)
                                 .font(.system(size: 24.0))
                                 .padding(.all, 16.0)
-                                .background(Color.white)
-                                .cornerRadius(4.0)
+                                .background(Color("Color2"))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 20)
+                                        .stroke(Color.gray, lineWidth: 15)
+                                )
+                                .cornerRadius(20)
                                 .padding(.horizontal, 16)
                                 .foregroundColor(Color("fontGray"))
+                                .shadow(radius: 10)
                         }
                             .background(GeometryReader { geometry in
                                 Path { _ in
                                     DispatchQueue.main.async {
-                                        print(currentQuiz.question.count)
+//                                        print(currentQuiz.question.count)
                                         if currentQuiz.question.count <= 19{
                                             self.bubbleHeight = geometry.size.height - 130
                                         }else if currentQuiz.question.count <= 38{
@@ -640,19 +794,26 @@ struct ViewPositionKey3: PreferenceKey {
                     }
                     VStack {
                         Spacer()
-                            .frame(height: buttonRect.minY - bubbleHeight)
+                            .frame(height: buttonRect.minY - bubbleHeight - 50)
                         VStack(alignment: .trailing, spacing: .zero) {
                         Text("選択肢の中から正解と思うものをクリックしてください。")
-                            .font(.system(size: 23.0))
-                            .padding(.all, 16.0)
-                            .background(Color.white)
-                            .cornerRadius(4.0)
-                            .padding(.horizontal, 18)
-                            .foregroundColor(Color("fontGray"))
-                        Image("下矢印")
-                            .resizable()
-                            .frame(width: 20, height: 20)
-                            .padding(.trailing, 236.0)
+                                .font(.callout)
+                                .padding(5)
+                                .font(.system(size: 24.0))
+                                .padding(.all, 16.0)
+                                .background(Color("Color2"))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 20)
+                                        .stroke(Color.gray, lineWidth: 15)
+                                )
+                                .cornerRadius(20)
+                                .padding(.horizontal, 16)
+                                .foregroundColor(Color("fontGray"))
+                                .shadow(radius: 10)
+//                        Image("下矢印")
+//                            .resizable()
+//                            .frame(width: 20, height: 20)
+//                            .padding(.trailing, 236.0)
                     }
                         .background(GeometryReader { geometry in
                         Path { _ in
@@ -705,19 +866,26 @@ struct ViewPositionKey3: PreferenceKey {
                     }
                     VStack {
                         Spacer()
-                            .frame(height: buttonRect.minY - bubbleHeight)
+                            .frame(height: buttonRect.minY + 250)
                     VStack(alignment: .trailing, spacing: .zero) {
                         Text("正解すると相手モンスターにダメージ、不正解だと自分がダメージを受けます。\n相手のHPが０になれば次の相手に、自分のHPが０になればゲームオーバーです。")
-                            .font(.system(size: 18.0))
+                            .font(.callout)
+                            .padding(5)
+                            .font(.system(size: 24.0))
                             .padding(.all, 16.0)
-                            .background(Color.white)
-                            .cornerRadius(4.0)
-                            .padding(.horizontal, 18)
+                            .background(Color("Color2"))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 20)
+                                    .stroke(Color.gray, lineWidth: 15)
+                            )
+                            .cornerRadius(20)
+                            .padding(.horizontal, 16)
                             .foregroundColor(Color("fontGray"))
-                        Image("下矢印")
-                            .resizable()
-                            .frame(width: 20, height: 20)
-                            .padding(.trailing, 236.0)
+                            .shadow(radius: 10)
+//                        Image("下矢印")
+//                            .resizable()
+//                            .frame(width: 20, height: 20)
+//                            .padding(.trailing, 236.0)
                     }  .background(GeometryReader { geometry in
                         Path { _ in
                             DispatchQueue.main.async {
@@ -775,19 +943,22 @@ struct ViewPositionKey3: PreferenceKey {
                     }
                     VStack {
                         Spacer()
-                            .frame(height: buttonRect.minY - bubbleHeight)
+                            .frame(height: buttonRect.minY - bubbleHeight - 30)
                     VStack(alignment: .trailing, spacing: .zero) {
-                        Image("上矢印")
-                            .resizable()
-                            .frame(width: 20, height: 20)
-                            .padding(.trailing, 46.0)
                         Text("30秒経つと自分がダメージを受けることになります。")
+                            .font(.callout)
+                            .padding(5)
                             .font(.system(size: 24.0))
                             .padding(.all, 16.0)
-                            .background(Color.white)
-                            .cornerRadius(4.0)
-                            .padding(.horizontal, 18)
+                            .background(Color("Color2"))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 20)
+                                    .stroke(Color.gray, lineWidth: 15)
+                            )
+                            .cornerRadius(20)
+                            .padding(.horizontal, 16)
                             .foregroundColor(Color("fontGray"))
+                            .shadow(radius: 10)
                     } .background(GeometryReader { geometry in
                         Path { _ in
                             DispatchQueue.main.async {
@@ -863,9 +1034,10 @@ struct ViewPositionKey3: PreferenceKey {
                 startCountdown()
 
                 self.monsterType = 1 // すぐに1に戻す
-                authManager.fetchUserInfo { (name, avator, money, hp, attack, tutorialNum) in
+                authManager.fetchUserInfo { (name, avatar, money, hp, attack, tutorialNum) in
                     self.userName = name ?? ""
-                    self.avator = avator ?? [[String: Any]]()
+                    self.avator = avatar ?? [[String: Any]]()
+                    print("avator:\(avator)")
                     self.userMoney = money ?? 0
                     self.userHp = hp ?? 100
                     self.userAttack = attack ?? 20
@@ -895,18 +1067,52 @@ struct ViewPositionKey3: PreferenceKey {
                 self.startTime = Date()
                 authManager.fetchUserRewardFlag()
                 
-                fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
-                self.incorrectAnswerCount = count
-                incorrectCount = count
+                if quizLevel == .incorrectITAnswer{
+                    fetchNumberOfIncorrectITAnswers(userId: authManager.currentUserId!) { count in
+                    self.incorrectAnswerCount = count
+                    incorrectCount = count
+                    }
+                    if quizLevel == .incorrectITAnswer {
+                    userAttack = 0
+                    }
+                }else if quizLevel == .incorrectInfoAnswer {
+                    fetchNumberOfIncorrectInfoAnswers(userId: authManager.currentUserId!) { count in
+                    self.incorrectAnswerCount = count
+                    incorrectCount = count
+                    }
+                    if quizLevel == .incorrectInfoAnswer {
+                    userAttack = 0
+                    }
+                }else if quizLevel == .incorrectAppliedAnswer {
+                    fetchNumberOfIncorrectAppliedAnswers(userId: authManager.currentUserId!) { count in
+                    self.incorrectAnswerCount = count
+                    incorrectCount = count
+                    }
+                    if quizLevel == .incorrectAppliedAnswer {
+                    userAttack = 0
+                    }
+                }else if quizLevel == .incorrectAnswer {
+                    fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
+                    self.incorrectAnswerCount = count
+                    incorrectCount = count
+                    }
+                    if quizLevel == .incorrectAnswer {
+                    userAttack = 0
+                    }
                 }
+                
+//                fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
+//                self.incorrectAnswerCount = count
+//                incorrectCount = count
+//                }
                 if quizLevel == .incorrectAnswer {
                 userAttack = 0
                 }
+                authManager.fetchPreFlag()
                 authManager.fetchUserFlag()
-                print("onAppear authManager.userFlag:\(authManager.userFlag)")
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                     userFlag = authManager.userFlag
-                    print("onAppear userFlag:\(userFlag)")
+                    userPreFlag = authManager.userPreFlag
                 }            }
             .onDisappear {
                 // QuizViewが閉じるときの時刻を記録する
@@ -918,14 +1124,14 @@ struct ViewPositionKey3: PreferenceKey {
                     // QuizResultViewへの遷移フラグを設定
                     self.navigateToQuizResult = true
                     // ここで経過時間を表示または保存する
-                    print("経過時間: \(self.elapsedTime!) 秒")
-                    authManager.saveElapsedTime(category: quizLevel.description, elapsedTime: elapsedTime!) { success in
-                        if success {
-                            print("経過時間を保存しました。")
-                        } else {
-                            print("経過時間の保存に失敗しました。")
-                        }
-                    }
+//                    print("経過時間: \(self.elapsedTime!) 秒")
+//                    authManager.saveElapsedTime(category: quizLevel.description, elapsedTime: elapsedTime!) { success in
+//                        if success {
+//                            print("経過時間を保存しました。")
+//                        } else {
+//                            print("経過時間の保存に失敗しました。")
+//                        }
+//                    }
                 }
             }
             .alert(isPresented: $showAlert) {
@@ -940,7 +1146,7 @@ struct ViewPositionKey3: PreferenceKey {
                   )
               }
             .onChange(of: userFlag) { flag in
-                          print("onchange userFlag:\(userFlag)")
+//                          print("onchange userFlag:\(userFlag)")
           //                userFlag = authManager.userFlag
                       }
             .onChange(of: selectedAnswerIndex) { newValue in
@@ -969,7 +1175,7 @@ struct ViewPositionKey3: PreferenceKey {
                 } else {
                     DispatchQueue.global(qos: .background).async {
                         authManager.addExperience(points: playerExperience * authManager.rewardFlag, onSuccess: {
-                            print("addExperience \(authManager.rewardFlag)")
+//                            print("addExperience \(authManager.rewardFlag)")
                         }, onFailure: { error in
                             // 失敗した時の処理をここに書きます。`error`は失敗の原因を示す情報が含まれている可能性があります。
                         })
@@ -990,7 +1196,7 @@ struct ViewPositionKey3: PreferenceKey {
                     monsterBackground = "beginnerBackground"
                     playerExperience = 20
                     playerMoney = 10
-                    print(playerExperience)
+                    // print(playerExperience)
                     if playerHP <= 0 {
                         playerExperience = 5
                         playerMoney = 5
@@ -1252,7 +1458,7 @@ struct ViewPositionKey3: PreferenceKey {
                 default:
                     monsterHP = 1000
                 }
-                case .incorrectAnswer:
+                case .incorrectAnswer,.incorrectITAnswer,.incorrectInfoAnswer,.incorrectAppliedAnswer:
                     monsterBackground = "incorrectAnswerBackground"
                     playerExperience = 0
                     playerMoney = 0
@@ -1276,6 +1482,381 @@ struct ViewPositionKey3: PreferenceKey {
                     default:
                         monsterHP = 10
                     }
+                case .beginnerStory1:
+                    monsterBackground = "beginnerBackground"
+                    playerExperience = 20
+                    playerMoney = 10
+                    // print(playerExperience)
+                    if playerHP <= 0 {
+                        playerExperience = 5
+                        playerMoney = 5
+                    }
+                    switch newMonsterType {
+                    case 1:
+                        monsterHP = 80
+                        monsterUnderHP = 80
+                        monsterAttack = 20
+                    case 2:
+                        monsterHP = 120
+                        monsterUnderHP = 120
+                        monsterAttack = 30
+                    case 3:
+                        monsterHP = 160
+                        monsterUnderHP = 160
+                        monsterAttack = 40
+                    default:
+                        monsterHP = 30
+                    }
+                case .beginnerStory2:
+                    monsterBackground = "beginnerBackground"
+                    playerExperience = 20
+                    playerMoney = 10
+                    // print(playerExperience)
+                    if playerHP <= 0 {
+                        playerExperience = 5
+                        playerMoney = 5
+                    }
+                    switch newMonsterType {
+                    case 1:
+                        monsterHP = 80
+                        monsterUnderHP = 80
+                        monsterAttack = 20
+                    case 2:
+                        monsterHP = 120
+                        monsterUnderHP = 120
+                        monsterAttack = 30
+                    case 3:
+                        monsterHP = 160
+                        monsterUnderHP = 160
+                        monsterAttack = 40
+                    default:
+                        monsterHP = 30
+                    }
+                case .beginnerStory3:
+                    monsterBackground = "beginnerBackground"
+                    playerExperience = 20
+                    playerMoney = 10
+                    // print(playerExperience)
+                    if playerHP <= 0 {
+                        playerExperience = 5
+                        playerMoney = 5
+                    }
+                    switch newMonsterType {
+                    case 1:
+                        monsterHP = 80
+                        monsterUnderHP = 80
+                        monsterAttack = 20
+                    case 2:
+                        monsterHP = 120
+                        monsterUnderHP = 120
+                        monsterAttack = 30
+                    case 3:
+                        monsterHP = 160
+                        monsterUnderHP = 160
+                        monsterAttack = 40
+                    default:
+                        monsterHP = 30
+                    }
+                case .itStrategy:
+                    monsterBackground = "itStrategyBackground"
+                    playerExperience = 20
+                    playerMoney = 10
+                    // print(playerExperience)
+                    if playerHP <= 0 {
+                        playerExperience = 5
+                        playerMoney = 5
+                    }
+                    switch newMonsterType {
+                    case 1:
+                        monsterHP = 80
+                        monsterUnderHP = 80
+                        monsterAttack = 20
+                    case 2:
+                        monsterHP = 120
+                        monsterUnderHP = 120
+                        monsterAttack = 30
+                    case 3:
+                        monsterHP = 160
+                        monsterUnderHP = 160
+                        monsterAttack = 40
+                    default:
+                        monsterHP = 30
+                    }
+                case .infoStrategy:
+                    monsterBackground = "infoStrategyBackground"
+                   playerExperience = 20
+                   playerMoney = 10
+                   // print(playerExperience)
+                   if playerHP <= 0 {
+                       playerExperience = 5
+                       playerMoney = 5
+                   }
+                   switch newMonsterType {
+                   case 1:
+                       monsterHP = 80
+                       monsterUnderHP = 80
+                       monsterAttack = 20
+                   case 2:
+                       monsterHP = 120
+                       monsterUnderHP = 120
+                       monsterAttack = 30
+                   case 3:
+                       monsterHP = 160
+                       monsterUnderHP = 160
+                       monsterAttack = 40
+                   default:
+                       monsterHP = 30
+                   }
+                case .appliedStrategy:
+                    monsterBackground = "appliedStrategyBackground"
+                   playerExperience = 20
+                   playerMoney = 10
+                   // print(playerExperience)
+                   if playerHP <= 0 {
+                       playerExperience = 5
+                       playerMoney = 5
+                   }
+                   switch newMonsterType {
+                   case 1:
+                       monsterHP = 80
+                       monsterUnderHP = 80
+                       monsterAttack = 20
+                   case 2:
+                       monsterHP = 120
+                       monsterUnderHP = 120
+                       monsterAttack = 30
+                   case 3:
+                       monsterHP = 160
+                       monsterUnderHP = 160
+                       monsterAttack = 40
+                   default:
+                       monsterHP = 30
+                   }
+                case .itTechnology:
+                    monsterBackground = "itTechnologyBackground"
+                   playerExperience = 20
+                   playerMoney = 10
+                   // print(playerExperience)
+                   if playerHP <= 0 {
+                       playerExperience = 5
+                       playerMoney = 5
+                   }
+                   switch newMonsterType {
+                   case 1:
+                       monsterHP = 80
+                       monsterUnderHP = 80
+                       monsterAttack = 20
+                   case 2:
+                       monsterHP = 120
+                       monsterUnderHP = 120
+                       monsterAttack = 30
+                   case 3:
+                       monsterHP = 160
+                       monsterUnderHP = 160
+                       monsterAttack = 40
+                   default:
+                       monsterHP = 30
+                   }
+                case .infoTechnology:
+                    monsterBackground = "infoTechnologyBackground"
+                   playerExperience = 20
+                   playerMoney = 10
+                   // print(playerExperience)
+                   if playerHP <= 0 {
+                       playerExperience = 5
+                       playerMoney = 5
+                   }
+                   switch newMonsterType {
+                   case 1:
+                       monsterHP = 80
+                       monsterUnderHP = 80
+                       monsterAttack = 20
+                   case 2:
+                       monsterHP = 120
+                       monsterUnderHP = 120
+                       monsterAttack = 30
+                   case 3:
+                       monsterHP = 160
+                       monsterUnderHP = 160
+                       monsterAttack = 40
+                   default:
+                       monsterHP = 30
+                   }
+                case .appliedTechnology:
+                    monsterBackground = "appliedTechnologyBackground"
+                       playerExperience = 20
+                       playerMoney = 10
+                       // print(playerExperience)
+                       if playerHP <= 0 {
+                           playerExperience = 5
+                           playerMoney = 5
+                       }
+                       switch newMonsterType {
+                       case 1:
+                           monsterHP = 80
+                           monsterUnderHP = 80
+                           monsterAttack = 20
+                       case 2:
+                           monsterHP = 120
+                           monsterUnderHP = 120
+                           monsterAttack = 30
+                       case 3:
+                           monsterHP = 160
+                           monsterUnderHP = 160
+                           monsterAttack = 40
+                       default:
+                           monsterHP = 30
+                       }
+                case .itManagement:
+                    monsterBackground = "itManagementBackground"
+                   playerExperience = 20
+                   playerMoney = 10
+                   // print(playerExperience)
+                   if playerHP <= 0 {
+                       playerExperience = 5
+                       playerMoney = 5
+                   }
+                   switch newMonsterType {
+                   case 1:
+                       monsterHP = 80
+                       monsterUnderHP = 80
+                       monsterAttack = 20
+                   case 2:
+                       monsterHP = 120
+                       monsterUnderHP = 120
+                       monsterAttack = 30
+                   case 3:
+                       monsterHP = 160
+                       monsterUnderHP = 160
+                       monsterAttack = 40
+                   default:
+                       monsterHP = 30
+                   }
+                case .infoManagement:
+                    monsterBackground = "infoManagementBackground"
+                   playerExperience = 20
+                   playerMoney = 10
+                   // print(playerExperience)
+                   if playerHP <= 0 {
+                       playerExperience = 5
+                       playerMoney = 5
+                   }
+                   switch newMonsterType {
+                   case 1:
+                       monsterHP = 80
+                       monsterUnderHP = 80
+                       monsterAttack = 20
+                   case 2:
+                       monsterHP = 120
+                       monsterUnderHP = 120
+                       monsterAttack = 30
+                   case 3:
+                       monsterHP = 160
+                       monsterUnderHP = 160
+                       monsterAttack = 40
+                   default:
+                       monsterHP = 30
+                   }
+                case .appliedManagement:
+                    monsterBackground = "appliedManagementBackground"
+                   playerExperience = 20
+                   playerMoney = 10
+                   // print(playerExperience)
+                   if playerHP <= 0 {
+                       playerExperience = 5
+                       playerMoney = 5
+                   }
+                   switch newMonsterType {
+                   case 1:
+                       monsterHP = 80
+                       monsterUnderHP = 80
+                       monsterAttack = 20
+                   case 2:
+                       monsterHP = 120
+                       monsterUnderHP = 120
+                       monsterAttack = 30
+                   case 3:
+                       monsterHP = 160
+                       monsterUnderHP = 160
+                       monsterAttack = 40
+                   default:
+                       monsterHP = 30
+                   }
+                case .itBasic:
+                    monsterBackground = "itBasicBackground"
+                    playerExperience = 20
+                    playerMoney = 10
+                    // print(playerExperience)
+                    if playerHP <= 0 {
+                        playerExperience = 5
+                        playerMoney = 5
+                    }
+                    switch newMonsterType {
+                    case 1:
+                        monsterHP = 80
+                        monsterUnderHP = 80
+                        monsterAttack = 20
+                    case 2:
+                        monsterHP = 120
+                        monsterUnderHP = 120
+                        monsterAttack = 30
+                    case 3:
+                        monsterHP = 160
+                        monsterUnderHP = 160
+                        monsterAttack = 40
+                    default:
+                        monsterHP = 30
+                    }
+                case .infoBasic:
+                    monsterBackground = "infoBasicBackground"
+                    playerExperience = 20
+                    playerMoney = 10
+                    // print(playerExperience)
+                    if playerHP <= 0 {
+                        playerExperience = 5
+                        playerMoney = 5
+                    }
+                    switch newMonsterType {
+                    case 1:
+                        monsterHP = 80
+                        monsterUnderHP = 80
+                        monsterAttack = 20
+                    case 2:
+                        monsterHP = 120
+                        monsterUnderHP = 120
+                        monsterAttack = 30
+                    case 3:
+                        monsterHP = 160
+                        monsterUnderHP = 160
+                        monsterAttack = 40
+                    default:
+                        monsterHP = 30
+                    }
+                case .appliedBasic:
+                    monsterBackground = "appliedBasicBackground"
+                    playerExperience = 20
+                    playerMoney = 10
+                    // print(playerExperience)
+                    if playerHP <= 0 {
+                        playerExperience = 5
+                        playerMoney = 5
+                    }
+                    switch newMonsterType {
+                    case 1:
+                        monsterHP = 80
+                        monsterUnderHP = 80
+                        monsterAttack = 20
+                    case 2:
+                        monsterHP = 120
+                        monsterUnderHP = 120
+                        monsterAttack = 30
+                    case 3:
+                        monsterHP = 160
+                        monsterUnderHP = 160
+                        monsterAttack = 40
+                    default:
+                        monsterHP = 30
+                    }
                 }
             }
         }
@@ -1287,7 +1868,7 @@ struct ViewPositionKey3: PreferenceKey {
 
 struct QuizView_Previews: PreviewProvider {
     static var previews: some View {
-        QuizBeginnerList(isPresenting: .constant(false))
+        QuizIntermediateList(isPresenting: .constant(false))
 //        QuizIncorrectAnswerListView(isPresenting: .constant(false))
     }
 }

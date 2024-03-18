@@ -10,6 +10,7 @@ import Firebase
 
 class RankingViewModel: ObservableObject {
     @Published var users = [User]()
+    @Published var rankMatchUsers = [User]()
     @Published var displayedUserCount = 10
     @State private var rankNum: Int = 0
     @Published var userAnswerDataList = [UserAnswerData]()
@@ -41,7 +42,11 @@ class RankingViewModel: ObservableObject {
                    let userHp = data["userHp"] as? Int,
                    let userAttack = data["userAttack"] as? Int,
                    let level = data["level"] as? Int,
-                   let experience = data["experience"] as? Int {
+                   let experience = data["experience"] as? Int{
+
+                    // rankMatchPointが存在しない場合は、デフォルト値100を使用
+                    let rankMatchPoint = data["rankMatchPoint"] as? Int ?? 100
+                    let rank = data["rank"] as? Int ?? 1
 
                     // アバターデータがあればフィルタリング
                     var filteredAvatars: [[String: Any]] = []
@@ -60,7 +65,7 @@ class RankingViewModel: ObservableObject {
                                     avatars: filteredAvatars,
                                     userMoney: userMoney,
                                     userHp: userHp,
-                                    userAttack: userAttack, userFlag: 1)
+                                    userAttack: userAttack, userFlag: 1, adminFlag: 0, rankMatchPoint: rankMatchPoint, rank: rank)
                     users.append(user)
                 }
             }
@@ -68,14 +73,128 @@ class RankingViewModel: ObservableObject {
             // レベルが高い順にソート
             self.users = users.sorted { $0.level > $1.level }
             DispatchQueue.main.async {
+                self.calculateLevelRankings()
+            }
+            self.fetchMonthlyAnswers()
+        }) { (error) in
+    //        print("Error getting users: \(error.localizedDescription)")
+        }
+    }
+
+    
+//    func fetchUsers() {
+//        let usersRef = Database.database().reference().child("users")
+//        usersRef.observeSingleEvent(of: .value, with: { (snapshot) in
+//            var users: [User] = []
+//
+//            guard let usersData = snapshot.value as? [String: [String: Any]] else {
+//                print("Error: Could not parse users data")
+//                return
+//            }
+//
+//            for (userId, data) in usersData {
+//                if let userName = data["userName"] as? String,
+//                   let userMoney = data["userMoney"] as? Int,
+//                   let userHp = data["userHp"] as? Int,
+//                   let userAttack = data["userAttack"] as? Int,
+//                   let level = data["level"] as? Int,
+//                   let experience = data["experience"] as? Int {
+//                    
+//                    // rankMatchPointが存在しない場合は100をデフォルト値として使用
+//                    let rankMatchPoint = data["rankMatchPoint"] as? Int ?? 100
+//
+//                    var filteredAvatars: [[String: Any]] = []
+//                    if let avatarsData = data["avatars"] as? [String: [String: Any]] {
+//                        for (_, avatarData) in avatarsData {
+//                            if avatarData["usedFlag"] as? Int == 1 {
+//                                filteredAvatars.append(avatarData)
+//                            }
+//                        }
+//                    }
+//
+//                    let user = User(id: userId,
+//                                    userName: userName,
+//                                    level: level,
+//                                    experience: experience,
+//                                    avatars: filteredAvatars,
+//                                    userMoney: userMoney,
+//                                    userHp: userHp,
+//                                    userAttack: userAttack, userFlag: 1,adminFlag: 0, rankMatchPoint: rankMatchPoint)
+//                    users.append(user)
+//                }
+//            }
+//
+//            // レベルが高い順にソート
+//            self.users = users.sorted { $0.level > $1.level }
+//            DispatchQueue.main.async {
+//                        self.calculateLevelRankings()
+//                    }
+//            self.fetchMonthlyAnswers()
+//        }) { (error) in
+//            // エラーハンドリング
+//        }
+//    }
+    
+    func rankMatchFetchUsers() {
+        
+        let usersRef = Database.database().reference().child("users")
+        usersRef.observeSingleEvent(of: .value, with: { (snapshot) in
+            var users: [User] = []
+            
+            guard let usersData = snapshot.value as? [String: [String: Any]] else {
+                print("Error: Could not parse users data:")
+                return
+            }
+            
+            guard let currentUserUID = Auth.auth().currentUser?.uid else { return }
+
+            for (userId, data) in usersData {
+                if userId == currentUserUID {
+                                continue
+                            }
+                if let userName = data["userName"] as? String,
+                   let userMoney = data["userMoney"] as? Int,
+                   let userHp = data["userHp"] as? Int,
+                   let userAttack = data["userAttack"] as? Int,
+                   let level = data["level"] as? Int,
+                   let experience = data["experience"] as? Int {
+                    // rankMatchPointが存在しない場合は100をデフォルト値として使用
+                    let rankMatchPoint = data["rankMatchPoint"] as? Int ?? 100
+                    let rank = data["rank"] as? Int ?? 1
+
+                    var filteredAvatars: [[String: Any]] = []
+                    if let avatarsData = data["avatars"] as? [String: [String: Any]] {
+                        for (_, avatarData) in avatarsData {
+                            if avatarData["usedFlag"] as? Int == 1 {
+                                filteredAvatars.append(avatarData)
+                            }
+                        }
+                    }
+
+                    let user = User(id: userId,
+                                    userName: userName,
+                                    level: level,
+                                    experience: experience,
+                                    avatars: filteredAvatars,
+                                    userMoney: userMoney,
+                                    userHp: userHp,
+                                    userAttack: userAttack, userFlag: 1,adminFlag: 0, rankMatchPoint: rankMatchPoint, rank: rank)
+                    users.append(user)
+                    print("user:\(user)")
+                }
+            }
+
+            // レベルが高い順にソート
+            self.rankMatchUsers = users
+            DispatchQueue.main.async {
                         self.calculateLevelRankings()
                     }
             self.fetchMonthlyAnswers()
         }) { (error) in
-//            print("Error getting users: \(error.localizedDescription)")
+            // エラーハンドリング
         }
-        
     }
+
     
     private func calculateLevelRankings() {
         // ユーザーをレベルが高い順にソート（レベルが同じ場合は経験値でソート、それでも同じ場合はIDでソート）
@@ -85,11 +204,11 @@ class RankingViewModel: ObservableObject {
             }
             return $0.level > $1.level
         }
-        print("sortedUsers:\(sortedUsers)")
+//        print("sortedUsers:\(sortedUsers)")
 
         // ログイン中のユーザーの順位を見つける
         if let currentUserIndex = sortedUsers.firstIndex(where: { $0.id == self.authManager.currentUserId }) {
-            print("currentUserIndex:\(currentUserIndex)")
+//            print("currentUserIndex:\(currentUserIndex)")
             // 順位はインデックス+1（配列は0から始まるため）
             self.currentUserLevelRank = currentUserIndex + 1
         }
@@ -275,6 +394,10 @@ struct LevelRankingView: View {
                             .padding()
                     }
                 }
+                
+                .onAppear{
+                    print("viewModel.users:\(viewModel.users)")
+                }
             }
             .background(Color("Color2"))
             .foregroundColor(Color("fontGray"))
@@ -292,8 +415,8 @@ struct LevelRankingView: View {
 
         let englishAlphabet = CharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
         let textCharacterSet = CharacterSet(charactersIn: text)
-print(text)
-        print(baseFontSize)
+//print(text)
+//        print(baseFontSize)
         if englishAlphabet.isSuperset(of: textCharacterSet) {
             return baseFontSize
         } else {
@@ -390,8 +513,8 @@ struct MonthlyAnswersRankingView: View {
 
         let englishAlphabet = CharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
         let textCharacterSet = CharacterSet(charactersIn: text)
-print(text)
-        print(baseFontSize)
+//print(text)
+//        print(baseFontSize)
         if englishAlphabet.isSuperset(of: textCharacterSet) {
             return baseFontSize
         } else {
@@ -423,46 +546,60 @@ struct AvatarRankingView: View {
     @ObservedObject var viewModel: RankingViewModel
     
     var body: some View {
+        if viewModel.userAnswerDataList.isEmpty {
+            // データがまだ読み込まれていない場合の表示
+            VStack{
+                ActivityIndicator()
+            }
+            .frame(maxWidth: .infinity,maxHeight: .infinity)
+        } else {
         ScrollView {
             ForEach(Array(viewModel.userAvatarCounts.prefix(10).enumerated()), id: \.element.userId) { index, userAvatarCount in
-                HStack {
-                    if (index==0||index==1||index==2){
-                        Image("\(index)")
-                            .resizable()
-                            .frame(width:50,height:50)
-                            .padding(.trailing)
-                    }else{
-                        if index != 9{
-                            Text("\(index + 1)位")
-                                .font(.system(size:40))
-                                .padding(.trailing, 5)
+
+                    HStack {
+                        if (index==0||index==1||index==2){
+                            Image("\(index)")
+                                .resizable()
+                                .frame(width:50,height:50)
+                                .padding(.trailing)
                         }else{
-                            Text("\(index + 1)位")
-                                .font(.system(size:30))
-                                .padding(.trailing, 5)
+                            if index != 9{
+                                Text("\(index + 1)位")
+                                    .font(.system(size:40))
+                                    .padding(.trailing, 5)
+                            }else{
+                                Text("\(index + 1)位")
+                                    .font(.system(size:30))
+                                    .padding(.trailing, 5)
+                            }
                         }
+                        Image(userAvatarCount.avatarName)
+                            .resizable()
+                            .frame(width: 50, height: 50)
+                        Text(userAvatarCount.userName)
+                            .font(.system(size: fontSize(for: userAvatarCount.userName, isIPad: isIPad())))
+                        Spacer()
+                        Text("おとも：\(userAvatarCount.avatarCount)")
+                            .font(.system(size: 20))
                     }
-                    Image(userAvatarCount.avatarName)
-                        .resizable()
-                        .frame(width: 50, height: 50)
-                    Text(userAvatarCount.userName)
-                        .font(.system(size: fontSize(for: userAvatarCount.userName, isIPad: isIPad())))
-                    Spacer()
-                    Text("おとも：\(userAvatarCount.avatarCount)")
-                        .font(.system(size: 20))
+                    .padding(.horizontal)
+                    Divider()
+
+                
+                
+                
                 }
-                .padding(.horizontal)
-                Divider()
-            }
             if let rank = viewModel.currentUserAvatarRank {
                 Text("あなたの順位: \(rank)位")
                     .font(.headline)
                     .padding()
             }
-        }
-        .foregroundColor(Color("fontGray"))
-        .onAppear {
-            viewModel.fetchUsersByAvatarCount()
+                }        .foregroundColor(Color("fontGray"))
+                .onAppear {
+                    viewModel.fetchUsersByAvatarCount()
+                }
+
+          
         }
     }
     func fontSize(for text: String, isIPad: Bool) -> CGFloat {
@@ -470,8 +607,8 @@ struct AvatarRankingView: View {
 
         let englishAlphabet = CharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
         let textCharacterSet = CharacterSet(charactersIn: text)
-print(text)
-        print(baseFontSize)
+//print(text)
+//        print(baseFontSize)
         if englishAlphabet.isSuperset(of: textCharacterSet) {
             return baseFontSize
         } else {

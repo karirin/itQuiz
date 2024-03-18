@@ -76,7 +76,7 @@ func fontSize(for text: String, isIPad: Bool) -> CGFloat {
 struct AnswerSelectionView_Previews: PreviewProvider {
     static var previews: some View {
         AnswerSelectionView(choices: ["選択肢1", "選択肢2", "選択肢3"], correctAnswerIndex: 1) { index in
-            print("選択肢 \(index + 1) がタップされました")
+//            print("選択肢 \(index + 1) がタップされました")
         }
     }
 }

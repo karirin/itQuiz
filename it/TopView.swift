@@ -26,6 +26,7 @@ struct TopView: View {
     @State private var buttonRect: CGRect = .zero
     @State private var bubbleHeight: CGFloat = 0.0
     @State var isAlert: Bool = false
+//    @ObservedObject var viewModel: RankingViewModel
     
     var body: some View {
         ZStack{
@@ -44,7 +45,8 @@ struct TopView: View {
                                 .padding()
                         }
                         ZStack {
-                            QuizManagerTabView(isPresenting: .constant(false))
+//                            ManagerListTabView()
+                            ManagerTabView()
                         }
                         .tabItem {
                             Image(systemName: "map")
@@ -60,25 +62,39 @@ struct TopView: View {
                             }
 //                    PentagonView(authManager: authManager, flag: .constant(false))
                     GraphManagerView()
-//                    PentagonView(authManager: authManager, flag: .constant(false))
+//                    PentagonManagerView()
                             .tabItem {
                                 Image(systemName: "chart.pie")
                                 Text("分析")
                             }
+//                    SettingView()
+//                            .tabItem {
+//                                Image(systemName: "gearshape.fill")
+//                                Text("設定")
+//                            }
+                    ZStack {
                         SettingView()
-                            .tabItem {
-                                Image(systemName: "gearshape.fill")
-                                Text("設定")
-                            }
+                    }
+                    .tabItem {
+                        Image(systemName: "gearshape.fill")
+                        Text("設定")
+                    }
                 }
             }
         }
 //        .alert(isPresented: $isAlert) {
-//                    Alert(title: Text("お知らせ"), message: Text("最新バージョンがあります"), dismissButton: .default(Text("OK")) {
-//                        // TODO: ここでAppStoreを開く
-//                    })
-//                }
-//                .appVersionMonitor(id: ) { status in
+//            Alert(
+//                 title: Text("お知らせ"),
+//                 message: Text("最新バージョンがあります"),
+//                 primaryButton: .default(Text("OK")) {
+//                     // TODO: ここでAppStoreを開く
+//                 },
+//                 secondaryButton: .cancel(Text("キャンセル")) {
+//                     // キャンセルボタンがタップされた時のアクション
+//                     print("キャンセルがタップされました")
+//                 }
+//             )                }
+//                .appVersionMonitor(id: 6469339499) { status in
 //                    switch status {
 //                    case .updateAvailable:
 //                        isAlert = true

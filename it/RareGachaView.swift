@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Firebase
 
 //class RareGachaManager {
 //
@@ -97,10 +98,18 @@ struct RareGachaView: View {
     @State private var isGachaButtonDisabled: Bool = false
     @State private var userMoney: Int = 0
     @ObservedObject var audioManager = AudioManager.shared
-    @ObservedObject var reward = Reward()
+//    @ObservedObject var reward = Reward()
+    @StateObject var reward = Reward()
     @State private var showLoginModal: Bool = false
 //    @State private var isShowingActivityIndicator: Bool = false
     @State private var isButtonClickable: Bool = false
+    @State private var showCoinModal: Bool = false
+    @State private var showUnCoinModal: Bool = false
+    @State private var otomo10flag: Bool = false
+    @State private var otomo20flag: Bool = false
+    @State private var otomoallflag: Bool = false
+    @State private var showAlert: Bool = false
+    
 
     var body: some View {
         ZStack{
@@ -108,10 +117,23 @@ struct RareGachaView: View {
                 HStack{
                     Spacer()
                     Image("コイン")
-                        .resizable()
-                        .frame(width:20,height:20)
-                    Text("+")
+                    .resizable()
+                    .frame(width:20,height:20)
+                    .padding(.top,3)
+                    Text("+").padding(.top,3)
                     Text(" \(userMoney)")
+                        .padding(.top,3)
+                    Button(action: {
+                    audioManager.playSound()
+                    self.showCoinModal = true
+                    showUnCoinModal = false
+                    }) {
+                    Image("コイン購入")
+                    .resizable()
+                    .frame(maxWidth:110,maxHeight:40)
+                    .shadow(radius: 3)
+                    }
+                    .padding(.top,3)
                 }
                 .foregroundColor(Color("fontGray"))
                 .padding(.trailing)
@@ -200,23 +222,20 @@ struct RareGachaView: View {
                         Spacer()
                         Button(action: {
                             reward.ShowReward()
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                                self.showLoginModal = true
-                            }
                         }) {
                             Image("獲得")
                                 .resizable()
                                 .frame(maxWidth:110,maxHeight:110)
                         }
-                        .disabled(!isButtonClickable)
-                            .onAppear() {
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { // 1秒後に
-                                                    self.isButtonClickable = true // ボタンをクリック可能に設定
-                                                }
+                        .disabled(!reward.rewardLoaded) // rewardLoadedを使用してボタンの活性状態を制御
+                        .shadow(radius: 10)
+                        .onChange(of: reward.rewardEarned) { rewardEarned in
+                            showAlert = rewardEarned
+//                            print("onChange reward.rewardEarned:\(reward.rewardEarned)")
+                        }
+                        .onAppear() {
                             reward.LoadReward()
                         }
-                        //                        .disabled(!reward.rewardLoaded)
-                        .shadow(radius: 10)
                         Spacer()
                     }
                     Spacer()
@@ -270,23 +289,31 @@ struct RareGachaView: View {
                             Spacer()
                             Button(action: {
                                 reward.ShowReward()
-                                DispatchQueue.main.asyncAfter(deadline: .now() +        1.0) {
-                                    self.showLoginModal = true
-                                }
                             }) {
                                 Image("獲得")
                                     .resizable()
                                     .frame(maxWidth:110,maxHeight:110)
                             }
-                            .disabled(!isButtonClickable)
-                                .onAppear() {
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { // 1秒後に
-                                                        self.isButtonClickable = true // ボタンをクリック可能に設定
-                                                    }
+                            .shadow(radius: 10)
+                            .disabled(!reward.rewardLoaded) // rewardLoadedを使用してボタンの活性状態を制御
+                            .onChange(of: reward.rewardEarned) { rewardEarned in
+                                showAlert = rewardEarned
+//                                print("onchange reward.rewardEarned:\(reward.rewardEarned)")
+                            }
+//                            .alert(isPresented: $showAlert) {
+//                                Alert(
+//                                    title: Text("報酬獲得！"),
+//                                    message: Text("300コイン獲得しました。"),
+//                                    dismissButton: .default(Text("OK"), action: {
+//                                        // アラートを閉じるアクション
+//                                        showAlert = false // アラートの表示状態を更新
+//                                        reward.rewardEarned = false // 必要に応じてrewardEarnedも更新
+//                                    })
+//                                )
+//                            }
+                            .onAppear() {
                                 reward.LoadReward()
                             }
-                            //                        .disabled(!reward.rewardLoaded)
-                            .shadow(radius: 10)
                             Spacer()
                         }
                         Spacer()
@@ -298,6 +325,55 @@ struct RareGachaView: View {
                 }
             }
             if showLoginModal {
+            ZStack {
+            Color.black.opacity(0.7)
+            .edgesIgnoringSafeArea(.all)
+            RewardModalView(audioManager: audioManager, isPresented: $showLoginModal)
+            }
+            }
+            if showCoinModal {
+                ZStack {
+                    Color.black.opacity(0.7)
+                        .edgesIgnoringSafeArea(.all)
+                    
+                    VStack{
+                        if showUnCoinModal {
+                            VStack{
+                                HStack{
+                                    Image("コインが無い")
+                                        .resizable()
+                                        .frame(width:70,height: 70)
+                                    VStack(alignment: .leading, spacing:15){
+                                        HStack{
+                                            Text("コインが足りません")
+                                            Spacer()
+                                        }
+                                        Text("ご購入することもできます")
+                                            .font(.system(size: isSmallDevice() ? 17 : 18))
+                                    }
+                                    
+                                }.padding()
+                            }.frame(width: isSmallDevice() ? 330: 340, height:120)
+                                .background(Color("Color2"))
+                                .font(.system(size: 20))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 20)
+                                        .stroke(Color.gray, lineWidth: 15)
+                                )
+                                .cornerRadius(20)
+                                .shadow(radius: 10)
+                        }
+                        CoinModalView(audioManager: audioManager, isPresented: $showCoinModal)
+                    }
+                }
+            }
+            if otomo10flag {
+            ModalTittleView(showLevelUpModal: $otomo10flag, authManager: authManager, tittleNumber: .constant(01))
+            }
+              if otomo20flag {
+            ModalTittleView(showLevelUpModal: $otomo20flag, authManager: authManager, tittleNumber: .constant(02))
+            }
+            if showLoginModal {
                 ZStack {
                     Color.black.opacity(0.7)
                         .edgesIgnoringSafeArea(.all)
@@ -305,9 +381,18 @@ struct RareGachaView: View {
                 }
             }
         }
+        
+        .alert(isPresented: $showAlert) { // rewardEarnedがtrueになった時にアラートを表示
+            Alert(
+                title: Text("報酬獲得！"),
+                message: Text("300コイン獲得しました。"),
+                dismissButton: .default(Text("OK"))
+            )
+        }
         .onAppear {
+//            print("onAppear:\(reward.rewardEarned)")
             authManager.getUserMoney { userMoney in
-                print(userMoney)
+//                print(userMoney)
                 self.userMoney = userMoney
                 // ここで userMoney を使用する
                 if(userMoney < 600){
@@ -323,8 +408,29 @@ struct RareGachaView: View {
                 // ここで userMoney を使用する
                 if(userMoney < 600){
                     isGachaButtonDisabled = false
+                     showCoinModal = true
+                     showUnCoinModal = true
                 }else{
                     isGachaButtonDisabled = true
+                }
+            }
+            countAvatarsForUser(userId: authManager.currentUserId!) { avatarCount in
+//                print("ユーザーのアバターの数: \(avatarCount)")
+                if avatarCount > 9 {
+                    authManager.checkTitles(userId: authManager.currentUserId!, title: "おとも１０種類制覇") { exists in
+                        if !exists {
+                            otomo10flag = true
+                            authManager.saveTitleForUser(userId: authManager.currentUserId!, title: "おとも１０種類制覇")
+                        }
+                    }
+                }
+                if avatarCount > 19 {
+                    authManager.checkTitles(userId: authManager.currentUserId!, title: "おとも２０種類制覇") { exists in
+                        if !exists {
+                            otomo20flag = true
+                            authManager.saveTitleForUser(userId: authManager.currentUserId!, title: "おとも２０種類制覇")
+                        }
+                    }
                 }
             }
         }
@@ -377,6 +483,58 @@ struct RareGachaView: View {
            }
         
        }
+    func isIPad() -> Bool {
+    return UIDevice.current.userInterfaceIdiom == .pad
+    }
+    func isSmallDevice() -> Bool {
+    return UIScreen.main.bounds.width < 390
+    }
+    // フレームサイズを調整する関数
+    func frameSize() -> CGSize {
+    if isIPad() {
+    // iPadの場合のサイズ
+    return CGSize(width: 700, height: 560)
+    } else {
+    // iPhoneやその他のデバイスの場合のサイズ
+    return CGSize(width: 350, height: 280)
+    }
+    }
+    func frameSize2() -> CGSize {
+    if isIPad() {
+    // iPadの場合のサイズ
+    return CGSize(width: 450, height: 260)
+    } else {
+    // iPhoneやその他のデバイスの場合のサイズ
+    return CGSize(width: 210, height: 100)
+    }
+    }
+    func frameSize3() -> CGSize {
+    if isIPad() {
+    // iPadの場合のサイズ
+    return CGSize(width: 300, height: 300)
+    } else {
+    // iPhoneやその他のデバイスの場合のサイズ
+    return CGSize(width: 110, height: 110)
+    }
+    }
+    func frameSize4() -> CGSize {
+    if isIPad() {
+    // iPadの場合のサイズ
+    return CGSize(width: 800, height: 300)
+    } else {
+    // iPhoneやその他のデバイスの場合のサイズ
+    return CGSize(width: 350, height: 120)
+    }
+    }
+    func countAvatarsForUser(userId: String, completion: @escaping (Int) -> Void) {
+        let avatarsRef = Database.database().reference().child("users").child(userId).child("avatars")
+        avatarsRef.observeSingleEvent(of: .value, with: { snapshot in
+            // アバターの数をカウント
+            let avatarCount = snapshot.childrenCount
+            completion(Int(avatarCount))
+        })
+    }
+
 }
 
 struct RareGachaView_Previews: PreviewProvider {

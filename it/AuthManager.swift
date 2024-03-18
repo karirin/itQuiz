@@ -26,8 +26,11 @@ class User: Identifiable {
     var userHp: Int
     var userAttack: Int
     var userFlag: Int
+    var adminFlag: Int
+    var rankMatchPoint: Int
+    var rank: Int
 
-    init(id: String, userName: String, level: Int, experience: Int, avatars: [[String: Any]], userMoney: Int, userHp: Int, userAttack: Int, userFlag: Int) {
+    init(id: String, userName: String, level: Int, experience: Int, avatars: [[String: Any]], userMoney: Int, userHp: Int, userAttack: Int, userFlag: Int, adminFlag: Int,rankMatchPoint: Int,rank: Int) {
         self.id = id
         self.userName = userName
         self.level = level
@@ -37,19 +40,28 @@ class User: Identifiable {
         self.userHp = userHp
         self.userAttack = userAttack
         self.userFlag = userFlag
+        self.adminFlag = adminFlag
+        self.rankMatchPoint = rankMatchPoint
+        self.rank = rank
     }
 }
 
 class AuthManager: ObservableObject {
     @Published var user: FirebaseAuth.User?
     @Published var experience: Int = 0
+    @Published var rankMatchPoint: Int = 0
+    @Published var rank: Int = 0
     @Published var level: Int = 1
     @Published var money: Int = 0
     @Published var userFlag: Int = 0
+    @Published var userCsFlag: Int = 0
+    @Published var adminFlag: Int = 0
     @Published var avatars: [Avatar] = []
     @Published var didLevelUp: Bool = false
     @Published var userAvatars: [Avatar] = []
     @Published var rewardFlag: Int = 1
+    @Published var story: Int = 0
+    @Published var userPreFlag: Int = 0
     
     init() {
         user = Auth.auth().currentUser
@@ -147,6 +159,52 @@ class AuthManager: ObservableObject {
         }
     }
     
+    func deleteUserAccount(completion: @escaping (Bool, Error?) -> Void) {
+        guard let userId = Auth.auth().currentUser?.uid else { return }
+        let userRef = Database.database().reference().child("users").child(userId)
+        userRef.removeValue { error, _ in
+            if let error = error {
+                completion(false, error)
+                return
+            }
+            completion(true, nil)
+        }
+    }
+    
+    func fetchUserStory() {
+        guard let userId = user?.uid else { return }
+
+        let userRef = Database.database().reference().child("users").child(userId)
+        userRef.child("story").observeSingleEvent(of: .value) { snapshot in
+            if let story = snapshot.value as? Int {
+                DispatchQueue.main.async {
+                    self.story = story
+                }
+            }
+        }
+    }
+    
+    func updateStory(story: Int, completion: @escaping (Bool) -> Void) {
+            guard let userId = user?.uid else {
+                completion(false) // ユーザーIDがnilの場合は失敗
+                return
+            }
+
+            let userRef = Database.database().reference().child("users").child(userId)
+            userRef.child("story").setValue(story) { error, _ in
+                DispatchQueue.main.async {
+                    if let error = error {
+                        print("Failed to update story:", error.localizedDescription)
+                        completion(false) // 更新に失敗した場合
+                    } else {
+                        print("Successfully updated story.")
+                        self.story = story // AuthManagerのstoryプロパティを更新
+                        completion(true) // 更新に成功した場合
+                    }
+                }
+            }
+        }
+    
     func saveUserToDatabase(userName: String, completion: @escaping (Bool) -> Void) {
         guard let userId = user?.uid else { return }
         
@@ -164,33 +222,52 @@ class AuthManager: ObservableObject {
     }
     
     func fetchUserInfo(completion: @escaping (String?, [[String: Any]]?, Int?, Int?, Int?, Int?) -> Void) {
+            guard let userId = user?.uid else {
+                completion(nil, nil, nil, nil, nil, nil)
+                return
+            }
+            let userRef = Database.database().reference().child("users").child(userId)
+            userRef.observeSingleEvent(of: .value) { (snapshot) in
+                if let data = snapshot.value as? [String: Any],
+                   let userName = data["userName"] as? String,
+                   let avatarsData = data["avatars"] as? [String:[String: Any]],
+                   let userMoney = data["userMoney"] as? Int,
+                   let userHp = data["userHp"] as? Int,
+                   let userAttack = data["userAttack"] as? Int,
+                   let tutorialNum = data["tutorialNum"] as? Int {  // 追加
+                    var filteredAvatars: [[String: Any]] = []
+                    for (_, avatarData) in avatarsData {
+                        if avatarData["usedFlag"] as? Int == 1 {
+                            filteredAvatars.append(avatarData)
+//                            print("filteredAvatars:\(filteredAvatars)")
+                        }
+                    }
+                    
+                    completion(userName, filteredAvatars, userMoney, userHp, userAttack, tutorialNum)  // 追加
+                } else {
+                    completion(nil, nil, nil, nil, nil, nil)  // 追加
+                }
+            }
+        }
+    
+    func fetchCurrentUserAdminFlag() {
         guard let userId = user?.uid else {
-            completion(nil, nil, nil, nil, nil, nil)
+            print("User is not logged in")
             return
         }
         let userRef = Database.database().reference().child("users").child(userId)
-        userRef.observeSingleEvent(of: .value) { (snapshot) in
-            if let data = snapshot.value as? [String: Any],
-               let userName = data["userName"] as? String,
-               let avatarsData = data["avatars"] as? [String:[String: Any]],
-               let userMoney = data["userMoney"] as? Int,
-               let userHp = data["userHp"] as? Int,
-               let userAttack = data["userAttack"] as? Int,
-               let tutorialNum = data["tutorialNum"] as? Int {  // 追加
-
-                var filteredAvatars: [[String: Any]] = []
-                for (_, avatarData) in avatarsData {
-                    if avatarData["usedFlag"] as? Int == 1 {
-                        filteredAvatars.append(avatarData)
-                    }
-                }
-                
-                completion(userName, filteredAvatars, userMoney, userHp, userAttack, tutorialNum)  // 追加
-            } else {
-                completion(nil, nil, nil, nil, nil, nil)  // 追加
+        userRef.observeSingleEvent(of: .value, with: { [weak self] snapshot in
+            guard let self = self, let data = snapshot.value as? [String: Any], let adminFlag = data["adminFlag"] as? Int else {
+                print("Failed to fetch user data or adminFlag is missing")
+                return
             }
-        }
+            DispatchQueue.main.async {
+                self.adminFlag = adminFlag
+                print("Updated adminFlag to \(adminFlag)")
+            }
+        })
     }
+
 
     func updateTutorialNum(userId: String, tutorialNum: Int, completion: @escaping (Bool) -> Void) {
         let userRef = Database.database().reference().child("users").child(userId)
@@ -202,6 +279,89 @@ class AuthManager: ObservableObject {
             } else {
                 completion(true)
             }
+        }
+    }
+    
+    func updateUserFlag(userId: String, userFlag: Int, completion: @escaping (Bool) -> Void) {
+        let userRef = Database.database().reference().child("users").child(userId)
+        let updates = ["userFlag": userFlag]
+        userRef.updateChildValues(updates) { (error, _) in
+            if let error = error {
+                print("Error updating tutorialNum: \(error)")
+                completion(false)
+            } else {
+                completion(true)
+            }
+        }
+    }
+    
+    func updateUserCsFlag(userId: String, userCsFlag: Int, completion: @escaping (Bool) -> Void) {
+        let userRef = Database.database().reference().child("users").child(userId)
+        let updates = ["userCsFlag": userCsFlag]
+        print(updates)
+        userRef.updateChildValues(updates) { (error, _) in
+            if let error = error {
+                print("Error updating tutorialNum: \(error)")
+                completion(false)
+            } else {
+                completion(true)
+            }
+        }
+    }
+    
+    func updatePreFlag(userId: String, userPreFlag: Int, completion: @escaping (Bool) -> Void) {
+        let userRef = Database.database().reference().child("users").child(userId)
+        let updates = ["userPreFlag": userPreFlag]
+        userRef.updateChildValues(updates) { (error, _) in
+            if let error = error {
+                completion(false)
+            } else {
+                completion(true)
+            }
+        }
+    }
+    
+    func fetchPreFlag() {
+        guard let userId = user?.uid else { return }
+        
+        let userRef = Database.database().reference().child("users").child(userId)
+        userRef.observeSingleEvent(of: .value) { (snapshot) in
+            if let data = snapshot.value as? [String: Any] {
+                self.userPreFlag = data["userPreFlag"] as? Int ?? 0
+                print("self.userPreFlag:\(self.userPreFlag)")
+            }
+        }
+    }
+    
+    func updateContact(userId: String, newContact: String, completion: @escaping (Bool) -> Void) {
+        // contactテーブルの下の指定されたuserIdの参照を取得
+        let contactRef = Database.database().reference().child("contacts").child(userId)
+        
+        // まず現在のcontactの値を読み取る
+        contactRef.observeSingleEvent(of: .value, with: { snapshot in
+            // 既存の問い合わせ内容を保持する変数を準備
+            var contacts: [String] = []
+            
+            // 現在の問い合わせ内容がある場合、それを読み込む
+            if let currentContacts = snapshot.value as? [String] {
+                contacts = currentContacts
+            }
+            
+            // 新しい問い合わせ内容をリストに追加
+            contacts.append(newContact)
+            
+            // データベースを更新する
+            contactRef.setValue(contacts, withCompletionBlock: { error, _ in
+                if let error = error {
+                    print("Error updating contact: \(error)")
+                    completion(false)
+                } else {
+                    completion(true)
+                }
+            })
+        }) { error in
+            print(error.localizedDescription)
+            completion(false)
         }
     }
     
@@ -359,6 +519,74 @@ class AuthManager: ObservableObject {
 //        }
 //    }
     
+    func addRankMatchPoints(for userId: String, points: Int, onSuccess: @escaping () -> Void, onFailure: @escaping (Error?) -> Void) {
+        let userRef = Database.database().reference().child("users").child(userId)
+        userRef.observeSingleEvent(of: .value) { (snapshot) in
+            if let data = snapshot.value as? [String: Any] {
+                // 現在のrankMatchPointとrankを取得、またはデフォルト値として100と1を設定
+                var currentRankMatchPoints = data["rankMatchPoint"] as? Int ?? 100
+                var currentRank = data["rank"] as? Int ?? 1
+                
+                // 100の位が変わるかどうかをチェック
+                let previousHundred = currentRankMatchPoints / 100
+                currentRankMatchPoints += points
+                let newHundred = currentRankMatchPoints / 100
+
+                if newHundred > previousHundred {
+                    // 100の位が増加した場合、rankをインクリメント
+                    currentRank += 1
+                }
+
+                // 更新されたデータでデータベースを更新
+                let updatedData: [String: Any] = ["rankMatchPoint": currentRankMatchPoints, "rank": currentRank]
+                userRef.updateChildValues(updatedData) { (error, ref) in
+                    if let error = error {
+                        onFailure(error)
+                    } else {
+                        onSuccess()
+                    }
+                }
+            } else {
+                onFailure(nil)
+            }
+        }
+    }
+
+    
+    func subtractRankMatchPoints(for userId: String, points: Int, onSuccess: @escaping () -> Void, onFailure: @escaping (Error?) -> Void) {
+        let userRef = Database.database().reference().child("users").child(userId)
+        userRef.observeSingleEvent(of: .value) { (snapshot) in
+            if let data = snapshot.value as? [String: Any] {
+                // 現在のrankMatchPointとrankを取得、またはデフォルト値として100と1を設定
+                var currentRankMatchPoints = data["rankMatchPoint"] as? Int ?? 100
+                var currentRank = data["rank"] as? Int ?? 1
+
+                // 100の位が変わるかどうかをチェック
+                let previousHundred = currentRankMatchPoints / 100
+                currentRankMatchPoints -= points // ポイントを減算
+                let newHundred = currentRankMatchPoints / 100
+
+                if newHundred < previousHundred {
+                    // 100の位が減少した場合、rankをデクリメント（ただし、rankが1より小さくならないようにする）
+                    currentRank = max(currentRank - 1, 1)
+                }
+
+                // 更新されたデータでデータベースを更新
+                let updatedData: [String: Any] = ["rankMatchPoint": currentRankMatchPoints, "rank": currentRank]
+                userRef.updateChildValues(updatedData) { (error, _) in
+                    if let error = error {
+                        onFailure(error)
+                    } else {
+                        onSuccess()
+                    }
+                }
+            } else {
+                onFailure(nil)
+            }
+        }
+    }
+
+    
     func addExperience(points: Int, onSuccess: @escaping () -> Void, onFailure: @escaping (Error?) -> Void) {
         guard let userId = user?.uid else {
             onFailure(nil)
@@ -451,6 +679,36 @@ class AuthManager: ObservableObject {
         }
     }
     
+    func fetchUserRankMatchPoint() {
+        guard let userId = user?.uid else { return }
+        
+        let userRef = Database.database().reference().child("users").child(userId)
+        userRef.observeSingleEvent(of: .value) { (snapshot) in
+            var rankMatchPoint = 100 // デフォルト値を100に設定
+            var rank = 1
+            
+            if let data = snapshot.value as? [String: Any] {
+                // rankMatchPointが存在する場合は取得した値を使用
+                if let existingRankMatchPoint = data["rankMatchPoint"] as? Int,
+                   let existingRank = data["rank"] as? Int{
+                    rankMatchPoint = existingRankMatchPoint
+                    rank = existingRank
+                    self.rankMatchPoint = existingRankMatchPoint
+                    self.rank = existingRank
+                } else {
+                    // rankMatchPointが存在しない場合は、デフォルト値でデータベースを更新
+                    userRef.updateChildValues(["rankMatchPoint": rankMatchPoint,"rank": rank])
+                    self.rankMatchPoint = 100
+                    self.rank = 1
+                }
+            }
+            
+            // rankMatchPointを使用する処理（必要に応じて）
+            print("rankMatchPoint: \(self.rank)")
+        }
+    }
+
+    
     func fetchUserRewardFlag() {
         guard let userId = user?.uid else { return }
         
@@ -468,10 +726,23 @@ class AuthManager: ObservableObject {
         let userRef = Database.database().reference().child("users").child(userId)
         userRef.observeSingleEvent(of: .value) { (snapshot) in
             if let data = snapshot.value as? [String: Any] {
-                print("data:\(data)")
+//                print("data:\(data)")
 //                self.experience = data["experience"] as? Int ?? 0
                 self.userFlag = data["userFlag"] as? Int ?? 0
                 print("self.userFlag:\(self.userFlag)")
+            }
+        }
+    }
+    
+    func fetchUserCsFlag() {
+        guard let userId = user?.uid else { return }
+        
+        let userRef = Database.database().reference().child("users").child(userId)
+        userRef.observeSingleEvent(of: .value) { (snapshot) in
+            if let data = snapshot.value as? [String: Any] {
+//                print("data:\(data)")
+//                self.experience = data["experience"] as? Int ?? 0
+                self.userCsFlag = data["userCsFlag"] as? Int ?? 0
             }
         }
     }
@@ -785,8 +1056,8 @@ class AuthManager: ObservableObject {
                 totalAnswers += totalAnswersForLevel // 合計回答数に加算
             }
 
-            print("totalData:\(totalData)")
-            print("Total Answers for all levels: \(totalAnswers)") // 全レベルの合計回答数を出力
+//            print("totalData:\(totalData)")
+//            print("Total Answers for all levels: \(totalAnswers)") // 全レベルの合計回答数を出力
             completion(totalData, totalAnswers) // コンプリーションハンドラーに合計回答数も渡す
         })
     }

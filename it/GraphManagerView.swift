@@ -34,18 +34,7 @@ struct GraphManagerView: View {
 
     var body: some View {
             VStack{
-                VStack{
-                    HStack{
-                        Spacer()
-                        Text("グラフ")
-                            .font(.system(size: 20))
-                            .foregroundStyle(Color.gray)
-//                            .padding(.top)
-                        Spacer()
-                    }.frame(maxWidth: .infinity)
                     TopTabView(list: list, selectedTab: $selectedTab)
-                }
-                .background(Color.white)
                 TabView(selection: $selectedTab,
                                     content: {
                     
@@ -53,8 +42,8 @@ struct GraphManagerView: View {
         .navigationViewStyle(StackNavigationViewStyle())
                                     .tag(0)
                     
-    PentagonView(authManager: authManager, flag: .constant(false))
-                        .padding(.top)
+//    PentagonView(authManager: authManager, flag: .constant(false))
+                    PentagonManagerView()
                                     .tag(1)
                             })
                             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))

@@ -9,6 +9,9 @@ import SwiftUI
 
 enum QuizLevel {
     case beginner
+    case beginnerStory1
+    case beginnerStory2
+    case beginnerStory3
     case intermediate
     case advanced
     case network
@@ -17,9 +20,24 @@ enum QuizLevel {
     case daily
     case god
     case incorrectAnswer
+    case incorrectITAnswer
+    case incorrectInfoAnswer
+    case incorrectAppliedAnswer
     case timeBeginner
     case timeIntermediate
     case timeAdvanced
+    case itBasic
+    case infoBasic
+    case appliedBasic
+    case itStrategy
+    case infoStrategy
+    case appliedStrategy
+    case itTechnology
+    case infoTechnology
+    case appliedTechnology
+    case itManagement
+    case infoManagement
+    case appliedManagement
     
     var description: String {
         switch self {
@@ -47,6 +65,42 @@ enum QuizLevel {
             return "timeIntermediate"
         case .timeAdvanced:
             return "timeAdvanced"
+        case .beginnerStory1:
+            return "beginnerStory1"
+        case .beginnerStory2:
+            return "beginnerStory2"
+        case .beginnerStory3:
+            return "beginnerStory3"
+        case .itStrategy:
+            return "itStrategy"
+        case .infoStrategy:
+            return "infoStrategy"
+        case .appliedStrategy:
+            return "appliedStrategy"
+        case .itTechnology:
+            return "itTechnology"
+        case .infoTechnology:
+            return "infoTechnology"
+        case .appliedTechnology:
+            return "appliedTechnology"
+        case .itManagement:
+            return "itManagement"
+        case .infoManagement:
+            return "infoManagement"
+        case .appliedManagement:
+            return "appliedManagement"
+        case .incorrectITAnswer:
+            return "incorrectITAnswer"
+        case .incorrectInfoAnswer:
+            return "incorrectInfoAnswer"
+        case .incorrectAppliedAnswer:
+            return "incorrectAppliedAnswer"
+        case .itBasic:
+            return "itBasic"
+        case .infoBasic:
+            return "infoBasic"
+        case .appliedBasic:
+            return "appliedBasic"
         }
     }
 }
@@ -282,17 +336,17 @@ struct PentagonView: View {
             .foregroundColor(Color("fontGray"))
         }.background(Color("Color2"))
         .onAppear {
-            print("currentuser:\(authManager.currentUserId)")
+//            print("currentuser:\(authManager.currentUserId)")
             RateManager.shared.fetchQuizData(userId: authManager.currentUserId!) { data in
                 self.quizData = data
-                print("self.quizData:\(self.quizData)")
+//                print("self.quizData:\(self.quizData)")
             }
             self.flag = true
         }
         .onChange(of: flag) { flag in
             RateManager.shared.fetchQuizData(userId: authManager.currentUserId!) { data in
                 self.quizData = data
-                print("self.quizData:\(self.quizData)")
+//                print("self.quizData:\(self.quizData)")
             }
         }
         .navigationBarBackButtonHidden(true)

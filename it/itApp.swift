@@ -44,13 +44,25 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         print("Oh no! Failed to register for remote notifications with error \(error)")
     }
 
-    func application(_: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+//    func application(_: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+//        var readableToken = ""
+//        for index in 0 ..< deviceToken.count {
+//            readableToken += String(format: "%02.2hhx", deviceToken[index] as CVarArg)
+//        }
+//        print("Received an APNs device token: \(readableToken)")
+//    }
+    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        // APNsデバイストークンを読みやすい形式に変換する処理
         var readableToken = ""
         for index in 0 ..< deviceToken.count {
             readableToken += String(format: "%02.2hhx", deviceToken[index] as CVarArg)
         }
         print("Received an APNs device token: \(readableToken)")
+        
+        // FirebaseにAPNsトークンを設定
+        Messaging.messaging().apnsToken = deviceToken
     }
+
 }
 
 extension AppDelegate: MessagingDelegate {
@@ -87,7 +99,8 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
 struct itApp: App {
     @ObservedObject var authManager: AuthManager
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-
+    @StateObject var appState = AppState()
+    
     init() {
         FirebaseApp.configure()
         authManager = AuthManager.shared
@@ -96,6 +109,16 @@ struct itApp: App {
     var body: some Scene {
         WindowGroup {
             RootView(authManager: authManager)
+                .onAppear{
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                        print("appState.isBannerVisible:\(appState.isBannerVisible)")
+          //              isLoading = false
+                        if appState.isBannerVisible {
+                            AuthManager.shared.updatePreFlag(userId: AuthManager.shared.currentUserId!, userPreFlag: 0){ success in
+                            }
+                        }
+                    }
+                }
 //            RewardView()
 //            GachaView()
 //            Interstitial1()

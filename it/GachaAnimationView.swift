@@ -63,7 +63,7 @@ struct GachaAnimationView: View {
 
         let asset = NSDataAsset(name: videoName)
         print("videoName")
-        print(videoName)
+//        print(videoName)
         let videoUrl = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("\(videoName).mp4")
         try? asset?.data.write(to: videoUrl, options: [.atomic])
         let playerItem = AVPlayerItem(url: videoUrl)

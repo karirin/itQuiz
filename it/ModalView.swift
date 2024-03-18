@@ -20,6 +20,7 @@ struct ModalView: View {
     var pauseTimer: () -> Void
     var resumeTimer: () -> Void
     @Binding var userFlag: Int
+    @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
         ZStack {

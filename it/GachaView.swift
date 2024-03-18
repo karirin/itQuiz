@@ -145,24 +145,50 @@ struct GachaView: View {
     @State private var isGachaButtonDisabled: Bool = false
     @State private var userMoney: Int = 0
     @ObservedObject var audioManager = AudioManager.shared
-    @ObservedObject var reward = Reward()
+//    @ObservedObject var reward = Reward()
+    @StateObject var reward = Reward()
     @State private var showLoginModal: Bool = false
     @State private var otomo10flag: Bool = false
     @State private var otomo20flag: Bool = false
     @State private var otomoallflag: Bool = false
     @State private var isButtonClickable: Bool = false
+    @State private var showCoinModal: Bool = false
+    @State private var showUnCoinModal: Bool = false
+    @State private var showAlert: Bool = false
 //    @State private var isShowingActivityIndicator: Bool = false
 
     var body: some View {
         ZStack{
             VStack{
                 HStack{
+                    Button(action: {
+                        self.presentationMode.wrappedValue.dismiss()
+                        audioManager.playCancelSound()
+                    }) {
+                        Image(systemName: "chevron.left")
+                            .foregroundColor(Color("fontGray"))
+                        Text("戻る")
+                            .foregroundColor(Color("fontGray"))
+                    }
+                    .padding(.leading)
                     Spacer()
                     Image("コイン")
                         .resizable()
                         .frame(width:20,height:20)
-                    Text("+")
-                    Text(" \(userMoney)")
+                        .padding(.top,3)
+                    Text("+").padding(.top,3)
+                    Text(" \(userMoney)").padding(.top,3)
+                    Button(action: {
+                        audioManager.playSound()
+                        self.showCoinModal = true
+                        showUnCoinModal = false
+                    }) {
+                        Image("コイン購入")
+                            .resizable()
+                            .frame(maxWidth:110,maxHeight:40)
+                            .shadow(radius: 3)
+                    }
+                    .padding(.top,3)
                 }
                 .foregroundColor(Color("fontGray"))
                 .padding(.trailing)
@@ -250,22 +276,30 @@ struct GachaView: View {
                         Spacer()
                         Button(action: {
                             reward.ShowReward()
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                self.showLoginModal = true
-                            }
                         }) {
                             Image("獲得")
                                 .resizable()
                                 .frame(maxWidth:110,maxHeight:110)
                         }
-                        .disabled(!isButtonClickable)
+                        .disabled(!reward.rewardLoaded) // rewardLoadedを使用してボタンの活性状態を制御
+                        .onChange(of: reward.rewardEarned) { rewardEarned in
+                            showAlert = rewardEarned
+//                            print("onChange reward.rewardEarned:\(reward.rewardEarned)")
+                        }
+                        .alert(isPresented: $showAlert) {
+                            Alert(
+                                title: Text("報酬獲得！"),
+                                message: Text("300コイン獲得しました。"),
+                                dismissButton: .default(Text("OK"), action: {
+                                    // アラートを閉じるアクション
+                                    showAlert = false // アラートの表示状態を更新
+                                    reward.rewardEarned = false // 必要に応じてrewardEarnedも更新
+                                })
+                            )
+                        }
                         .onAppear() {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { // 1秒後に
-                                                self.isButtonClickable = true // ボタンをクリック可能に設定
-                                            }
                             reward.LoadReward()
                         }
-//                        .disabled(!reward.rewardLoaded)
                         .shadow(radius: 10)
                         Spacer()
                     }
@@ -319,21 +353,25 @@ struct GachaView: View {
                             Spacer()
                             Button(action: {
                                 reward.ShowReward()
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                    self.showLoginModal = true
-                                }
                             }) {
                                 Image("獲得")
                                     .resizable()
-                                    .frame(width: frameSize3().width, height: frameSize3().height)
+                                    .frame(maxWidth:110,maxHeight:110)
                             }
-                            .disabled(!isButtonClickable)
-                                .onAppear() {
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { // 1秒後に
-                                                        self.isButtonClickable = true // ボタンをクリック可能に設定
-                                                    }
+                            .disabled(!reward.rewardLoaded) // rewardLoadedを使用してボタンの活性状態を制御
+                            .onChange(of: reward.rewardEarned) { rewardEarned in
+                                showAlert = rewardEarned
+//                                print("onChange reward.rewardEarned:\(rewardEarned)")
+                            }
+                            .onAppear() {
                                 reward.LoadReward()
                             }
+//                                .onAppear() {
+//                                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { // 1秒後に
+//                                                        self.isButtonClickable = true // ボタンをクリック可能に設定
+//                                                    }
+//                                reward.LoadReward()
+//                            }
                             //                        .disabled(!reward.rewardLoaded)
                             .shadow(radius: 10)
                             Spacer()
@@ -353,6 +391,42 @@ struct GachaView: View {
                     RewardModalView(audioManager: audioManager, isPresented: $showLoginModal)
                 }
             }
+            if showCoinModal {
+                ZStack {
+                    Color.black.opacity(0.7)
+                        .edgesIgnoringSafeArea(.all)
+                    
+                    VStack{
+                        if showUnCoinModal {
+                            VStack{
+                                HStack{
+                                    Image("コインが無い")
+                                        .resizable()
+                                        .frame(width:70,height: 70)
+                                    VStack(alignment: .leading, spacing:15){
+                                        HStack{
+                                            Text("コインが足りません")
+                                            Spacer()
+                                        }
+                                        Text("ご購入することもできます")
+                                            .font(.system(size: isSmallDevice() ? 17 : 18))
+                                    }
+                                    
+                                }.padding()
+                            }.frame(width: isSmallDevice() ? 330: 340, height:120)
+                                .background(Color("Color2"))
+                                .font(.system(size: 20))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 20)
+                                        .stroke(Color.gray, lineWidth: 15)
+                                )
+                                .cornerRadius(20)
+                                .shadow(radius: 10)
+                        }
+                        CoinModalView(audioManager: audioManager, isPresented: $showCoinModal)
+                    }
+                }
+            }
             if otomo10flag {
                 ModalTittleView(showLevelUpModal: $otomo10flag, authManager: authManager, tittleNumber: .constant(01))
             }
@@ -360,9 +434,20 @@ struct GachaView: View {
                 ModalTittleView(showLevelUpModal: $otomo20flag, authManager: authManager, tittleNumber: .constant(02))
             }
         }
+        .alert(isPresented: $showAlert) {
+            Alert(
+                title: Text("報酬獲得！"),
+                message: Text("300コイン獲得しました。"),
+                dismissButton: .default(Text("OK"), action: {
+                    // アラートを閉じるアクション
+                    showAlert = false // アラートの表示状態を更新
+                    reward.rewardEarned = false // 必要に応じてrewardEarnedも更新
+                })
+            )
+        }
         .onAppear {
             authManager.getUserMoney { userMoney in
-                print(userMoney)
+//                print(userMoney)
                 self.userMoney = userMoney
                 // ここで userMoney を使用する
                 if(userMoney < 300){
@@ -378,6 +463,8 @@ struct GachaView: View {
                 // ここで userMoney を使用する
                 if(userMoney < 300){
                     isGachaButtonDisabled = false
+                    showCoinModal = true
+                    showUnCoinModal = true
                 }else{
                     isGachaButtonDisabled = true
                 }
@@ -430,15 +517,15 @@ struct GachaView: View {
 
         .frame(maxWidth: .infinity,maxHeight: .infinity)
         .navigationBarBackButtonHidden(true)
-                .navigationBarItems(leading: Button(action: {
-                    self.presentationMode.wrappedValue.dismiss()
-                    audioManager.playCancelSound()
-                }) {
-                    Image(systemName: "chevron.left")
-                        .foregroundColor(Color("fontGray"))
-                    Text("戻る")
-                        .foregroundColor(Color("fontGray"))
-                })
+//                .navigationBarItems(leading: Button(action: {
+//                    self.presentationMode.wrappedValue.dismiss()
+//                    audioManager.playCancelSound()
+//                }) {
+//                    Image(systemName: "chevron.left")
+//                        .foregroundColor(Color("fontGray"))
+//                    Text("戻る")
+//                        .foregroundColor(Color("fontGray"))
+//                })
         .background(Color("Color2"))
            .onChange(of: animationFinished) { finished in
                if finished {
@@ -453,6 +540,10 @@ struct GachaView: View {
        }
     func isIPad() -> Bool {
         return UIDevice.current.userInterfaceIdiom == .pad
+    }
+    
+    func isSmallDevice() -> Bool {
+        return UIScreen.main.bounds.width < 390
     }
     // フレームサイズを調整する関数
     func frameSize() -> CGSize {

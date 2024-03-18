@@ -203,7 +203,7 @@ struct BarChartView: View {
                 .onAppear {
                     fetchData(userId: authManager.currentUserId!,for: currentDate)
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                        print("data:\(data)")
+//                        print("data:\(data)")
                     }
                 }
             }

@@ -50,12 +50,12 @@ class AppState: ObservableObject {
         Task {
             do {
                 let subscribed = try await self.isSubscribed()
-                print("subscribed:\(subscribed)")
+//                print("subscribed:\(subscribed)")
                 DispatchQueue.main.async {
                     self.isBannerVisible = !subscribed
 //                    self.isBannerVisible = !true
                     print("self.isBannerVisible = !subscribed")
-                    print(self.isBannerVisible)
+//                    print(self.isBannerVisible)
                 }
             } catch {
                 print("サブスクリプションの確認中にエラー: \(error)")
@@ -89,19 +89,19 @@ class AppState: ObservableObject {
     func isSubscribed() async throws -> Bool {
         var subscriptionGroupIds: [String] = []
         print("isSubscribed_1")
-        print("Transaction.currentEntitlements:\(Transaction.currentEntitlements)")
+//        print("Transaction.currentEntitlements:\(Transaction.currentEntitlements)")
         for await result in Transaction.currentEntitlements {
             print("isSubscribed_2")
             let transaction = try self.checkVerified(result)
-            print("transaction:\(transaction)")
+//            print("transaction:\(transaction)")
             guard let groupId = transaction.subscriptionGroupID else { continue }
-            print("groupId:\(groupId)")
+//            print("groupId:\(groupId)")
             subscriptionGroupIds.append(groupId)
         }
 
         for groupId in subscriptionGroupIds {
             let renewalStates = try await getSubscriptionRenewalState(groupID: groupId)
-            print("renewalStates:\(renewalStates)")
+//            print("renewalStates:\(renewalStates)")
             for state in renewalStates {
                 switch state {
                 case .subscribed, .inGracePeriod:
@@ -130,6 +130,8 @@ enum SubscribeError: LocalizedError {
 class SubscriptionViewModel: ObservableObject {
     @Published var products: [Product] = []
     @Published var isPrivilegeEnabled: Bool = false
+    @ObservedObject var authManager = AuthManager.shared
+    @EnvironmentObject var appState: AppState
 
     let productIdList = [
         "IT",
@@ -141,7 +143,7 @@ class SubscriptionViewModel: ObservableObject {
             DispatchQueue.main.async {
                 self.products = products
                 print("self.products")
-                print(self.products)
+//                print(self.products)
             }
         } catch {
             print("Failed to load products: \(error)")
@@ -152,7 +154,7 @@ class SubscriptionViewModel: ObservableObject {
         DispatchQueue.main.async {
             self.isPrivilegeEnabled = true
             print("self.isPrivilegeEnabled")
-            print(self.isPrivilegeEnabled)
+//            print(self.isPrivilegeEnabled)
         }
     }
 
@@ -160,13 +162,15 @@ class SubscriptionViewModel: ObservableObject {
         DispatchQueue.main.async {
             self.isPrivilegeEnabled = false
             print("self.isPrivilegeEnabled")
-            print(self.isPrivilegeEnabled)
+//            print(self.isPrivilegeEnabled)
         }
     }
     
     func purchaseProduct(_ product: Product) async throws {
         do {
             let transaction = try await purchase(product: product)
+            authManager.updatePreFlag(userId: authManager.currentUserId!, userPreFlag: 1){ success in
+            }
             print("購入が完了しました: \(transaction)")
         } catch {
             print("購入中にエラーが発生しました: \(error)")
@@ -295,53 +299,135 @@ func observeTransactionUpdates() {
     }
 }
 
-
 struct SubscriptionView: View {
     @StateObject private var viewModel = SubscriptionViewModel()
-//    @StateObject var appState = AppState()
-    @EnvironmentObject var appState: AppState
-    
+    @StateObject var appState = AppState()
+    @Environment(\.presentationMode) var presentationMode
+    @ObservedObject var audioManager:AudioManager
+
     var body: some View {
-        VStack {
-            List(viewModel.products, id: \.id) { product in
-                    Text("特典内容：広告を非表示にする")
-                    Text("金額：200円")
-                    Text("期間：1ヶ月")
+        ScrollView { // Listの代わりにScrollViewを使用
+            VStack { // VStackで各要素を縦に並べる
                 HStack{
+                    Button(action: {
+                        self.presentationMode.wrappedValue.dismiss()
+                        audioManager.playCancelSound()
+                    }) {
+                        Image(systemName: "chevron.left")
+                            .foregroundColor(Color("fontGray"))
+                        Text("戻る")
+                            .foregroundColor(Color("fontGray"))
+                    }
+                    .padding(.leading)
+                    Spacer()
+                    Text("プレミアムプラン")
+                        .font(.system(size:24))
                     Spacer()
                     Button(action: {
-                        Task {
-                            do {
-                                try await AppStore.sync()
-                                try await viewModel.purchaseProduct(product)
-                                appState.isBannerVisible = false
-                                print("サブスクリプション登録 appState.isBannerVisible = false")
-                                print(appState.isBannerVisible)
-                            } catch {
-                                // ここでエラー処理を行います。
-                                print("購入処理中にエラーが発生しました: \(error)")
-                            }
-                        }
+                        self.presentationMode.wrappedValue.dismiss()
+                        audioManager.playCancelSound()
                     }) {
-                        Text("サブスクリプション登録")
+                        Image(systemName: "chevron.left")
+                            .foregroundColor(Color("fontGray"))
+                        Text("戻る")
+                            .foregroundColor(Color("fontGray"))
+                    }
+                    .padding(.leading)
+                    .opacity(0)
+                }
+                .padding(.top)
+                HStack{
+                    Text("プレミアムプランに加入すると\n下記特典が受けられます")
+                        .font(.system(size:22))
+                    Spacer()
+                }.padding()
+                VStack{
+                    HStack{
+                        Image(systemName: "rectangle.badge.xmark")
+                            .resizable()
+                            .frame(width:40,height:30)
+                            .fontWeight(.bold)
+                    Text("広告が非表示になります")
+                            .font(.system(size: 24))
+                            .fontWeight(.bold)
+                        Spacer()
+                    }
+                }.padding(.leading)
+                    .font(.system(size:16))
+                    .padding(.bottom)
+                Text("※プレミアムプランはいつでも解約できます")
+                        .font(.system(size: 18))
+                        .padding(.bottom)
+//                ForEach(viewModel.products.sorted(by: { $0.displayName == "お試しプラン" && $1.displayName != "お試しプラン" }), id: \.id) { product in
+                ForEach(viewModel.products, id: \.id) { product in
+                    VStack{ // 各商品情報をVStackで囲む
+//                        if product.displayName == "広告非表示" {
+                                Button(action: {
+                                    Task {
+                                        do {
+                                            try await AppStore.sync()
+                                            try await viewModel.purchaseProduct(product)
+                                            appState.isBannerVisible = false
+                                        } catch {
+                                            print("購入処理中にエラーが発生しました: \(error)")
+                                        }
+                                    }
+                                }) {
+//                                    Text("サブスクリプション登録")
+                                    Image("広告非表示ボタン")
+                                        .resizable()
+                                        .frame(width:250,height:80)
+                                }.shadow(radius: 3)
+                                .padding(.bottom)
                     }
                 }
-                Button(action: {
-                    Task {
-                        do {
-//                            try await viewModel.purchaseProduct(product)
-                            try await AppStore.sync()
-                            appState.isBannerVisible = false
-                            print("購入の復元 appState.isBannerVisible = false")
-                            print(appState.isBannerVisible)
-                        } catch {
-                            // ここでエラー処理を行います。
-                            print("購入処理中にエラーが発生しました: \(error)")
+                
+            Button(action: {
+                Task {
+                    do {
+                        try await AppStore.sync()
+                    } catch {
+                        print("購入処理中にエラーが発生しました: \(error)")
+                    }
+                }
+            }) {
+                Text("購入を復元する")
+                    .fontWeight(.semibold)
+                    .frame(height:40)
+                    .padding(3)
+                    .padding(.horizontal)
+                    .foregroundColor(Color.white)
+                    .background(Color.gray)
+                    .cornerRadius(24)
+                    .shadow(radius: 3)
+                    .padding(.top)
+            }
+                HStack{
+                    Text("解約時は")
+                    NavigationLink(destination: WebView(urlString: "https://support.apple.com/ja-jp/HT202039")) {
+                        Text("こちら")
+                            .foregroundStyle(Color.blue)
+                    }
+                    Text("をご参考ください")
+                }.font(.system(size: 18))
+                    .padding(.top)
+                HStack{
+                    Spacer()
+                    NavigationLink(destination: TermsOfServiceView()) {
+                        HStack {
+                            Text("利用規約")
                         }
                     }
-                }) {
-                    Text("購入の復元")
+                    Spacer()
+                    NavigationLink(destination: PrivacyView()) {
+                        HStack {
+                            Text("プライバシーポリシー")
+                        }
+                    }
+                    Spacer()
                 }
+                .padding(.top)
+                .foregroundStyle(Color.blue)
             }
             .onAppear {
                 Task {
@@ -349,12 +435,67 @@ struct SubscriptionView: View {
                 }
             }
         }
+        .foregroundColor(Color("fontGray"))
+        .frame(maxHeight:.infinity)
+        .background(Color("Color2"))
     }
 }
+
+//struct SubscriptionView: View {
+//    @StateObject private var viewModel = SubscriptionViewModel()
+////    @StateObject var appState = AppState()
+//    @EnvironmentObject var appState: AppState
+//    
+//    var body: some View {
+//        VStack {
+//            List(viewModel.products, id: \.id) { product in
+//                    Text("特典内容：広告を非表示にする")
+//                    Text("金額：200円")
+//                    Text("期間：1ヶ月")
+//                HStack{
+//                    Spacer()
+//                    Button(action: {
+//                        Task {
+//                            do {
+//                                try await AppStore.sync()
+//                                try await viewModel.purchaseProduct(product)
+////                                appState.isBannerVisible = false
+//                                appState.isBannerVisible = false
+//                            } catch {
+//                                // ここでエラー処理を行います。
+//                                print("購入処理中にエラーが発生しました: \(error)")
+//                            }
+//                        }
+//                    }) {
+//                        Text("サブスクリプション登録")
+//                    }
+//                }
+//                Button(action: {
+//                    Task {
+//                        do {
+////                            try await viewModel.purchaseProduct(product)
+//                            try await AppStore.sync()
+//                        } catch {
+//                            // ここでエラー処理を行います。
+//                            print("購入処理中にエラーが発生しました: \(error)")
+//                        }
+//                    }
+//                }) {
+//                    Text("購入の復元")
+//                }
+//            }
+//            .onAppear {
+//                Task {
+//                    await viewModel.loadProducts()
+//                }
+//            }
+//        }
+//    }
+//}
 
 
 struct SubscriptionView_Previews: PreviewProvider {
     static var previews: some View {
-        SubscriptionView()
+        SubscriptionView(audioManager: AudioManager())
     }
 }

@@ -31,6 +31,7 @@ struct QuizResultView: View {
     @ObservedObject var authManager: AuthManager
     @ObservedObject var audioManager = AudioManager.shared
     // QuizResultView.swift
+    let quizLevel: QuizLevel
     @State private var playerExperience: Int
     @State private var playerMoney: Int
     @State private var isContentView: Bool = false
@@ -38,12 +39,14 @@ struct QuizResultView: View {
     @State var results: [QuizResult]
     @State private var isShow: Bool = true
     @State private var flag: Bool = false
+    @State private var showSubFlag: Bool = false
     @State private var level3flag: Bool = false
     @State private var level5flag: Bool = false
     @State private var level10flag: Bool = false
     @State private var answer30flag: Bool = false
     @State private var answer50flag: Bool = false
     @State private var answer100flag: Bool = false
+    @State private var userPreFlag: Int = 0
 //    @Int var elapsedTime = 1
     @Binding var isPresenting: Bool
     @Binding var navigateToQuizResultView: Bool
@@ -55,7 +58,7 @@ struct QuizResultView: View {
     private let adViewControllerRepresentable = AdViewControllerRepresentable()
 
     // QuizResultView.swift
-    init(results: [QuizResult], authManager: AuthManager, isPresenting: Binding<Bool>, navigateToQuizResultView: Binding<Bool>, playerExperience: Int, playerMoney: Int, elapsedTime: TimeInterval) {
+    init(results: [QuizResult], authManager: AuthManager, isPresenting: Binding<Bool>, navigateToQuizResultView: Binding<Bool>, playerExperience: Int, playerMoney: Int, elapsedTime: TimeInterval, quizLevel: QuizLevel) {
         _results = State(initialValue: results)
         self.authManager = authManager
         _isPresenting = isPresenting
@@ -63,50 +66,32 @@ struct QuizResultView: View {
         _playerExperience = State(initialValue: playerExperience)
         _playerMoney = State(initialValue: playerMoney)
         self.elapsedTime = elapsedTime
-        print("self.elapsedTime init:\(self.elapsedTime)")
+        self.quizLevel = quizLevel
+//        print("self.elapsedTime init:\(self.elapsedTime)")
     }
     
     var body: some View {
         ZStack {
         NavigationView{
                 VStack{
-//                    Spacer()
-//                    HStack{
-////                        NavigationLink(destination: ContentView(isPresentingQuizBeginnerList: .constant(false), isPresentingAvatarList: .constant(false)).navigationBarBackButtonHidden(true)) {
-////                        NavigationLink(destination: ContentView().navigationBarBackButtonHidden(true)) {
-//                            Button(action: {
-//                                audioManager.playCancelSound()
-//                                self.isPresenting = false
-////                                isContentView = true
-////                                self.rootPresentationMode.wrappedValue.dismissToRoot()
-//                                // ここで画面遷移を行います。
-//                            }) {
-//                                HStack {
-//                                    Image(systemName: "chevron.left")
-//                                        .foregroundColor(.gray)
-//                                    Text("戻る")
-//                                        .background(Color.white)
-//                                        .foregroundColor(.gray)
-//                                }
-//                                .foregroundColor(Color("fontGray"))
-//                            }
-////                        }
-//                        .padding(.leading)
-//                        Spacer()
-//                        Text("クイズ結果")
-//                        Spacer()
-//                        HStack{
-//                            Image(systemName: "chevron.left")
-//                                .foregroundColor(.gray)
-//                            Text("戻る")
-//                                .background(Color.white)
-//                                .foregroundColor(.gray)
-//                        }
-//                        .padding(.trailing)
-//                        .opacity(0)
-//                    }
-//                    .foregroundColor(Color("fontGray"))
-//                    Spacer()
+                    VStack{
+                        HStack{
+                            Spacer()
+                            Button(action: {
+                                showSubFlag = true
+                                audioManager.playSound()
+                            }) {
+                                Image("プレミアムプランボタン")
+                                    .resizable()
+                                    .frame(width:250,height:80)
+                            }
+                            .shadow(radius: 3)
+                            .fullScreenCover(isPresented: $showSubFlag) {
+                                SubscriptionView(audioManager: audioManager)
+                            }
+                            Spacer()
+                        }.padding(5)
+                                                }
                         if elapsedTime != 0 {
 //                            Spacer()
                             Spacer()
@@ -194,8 +179,8 @@ struct QuizResultView: View {
                                     }
                                     .font(.system(size:24))
                                     Text(result.question)
-//                                    Text("あなたの回答: \(result.userAnswer)")
-                                    Text("あなたの回答")
+                                    Text("あなたの回答: \(result.userAnswer)")
+//                                    Text("あなたの回答")
                                     Text("正解: \(result.correctAnswer)")
                                     Text("解説: \(result.explanation)")
                                 }.padding()
@@ -212,12 +197,6 @@ struct QuizResultView: View {
                     }
 //                    Spacer()
                 }
-                .background {
-                        // Add the adViewControllerRepresentable to the background so it
-                        // doesn't influence the placement of other views in the view hierarchy.
-                        adViewControllerRepresentable
-                          .frame(width: .zero, height: .zero)
-                      }
                 .onChange(of: authManager.didLevelUp) { newValue in
                     if newValue {
                         // レベルアップ通知を表示した後、フラグをリセット
@@ -227,36 +206,58 @@ struct QuizResultView: View {
                         }
                     }
                 }
-//                .onChange(of: elapsedTime) { newValue in
-//                    print("onChange")
-//                    print(elapsedTime)
-//                    if elapsedTime != 0 {
-//                        authManager.saveElapsedTime(category: "Beginner", elapsedTime: elapsedTime) { success in
-//                            if success {
-//                                print("経過時間を保存しました。")
-//                            } else {
-//                                print("経過時間の保存に失敗しました。")
-//                            }
-//                        }
-//                    }
-//                }
-//                .onChange(of: interstitial.interstitialAdLoaded) { isLoaded in
-//                    print("onChange isLoaded:\(isLoaded)")
-//                    print("onChange interstitial.wasAdDismissed:\(interstitial.wasAdDismissed)")
-//                      if isLoaded && !interstitial.wasAdDismissed {
-//                          interstitial.presentInterstitial()
-//                      }
-//                  }
                 .onAppear {
-//                    interstitial.loadInterstitial()
-                    if interstitial.interstitialAdLoaded {
-                        if let rootViewController = UIApplication.shared.windows.first?.rootViewController {
-                            interstitial.presentInterstitial(from: rootViewController)
+                    authManager.fetchPreFlag()
+                    authManager.fetchUserStory()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                        userPreFlag = authManager.userPreFlag
+//                        print("authManager.story:\(authManager.story)")
+                        if authManager.story == 2 {
+//                            print("quizLevel:\(quizLevel)")
+                            if quizLevel == .beginnerStory1 && playerExperience != 5 {
+                                authManager.updateStory(story: 3) { success in
+                                    if success {
+                                        print("ストーリーが正常に更新されました。")
+                                    } else {
+                                        print("ストーリーの更新に失敗しました。")
+                                    }
+                                }
+                            }
                         }
-                    } else {
-                        print("広告はまだロードされていません。")
+                        if authManager.story == 3 {
+                            if quizLevel == .beginnerStory2 && playerExperience != 5 {
+                                authManager.updateStory(story: 4) { success in
+                                    if success {
+                                        print("ストーリーが正常に更新されました。")
+                                    } else {
+                                        print("ストーリーの更新に失敗しました。")
+                                    }
+                                }
+                            }
+                        }
+                        if authManager.story == 4 {
+                            if quizLevel == .beginnerStory3 && playerExperience != 5 {
+                                authManager.updateStory(story: 5) { success in
+                                    if success {
+                                        print("ストーリーが正常に更新されました。")
+                                    } else {
+                                        print("ストーリーの更新に失敗しました。")
+                                    }
+                                }
+                            }
+                        }
                     }
-                    print("onAppear")
+                    
+//                    interstitial.loadInterstitial()
+                        if !interstitial.interstitialAdLoaded {
+                            interstitial.loadInterstitial(completion: { isLoaded in
+                                if isLoaded {
+                                    self.interstitial.presentInterstitial(from: adViewControllerRepresentable.viewController)
+                                }
+                            })
+                        } else if !interstitial.wasAdDismissed {
+                            interstitial.presentInterstitial(from: adViewControllerRepresentable.viewController)
+                        }
 //                    interstitial.presentInterstitial(from: adViewControllerRepresentable.viewController)
                     authManager.fetchUserExperienceAndLevel()
                       DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -312,29 +313,18 @@ struct QuizResultView: View {
                           }
                           }
                       }
-                    print("onAppear !interstitial.interstitialAdLoaded:\(!interstitial.interstitialAdLoaded)")
-                    print("onAppear !interstitial.wasAdDismissed:\(!interstitial.wasAdDismissed)")
-//                    if !interstitial.interstitialAdLoaded {
-//                        interstitial.loadInterstitial()
-//                    } else if !interstitial.wasAdDismissed {
-//                        interstitial.presentInterstitial()
-//                    }
-//                    interstitial.loadInterstitial(completion: { isLoaded in
-//                                            self.interstitial.presentInterstitial()
-//                                        })
-//                    if elapsedTime != 0 {
-//                        authManager.saveElapsedTime(category: "Beginner", elapsedTime: elapsedTime) { success in
-//                            if success {
-//                                print("経過時間を保存しました。＠＠＠＠＠＠＠＠＠＠")
-//                            } else {
-//                                print("経過時間の保存に失敗しました。＠＠＠＠＠＠＠＠＠＠")
-//                            }
-//                        }
-//                    }
+//                    print("onAppear !interstitial.interstitialAdLoaded:\(!interstitial.interstitialAdLoaded)")
+//                    print("onAppear !interstitial.wasAdDismissed:\(!interstitial.wasAdDismissed)")
                 }
 
                 if showMemoView {
                     MemoView(memo: $currentMemo, question: selectedQuestion)
+                }
+            }
+            .background {
+                if userPreFlag != 1 {
+                    adViewControllerRepresentable
+                        .frame(width: .zero, height: .zero)
                 }
             }
             .background(Color("Color2"))
@@ -446,8 +436,8 @@ struct ExperienceModalView: View {
             .onAppear {
                 authManager.fetchUserFlag()
                 withAnimation {
-                    currentExperience += Double(addedExperience) * Double(authManager.rewardFlag)
-                    currentMoney += Double(addedMoney) * Double(authManager.rewardFlag)
+                    currentExperience = Double(addedExperience) * Double(authManager.rewardFlag)
+                    currentMoney = Double(addedMoney) * Double(authManager.rewardFlag)
                 }
                 if currentExperience != 5 {
                     audioManager.playGameClearSound()
@@ -572,6 +562,6 @@ struct QuizResultView_Previews: PreviewProvider {
         let authManager = AuthManager() // 適切なダミーまたはモックオブジェクトで置き換えてください
 
         // プレビュー用にビューを初期化
-        QuizResultView(results: dummyResults, authManager: authManager, isPresenting: $isPresenting, navigateToQuizResultView: $navigateToQuizResultView, playerExperience: 10, playerMoney: 10, elapsedTime: 0)
+        QuizResultView(results: dummyResults, authManager: authManager, isPresenting: $isPresenting, navigateToQuizResultView: $navigateToQuizResultView, playerExperience: 10, playerMoney: 10, elapsedTime: 0, quizLevel: .beginner)
     }
 }
