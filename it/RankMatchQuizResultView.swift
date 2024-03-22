@@ -34,7 +34,7 @@ struct RankMatchQuizResultView: View {
     let quizLevel: QuizLevel
     @State private var playerExperience: Int
     @State private var playerMoney: Int
-    @State private var rankMatchPoint: Int
+//    @State private var rankMatchPoint: Int
     @State private var isContentView: Bool = false
     var elapsedTime: TimeInterval
     @State var results: [QuizResult]
@@ -47,9 +47,12 @@ struct RankMatchQuizResultView: View {
     @State private var answer30flag: Bool = false
     @State private var answer50flag: Bool = false
     @State private var answer100flag: Bool = false
+    @State private var rankUpFlag: Bool = false
+    @State private var rankDownFlag: Bool = false
     @State private var userPreFlag: Int = 0
 //    @Int var elapsedTime = 1
     @Binding var isPresenting: Bool
+
     @Binding var navigateToQuizResultView: Bool
 //    @Environment(\.rootPresentationMode) private var rootPresentationMode: Binding<RootPresentationMode>
     @State private var isHidden = false
@@ -57,18 +60,20 @@ struct RankMatchQuizResultView: View {
 //    @StateObject var interstitial = Interstitial()
     @Environment(\.presentationMode) var presentationMode
     private let adViewControllerRepresentable = AdViewControllerRepresentable()
-
+    @Binding var victoryFlag : Bool
+//    @Binding private var victoryFlag: Bool
     // QuizResultView.swift
-    init(results: [QuizResult], authManager: AuthManager, isPresenting: Binding<Bool>, navigateToQuizResultView: Binding<Bool>, playerExperience: Int, playerMoney: Int, rankMatchPoint: Int, elapsedTime: TimeInterval, quizLevel: QuizLevel) {
+    init(results: [QuizResult], authManager: AuthManager, isPresenting: Binding<Bool>, navigateToQuizResultView: Binding<Bool>, playerExperience: Int, playerMoney: Int, elapsedTime: TimeInterval, quizLevel: QuizLevel, victoryFlag: Binding<Bool>) {
         _results = State(initialValue: results)
         self.authManager = authManager
         _isPresenting = isPresenting
         _navigateToQuizResultView = navigateToQuizResultView
         _playerExperience = State(initialValue: playerExperience)
         _playerMoney = State(initialValue: playerMoney)
-        _rankMatchPoint = State(initialValue: rankMatchPoint)
+//        _rankMatchPoint = State(initialValue: rankMatchPoint)
         self.elapsedTime = elapsedTime
         self.quizLevel = quizLevel
+        _victoryFlag = victoryFlag
 //        print("self.elapsedTime init:\(self.elapsedTime)")
     }
     
@@ -208,6 +213,24 @@ struct RankMatchQuizResultView: View {
                         }
                     }
                 }
+                .onChange(of: authManager.rankUp) { newValue in
+                    if newValue {
+                        // レベルアップ通知を表示した後、フラグをリセット
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                            rankUpFlag = true
+                            audioManager.playLevelUpSound()
+                        }
+                    }
+                }
+                .onChange(of: authManager.rankDown) { newValue in
+                    if newValue {
+                        // レベルアップ通知を表示した後、フラグをリセット
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                            rankDownFlag = true
+                            audioManager.playLevelUpSound()
+                        }
+                    }
+                }
                 .onAppear {
                     authManager.fetchPreFlag()
                     authManager.fetchUserStory()
@@ -313,7 +336,7 @@ struct RankMatchQuizResultView: View {
                     }
                 }
             if showModal {
-                RankMatchQuizExperienceModalView(showModal: $showModal, addedExperience: playerExperience, addedMoney: playerMoney, addedRankMatchPoint: rankMatchPoint, authManager: authManager)
+                RankMatchQuizExperienceModalView(showModal: $showModal, victoryFlag: $victoryFlag, addedExperience: playerExperience, addedMoney: playerMoney, addedRankMatchPoint: 10, authManager: authManager)
             }
             if showLevelUpModal {
                 LevelUpModalView(showLevelUpModal: $showLevelUpModal, authManager: authManager)
@@ -336,6 +359,12 @@ struct RankMatchQuizResultView: View {
             if level10flag {
                 ModalTittleView(showLevelUpModal: $level10flag, authManager: authManager, tittleNumber: .constant(10))
             }
+            if rankUpFlag {
+                RankUpModalView(showLevelUpModal: $rankUpFlag, authManager: authManager)
+            }
+            if rankDownFlag {
+                RankDownModalView(showLevelUpModal: $rankDownFlag, authManager: authManager)
+            }
             NavigationLink("", destination: ContentView().navigationBarBackButtonHidden(true), isActive: $isContentView)
         }
     }
@@ -352,6 +381,7 @@ struct RankMatchQuizResultView: View {
 
 struct RankMatchQuizExperienceModalView: View {
     @Binding var showModal: Bool
+    @Binding var victoryFlag: Bool
     var addedExperience: Int
     var addedMoney: Int
     var addedRankMatchPoint: Int
@@ -361,6 +391,7 @@ struct RankMatchQuizExperienceModalView: View {
     let maxExperience: Double = 100
     @ObservedObject var authManager: AuthManager
     @ObservedObject var audioManager = AudioManager.shared
+    @StateObject var viewModel = RankingViewModel()
 
     var body: some View {
         ZStack {
@@ -372,19 +403,52 @@ struct RankMatchQuizExperienceModalView: View {
                 }
             VStack{
                 VStack(spacing: 20) {
-                    if currentExperience != 5{
+                    if victoryFlag == true{
                         Text("クリア！！")
                             .font(.largeTitle)
+                        
+                            
+                        let rankMatchPoint = authManager.rankMatchPoint // 現在のランクマッチポイント
+                        let tensPlace = (rankMatchPoint / 10) % 10 // 10の位を取り出す
+
+                        // 10の位だけを持つ数値に変換
+                        let adjustedRankMatchPoint = Double(tensPlace * 10)
+
+                        // adjustedRankMatchPointを使用してプログレスバーの値を設定
+                        rankMatchProgressBar(value: adjustedRankMatchPoint, maxValue: 100)
+                        let nextRankPointsNeeded = (authManager.rank + 1) * 100
+                        let pointsToNextRank = nextRankPointsNeeded - authManager.rankMatchPoint
+                            Text("次のランクまで\(pointsToNextRank)ポイント")
+                        HStack{
+                            Image("ランクマッチマーク")
+                                .resizable()
+                                .frame(width:30,height:30)
+                            Text("ランクマッチポイント ＋ 10")
+    //                            .font(.title)
+                        }
                     }else{
                         Text("ゲームオーバー")
                             .font(.largeTitle)
-                    }
-                    HStack{
-                        Image("ランクマッチマーク")
-                            .resizable()
-                            .frame(width:30,height:30)
-                        Text("ランクマッチポイント ＋\(Int(currentRankMatchPoint))")
-//                            .font(.title)
+                        
+                            
+                        let rankMatchPoint = authManager.rankMatchPoint // 現在のランクマッチポイント
+                        let tensPlace = (rankMatchPoint / 10) % 10 // 10の位を取り出す
+
+                        // 10の位だけを持つ数値に変換
+                        let adjustedRankMatchPoint = Double(tensPlace * 10)
+
+                        // adjustedRankMatchPointを使用してプログレスバーの値を設定
+                        rankMatchProgressBar(value: adjustedRankMatchPoint, maxValue: 100)
+                        let nextRankPointsNeeded = (authManager.rank + 1) * 100
+                        let pointsToNextRank = nextRankPointsNeeded - authManager.rankMatchPoint
+                            Text("次のランクまで\(pointsToNextRank)ポイント")
+                        HStack{
+                            Image("ランクマッチマーク")
+                                .resizable()
+                                .frame(width:30,height:30)
+                            Text("ランクマッチポイント - 10")
+    //                            .font(.title)
+                        }
                     }
                     
 //                    HStack{
@@ -403,9 +467,11 @@ struct RankMatchQuizExperienceModalView: View {
             }
             .foregroundColor(Color("fontGray"))
             .onAppear {
+                viewModel.rankMatchFetchUsers()
+                authManager.fetchUserRankMatchPoint()
                 authManager.fetchUserFlag()
                 withAnimation {
-                    currentRankMatchPoint = Double(addedRankMatchPoint)
+                    currentRankMatchPoint = 10
                 }
                 if currentRankMatchPoint != 0 {
                     audioManager.playGameClearSound()
@@ -435,8 +501,156 @@ struct RankMatchQuizExperienceModalView: View {
                     .cornerRadius(30)
                     .padding()
             }
-            .offset(x: 150, y: -130)
+            .offset(x: 150, y: -100)
         )
+    }
+}
+
+struct RankUpModalView: View {
+    @Binding var showLevelUpModal: Bool
+    @ObservedObject var authManager: AuthManager
+    @ObservedObject var audioManager = AudioManager.shared
+    @StateObject var viewModel = RankingViewModel()
+
+    var body: some View {
+        ZStack {
+            // 半透明の背景
+            Color.black.opacity(0.4)
+                .edgesIgnoringSafeArea(.all)
+                .onTapGesture {
+                    showLevelUpModal = false
+                }
+
+            VStack(spacing: 0) {
+                Text("ランクアップしました！")
+                    .font(.system(size: 20))
+                Image(getRankImageName(rank: authManager.rank))
+                    .resizable()
+                    .frame(width:200,height:200)
+                Text("\(getRankImageName(rank: authManager.rank))にランクアップしました！")
+                    .font(.system(size: 18))
+            }
+            .padding()
+            .background(Color.white)
+            .cornerRadius(20)
+            .shadow(radius: 10)
+            .padding()
+        }
+        .onAppear{
+                viewModel.rankMatchFetchUsers()
+                authManager.fetchUserRankMatchPoint()
+//            authManager.fetchUserInfo { (name, avatar, money, hp, attack, tutorialNum) in
+//                self.userName = name ?? ""
+//                self.avatar = avatar ?? [[String: Any]]()
+//            }
+        }
+        .overlay(
+            // 「×」ボタンを右上に配置
+            Button(action: {
+                showLevelUpModal = false
+                audioManager.playCancelSound()
+            }) {
+                Image(systemName: "xmark.circle.fill")
+                    .resizable()
+                    .frame(width: 50, height: 50)
+                    .foregroundColor(.black)
+                    .background(.white)
+                    .cornerRadius(50)
+                    .padding()
+            }
+            .offset(x: 130, y: -140)
+        )
+        .onAppear{
+            authManager.fetchUserExperienceAndLevel()
+        }
+    }
+    func getRankImageName(rank: Int) -> String {
+        switch rank {
+        case 1:
+            return "ブロンズ"
+        case 2:
+            return "シルバー"
+        case 3:
+            return "ゴールド"
+        case 4:
+            return "マスター"
+        default:
+            return "ブロンズ" // ランクが1-4以外の場合のデフォルト画像
+        }
+    }
+}
+
+struct RankDownModalView: View {
+    @Binding var showLevelUpModal: Bool
+    @ObservedObject var authManager: AuthManager
+    @ObservedObject var audioManager = AudioManager.shared
+    @StateObject var viewModel = RankingViewModel()
+
+    var body: some View {
+        ZStack {
+            // 半透明の背景
+            Color.black.opacity(0.4)
+                .edgesIgnoringSafeArea(.all)
+                .onTapGesture {
+                    showLevelUpModal = false
+                }
+
+            VStack(spacing: 0) {
+                Text("ランクダウンしました")
+                    .font(.system(size: 20))
+                Image(getRankImageName(rank: authManager.rank))
+                    .resizable()
+                    .frame(width:200,height:200)
+                Text("\(getRankImageName(rank: authManager.rank))にランクダウンしました")
+                    .font(.system(size: 18))
+            }
+            .padding()
+            .background(Color.white)
+            .cornerRadius(20)
+            .shadow(radius: 10)
+            .padding()
+        }
+        .onAppear{
+                viewModel.rankMatchFetchUsers()
+                authManager.fetchUserRankMatchPoint()
+//            authManager.fetchUserInfo { (name, avatar, money, hp, attack, tutorialNum) in
+//                self.userName = name ?? ""
+//                self.avatar = avatar ?? [[String: Any]]()
+//            }
+        }
+        .overlay(
+            // 「×」ボタンを右上に配置
+            Button(action: {
+                showLevelUpModal = false
+                audioManager.playCancelSound()
+            }) {
+                Image(systemName: "xmark.circle.fill")
+                    .resizable()
+                    .frame(width: 50, height: 50)
+                    .foregroundColor(.black)
+                    .background(.white)
+                    .cornerRadius(50)
+                    .padding()
+            }
+            .offset(x: 130, y: -140)
+        )
+        .onAppear{
+            authManager.fetchUserExperienceAndLevel()
+        }
+    }
+    func getRankImageName(rank: Int) -> String {
+        switch rank {
+        case 1:
+            return "ブロンズ"
+        case 2:
+            return "シルバー"
+        case 3:
+            return "ゴールド"
+        case 4:
+            return "マスター"
+        default:
+            return "ブロンズ" // ランクが1-4以外の場合のデフォルト画像
+        }
     }
 }
 
@@ -527,6 +741,6 @@ struct RankMatchQuizResultView_Previews: PreviewProvider {
         let authManager = AuthManager() // 適切なダミーまたはモックオブジェクトで置き換えてください
 
         // プレビュー用にビューを初期化
-        RankMatchQuizResultView(results: dummyResults, authManager: authManager, isPresenting: $isPresenting, navigateToQuizResultView: $navigateToQuizResultView, playerExperience: 10, playerMoney: 10, rankMatchPoint: 10, elapsedTime: 0, quizLevel: .beginner)
+        RankMatchQuizResultView(results: dummyResults, authManager: authManager, isPresenting: $isPresenting, navigateToQuizResultView: $navigateToQuizResultView, playerExperience: 10, playerMoney: 10, elapsedTime: 0, quizLevel: .beginner, victoryFlag: .constant(true))
     }
 }

@@ -52,7 +52,6 @@ struct ModalReturnView: View {
                             .disabled(!isButtonActive)
                         }
                         }
-                        NavigationLink("", destination: QuizManagerView(isPresenting: .constant(false)).navigationBarBackButtonHidden(true), isActive: $isContentView)
                         
                     }
                     .padding(20)

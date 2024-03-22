@@ -129,8 +129,10 @@ struct ModalExplanationView: View {
                             Spacer()
                         }
                         HStack {
-                            Text("\(explanation)")
-                                .foregroundColor(Color("fontGray"))
+                            ScrollView{
+                                Text("\(explanation)")
+                                    .foregroundColor(Color("fontGray"))
+                            }
                             Spacer()
                         }
                         

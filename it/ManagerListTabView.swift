@@ -37,6 +37,7 @@ struct ManagerListTabView: View {
     @ObservedObject var reward = Reward()
     @State private var showLoginModal: Bool = false
     @State private var isButtonClickable: Bool = false
+    @State private var showAlert: Bool = false
     
     init() {
 //        _isPresenting = isPresenting
@@ -200,58 +201,58 @@ struct ManagerListTabView: View {
 //                                            QuizGodList(isPresenting: $isPresentingQuizGod)
 //                                        }
                             // ネットワーク系の問題
-                            Button(action: {
-                                audioManager.playKetteiSound()
-                                self.isPresentingQuizNetwork = true
-                            }) {
-                                //                    Image("ネットワーク系の問題")
-                                Image("選択肢4")
-                                    .resizable()
-                                    .frame(height: isIPad() ? 200 : 70)
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding(.horizontal)
-                            .padding(.bottom)
-                            .shadow(radius: 1)
-                            .fullScreenCover(isPresented: $isPresentingQuizNetwork) {
-                                            QuizNetworkList(isPresenting: $isPresentingQuizNetwork)
-                                        }
+//                            Button(action: {
+//                                audioManager.playKetteiSound()
+//                                self.isPresentingQuizNetwork = true
+//                            }) {
+//                                //                    Image("ネットワーク系の問題")
+//                                Image("選択肢4")
+//                                    .resizable()
+//                                    .frame(height: isIPad() ? 200 : 70)
+//                            }
+//                            .frame(maxWidth: .infinity)
+//                            .padding(.horizontal)
+//                            .padding(.bottom)
+//                            .shadow(radius: 1)
+//                            .fullScreenCover(isPresented: $isPresentingQuizNetwork) {
+//                                            QuizNetworkList(isPresenting: $isPresentingQuizNetwork)
+//                                        }
                             
                             // セキュリティ系の問題
-                            Button(action: {
-                                audioManager.playKetteiSound()
-                                self.isPresentingQuizSecurity = true
-                            }) {
-                                //                    Image("セキュリティ系の問題")
-                                Image("選択肢5")
-                                    .resizable()
-                                    .frame(height: isIPad() ? 200 : 70)
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding(.horizontal)
-                            .padding(.bottom)
-                            .shadow(radius: 3)
-                            .fullScreenCover(isPresented: $isPresentingQuizSecurity) {
-                                            QuizSecurityList(isPresenting: $isPresentingQuizSecurity)
-                                        }
+//                            Button(action: {
+//                                audioManager.playKetteiSound()
+//                                self.isPresentingQuizSecurity = true
+//                            }) {
+//                                //                    Image("セキュリティ系の問題")
+//                                Image("選択肢5")
+//                                    .resizable()
+//                                    .frame(height: isIPad() ? 200 : 70)
+//                            }
+//                            .frame(maxWidth: .infinity)
+//                            .padding(.horizontal)
+//                            .padding(.bottom)
+//                            .shadow(radius: 3)
+//                            .fullScreenCover(isPresented: $isPresentingQuizSecurity) {
+//                                            QuizSecurityList(isPresenting: $isPresentingQuizSecurity)
+//                                        }
                             
                             // データベース系の問題
-                            Button(action: {
-                                audioManager.playKetteiSound()
-                                self.isPresentingQuizDatabase = true
-                            }) {
-                                //                    Image("データベース系の問題")
-                                Image("選択肢6")
-                                    .resizable()
-                                    .frame(height: isIPad() ? 200 : 70)
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding(.horizontal)
-                            .padding(.bottom,120)
-                            .shadow(radius: 3)
-                            .fullScreenCover(isPresented: $isPresentingQuizDatabase) {
-                                            QuizDatabaseList(isPresenting: $isPresentingQuizDatabase)
-                                        }
+//                            Button(action: {
+//                                audioManager.playKetteiSound()
+//                                self.isPresentingQuizDatabase = true
+//                            }) {
+//                                //                    Image("データベース系の問題")
+//                                Image("選択肢6")
+//                                    .resizable()
+//                                    .frame(height: isIPad() ? 200 : 70)
+//                            }
+//                            .frame(maxWidth: .infinity)
+//                            .padding(.horizontal)
+//                            .padding(.bottom,120)
+//                            .shadow(radius: 3)
+//                            .fullScreenCover(isPresented: $isPresentingQuizDatabase) {
+//                                            QuizDatabaseList(isPresenting: $isPresentingQuizDatabase)
+//                                        }
                             
                         }
                         NavigationLink("", destination: ITManagerListView(isPresenting: $isPresentingITView).navigationBarBackButtonHidden(true), isActive: $isPresentingITView)
@@ -267,16 +268,34 @@ struct ManagerListTabView: View {
                                     Spacer()
                                     HStack {
                                         Button(action: {
-//                                                self.showAnotherView_post = true
-                                            reward.ExAndMoReward()
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                                self.showLoginModal = true
-                                            }
-                                        }, label: {
-                                            Image("倍ボタン")
-                                                .resizable()
-                                                .frame(width: 110, height: 110)
-                                        })
+                                           reward.ExAndMoReward()
+                                       }, label: {
+                                           if reward.rewardLoaded{
+                                               Image("倍ボタン")
+                                                   .resizable()
+                                                   .frame(width: 110, height: 110)
+                                           }else{
+                                               Image("倍ボタン白黒")
+                                                   .resizable()
+                                                   .frame(width: 110, height: 110)
+                                           }
+                                       })
+                                           .shadow(radius: 5)
+                                           .disabled(!reward.rewardLoaded)
+                                           .onChange(of: reward.rewardEarned) { rewardEarned in
+                                               showAlert = rewardEarned
+                                               print("onchange reward.rewardEarned:\(showAlert)")
+                                           }
+                                           .alert(isPresented: $showAlert) {
+                                               Alert(
+                                                   title: Text("報酬獲得！"),
+                                                   message: Text("1時間だけ獲得した経験値とコインが2倍"),
+                                                   dismissButton: .default(Text("OK"), action: {
+                                                       showAlert = false
+                                                       reward.rewardEarned = false
+                                                   })
+                                               )
+                                           }
                                             .shadow(radius: 5)
                                             .disabled(!isButtonClickable)
                                             .background(GeometryReader { geometry in

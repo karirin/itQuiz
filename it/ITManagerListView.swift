@@ -35,6 +35,7 @@ struct ITManagerListView: View {
     @ObservedObject var reward = Reward()
     @State private var showLoginModal: Bool = false
     @State private var isButtonClickable: Bool = false
+    @State private var showAlert: Bool = false
     
     init(isPresenting: Binding<Bool>) {
         _isPresenting = isPresenting
@@ -140,14 +141,16 @@ struct ITManagerListView: View {
                                 }
                                 .frame(maxWidth: .infinity)
                                 .padding(.horizontal)
+                            
+                            .background(GeometryReader { geometry in
+                                Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
+                            })
                                 .padding(.bottom)
                                 .shadow(radius: 3)
                                 .fullScreenCover(isPresented: $isPresentingQuizBeginner) {
                                                 QuizITBasicList(isPresenting: $isPresentingQuizBeginner)
                                             }
-                            .background(GeometryReader { geometry in
-                                Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
-                            })
+                            
                             Button(action: {
                                 audioManager.playKetteiSound()
                                 self.isPresentingQuizIntermediate = true
@@ -264,21 +267,34 @@ struct ITManagerListView: View {
                                     Spacer()
                                     HStack {
                                         Button(action: {
-//                                                self.showAnotherView_post = true
                                             reward.ExAndMoReward()
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                                self.showLoginModal = true
-                                            }
                                         }, label: {
-                                            Image("倍ボタン")
-                                                .resizable()
-                                                .frame(width: 110, height: 110)
+                                            if reward.rewardLoaded{
+                                                Image("倍ボタン")
+                                                    .resizable()
+                                                    .frame(width: 110, height: 110)
+                                            }else{
+                                                Image("倍ボタン白黒")
+                                                    .resizable()
+                                                    .frame(width: 110, height: 110)
+                                            }
                                         })
                                             .shadow(radius: 5)
-                                            .disabled(!isButtonClickable)
-                                            .background(GeometryReader { geometry in
-                                                Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
-                                            })
+                                            .disabled(!reward.rewardLoaded)
+                                            .onChange(of: reward.rewardEarned) { rewardEarned in
+                                                showAlert = rewardEarned
+                                                print("onchange reward.rewardEarned:\(showAlert)")
+                                            }
+                                            .alert(isPresented: $showAlert) {
+                                                Alert(
+                                                    title: Text("報酬獲得！"),
+                                                    message: Text("1時間だけ獲得した経験値とコインが2倍"),
+                                                    dismissButton: .default(Text("OK"), action: {
+                                                        showAlert = false
+                                                        reward.rewardEarned = false
+                                                    })
+                                                )
+                                            }
                                             .padding(.bottom)
 //                                                .fullScreenCover(isPresented: $showAnotherView_post, content: {
 //                                                    RewardRegistrationView()
@@ -300,14 +316,14 @@ struct ITManagerListView: View {
                         RewardTimesModal(audioManager: audioManager, isPresented: $showLoginModal)
                     }
                 }
-                if tutorialNum == 2 {
+                if tutorialNum == 3 {
                     GeometryReader { geometry in
                         Color.black.opacity(0.5)
                         // スポットライトの領域をカットアウ
                             .overlay(
                                 RoundedRectangle(cornerRadius: 20, style: .continuous)
                                     .frame(width: buttonRect.width - 20, height: buttonRect.height)
-                                    .position(x: buttonRect.midX, y: isSmallDevice() ? buttonRect.midY-120 : buttonRect.midY-155)
+                                    .position(x: buttonRect.midX, y: isSmallDevice() ? buttonRect.midY : buttonRect.midY)
                                     .blendMode(.destinationOut)
                             )
                             .ignoresSafeArea()
@@ -316,13 +332,13 @@ struct ITManagerListView: View {
                     }
                     VStack {
                         Spacer()
-                            .frame(height:isSmallDevice() ? buttonRect.minY + bubbleHeight-50 : buttonRect.minY + bubbleHeight-90)
+                            .frame(height:isSmallDevice() ? buttonRect.minY + bubbleHeight : buttonRect.minY + bubbleHeight)
                         VStack(alignment: .trailing, spacing: .zero) {
 //                            Image("上矢印")
 //                                .resizable()
 //                                .frame(width: 20, height: 20)
 //                                .padding(.trailing, 306.0)
-                            Text("「IT基礎知識の問題（初級）」をクリックしてください。")
+                            Text("「基礎理解の問題」をクリックしてください。")
                                 .font(.callout)
                                 .padding(5)
                                 .font(.system(size: 24.0))
@@ -340,7 +356,7 @@ struct ITManagerListView: View {
                         .background(GeometryReader { geometry in
                             Path { _ in
                                 DispatchQueue.main.async {
-                                    self.bubbleHeight = geometry.size.height - 40
+                                    self.bubbleHeight = geometry.size.height
                                 }
                             }
                         })
@@ -368,10 +384,10 @@ struct ITManagerListView: View {
             }
             
             .onTapGesture {
-                if tutorialNum == 2 {
+                if tutorialNum == 3 {
                         audioManager.playSound()
                     tutorialNum = 0
-                    authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 3) { success in
+                    authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 4) { success in
                         // データベースのアップデートが成功したかどうかをハンドリング
                     }
                 }
@@ -429,7 +445,7 @@ struct ITManagerListView: View {
                     .foregroundColor(Color("fontGray"))
                 Text("戻る")
                     .foregroundColor(Color("fontGray"))
-            }.padding(.bottom))
+            }.padding(.top))
 //            .toolbar {
 //                    ToolbarItem(placement: .principal) {
 //                        Text("ダンジョン一覧")
@@ -460,6 +476,7 @@ struct ITManagerListView: View {
     }
 
 #Preview {
-    ITManagerListView(isPresenting: .constant(false))
+//    ITManagerListView(isPresenting: .constant(false))
 //    ManagerListView(isPresenting: .constant(false))
+    TopView()
 }

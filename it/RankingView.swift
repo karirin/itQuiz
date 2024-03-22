@@ -136,64 +136,66 @@ class RankingViewModel: ObservableObject {
 //    }
     
     func rankMatchFetchUsers() {
-        
         let usersRef = Database.database().reference().child("users")
         usersRef.observeSingleEvent(of: .value, with: { (snapshot) in
             var users: [User] = []
             
             guard let usersData = snapshot.value as? [String: [String: Any]] else {
-                print("Error: Could not parse users data:")
+                print("Error: Could not parse users data")
                 return
             }
             
             guard let currentUserUID = Auth.auth().currentUser?.uid else { return }
-
+            
+            var currentUserRank: Int? = nil
             for (userId, data) in usersData {
                 if userId == currentUserUID {
-                                continue
-                            }
-                if let userName = data["userName"] as? String,
-                   let userMoney = data["userMoney"] as? Int,
-                   let userHp = data["userHp"] as? Int,
-                   let userAttack = data["userAttack"] as? Int,
-                   let level = data["level"] as? Int,
-                   let experience = data["experience"] as? Int {
-                    // rankMatchPointが存在しない場合は100をデフォルト値として使用
-                    let rankMatchPoint = data["rankMatchPoint"] as? Int ?? 100
-                    let rank = data["rank"] as? Int ?? 1
-
-                    var filteredAvatars: [[String: Any]] = []
-                    if let avatarsData = data["avatars"] as? [String: [String: Any]] {
-                        for (_, avatarData) in avatarsData {
-                            if avatarData["usedFlag"] as? Int == 1 {
-                                filteredAvatars.append(avatarData)
-                            }
-                        }
-                    }
-
-                    let user = User(id: userId,
-                                    userName: userName,
-                                    level: level,
-                                    experience: experience,
-                                    avatars: filteredAvatars,
-                                    userMoney: userMoney,
-                                    userHp: userHp,
-                                    userAttack: userAttack, userFlag: 1,adminFlag: 0, rankMatchPoint: rankMatchPoint, rank: rank)
-                    users.append(user)
-                    print("user:\(user)")
+                    currentUserRank = data["rank"] as? Int ?? 1
+                    break
                 }
             }
-
-            // レベルが高い順にソート
+            
+            let sameRankUsers = usersData.filter { $1["rank"] as? Int == currentUserRank && $0 != currentUserUID }
+            let otherUsers = usersData.filter { $1["rank"] as? Int != currentUserRank && $0 != currentUserUID }
+            
+            for array in [sameRankUsers, otherUsers] {
+                for (userId, data) in array {
+                    if let userName = data["userName"] as? String,
+                       let userMoney = data["userMoney"] as? Int,
+                       let userHp = data["userHp"] as? Int,
+                       let userAttack = data["userAttack"] as? Int,
+                       let level = data["level"] as? Int,
+                       let experience = data["experience"] as? Int {
+                        // rankMatchPointが存在しない場合は100をデフォルト値として使用
+                        let rankMatchPoint = data["rankMatchPoint"] as? Int ?? 100
+                        let rank = data["rank"] as? Int ?? 1
+                        
+                        var filteredAvatars: [[String: Any]] = []
+                        if let avatarsData = data["avatars"] as? [String: [String: Any]] {
+                            for (_, avatarData) in avatarsData {
+                                if avatarData["usedFlag"] as? Int == 1 {
+                                    filteredAvatars.append(avatarData)
+                                }
+                            }
+                        }
+                        
+                        let user = User(id: userId, userName: userName, level: level, experience: experience, avatars: filteredAvatars, userMoney: userMoney, userHp: userHp, userAttack: userAttack, userFlag: 1, adminFlag: 0, rankMatchPoint: rankMatchPoint, rank: rank)
+                        users.append(user)
+                    }
+                }
+            }
+            
+            // ここでユーザーリストの更新とその他の処理を行います
             self.rankMatchUsers = users
             DispatchQueue.main.async {
-                        self.calculateLevelRankings()
-                    }
+                self.calculateLevelRankings()
+            }
             self.fetchMonthlyAnswers()
         }) { (error) in
             // エラーハンドリング
         }
     }
+
 
     
     private func calculateLevelRankings() {

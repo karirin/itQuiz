@@ -277,14 +277,20 @@ struct GachaView: View {
                         Button(action: {
                             reward.ShowReward()
                         }) {
-                            Image("獲得")
-                                .resizable()
-                                .frame(maxWidth:110,maxHeight:110)
+                            if reward.rewardLoaded {
+                                Image("獲得")
+                                    .resizable()
+                                    .frame(maxWidth:110,maxHeight:110)
+                            } else {
+                                Image("獲得白黒")
+                                    .resizable()
+                                    .frame(maxWidth:110,maxHeight:110)
+                            }
                         }
                         .disabled(!reward.rewardLoaded) // rewardLoadedを使用してボタンの活性状態を制御
                         .onChange(of: reward.rewardEarned) { rewardEarned in
                             showAlert = rewardEarned
-//                            print("onChange reward.rewardEarned:\(reward.rewardEarned)")
+                            print("onChange reward.rewardEarned:\(reward.rewardEarned)")
                         }
                         .alert(isPresented: $showAlert) {
                             Alert(
@@ -354,9 +360,15 @@ struct GachaView: View {
                             Button(action: {
                                 reward.ShowReward()
                             }) {
-                                Image("獲得")
-                                    .resizable()
-                                    .frame(maxWidth:110,maxHeight:110)
+                                if reward.rewardLoaded {
+                                    Image("獲得")
+                                        .resizable()
+                                        .frame(maxWidth:110,maxHeight:110)
+                                } else {
+                                    Image("獲得白黒")
+                                        .resizable()
+                                        .frame(maxWidth:110,maxHeight:110)
+                                }
                             }
                             .disabled(!reward.rewardLoaded) // rewardLoadedを使用してボタンの活性状態を制御
                             .onChange(of: reward.rewardEarned) { rewardEarned in

@@ -70,9 +70,9 @@ struct RankMatchQuizView: View {
     @State private var correctAnswerCount: Int = 0
     @State private var countdownValue: Int = 3
     @State private var showCountdown: Bool = false
-    @State private var playerHP: Int = 1000
-    @State private var playerMaxHP: Int = 1000
-    @State private var monsterHP: Int = 3000
+    @State private var playerHP: Int = 100
+    @State private var playerMaxHP: Int = 100
+    @State private var monsterHP: Int = 100
     @State private var monsterUnderHP: Int = 30
     @State private var monsterAttack: Int = 30
     @State var showAlert: Bool = false
@@ -112,6 +112,7 @@ struct RankMatchQuizView: View {
     @State private var endTime: Date?
     @State private var elapsedTime: TimeInterval?
     @State private var navigateToQuizResult = false
+    @State private var victoryFlag = false
     @ObservedObject var interstitial: Interstitial
 //        @EnvironmentObject var appState: AppState
     @StateObject var appState = AppState()
@@ -639,9 +640,9 @@ struct RankMatchQuizView: View {
                             // QuizView.swift
                             if quizLevel == .timeBeginner {
                                 
-                                NavigationLink("", destination: QuizResultView(results: quizResults, authManager: authManager, isPresenting: $isPresenting, navigateToQuizResultView: $navigateToQuizResultView, playerExperience: playerExperience, playerMoney: playerMoney, elapsedTime: self.elapsedTime ?? 0, quizLevel: quizLevel).navigationBarBackButtonHidden(true), isActive: $navigateToQuizResultView)
+                                NavigationLink("", destination: RankMatchQuizResultView(results: quizResults, authManager: authManager, isPresenting: $isPresenting, navigateToQuizResultView: $navigateToQuizResultView, playerExperience: playerExperience, playerMoney: playerMoney, elapsedTime: self.elapsedTime ?? 0, quizLevel: quizLevel,victoryFlag:$victoryFlag).navigationBarBackButtonHidden(true), isActive: $navigateToQuizResultView)
                             }else{
-                                NavigationLink("", destination: QuizResultView(results: quizResults, authManager: authManager, isPresenting: $isPresenting, navigateToQuizResultView: $navigateToQuizResultView, playerExperience: playerExperience, playerMoney: playerMoney, elapsedTime: 0, quizLevel: quizLevel).navigationBarBackButtonHidden(true), isActive: $navigateToQuizResultView)
+                                NavigationLink("", destination: RankMatchQuizResultView(results: quizResults, authManager: authManager, isPresenting: $isPresenting, navigateToQuizResultView: $navigateToQuizResultView, playerExperience: playerExperience, playerMoney: playerMoney, elapsedTime: 0, quizLevel: quizLevel,victoryFlag:$victoryFlag).navigationBarBackButtonHidden(true), isActive: $navigateToQuizResultView)
                             }
                             
                         }
@@ -688,7 +689,7 @@ struct RankMatchQuizView: View {
                 ZStack {
                     Color.black.opacity(0.7)
                         .edgesIgnoringSafeArea(.all)
-                    ModalView(isSoundOn: $isSoundOn, isPresented: $showHomeModal, isPresenting: $isPresenting, audioManager: audioManager, showHomeModal: $showHomeModal,tutorialNum: $tutorialNum,pauseTimer:pauseTimer,resumeTimer: resumeTimer, userFlag: $userFlag)
+                    RankModalView(isSoundOn: $isSoundOn, isPresented: $showHomeModal, isPresenting: $isPresenting, audioManager: audioManager, showHomeModal: $showHomeModal,tutorialNum: $tutorialNum,pauseTimer:pauseTimer,resumeTimer: resumeTimer, userFlag: $userFlag)
                 }
             }
             if showSubFlag {
@@ -754,9 +755,12 @@ struct RankMatchQuizView: View {
                 self.userAttack = attack ?? 20
                 self.tutorialNum = tutorialNum ?? 0
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                    monsterHP = user.avatars.first?["health"] as? Int  ?? 0 + self.userHp
-                    monsterUnderHP = user.avatars.first?["health"] as? Int ?? 0 + self.userAttack
-                    monsterAttack = user.avatars.first?["attack"] as? Int ?? 0
+                    monsterHP = (user.avatars.first?["health"] as? Int ?? 0) + self.userHp
+                    print("user.avatars.first?[health]:\(user.avatars.first?["health"] as? Int  ?? 0)")
+                    print("userHP:\(self.userHp)")
+                    print("monsterHP:\(monsterHP)")
+                    monsterUnderHP = (user.avatars.first?["health"] as? Int ?? 0) + self.userHp
+                    monsterAttack = (user.avatars.first?["attack"] as? Int ?? 0) + self.userAttack
                 }
                 if let additionalAttack = self.avator.first?["attack"] as? Int {
                     self.userAttack = self.userAttack + additionalAttack
@@ -877,10 +881,13 @@ struct RankMatchQuizView: View {
         .onChange(of: showCompletionMessage) { newValue in
             // 味方のHPが０以下のとき
             if newValue && playerHP <= 0 {
+//                victoryFlag = false
                 authManager.addRankMatchPoints(for: user.id, points: 10, onSuccess: {
+                    print("@@@@@@@@@@@@@@@@@@@@@@@1")
                 }, onFailure: { error in
                 })
                 authManager.subtractRankMatchPoints(for: authManager.currentUserId!, points: 10, onSuccess: {
+                    print("@@@@@@@@@@@@@@@@@@@@@@@2")
                     }, onFailure: { error in
                     })
 //                DispatchQueue.global(qos: .background).async {
@@ -895,12 +902,16 @@ struct RankMatchQuizView: View {
 //                    }
 //                }
             } else {
+                victoryFlag = true
                 DispatchQueue.global(qos: .background).async {
                     print("userId:\(user.id)")
                     authManager.addRankMatchPoints(for: authManager.currentUserId!, points: 10, onSuccess: {
+                        print("@@@@@@@@@@@@@@@@@@@@@@@3")
                     }, onFailure: { error in
+                       
                     })
                 authManager.subtractRankMatchPoints(for: user.id, points: 10, onSuccess: {
+                    print("@@@@@@@@@@@@@@@@@@@@@@@4")
                     }, onFailure: { error in
                     })
 //                    authManager.addExperience(points: playerExperience * authManager.rewardFlag, onSuccess: {

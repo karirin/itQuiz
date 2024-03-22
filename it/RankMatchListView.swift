@@ -17,7 +17,7 @@ struct RankMatchListView: View {
     @StateObject var viewModel = RankingViewModel()
     @State private var avatar: [[String: Any]] = []
     @State private var userName: String = ""
-    @State private var showModal: Bool = true
+    @State private var showModal: Bool = false
     
     var body: some View {
         ZStack{
@@ -43,7 +43,16 @@ struct RankMatchListView: View {
                                     .font(.system(size: fontSize1(for: userName, isIPad: isIPad())))
                                 Spacer()
                             }
-                            rankMatchProgressBar(value: Double(authManager.rankMatchPoint), maxValue: Double((authManager.rank + 1) * 100))
+                            let rankMatchPoint = authManager.rankMatchPoint // 現在のランクマッチポイント
+                            let tensPlace = (rankMatchPoint / 10) % 10 // 10の位を取り出す
+
+                            // 10の位だけを持つ数値に変換
+                            let adjustedRankMatchPoint = Double(tensPlace * 10)
+
+                            // adjustedRankMatchPointを使用してプログレスバーの値を設定
+                            rankMatchProgressBar(value: adjustedRankMatchPoint, maxValue: 100)
+
+
                                 .padding(.trailing)
                             let nextRankPointsNeeded = (authManager.rank + 1) * 100
                             let pointsToNextRank = nextRankPointsNeeded - authManager.rankMatchPoint
@@ -68,26 +77,15 @@ struct RankMatchListView: View {
                             print("authManager.rank:\(authManager.rank)")
                         }
                         Spacer()
-                        Button(action: {
-                            showModal = true
-                            audioManager.playSound()
-                        }) {
-                            Image("ハテナ")
-                                .resizable()
-                                .frame(width:40,height:40)
-                                .shadow(radius: 3)
-                        }        
-                        .sheet(isPresented: $showModal) {
-                            // ここにビューシートとして表示する内容を書きます
-                            RankMatchHelpView() // 表示するビューの名前に読み替えてください
-                        }
-                        
+                        RankMatchHelpView()
+                            .shadow(radius: 3)
+                            .frame(width:40,height:40)
                     }
                     .padding(.horizontal)
                     .padding(.bottom,5)
                     ScrollView{
                         VStack {
-                            ForEach(viewModel.rankMatchUsers.filter { $0.level >= 3 }) { user in
+                            ForEach(viewModel.rankMatchUsers.prefix(10)) { user in
                                 
                                 HStack {
                                     ForEach(user.avatars.indices, id: \.self) { index in
@@ -132,7 +130,7 @@ struct RankMatchListView: View {
                                         Image("対戦する")
                                             .resizable()
                                             .frame(width:100,height:35)
-                                    }
+                                    }.shadow(radius: 3)
                                 }
                                 .fullScreenCover(isPresented: $isPresentingQuizRankMatch) {
                                     if let user = selectedUser {
@@ -157,7 +155,6 @@ struct RankMatchListView: View {
                     
                 }
             }
-            
         }
         .onAppear{
                 viewModel.rankMatchFetchUsers()
@@ -166,6 +163,10 @@ struct RankMatchListView: View {
                 self.userName = name ?? ""
                 self.avatar = avatar ?? [[String: Any]]()
             }
+        }
+        .onChange(of: isPresentingQuizRankMatch) { flag in
+            viewModel.rankMatchFetchUsers()
+            authManager.fetchUserRankMatchPoint()
         }
         .background(Color("Color2"))
         .foregroundColor(Color("fontGray"))

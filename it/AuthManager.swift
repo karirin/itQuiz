@@ -57,6 +57,8 @@ class AuthManager: ObservableObject {
     @Published var userCsFlag: Int = 0
     @Published var adminFlag: Int = 0
     @Published var avatars: [Avatar] = []
+    @Published var rankUp: Bool = false
+    @Published var rankDown: Bool = false
     @Published var didLevelUp: Bool = false
     @Published var userAvatars: [Avatar] = []
     @Published var rewardFlag: Int = 1
@@ -535,6 +537,7 @@ class AuthManager: ObservableObject {
                 if newHundred > previousHundred {
                     // 100の位が増加した場合、rankをインクリメント
                     currentRank += 1
+                    self.rankUp = true
                 }
 
                 // 更新されたデータでデータベースを更新
@@ -569,6 +572,7 @@ class AuthManager: ObservableObject {
                 if newHundred < previousHundred {
                     // 100の位が減少した場合、rankをデクリメント（ただし、rankが1より小さくならないようにする）
                     currentRank = max(currentRank - 1, 1)
+                    self.rankDown = true
                 }
 
                 // 更新されたデータでデータベースを更新

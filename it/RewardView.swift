@@ -42,11 +42,8 @@ class Reward: NSObject, GADFullScreenContentDelegate, ObservableObject {
                 ad.present(fromRootViewController: root, userDidEarnRewardHandler: {
                     print("😍: 報酬を獲得しました")
                     self.authManager.addMoney(amount: 300)
-//                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                        self.rewardEarned = true
-//                        print("self.rewardEarned:\(self.rewardEarned)")
-//                    }
                     self.LoadReward()
+                    self.rewardEarned = true
                 })
             } else {
                 print("😭: 広告の準備ができていませんでした")
@@ -64,6 +61,8 @@ class Reward: NSObject, GADFullScreenContentDelegate, ObservableObject {
                     self.authManager.updateRewardFlag(userId: self.authManager.currentUserId!, userFlag: 2)
                     let now = Date()
                             UserDefaults.standard.set(now, forKey: "rewardAcquiredDate")
+                    self.rewardEarned = true
+                    print("::::::\(self.rewardEarned)")
                     self.resetupdateRewardFlag()
                     // 報酬を得た後に、新しい広告をロードする
                     self.LoadReward()

@@ -35,6 +35,7 @@ struct InfoManagerListView: View {
     @ObservedObject var reward = Reward()
     @State private var showLoginModal: Bool = false
     @State private var isButtonClickable: Bool = false
+    @State private var showAlert: Bool = false
 
     init(isPresenting: Binding<Bool>) {
         _isPresenting = isPresenting
@@ -263,18 +264,34 @@ struct InfoManagerListView: View {
                                     Spacer()
                                     HStack {
                                         Button(action: {
-    //                                                self.showAnotherView_post = true
-                                            reward.ExAndMoReward()
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                                self.showLoginModal = true
-                                            }
-                                        }, label: {
-                                            Image("倍ボタン")
-                                                .resizable()
-                                                .frame(width: 110, height: 110)
-                                        })
-                                            .shadow(radius: 5)
-                                            .disabled(!isButtonClickable)
+                                           reward.ExAndMoReward()
+                                       }, label: {
+                                           if reward.rewardLoaded{
+                                               Image("倍ボタン")
+                                                   .resizable()
+                                                   .frame(width: 110, height: 110)
+                                           }else{
+                                               Image("倍ボタン白黒")
+                                                   .resizable()
+                                                   .frame(width: 110, height: 110)
+                                           }
+                                       })
+                                           .shadow(radius: 5)
+                                           .disabled(!reward.rewardLoaded)
+                                           .onChange(of: reward.rewardEarned) { rewardEarned in
+                                               showAlert = rewardEarned
+                                               print("onchange reward.rewardEarned:\(showAlert)")
+                                           }
+                                           .alert(isPresented: $showAlert) {
+                                               Alert(
+                                                   title: Text("報酬獲得！"),
+                                                   message: Text("1時間だけ獲得した経験値とコインが2倍"),
+                                                   dismissButton: .default(Text("OK"), action: {
+                                                       showAlert = false
+                                                       reward.rewardEarned = false
+                                                   })
+                                               )
+                                           }
                                             .background(GeometryReader { geometry in
                                                 Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
                                             })
@@ -428,7 +445,7 @@ struct InfoManagerListView: View {
                         .foregroundColor(Color("fontGray"))
                     Text("戻る")
                         .foregroundColor(Color("fontGray"))
-                }.padding(.bottom))
+                }.padding(.top))
 //                .toolbar {
 //                        ToolbarItem(placement: .principal) {
 //                            Text("ダンジョン一覧")

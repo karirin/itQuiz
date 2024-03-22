@@ -38,6 +38,7 @@ struct ManagerListView: View {
     @ObservedObject var reward = Reward()
     @State private var showLoginModal: Bool = false
     @State private var isButtonClickable: Bool = false
+    @State private var showAlert: Bool = false
     
     init(isPresenting: Binding<Bool>) {
         _isPresenting = isPresenting
@@ -50,75 +51,6 @@ struct ManagerListView: View {
             ZStack{
                     ScrollView{
                         VStack {
-//                            HStack{
-//                                Text(" ")
-//                                    .frame(width:isIPad() ? 10 : 5,height: isIPad() ? 40 : 20)
-//                                    .background(.gray)
-//                                Text("不正解した問題だけを解くことができます")
-//                                    .font(.system(size: isIPad() ? 40 : 16))
-//                                    .foregroundColor(Color("fontGray"))
-//                                Spacer()
-//                            }
-//                            .padding(.leading,30)
-////                            .padding(.horizontal,0)
-//                            .padding(.bottom)
-//                            .padding(.top)
-//                            Button(action: {
-//                                audioManager.playKetteiSound()
-//                                // 画面遷移のトリガーをオンにする
-//                                self.isPresentingQuizIncorrectAnswer = true
-//                            }) {
-//                                //                        Image("IT基礎知識の問題の初級")
-//                                if isIncorrectAnswersEmpty == true {
-//                                Image("白黒選択肢0")
-//                                    .resizable()
-//                                    .frame(height: isIPad() ? 200 : 70)
-//                                }else{
-//                                    Image("選択肢0")
-//                                        .resizable()
-//                                        .frame(height: isIPad() ? 200 : 70)
-//                                }
-//                            }
-//                            .disabled(isIncorrectAnswersEmpty)
-//                            .frame(maxWidth: .infinity)
-//                            .padding(.horizontal)
-//                            .padding(.bottom)
-//                            .shadow(radius: 3)
-//                            .fullScreenCover(isPresented: $isPresentingQuizIncorrectAnswer) {
-//                                QuizIncorrectAnswerListView(isPresenting: $isPresentingQuizIncorrectAnswer)
-//                                        }
-//                            .onChange(of: isPresentingQuizBeginner) { isPresenting in
-//                                    fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
-//                                }
-//                            }
-//                            .onChange(of: isPresentingQuizIncorrectAnswer) { isPresenting in
-//                                    fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
-//                                }
-//                            }
-//                            .onChange(of: isPresentingQuizIntermediate) { isPresenting in
-//                                    fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
-//                                }
-//                            }
-//                            .onChange(of: isPresentingQuizAdvanced) { isPresenting in
-//                                    fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
-//                                }
-//                            }
-//                            .onChange(of: isPresentingQuizGod) { isPresenting in
-//                                    fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
-//                                }
-//                            }
-//                            .onChange(of: isPresentingQuizNetwork) { isPresenting in
-//                                    fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
-//                                }
-//                            }
-//                            .onChange(of: isPresentingQuizSecurity) { isPresenting in
-//                                    fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
-//                                }
-//                            }
-//                            .onChange(of: isPresentingQuizDatabase) { isPresenting in
-//                                    fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
-//                                }
-//                            }
                         
                             HStack{
                                 Text(" ")
@@ -146,9 +78,6 @@ struct ManagerListView: View {
                                 .padding(.horizontal)
                                 .padding(.bottom)
                                 .shadow(radius: 3)
-//                                .fullScreenCover(isPresented: $isPresentingQuizBeginner) {
-//                                                QuizBeginnerList(isPresenting: $isPresentingQuizBeginner)
-//                                            }
                             .background(GeometryReader { geometry in
                                 Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
                             })
@@ -165,10 +94,6 @@ struct ManagerListView: View {
                             .padding(.horizontal)
                             .padding(.bottom)
                             .shadow(radius: 3)
-//                            .fullScreenCover(isPresented: $isPresentingQuizIntermediate) {
-//                                            QuizIntermediateList(isPresenting: $isPresentingQuizIntermediate)
-//                                        }
-                            
                             Button(action: {
                                 audioManager.playSound()
                                 self.isPresentingAppliedView = true
@@ -182,78 +107,6 @@ struct ManagerListView: View {
                             .padding(.horizontal)
                             .padding(.bottom)
                             .shadow(radius: 3)
-//                            .fullScreenCover(isPresented: $isPresentingQuizAdvanced) {
-//                                            QuizAdvancedList(isPresenting: $isPresentingQuizAdvanced)
-//                                        }
-//                            Button(action: {
-//                                audioManager.playKetteiSound()
-//                                self.isPresentingQuizGod = true
-//                            }) {
-//                                //                    Image("データベース系の問題")
-//                                Image("選択肢7")
-//                                    .resizable()
-//                                    .frame(height: isIPad() ? 200 : 70)
-//                            }
-//                            .frame(maxWidth: .infinity)
-//                            .padding(.horizontal)
-//                            .padding(.bottom)
-//                            .shadow(radius: 3)
-//                            .fullScreenCover(isPresented: $isPresentingQuizGod) {
-//                                            QuizGodList(isPresenting: $isPresentingQuizGod)
-//                                        }
-                            // ネットワーク系の問題
-//                            Button(action: {
-//                                audioManager.playKetteiSound()
-//                                self.isPresentingQuizNetwork = true
-//                            }) {
-//                                //                    Image("ネットワーク系の問題")
-//                                Image("選択肢4")
-//                                    .resizable()
-//                                    .frame(height: isIPad() ? 200 : 70)
-//                            }
-//                            .frame(maxWidth: .infinity)
-//                            .padding(.horizontal)
-//                            .padding(.bottom)
-//                            .shadow(radius: 1)
-//                            .fullScreenCover(isPresented: $isPresentingQuizNetwork) {
-//                                            QuizNetworkList(isPresenting: $isPresentingQuizNetwork)
-//                                        }
-//                            
-//                            // セキュリティ系の問題
-//                            Button(action: {
-//                                audioManager.playKetteiSound()
-//                                self.isPresentingQuizSecurity = true
-//                            }) {
-//                                //                    Image("セキュリティ系の問題")
-//                                Image("選択肢5")
-//                                    .resizable()
-//                                    .frame(height: isIPad() ? 200 : 70)
-//                            }
-//                            .frame(maxWidth: .infinity)
-//                            .padding(.horizontal)
-//                            .padding(.bottom)
-//                            .shadow(radius: 3)
-//                            .fullScreenCover(isPresented: $isPresentingQuizSecurity) {
-//                                            QuizSecurityList(isPresenting: $isPresentingQuizSecurity)
-//                                        }
-//                            
-//                            // データベース系の問題
-//                            Button(action: {
-//                                audioManager.playKetteiSound()
-//                                self.isPresentingQuizDatabase = true
-//                            }) {
-//                                //                    Image("データベース系の問題")
-//                                Image("選択肢6")
-//                                    .resizable()
-//                                    .frame(height: isIPad() ? 200 : 70)
-//                            }
-//                            .frame(maxWidth: .infinity)
-//                            .padding(.horizontal)
-//                            .padding(.bottom,120)
-//                            .shadow(radius: 3)
-//                            .fullScreenCover(isPresented: $isPresentingQuizDatabase) {
-//                                            QuizDatabaseList(isPresenting: $isPresentingQuizDatabase)
-//                                        }
                             
                         }
                         NavigationLink("", destination: ITManagerListView(isPresenting: $isPresentingITView).navigationBarBackButtonHidden(true), isActive: $isPresentingITView)
@@ -269,25 +122,38 @@ struct ManagerListView: View {
                                     Spacer()
                                     HStack {
                                         Button(action: {
-//                                                self.showAnotherView_post = true
                                             reward.ExAndMoReward()
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                                self.showLoginModal = true
-                                            }
                                         }, label: {
-                                            Image("倍ボタン")
-                                                .resizable()
-                                                .frame(width: 110, height: 110)
+                                            if reward.rewardLoaded{
+                                                Image("倍ボタン")
+                                                    .resizable()
+                                                    .frame(width: 110, height: 110)
+                                            }else{
+                                                Image("倍ボタン白黒")
+                                                    .resizable()
+                                                    .frame(width: 110, height: 110)
+                                            }
                                         })
                                             .shadow(radius: 5)
-                                            .disabled(!isButtonClickable)
+                                            .disabled(!reward.rewardLoaded)
+                                            .onChange(of: reward.rewardEarned) { rewardEarned in
+                                                showAlert = rewardEarned
+                                                print("onchange reward.rewardEarned:\(showAlert)")
+                                            }
+                                            .alert(isPresented: $showAlert) {
+                                                Alert(
+                                                    title: Text("報酬獲得！"),
+                                                    message: Text("1時間だけ獲得した経験値とコインが2倍"),
+                                                    dismissButton: .default(Text("OK"), action: {
+                                                        showAlert = false
+                                                        reward.rewardEarned = false
+                                                    })
+                                                )
+                                            }
                                             .background(GeometryReader { geometry in
                                                 Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
                                             })
                                             .padding(.bottom)
-//                                                .fullScreenCover(isPresented: $showAnotherView_post, content: {
-//                                                    RewardRegistrationView()
-//                                                })
                                         
                                             Spacer()
                                     }
@@ -305,73 +171,74 @@ struct ManagerListView: View {
                         RewardTimesModal(audioManager: audioManager, isPresented: $showLoginModal)
                     }
                 }
-//                if tutorialNum == 2 {
-//                    GeometryReader { geometry in
-//                        Color.black.opacity(0.5)
-//                        // スポットライトの領域をカットアウ
-//                            .overlay(
-//                                RoundedRectangle(cornerRadius: 20, style: .continuous)
-//                                    .frame(width: buttonRect.width - 20, height: buttonRect.height)
-//                                    .position(x: buttonRect.midX, y: isSmallDevice() ? buttonRect.midY-120 : buttonRect.midY-155)
-//                                    .blendMode(.destinationOut)
-//                            )
-//                            .ignoresSafeArea()
-//                            .compositingGroup()
-//                            .background(.clear)
-//                    }
-//                    VStack {
+                if tutorialNum == 2 {
+                    GeometryReader { geometry in
+                        Color.black.opacity(0.5)
+                        // スポットライトの領域をカットアウ
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                                    .frame(width: buttonRect.width - 20, height: buttonRect.height)
+                                    .position(x: buttonRect.midX, y: isSmallDevice() ? buttonRect.midY-120 : buttonRect.midY-155)
+                                    .blendMode(.destinationOut)
+                            )
+                            .ignoresSafeArea()
+                            .compositingGroup()
+                            .background(.clear)
+                    }
+                    VStack {
+                        Spacer()
+                            .frame(height:isSmallDevice() ? buttonRect.minY + bubbleHeight-50 : buttonRect.minY + bubbleHeight-90)
+                        VStack(alignment: .trailing, spacing: .zero) {
+//                            Image("上矢印")
+//                                .resizable()
+//                                .frame(width: 20, height: 20)
+//                                .padding(.trailing, 306.0)
+                            Text("「ITパスポートの問題」をクリックしてください。")
+                                .font(.callout)
+                                .padding(5)
+                                .font(.system(size: 24.0))
+                                .padding(.all, 16.0)
+                                .background(Color("Color2"))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 20)
+                                        .stroke(Color.gray, lineWidth: 15)
+                                )
+                                .cornerRadius(20)
+                                .padding(.horizontal, 16)
+                                .foregroundColor(Color("fontGray"))
+                                .shadow(radius: 10)
+                        }
+                        .background(GeometryReader { geometry in
+                            Path { _ in
+                                DispatchQueue.main.async {
+                                    self.bubbleHeight = geometry.size.height - 40
+                                }
+                            }
+                        })
+                        Spacer()
+                    }
+                    .ignoresSafeArea()
+                    VStack{
+                        Spacer()
+                        HStack{
+                            Button(action: {
+                                tutorialNum = 0 // タップでチュートリアルを終了
+                                authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { success in
+                                }
+                            }) {
+                                Image("スキップ")
+                                    .resizable()
+                                    .frame(width:200,height:60)
+                                    .padding(.leading)
+                            }
+                            Spacer()
+                        }
+                        .padding(.bottom)
 //                        Spacer()
-//                            .frame(height:isSmallDevice() ? buttonRect.minY + bubbleHeight-50 : buttonRect.minY + bubbleHeight-90)
-//                        VStack(alignment: .trailing, spacing: .zero) {
-////                            Image("上矢印")
-////                                .resizable()
-////                                .frame(width: 20, height: 20)
-////                                .padding(.trailing, 306.0)
-//                            Text("「IT基礎知識の問題（初級）」をクリックしてください。")
-//                                .font(.callout)
-//                                .padding(5)
-//                                .font(.system(size: 24.0))
-//                                .padding(.all, 16.0)
-//                                .background(Color("Color2"))
-//                                .overlay(
-//                                    RoundedRectangle(cornerRadius: 20)
-//                                        .stroke(Color.gray, lineWidth: 15)
-//                                )
-//                                .cornerRadius(20)
-//                                .padding(.horizontal, 16)
-//                                .foregroundColor(Color("fontGray"))
-//                                .shadow(radius: 10)
-//                        }
-//                        .background(GeometryReader { geometry in
-//                            Path { _ in
-//                                DispatchQueue.main.async {
-//                                    self.bubbleHeight = geometry.size.height - 40
-//                                }
-//                            }
-//                        })
-//                        Spacer()
-//                    }
-//                    .ignoresSafeArea()
-//                    VStack{
-//                        HStack{
-//                            Button(action: {
-//                                tutorialNum = 0 // タップでチュートリアルを終了
-//                                authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { success in
-//                                }
-//                            }) {
-//                                Image("スキップ")
-//                                    .resizable()
-//                                    .frame(width:200,height:60)
-//                                    .padding(.leading)
-//                            }
-//                            Spacer()
-//                        }
-//                        Spacer()
-//                    }
-//                }
+                    }
+                }
                     
             }
-            
             .onTapGesture {
                 if tutorialNum == 2 {
                         audioManager.playSound()
@@ -424,24 +291,6 @@ struct ManagerListView: View {
                 } else {
                     audioPlayerKettei?.volume = 1.0
                 }
-//            }
-//            .navigationBarBackButtonHidden(true)
-//            .navigationBarItems(leading: Button(action: {
-//                self.presentationMode.wrappedValue.dismiss()
-//                audioManager.playCancelSound()
-//            }) {
-//                Image(systemName: "chevron.left")
-//                    .foregroundColor(Color("fontGray"))
-//                Text("戻る")
-//                    .foregroundColor(Color("fontGray"))
-//            })
-//            .toolbar {
-//                    ToolbarItem(placement: .principal) {
-//                        Text("ダンジョン一覧")
-//                            .font(.system(size: 20)) // ここでフォントサイズを指定
-//                            .foregroundStyle(Color("fontGray"))
-//                    }
-//                }
             }
         .navigationViewStyle(StackNavigationViewStyle())
         }
@@ -465,5 +314,6 @@ struct ManagerListView: View {
     }
 
 #Preview {
-    ManagerListView(isPresenting: .constant(false))
+//    ManagerListView(isPresenting: .constant(false))
+    TopView()
 }

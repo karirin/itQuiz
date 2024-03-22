@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ModalView: View {
+struct RankModalView: View {
     @Binding var isSoundOn: Bool
     @Binding var isPresented: Bool
     @Binding var isPresenting: Bool
@@ -25,25 +25,6 @@ struct ModalView: View {
     var body: some View {
         ZStack {
             VStack(spacing: 10) {
-                Button(action: {
-                    isPresenting = false
-                    if isDaily {
-                        isContentView = true
-                    }
-                    audioManager.playReturnSound()
-                }) {
-                    HStack{
-                        Image(systemName: "house.fill")
-                        Text("ホームに戻る　")
-                            
-                    }.padding(20)
-                        .foregroundColor(.black)
-                        .background(Color.white)
-                        .cornerRadius(8)
-                        .shadow(radius: 1)
-                }
-                NavigationLink("", destination: TopView().navigationBarBackButtonHidden(true), isActive: $isContentView)
-                
                 Button(action: {
                     isSoundOn.toggle()
                     audioManager.playSound()

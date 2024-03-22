@@ -452,12 +452,12 @@ struct ViewPositionKey3: PreferenceKey {
                         .padding(.leading)
                         .foregroundColor(.gray)
                         Spacer()
-                        if let selected = selectedAnswerIndex, selected != currentQuiz.correctAnswerIndex {
-                            Text("正解")
-                                .foregroundColor(Color("fontGray"))
-                            Text("\(currentQuiz.choices[currentQuiz.correctAnswerIndex])")
-                                .foregroundColor(Color("fontGray"))
-                        }
+//                        if let selected = selectedAnswerIndex, selected != currentQuiz.correctAnswerIndex {
+//                            Text("正解")
+//                                .foregroundColor(Color("fontGray"))
+//                            Text("\(currentQuiz.choices[currentQuiz.correctAnswerIndex])")
+//                                .foregroundColor(Color("fontGray"))
+//                        }
                         Spacer()
                         // 正解の場合の赤い円
                         if let selected = selectedAnswerIndex, selected == currentQuiz.correctAnswerIndex {
@@ -705,7 +705,7 @@ struct ViewPositionKey3: PreferenceKey {
                         SubModalView(isSoundOn: $isSoundOn, isPresented: $showSubFlag, isPresenting: $isPresenting, audioManager: audioManager, showHomeModal: $showHomeModal,pauseTimer:pauseTimer,resumeTimer: resumeTimer, userFlag: $userFlag)
                     }
                 }
-                if tutorialNum == 3 && showTutorial == true {
+                if tutorialNum == 4 && showTutorial == true {
                     GeometryReader { geometry in
                         Color.black.opacity(0.5)
                         // スポットライトの領域をカットアウ
@@ -777,7 +777,7 @@ struct ViewPositionKey3: PreferenceKey {
                         .padding()
                     }
                 }
-                if tutorialNum == 4 && showTutorial == true{
+                if tutorialNum == 5 && showTutorial == true{
                     GeometryReader { geometry in
                         Color.black.opacity(0.5)
                             .ignoresSafeArea()
@@ -850,7 +850,7 @@ struct ViewPositionKey3: PreferenceKey {
                             Spacer()
                         }
                 }
-                if tutorialNum == 5 && showTutorial == true{
+                if tutorialNum == 6 && showTutorial == true{
                     GeometryReader { geometry in
                         Color.black.opacity(0.5)
                         // スポットライトの領域をカットアウ
@@ -921,7 +921,7 @@ struct ViewPositionKey3: PreferenceKey {
                     .padding()
                 }
                 }
-                if tutorialNum == 6 && showTutorial == true{
+                if tutorialNum == 7 && showTutorial == true{
                     GeometryReader { geometry in
                         Color.black.opacity(0.5)
                         // スポットライトの領域をカットアウ
@@ -1005,11 +1005,7 @@ struct ViewPositionKey3: PreferenceKey {
             .onTapGesture {
 //                audioManager.playSound()
                 if showCountdown == false {
-                    if tutorialNum == 3 {
-                        tutorialNum = 4
-                        authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 4) { success in
-                        }
-                    } else if tutorialNum == 4 {
+                    if tutorialNum == 4 {
                         tutorialNum = 5
                         authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 5) { success in
                         }
@@ -1018,6 +1014,10 @@ struct ViewPositionKey3: PreferenceKey {
                         authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 6) { success in
                         }
                     } else if tutorialNum == 6 {
+                        tutorialNum = 7
+                        authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 7) { success in
+                        }
+                    } else if tutorialNum == 7 {
                         resumeTimer()
                         tutorialNum = 0
                         authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { success in
@@ -1868,7 +1868,7 @@ struct ViewPositionKey3: PreferenceKey {
 
 struct QuizView_Previews: PreviewProvider {
     static var previews: some View {
-        QuizIntermediateList(isPresenting: .constant(false))
-//        QuizIncorrectAnswerListView(isPresenting: .constant(false))
+//        QuizIntermediateList(isPresenting: .constant(false))
+        QuizIncorrectAnswerListView(isPresenting: .constant(false))
     }
 }

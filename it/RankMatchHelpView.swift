@@ -26,7 +26,7 @@ struct RankMatchHelpView: View {
 //                        .font(.system(size: 40))
                     Image("ハテナ")
                         .resizable()
-                        .frame(width:50,height: 50)
+                        .frame(width:40,height: 40)
                 })
                 
                 
@@ -49,10 +49,10 @@ struct RankMatchSwipeableView: View {
                     .tag(0)
                 RankMatchSecondView()
                     .tag(1)
-                RankMatchThirdView()
-                    .tag(2)
-                RankMatchFourthView()
-                    .tag(3)
+//                RankMatchThirdView()
+//                    .tag(2)
+//                RankMatchFourthView()
+//                    .tag(3)
             }
             .tabViewStyle(PageTabViewStyle())
             
@@ -107,13 +107,12 @@ struct RankMatchFirstView: View {
             Image("ランクマッチの説明１")
                 .resizable()
                 .scaledToFit()
-            Image("ランクマッチの説明１")
+            Image("ランクマッチの説明２")
                 .resizable()
                 .scaledToFit()
             Spacer()
             }
         .foregroundColor(Color("fontGray"))
-        .edgesIgnoringSafeArea(.all) // シートの端までコンテンツを広げます。
     }
 }
 
@@ -131,7 +130,7 @@ struct RankMatchSecondView: View {
                 }
                 .padding()
                 Spacer()
-                Text("チュートリアル")
+                Text("ランクマッチについて")
                 Spacer()
                 Button(action:{
                     presentationMode.wrappedValue.dismiss()
@@ -143,76 +142,13 @@ struct RankMatchSecondView: View {
             }
             .background(Color("fontGray"))
             .foregroundColor(.white)
-            HStack{
-                Text("各メニュー説明")
-                    .font(.system(size: 24))
-                Spacer()
-            }
-            .padding(.leading)
-            ScrollView{
-                VStack{
-                HStack{
-                    Image("ダンジョンボタン")
-                        .resizable()
-                        .frame(width:70, height:70)
-                        .padding(.horizontal)
-                    Spacer()
-                }
-                Text("難易度、種類別のクイズを選ぶことができます　")
-                
-                HStack{
-                    Image("ガチャボタン")
-                        .resizable()
-                        .frame(width:200, height:70)
-                        .padding(.horizontal)
-                    Spacer()
-                }
-                Text("ガチャを回すことがで新しいおともを手に入れることができます")
-                
-                HStack{
-                    Image("おとも図鑑ボタン")
-                        .resizable()
-                        .frame(width:200, height:70)
-                        .padding(.horizontal)
-                    Spacer()
-                }
-                Text("手に入れたおともを確認することができます")
-                    
-                HStack{
-                    Image("称号ボタン")
-                        .resizable()
-                        .frame(width:200, height:70)
-                        .padding(.horizontal)
-                    Spacer()
-                }
-                Text("手に入れた称号を確認することができます")
-                
-                        HStack{
-                            Image(systemName: "square.grid.2x2")
-                                .resizable()
-                                .frame(width:30, height:30)
-                            Text("おとも一覧")
-                                .font(.system(size: 24))
-                            Spacer()
-                        }
-                        .padding(.leading)
-                        .padding(.top)
-                        Text("選択中のおともを変えることができます　　　　　　　　　　　　　　")
-                            .padding(.leading)
-                        HStack{
-                            Image(systemName: "chart.pie")
-                                .resizable()
-                                .frame(width:30, height:30)
-                            Text("分析")
-                                .font(.system(size: 24))
-                            Spacer()
-                        }.padding(.leading).padding(.top)
-                        Text("日々の回答数や正答率をグラフで確認することができます")
-                            .padding(.leading,11)
-                    }
-            
-                .padding(.horizontal)
-            }
+            Image("ランクマッチの説明３")
+                .resizable()
+                .scaledToFit()
+            Image("ランクマッチの説明４")
+                .resizable()
+                .scaledToFit()
+            Spacer()
         }
         .foregroundColor(Color("fontGray"))
     }
