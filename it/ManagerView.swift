@@ -14,6 +14,7 @@ struct ManagerView: View {
     @State private var selectedTab: Int = 0
     @State private var canSwipe: Bool = false
     @ObservedObject var viewModel: RankingViewModel
+    @ObservedObject var reward = Reward()
     
     let list: [String] = ["ダンジョン", "ランクマッチ"]
     
@@ -52,6 +53,9 @@ struct ManagerView: View {
                 })
                             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
 //                LevelRankingView(viewModel: viewModel)
+            }
+            .onAppear{
+                reward.LoadReward()
             }
             .background(Color("Color2"))
 //        }

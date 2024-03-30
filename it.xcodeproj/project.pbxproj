@@ -7,11 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1820AE162B518D8D00BBA679 /* ゲームクリア.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1820AE082B518D8C00BBA679 /* ゲームクリア.mp3 */; };
 		1820AE172B518D8D00BBA679 /* 正解.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1820AE092B518D8C00BBA679 /* 正解.mp3 */; };
 		1820AE182B518D8D00BBA679 /* カウントダウン.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1820AE0A2B518D8C00BBA679 /* カウントダウン.mp3 */; };
 		1820AE192B518D8D00BBA679 /* 倒れる.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1820AE0B2B518D8C00BBA679 /* 倒れる.mp3 */; };
-		1820AE1A2B518D8D00BBA679 /* ゲームオーバー.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1820AE0C2B518D8C00BBA679 /* ゲームオーバー.mp3 */; };
 		1820AE1B2B518D8D00BBA679 /* おとも切り替え.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1820AE0D2B518D8C00BBA679 /* おとも切り替え.mp3 */; };
 		1820AE1D2B518D8D00BBA679 /* キャンセル.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1820AE0F2B518D8D00BBA679 /* キャンセル.mp3 */; };
 		1820AE1E2B518D8D00BBA679 /* soundKettei.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1820AE102B518D8D00BBA679 /* soundKettei.mp3 */; };
@@ -55,6 +53,9 @@
 		1896A2012BAD77E40072F12B /* ManagerListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1896A2002BAD77E40072F12B /* ManagerListView.swift */; };
 		1896A2032BAD7B5E0072F12B /* TimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1896A2022BAD7B5E0072F12B /* TimerView.swift */; };
 		1896A2052BAD7BD30072F12B /* ManagerTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1896A2042BAD7BD30072F12B /* ManagerTabView.swift */; };
+		1898ECD32BB7DC2B0085D467 /* ゲームオーバー.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1898ECD02BB7DC2B0085D467 /* ゲームオーバー.mp3 */; };
+		1898ECD42BB7DC2B0085D467 /* ゲームクリア.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1898ECD12BB7DC2B0085D467 /* ゲームクリア.mp3 */; };
+		1898ECD52BB7DC2B0085D467 /* 称号.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1898ECD22BB7DC2B0085D467 /* 称号.mp3 */; };
 		189F82C42BA4689D00C0247A /* RankMatchListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189F82C32BA4689D00C0247A /* RankMatchListView.swift */; };
 		189F82C62BA549AC00C0247A /* RankMatchQuizView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189F82C52BA549AC00C0247A /* RankMatchQuizView.swift */; };
 		189F82C82BA550E100C0247A /* RankMatchQuizListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189F82C72BA550E100C0247A /* RankMatchQuizListView.swift */; };
@@ -63,7 +64,6 @@
 		18A5A4B62B7C6A0D009EFAB6 /* TestAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A5A4B52B7C6A0D009EFAB6 /* TestAnimationView.swift */; };
 		18A5A4B82B7C728C009EFAB6 /* TestModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A5A4B72B7C728C009EFAB6 /* TestModalView.swift */; };
 		18A5A4BC2B7C859C009EFAB6 /* QuizBeginnerStoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A5A4BB2B7C859C009EFAB6 /* QuizBeginnerStoryView.swift */; };
-		18BD10B62B6B5DEE00ABB28F /* 称号.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18BD10B52B6B5DEE00ABB28F /* 称号.mp3 */; };
 		18BD10B82B6B601500ABB28F /* sound.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18BD10B72B6B601500ABB28F /* sound.mp3 */; };
 		18E818572B5EBDFC00595669 /* RewardTimesModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E818562B5EBDFC00595669 /* RewardTimesModal.swift */; };
 		18EA883E2B8C48AE00067FE7 /* SubModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18EA883D2B8C48AE00067FE7 /* SubModalView.swift */; };
@@ -117,11 +117,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		1820AE082B518D8C00BBA679 /* ゲームクリア.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "ゲームクリア.mp3"; path = "../../../Downloads/it 効果音/ゲームクリア.mp3"; sourceTree = "<group>"; };
 		1820AE092B518D8C00BBA679 /* 正解.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "正解.mp3"; path = "../../../Downloads/it 効果音/正解.mp3"; sourceTree = "<group>"; };
 		1820AE0A2B518D8C00BBA679 /* カウントダウン.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "カウントダウン.mp3"; path = "../../../Downloads/it 効果音/カウントダウン.mp3"; sourceTree = "<group>"; };
 		1820AE0B2B518D8C00BBA679 /* 倒れる.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "倒れる.mp3"; path = "../../../Downloads/it 効果音/倒れる.mp3"; sourceTree = "<group>"; };
-		1820AE0C2B518D8C00BBA679 /* ゲームオーバー.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "ゲームオーバー.mp3"; path = "../../../Downloads/it 効果音/ゲームオーバー.mp3"; sourceTree = "<group>"; };
 		1820AE0D2B518D8C00BBA679 /* おとも切り替え.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "おとも切り替え.mp3"; path = "../../../Downloads/it 効果音/おとも切り替え.mp3"; sourceTree = "<group>"; };
 		1820AE0F2B518D8D00BBA679 /* キャンセル.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "キャンセル.mp3"; path = "../../../Downloads/it 効果音/キャンセル.mp3"; sourceTree = "<group>"; };
 		1820AE102B518D8D00BBA679 /* soundKettei.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = soundKettei.mp3; path = "../../../Downloads/it 効果音/soundKettei.mp3"; sourceTree = "<group>"; };
@@ -167,6 +165,9 @@
 		1896A2002BAD77E40072F12B /* ManagerListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagerListView.swift; sourceTree = "<group>"; };
 		1896A2022BAD7B5E0072F12B /* TimerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TimerView.swift; path = "../../itQuiz 余分コード/TimerView.swift"; sourceTree = "<group>"; };
 		1896A2042BAD7BD30072F12B /* ManagerTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagerTabView.swift; sourceTree = "<group>"; };
+		1898ECD02BB7DC2B0085D467 /* ゲームオーバー.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "ゲームオーバー.mp3"; path = "../../音声/ゲームオーバー.mp3"; sourceTree = "<group>"; };
+		1898ECD12BB7DC2B0085D467 /* ゲームクリア.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "ゲームクリア.mp3"; path = "../../音声/ゲームクリア.mp3"; sourceTree = "<group>"; };
+		1898ECD22BB7DC2B0085D467 /* 称号.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "称号.mp3"; path = "../../音声/称号.mp3"; sourceTree = "<group>"; };
 		189F82C32BA4689D00C0247A /* RankMatchListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RankMatchListView.swift; sourceTree = "<group>"; };
 		189F82C52BA549AC00C0247A /* RankMatchQuizView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RankMatchQuizView.swift; sourceTree = "<group>"; };
 		189F82C72BA550E100C0247A /* RankMatchQuizListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RankMatchQuizListView.swift; sourceTree = "<group>"; };
@@ -175,7 +176,6 @@
 		18A5A4B52B7C6A0D009EFAB6 /* TestAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestAnimationView.swift; sourceTree = "<group>"; };
 		18A5A4B72B7C728C009EFAB6 /* TestModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestModalView.swift; sourceTree = "<group>"; };
 		18A5A4BB2B7C859C009EFAB6 /* QuizBeginnerStoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizBeginnerStoryView.swift; sourceTree = "<group>"; };
-		18BD10B52B6B5DEE00ABB28F /* 称号.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "称号.mp3"; path = "../../../Downloads/称号.mp3"; sourceTree = "<group>"; };
 		18BD10B72B6B601500ABB28F /* sound.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = sound.mp3; path = ../../../Downloads/sound.mp3; sourceTree = "<group>"; };
 		18E818562B5EBDFC00595669 /* RewardTimesModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardTimesModal.swift; sourceTree = "<group>"; };
 		18EA883D2B8C48AE00067FE7 /* SubModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubModalView.swift; sourceTree = "<group>"; };
@@ -362,13 +362,13 @@
 				1820AE0A2B518D8C00BBA679 /* カウントダウン.mp3 */,
 				18BD10B72B6B601500ABB28F /* sound.mp3 */,
 				1820AE0F2B518D8D00BBA679 /* キャンセル.mp3 */,
-				1820AE0C2B518D8C00BBA679 /* ゲームオーバー.mp3 */,
+				1898ECD02BB7DC2B0085D467 /* ゲームオーバー.mp3 */,
+				1898ECD12BB7DC2B0085D467 /* ゲームクリア.mp3 */,
+				1898ECD22BB7DC2B0085D467 /* 称号.mp3 */,
 				1820AE142B518D8D00BBA679 /* ホームに戻る.mp3 */,
 				1820AE152B518D8D00BBA679 /* レベルアップ.mp3 */,
 				1820AE132B518D8D00BBA679 /* 敵攻撃.mp3 */,
-				1820AE082B518D8C00BBA679 /* ゲームクリア.mp3 */,
 				1820AE092B518D8C00BBA679 /* 正解.mp3 */,
-				18BD10B52B6B5DEE00ABB28F /* 称号.mp3 */,
 				1820AE0B2B518D8C00BBA679 /* 倒れる.mp3 */,
 				1820AE112B518D8D00BBA679 /* 不正解.mp3 */,
 				1820AE122B518D8D00BBA679 /* 味方攻撃.mp3 */,
@@ -478,18 +478,18 @@
 				1820AE172B518D8D00BBA679 /* 正解.mp3 in Resources */,
 				1820AE202B518D8D00BBA679 /* 味方攻撃.mp3 in Resources */,
 				260E441A2AB572DE00FBB487 /* Preview Assets.xcassets in Resources */,
-				1820AE162B518D8D00BBA679 /* ゲームクリア.mp3 in Resources */,
 				1820AE1F2B518D8D00BBA679 /* 不正解.mp3 in Resources */,
 				1820AE192B518D8D00BBA679 /* 倒れる.mp3 in Resources */,
 				1820AE1B2B518D8D00BBA679 /* おとも切り替え.mp3 in Resources */,
 				1820AE1D2B518D8D00BBA679 /* キャンセル.mp3 in Resources */,
+				1898ECD32BB7DC2B0085D467 /* ゲームオーバー.mp3 in Resources */,
 				1820AE232B518D8D00BBA679 /* レベルアップ.mp3 in Resources */,
-				18BD10B62B6B5DEE00ABB28F /* 称号.mp3 in Resources */,
 				1820AE182B518D8D00BBA679 /* カウントダウン.mp3 in Resources */,
 				18BD10B82B6B601500ABB28F /* sound.mp3 in Resources */,
 				1820AE222B518D8D00BBA679 /* ホームに戻る.mp3 in Resources */,
+				1898ECD42BB7DC2B0085D467 /* ゲームクリア.mp3 in Resources */,
 				260E44172AB572DE00FBB487 /* Assets.xcassets in Resources */,
-				1820AE1A2B518D8D00BBA679 /* ゲームオーバー.mp3 in Resources */,
+				1898ECD52BB7DC2B0085D467 /* 称号.mp3 in Resources */,
 				260E44212AB5958300FBB487 /* GoogleService-Info.plist in Resources */,
 				1820AE1E2B518D8D00BBA679 /* soundKettei.mp3 in Resources */,
 				1820AE212B518D8D00BBA679 /* 敵攻撃.mp3 in Resources */,

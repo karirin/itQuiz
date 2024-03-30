@@ -16,7 +16,6 @@ struct ViewPositionKey5: PreferenceKey {
     }
 }
 
-
 struct TopView: View {
     static let samplePaymentDates: [Date] = [Date()]
     @State private var isPresentingAvatarList: Bool = false

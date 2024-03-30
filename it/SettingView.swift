@@ -25,7 +25,7 @@ struct SettingView: View {
     @ObservedObject var audioManager = AudioManager.shared
     @Environment(\.presentationMode) var presentationMode
     @State private var isSoundOn: Bool = true
-    @ObservedObject var authManager = AuthManager.shared
+    @ObservedObject var authManager = AuthManager()
     @State private var showingDeleteAlert = false
 
     var body: some View {

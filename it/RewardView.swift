@@ -16,7 +16,7 @@ class Reward: NSObject, GADFullScreenContentDelegate, ObservableObject {
 
     override init() {
         super.init()
-        LoadReward() // 初期化時に広告をロード
+//        LoadReward() // 初期化時に広告をロード
     }
 
     // リワード広告の読み込み
@@ -24,11 +24,11 @@ class Reward: NSObject, GADFullScreenContentDelegate, ObservableObject {
         GADRewardedAd.load(withAdUnitID: "ca-app-pub-4898800212808837/5768331457", request: GADRequest()) { (ad, error) in
 //        GADRewardedAd.load(withAdUnitID: "ca-app-pub-3940256099942544/1712485313", request: GADRequest()) { (ad, error) in //テスト
             if let _ = error {
-                print("😭: 読み込みに失敗しましたaaa")
+                print("😭: 読み込みに失敗しました")
                 self.rewardLoaded = false
                 return
             }
-            print("😍: 読み込みに成功しました")
+            print("😍: 読み込みに成功しました LoadReward")
             self.rewardLoaded = true
             self.rewardedAd = ad
             self.rewardedAd?.fullScreenContentDelegate = self
