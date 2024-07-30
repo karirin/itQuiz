@@ -44,7 +44,6 @@ struct TopView: View {
                                 .padding()
                         }
                         ZStack {
-//                            ManagerListTabView()
                             ManagerTabView()
                         }
                         .tabItem {
@@ -59,18 +58,11 @@ struct TopView: View {
                                 Image(systemName: "square.grid.2x2")
                                 Text("おとも一覧")
                             }
-//                    PentagonView(authManager: authManager, flag: .constant(false))
                     GraphManagerView()
-//                    PentagonManagerView()
                             .tabItem {
                                 Image(systemName: "chart.pie")
                                 Text("分析")
                             }
-//                    SettingView()
-//                            .tabItem {
-//                                Image(systemName: "gearshape.fill")
-//                                Text("設定")
-//                            }
                     ZStack {
                         SettingView()
                     }
@@ -81,29 +73,6 @@ struct TopView: View {
                 }
             }
         }
-//        .alert(isPresented: $isAlert) {
-//            Alert(
-//                 title: Text("お知らせ"),
-//                 message: Text("最新バージョンがあります"),
-//                 primaryButton: .default(Text("OK")) {
-//                     // TODO: ここでAppStoreを開く
-//                 },
-//                 secondaryButton: .cancel(Text("キャンセル")) {
-//                     // キャンセルボタンがタップされた時のアクション
-//                     print("キャンセルがタップされました")
-//                 }
-//             )                }
-//                .appVersionMonitor(id: 6469339499) { status in
-//                    switch status {
-//                    case .updateAvailable:
-//                        isAlert = true
-//                        print("アップデートがあります")
-//                    case .updateUnavailable:
-//                        print("アップデートがありません")
-//                    case .failure(let error):
-//                        print("エラーが発生しました: \(error)")
-//                    }
-//                }
     }
 }
 

@@ -27,6 +27,8 @@ struct ManagerListTabView: View {
     @State private var isPresentingITView: Bool = false
     @State private var isPresentingInfoView: Bool = false
     @State private var isPresentingAppliedView: Bool = false
+    @State private var isPresentingESView: Bool = false
+    @State private var isPresentingSystemArchitectView: Bool = false
     @State private var isSoundOn: Bool = true
     @ObservedObject var audioManager = AudioManager.shared
     @Environment(\.presentationMode) var presentationMode
@@ -34,7 +36,7 @@ struct ManagerListTabView: View {
     @State private var buttonRect: CGRect = .zero
     @State private var bubbleHeight: CGFloat = 0.0
     @State private var isIncorrectAnswersEmpty: Bool = true
-    @ObservedObject var reward = Reward()
+    @StateObject var reward = Reward()
     @State private var showLoginModal: Bool = false
     @State private var isButtonClickable: Bool = false
     @State private var showAlert: Bool = false
@@ -181,6 +183,31 @@ struct ManagerListTabView: View {
                             .padding(.horizontal)
                             .padding(.bottom)
                             .shadow(radius: 3)
+                            Button(action: {
+                                audioManager.playSound()
+                                self.isPresentingSystemArchitectView = true
+                            }) {
+                                Image("ITストラテジの問題")
+                                    .resizable()
+                                    .frame(height: isIPad() ? 200 : 70)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.horizontal)
+                            .padding(.bottom)
+                            .shadow(radius: 3)
+                            
+                            Button(action: {
+                                audioManager.playSound()
+                                self.isPresentingESView = true
+                            }) {
+                                Image("ESボタン")
+                                    .resizable()
+                                    .frame(height: isIPad() ? 200 : 70)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.horizontal)
+                            .padding(.bottom)
+                            .shadow(radius: 3)
 //                            .fullScreenCover(isPresented: $isPresentingQuizAdvanced) {
 //                                            QuizAdvancedList(isPresenting: $isPresentingQuizAdvanced)
 //                                        }
@@ -255,9 +282,12 @@ struct ManagerListTabView: View {
 //                                        }
                             
                         }
+                        .padding(.bottom,70)
                         NavigationLink("", destination: ITManagerListView(isPresenting: $isPresentingITView).navigationBarBackButtonHidden(true), isActive: $isPresentingITView)
                         NavigationLink("", destination: InfoManagerListView(isPresenting: $isPresentingInfoView).navigationBarBackButtonHidden(true), isActive: $isPresentingInfoView)
                         NavigationLink("", destination: AppliedManagerListView(isPresenting: $isPresentingAppliedView).navigationBarBackButtonHidden(true), isActive: $isPresentingAppliedView)
+                        NavigationLink("", destination: ESManagerListView(isPresenting: $isPresentingESView).navigationBarBackButtonHidden(true), isActive: $isPresentingESView)
+                        NavigationLink("", destination: ITStoratagyManagerListView(isPresenting: $isPresentingSystemArchitectView).navigationBarBackButtonHidden(true), isActive: $isPresentingSystemArchitectView)
                     }
                     .overlay(
                         ZStack {

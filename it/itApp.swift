@@ -11,6 +11,7 @@ import FirebaseCore
 import FirebaseMessaging
 import UserNotifications
 import GoogleMobileAds
+import AVFoundation
 
 class AppDelegate: NSObject, UIApplicationDelegate {
     var appState: AppState!
@@ -23,34 +24,37 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         self.appState = AppState()
         Messaging.messaging().delegate = self
 
-         UNUserNotificationCenter.current().delegate = self
+        UNUserNotificationCenter.current().delegate = self
 
-         let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
-         UNUserNotificationCenter.current().requestAuthorization(options: authOptions, completionHandler: { _, _ in })
+        let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
+        UNUserNotificationCenter.current().requestAuthorization(options: authOptions, completionHandler: { _, _ in })
 
-         application.registerForRemoteNotifications()
+        application.registerForRemoteNotifications()
 
-         Messaging.messaging().token { token, error in
-             if let error {
-                 print("Error fetching FCM registration token: \(error)")
-             } else if let token {
-                 print("FCM registration token: \(token)")
-             }
-         }
+        Messaging.messaging().token { token, error in
+            if let error {
+                print("Error fetching FCM registration token: \(error)")
+            } else if let token {
+                print("FCM registration token: \(token)")
+            }
+        }
+        
+        // オーディオセッションを設定
+        let audioSession = AVAudioSession.sharedInstance()
+        do {
+            try audioSession.setCategory(.playback, mode: .default, options: [.mixWithOthers])
+            try audioSession.setActive(true)
+        } catch {
+            print("Failed to set audio session category.")
+        }
 
-         return true
-     }
+        return true
+    }
+
     func application(_: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
         print("Oh no! Failed to register for remote notifications with error \(error)")
     }
 
-//    func application(_: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-//        var readableToken = ""
-//        for index in 0 ..< deviceToken.count {
-//            readableToken += String(format: "%02.2hhx", deviceToken[index] as CVarArg)
-//        }
-//        print("Received an APNs device token: \(readableToken)")
-//    }
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         // APNsデバイストークンを読みやすい形式に変換する処理
         var readableToken = ""
@@ -62,8 +66,8 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         // FirebaseにAPNsトークンを設定
         Messaging.messaging().apnsToken = deviceToken
     }
-
 }
+
 
 extension AppDelegate: MessagingDelegate {
     @objc func messaging(_: Messaging, didReceiveRegistrationToken fcmToken: String?) {

@@ -32,7 +32,8 @@ struct ITManagerListView: View {
     @State private var buttonRect: CGRect = .zero
     @State private var bubbleHeight: CGFloat = 0.0
     @State private var isIncorrectAnswersEmpty: Bool = true
-    @ObservedObject var reward = Reward()
+//    @ObservedObject var reward = Reward()
+    @StateObject var reward = Reward()
     @State private var showLoginModal: Bool = false
     @State private var isButtonClickable: Bool = false
     @State private var showAlert: Bool = false
@@ -395,14 +396,16 @@ struct ITManagerListView: View {
             .frame(maxWidth:.infinity,maxHeight: .infinity)
             .background(Color("Color2"))
             .onAppear {
-//                print("isButtonClickable:\(isButtonClickable)")
                 reward.LoadReward()
+//                print("isButtonClickable:\(isButtonClickable)")
+//                reward.LoadReward()
                 fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
 //                self.incorrectAnswerCount = count
 //                incorrectCount = count
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { // 1秒後に
                     self.isButtonClickable = true // ボタンをクリック可能に設定
+                    
                 }
                 authManager.fetchUserInfo { (name, avatar, money, hp, attack, tutorialNum) in
                     if let fetchedTutorialNum = tutorialNum {
@@ -476,7 +479,7 @@ struct ITManagerListView: View {
     }
 
 #Preview {
-//    ITManagerListView(isPresenting: .constant(false))
+    ITManagerListView(isPresenting: .constant(false))
 //    ManagerListView(isPresenting: .constant(false))
-    TopView()
+//    TopView()
 }

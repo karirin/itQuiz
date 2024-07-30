@@ -141,8 +141,6 @@ struct BarChartView: View {
                             }
                             .frame(height:200)
                             .padding()
-                            
-                            
                             Spacer()
                             HStack{
                                 Image(systemName: "calendar")
@@ -179,7 +177,6 @@ struct BarChartView: View {
                                     }
                                 }
                             }
-                            
                             .foregroundColor(Color("fontGray"))
                             .onAppear {
                                 fetchData(userId: authManager.currentUserId!,for: currentDate)
@@ -202,9 +199,6 @@ struct BarChartView: View {
                 }
                 .onAppear {
                     fetchData(userId: authManager.currentUserId!,for: currentDate)
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-//                        print("data:\(data)")
-                    }
                 }
             }
             .background(Color("Color2"))

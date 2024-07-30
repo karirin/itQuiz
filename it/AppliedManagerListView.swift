@@ -32,7 +32,7 @@ struct AppliedManagerListView: View {
     @State private var buttonRect: CGRect = .zero
     @State private var bubbleHeight: CGFloat = 0.0
     @State private var isIncorrectAnswersEmpty: Bool = true
-    @ObservedObject var reward = Reward()
+    @StateObject var reward = Reward()
     @State private var showLoginModal: Bool = false
     @State private var isButtonClickable: Bool = false
     @State private var showAlert: Bool = false

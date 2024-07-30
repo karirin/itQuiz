@@ -22,7 +22,9 @@ struct QuizTotal {
 
 struct QuizResultView: View {
 //    var results: [QuizResult]
+    let quizLevel: QuizLevel
     @State private var showModal = true
+    @State private var adFlag = false
     @State private var showLevelUpModal = false
     @State private var showTittleModal = false
     @State private var showMemoView = false
@@ -31,12 +33,12 @@ struct QuizResultView: View {
     @ObservedObject var authManager: AuthManager
     @ObservedObject var audioManager = AudioManager.shared
     // QuizResultView.swift
-    let quizLevel: QuizLevel
     @State private var playerExperience: Int
     @State private var playerMoney: Int
     @State private var isContentView: Bool = false
     var elapsedTime: TimeInterval
     @State var results: [QuizResult]
+    let quizBossLevel: QuizBossLevel
     @State private var isShow: Bool = true
     @State private var flag: Bool = false
     @State private var showSubFlag: Bool = false
@@ -46,19 +48,20 @@ struct QuizResultView: View {
     @State private var answer30flag: Bool = false
     @State private var answer50flag: Bool = false
     @State private var answer100flag: Bool = false
+    @State private var goburinflag: Bool = false
+    @State private var kaijyuflag: Bool = false
+    @State private var shinjyuflag: Bool = false
     @State private var userPreFlag: Int = 0
-//    @Int var elapsedTime = 1
     @Binding var isPresenting: Bool
     @Binding var navigateToQuizResultView: Bool
-//    @Environment(\.rootPresentationMode) private var rootPresentationMode: Binding<RootPresentationMode>
     @State private var isHidden = false
     private let interstitial = Interstitial()
-//    @StateObject var interstitial = Interstitial()
     @Environment(\.presentationMode) var presentationMode
     private let adViewControllerRepresentable = AdViewControllerRepresentable()
+    @State private var restart = false
 
     // QuizResultView.swift
-    init(results: [QuizResult], authManager: AuthManager, isPresenting: Binding<Bool>, navigateToQuizResultView: Binding<Bool>, playerExperience: Int, playerMoney: Int, elapsedTime: TimeInterval, quizLevel: QuizLevel) {
+    init(results: [QuizResult], authManager: AuthManager, isPresenting: Binding<Bool>, navigateToQuizResultView: Binding<Bool>, playerExperience: Int, playerMoney: Int, elapsedTime: TimeInterval, quizBossLevel: QuizBossLevel, quizLevel: QuizLevel) {
         _results = State(initialValue: results)
         self.authManager = authManager
         _isPresenting = isPresenting
@@ -66,13 +69,14 @@ struct QuizResultView: View {
         _playerExperience = State(initialValue: playerExperience)
         _playerMoney = State(initialValue: playerMoney)
         self.elapsedTime = elapsedTime
+        self.quizBossLevel = quizBossLevel
         self.quizLevel = quizLevel
-//        print("self.elapsedTime init:\(self.elapsedTime)")
     }
     
     var body: some View {
+        
         ZStack {
-        NavigationView{
+            NavigationView{
                 VStack{
                     VStack{
                         HStack{
@@ -93,7 +97,6 @@ struct QuizResultView: View {
                         }.padding(5)
                                                 }
                         if elapsedTime != 0 {
-//                            Spacer()
                             Spacer()
                                 .frame(height: 50)
                             
@@ -166,8 +169,6 @@ struct QuizResultView: View {
                                         
                                         
                         } else {
-//                            Text("正解")
-//                                .foregroundColor(Color("fontGray1"))
                         ScrollView{
                             ForEach(results, id: \.question) { result in
                                 VStack(alignment: .leading,spacing: 20) {
@@ -195,7 +196,6 @@ struct QuizResultView: View {
                         }
                         .foregroundColor(Color("fontGray1"))
                     }
-//                    Spacer()
                 }
                 .onChange(of: authManager.didLevelUp) { newValue in
                     if newValue {
@@ -209,56 +209,45 @@ struct QuizResultView: View {
                 .onAppear {
                     authManager.fetchPreFlag()
                     authManager.fetchUserStory()
+                    executeProcessEveryThreeTimes()
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                         userPreFlag = authManager.userPreFlag
-//                        print("authManager.story:\(authManager.story)")
-                        if authManager.story == 2 {
-//                            print("quizLevel:\(quizLevel)")
-                            if quizLevel == .beginnerStory1 && playerExperience != 5 {
-                                authManager.updateStory(story: 3) { success in
-                                    if success {
-                                        print("ストーリーが正常に更新されました。")
-                                    } else {
-                                        print("ストーリーの更新に失敗しました。")
-                                    }
+                    }
+                    if playerExperience != 5 {
+                        if quizBossLevel == .goburin {
+                            authManager.checkTitles(userId: authManager.currentUserId!, title: "ゴブリン") { exists in
+                                if !exists {
+                                    goburinflag = true
+                                    authManager.saveTitleForUser(userId: authManager.currentUserId!, title: "ゴブリン")
                                 }
                             }
                         }
-                        if authManager.story == 3 {
-                            if quizLevel == .beginnerStory2 && playerExperience != 5 {
-                                authManager.updateStory(story: 4) { success in
-                                    if success {
-                                        print("ストーリーが正常に更新されました。")
-                                    } else {
-                                        print("ストーリーの更新に失敗しました。")
-                                    }
+                        if quizBossLevel == .kaijyu {
+                            authManager.checkTitles(userId: authManager.currentUserId!, title: "ガルーラ") { exists in
+                                if !exists {
+                                    kaijyuflag = true
+                                    authManager.saveTitleForUser(userId: authManager.currentUserId!, title: "ガルーラ")
                                 }
                             }
                         }
-                        if authManager.story == 4 {
-                            if quizLevel == .beginnerStory3 && playerExperience != 5 {
-                                authManager.updateStory(story: 5) { success in
-                                    if success {
-                                        print("ストーリーが正常に更新されました。")
-                                    } else {
-                                        print("ストーリーの更新に失敗しました。")
-                                    }
+                        if quizBossLevel == .shinjyu {
+                            authManager.checkTitles(userId: authManager.currentUserId!, title: "ルーン") { exists in
+                                if !exists {
+                                    shinjyuflag = true
+                                    authManager.saveTitleForUser(userId: authManager.currentUserId!, title: "ルーン")
                                 }
                             }
                         }
                     }
-                    
-//                    interstitial.loadInterstitial()
-                        if !interstitial.interstitialAdLoaded {
-                            interstitial.loadInterstitial(completion: { isLoaded in
-                                if isLoaded {
-                                    self.interstitial.presentInterstitial(from: adViewControllerRepresentable.viewController)
-                                }
-                            })
-                        } else if !interstitial.wasAdDismissed {
-                            interstitial.presentInterstitial(from: adViewControllerRepresentable.viewController)
-                        }
-//                    interstitial.presentInterstitial(from: adViewControllerRepresentable.viewController)
+                    if !interstitial.interstitialAdLoaded {
+                        interstitial.loadInterstitial(completion: { isLoaded in
+                            if isLoaded {
+                                self.interstitial.presentInterstitial(from: adViewControllerRepresentable.viewController)
+                            }
+                        })
+                    } else if !interstitial.wasAdDismissed {
+                        interstitial.presentInterstitial(from: adViewControllerRepresentable.viewController)
+                    }
                     authManager.fetchUserExperienceAndLevel()
                       DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                           if authManager.level > 2 {
@@ -313,8 +302,6 @@ struct QuizResultView: View {
                           }
                           }
                       }
-//                    print("onAppear !interstitial.interstitialAdLoaded:\(!interstitial.interstitialAdLoaded)")
-//                    print("onAppear !interstitial.wasAdDismissed:\(!interstitial.wasAdDismissed)")
                 }
 
                 if showMemoView {
@@ -330,7 +317,6 @@ struct QuizResultView: View {
             .background(Color("Color2"))
             .navigationBarBackButtonHidden(true)
             .navigationBarItems(leading: Button(action: {
-//                self.presentationMode.wrappedValue.dismiss()
                 isPresenting = false
                 audioManager.playCancelSound()
             }) {
@@ -369,6 +355,15 @@ struct QuizResultView: View {
             if level10flag {
                 ModalTittleView(showLevelUpModal: $level10flag, authManager: authManager, tittleNumber: .constant(10))
             }
+            if goburinflag {
+                ModalTittleView(showLevelUpModal: $goburinflag, authManager: authManager, tittleNumber: .constant(44))
+            }
+            if kaijyuflag {
+                ModalTittleView(showLevelUpModal: $kaijyuflag, authManager: authManager, tittleNumber: .constant(55))
+            }
+            if shinjyuflag {
+                ModalTittleView(showLevelUpModal: $shinjyuflag, authManager: authManager, tittleNumber: .constant(66))
+            }
             NavigationLink("", destination: ContentView().navigationBarBackButtonHidden(true), isActive: $isContentView)
         }
     }
@@ -380,7 +375,20 @@ struct QuizResultView: View {
         formatter.zeroFormattingBehavior = .pad
         return formatter.string(from: duration) ?? ""
     }
-
+    
+    func executeProcessEveryThreeTimes() {
+        // UserDefaultsからカウンターを取得
+        let count = UserDefaults.standard.integer(forKey: "launchCountFlag") + 1
+        
+        // カウンターを更新
+        UserDefaults.standard.set(count, forKey: "launchCountFlag")
+        
+        // 3回に1回の割合で処理を実行
+        print("count:\(count)")
+        if count % 4 == 0 {
+            adFlag = true
+        }
+    }
 }
 
 struct ExperienceModalView: View {
@@ -562,6 +570,6 @@ struct QuizResultView_Previews: PreviewProvider {
         let authManager = AuthManager() // 適切なダミーまたはモックオブジェクトで置き換えてください
 
         // プレビュー用にビューを初期化
-        QuizResultView(results: dummyResults, authManager: authManager, isPresenting: $isPresenting, navigateToQuizResultView: $navigateToQuizResultView, playerExperience: 10, playerMoney: 10, elapsedTime: 0, quizLevel: .beginner)
+        QuizResultView(results: dummyResults, authManager: authManager, isPresenting: $isPresenting, navigateToQuizResultView: $navigateToQuizResultView, playerExperience: 10, playerMoney: 10, elapsedTime: 0, quizBossLevel: .none, quizLevel: .beginner)
     }
 }

@@ -172,12 +172,15 @@ struct GachaView: View {
                     }
                     .padding(.leading)
                     Spacer()
-                    Image("コイン")
-                        .resizable()
-                        .frame(width:20,height:20)
-                        .padding(.top,3)
-                    Text("+").padding(.top,3)
-                    Text(" \(userMoney)").padding(.top,3)
+                    ZStack {
+                        Image("コインバー")
+                            .resizable()
+                            .frame(width:80,height:30)
+                        Text(" \(userMoney)")
+                            .foregroundColor(Color("fontGray"))
+                            .padding(.leading,25)
+                            .padding(.top,3)
+                    }
                     Button(action: {
                         audioManager.playSound()
                         self.showCoinModal = true
@@ -185,7 +188,7 @@ struct GachaView: View {
                     }) {
                         Image("コイン購入")
                             .resizable()
-                            .frame(maxWidth:110,maxHeight:40)
+                            .frame(maxWidth:110,maxHeight:35)
                             .shadow(radius: 3)
                     }
                     .padding(.top,3)
@@ -216,16 +219,38 @@ struct GachaView: View {
                         }
                         
                         HStack{
-                            Image("ハート")
-                                .resizable()
-                                .frame(width: 30,height:30)
-                            Text("体力：\(item.health)")
-                                .font(.system(size: 24))
-                            Image("ソード")
-                                .resizable()
-                                .frame(width: 40,height:30)
-                            Text("攻撃力：\(item.attack)")
-                                .font(.system(size: 24))
+                            ZStack {
+                                Image("ハートバー")
+                                    .resizable()
+                                    .frame(width:140,height:50)
+                                Text("\(item.health)")
+                                    .multilineTextAlignment(.leading)
+                                    .font(.system(size: 26))
+                                    .foregroundColor(Color("fontGray"))
+                                    .padding(.leading,65)
+                                    .padding(.top,15)
+                            }
+                            ZStack {
+                                Image("攻撃バー")
+                                    .resizable()
+                                    .frame(width:136,height:48)
+                                Text("\(item.attack)")
+                                    .multilineTextAlignment(.leading)
+                                    .font(.system(size: 26))
+                                    .foregroundColor(Color("fontGray"))
+                                    .padding(.leading,65)
+                                    .padding(.top,10)
+                            }
+//                            Image("ハート")
+//                                .resizable()
+//                                .frame(width: 30,height:30)
+//                            Text("体力：\(item.health)")
+//                                .font(.system(size: 24))
+//                            Image("ソード")
+//                                .resizable()
+//                                .frame(width: 40,height:30)
+//                            Text("攻撃力：\(item.attack)")
+//                                .font(.system(size: 24))
                         }
                         .foregroundColor(Color("fontGray"))
                     }
@@ -271,7 +296,8 @@ struct GachaView: View {
                         
                         Image("300コイン")
                             .resizable()
-                            .frame(maxWidth:150,maxHeight:50)
+                            .frame(maxWidth:130,maxHeight:50)
+                            .padding(.top,-5)
                     }
                         Spacer()
                         Button(action: {
@@ -330,7 +356,6 @@ struct GachaView: View {
                                     }
                                     self.showAnimation = true
                                     self.gachaManager.shuffleItems()
-                                    //                            self.obtainedItem = self.gachaManager.drawGacha()
                                     self.obtainedRareItem = self.gachaManager.drawGacha()
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                                         self.showResult = true
@@ -354,7 +379,8 @@ struct GachaView: View {
                                 .disabled(!isGachaButtonDisabled)
                                 Image("300コイン")
                                     .resizable()
-                                    .frame(maxWidth:150,maxHeight:50)
+                                    .frame(maxWidth:130,maxHeight:50)
+                                    .padding(.top,-5)
                             }
                             Spacer()
                             Button(action: {
@@ -373,18 +399,10 @@ struct GachaView: View {
                             .disabled(!reward.rewardLoaded) // rewardLoadedを使用してボタンの活性状態を制御
                             .onChange(of: reward.rewardEarned) { rewardEarned in
                                 showAlert = rewardEarned
-//                                print("onChange reward.rewardEarned:\(rewardEarned)")
                             }
                             .onAppear() {
                                 reward.LoadReward()
                             }
-//                                .onAppear() {
-//                                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { // 1秒後に
-//                                                        self.isButtonClickable = true // ボタンをクリック可能に設定
-//                                                    }
-//                                reward.LoadReward()
-//                            }
-                            //                        .disabled(!reward.rewardLoaded)
                             .shadow(radius: 10)
                             Spacer()
                         }

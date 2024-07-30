@@ -19,6 +19,8 @@ class RankingViewModel: ObservableObject {
     @Published var currentUserLevelRank: Int?
     @Published var userAvatarCounts: [UserAvatarCount] = []
     @Published var currentUserAvatarRank: Int?
+    @Published var rankedUsers = [User]()
+    @Published var currentUserRankRank: Int?
 
     
     init() {
@@ -42,13 +44,11 @@ class RankingViewModel: ObservableObject {
                    let userHp = data["userHp"] as? Int,
                    let userAttack = data["userAttack"] as? Int,
                    let level = data["level"] as? Int,
-                   let experience = data["experience"] as? Int{
+                   let experience = data["experience"] as? Int {
 
-                    // rankMatchPointが存在しない場合は、デフォルト値100を使用
                     let rankMatchPoint = data["rankMatchPoint"] as? Int ?? 100
                     let rank = data["rank"] as? Int ?? 1
 
-                    // アバターデータがあればフィルタリング
                     var filteredAvatars: [[String: Any]] = []
                     if let avatarsData = data["avatars"] as? [String: [String: Any]] {
                         for (_, avatarData) in avatarsData {
@@ -65,22 +65,33 @@ class RankingViewModel: ObservableObject {
                                     avatars: filteredAvatars,
                                     userMoney: userMoney,
                                     userHp: userHp,
-                                    userAttack: userAttack, userFlag: 1, adminFlag: 0, rankMatchPoint: rankMatchPoint, rank: rank)
+                                    userAttack: userAttack,
+                                    userFlag: 1,
+                                    adminFlag: 0,
+                                    rankMatchPoint: rankMatchPoint,
+                                    rank: rank)
                     users.append(user)
                 }
             }
 
-            // レベルが高い順にソート
             self.users = users.sorted { $0.level > $1.level }
+            self.rankedUsers = users.sorted { $0.rankMatchPoint > $1.rankMatchPoint }
+            
             DispatchQueue.main.async {
                 self.calculateLevelRankings()
+                self.calculateRankRankings()
             }
             self.fetchMonthlyAnswers()
         }) { (error) in
-    //        print("Error getting users: \(error.localizedDescription)")
+            print("Error getting users: \(error.localizedDescription)")
         }
     }
-
+    
+    private func calculateRankRankings() {
+        if let currentUserIndex = rankedUsers.firstIndex(where: { $0.id == self.authManager.currentUserId }) {
+            self.currentUserRankRank = currentUserIndex + 1
+        }
+    }
     
 //    func fetchUsers() {
 //        let usersRef = Database.database().reference().child("users")
@@ -334,6 +345,90 @@ class RankingViewModel: ObservableObject {
 
 }
 
+struct RankRankingView: View {
+    @ObservedObject var viewModel: RankingViewModel
+    
+    var body: some View {
+        if viewModel.rankedUsers.isEmpty {
+            VStack {
+                ActivityIndicator()
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else {
+            ScrollView {
+                VStack {
+                    ForEach(Array(viewModel.rankedUsers.prefix(viewModel.displayedUserCount).enumerated()), id: \.element.id) { index, user in
+                        HStack {
+                            if index < 3 {
+                                Image("\(index)")
+                                    .resizable()
+                                    .frame(width: 50, height: 50)
+                                    .padding(.trailing)
+                            } else {
+                                Text("\(index + 1)位")
+                                    .font(.system(size: 40))
+                                    .padding(.trailing, 5)
+                            }
+                            ForEach(user.avatars.indices, id: \.self) { index in
+                                let avatarData = user.avatars[index]
+                                if let name = avatarData["name"] as? String, let usedFlag = avatarData["usedFlag"] as? Int, usedFlag == 1 {
+                                    Image(name)
+                                        .resizable()
+                                        .frame(width: 50, height: 50)
+                                }
+                            }
+                            Text(user.userName)
+                                .font(.system(size: fontSize(for: user.userName, isIPad: isIPad())))
+                            Spacer()
+                            VStack(spacing:5) {
+                                Text("ランク値")
+                                HStack {
+                                    Image("ランクマッチマーク")
+                                        .resizable()
+                                        .frame(width:30,height:30)
+                                    Text("\(user.rankMatchPoint)")
+                                }
+                            }.font(.system(size: 20))
+                        }
+                        .padding(.horizontal)
+                        Divider()
+                    }
+                    if let currentUserRankRank = viewModel.currentUserRankRank {
+                        Text("あなたの順位: \(currentUserRankRank)位")
+                            .font(.headline)
+                            .padding()
+                    }
+                }
+                .foregroundColor(Color("fontGray"))
+            }
+        }
+    }
+
+    func fontSize(for text: String, isIPad: Bool) -> CGFloat {
+        let baseFontSize: CGFloat = isIPad ? 28 : 24
+        let englishAlphabet = CharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+        let textCharacterSet = CharacterSet(charactersIn: text)
+        if englishAlphabet.isSuperset(of: textCharacterSet) {
+            return baseFontSize
+        } else {
+            if text.count >= 12 {
+                return baseFontSize - 14
+            } else if text.count >= 10 {
+                return baseFontSize - 12
+            } else if text.count >= 8 {
+                return baseFontSize - 10
+            } else if text.count >= 6 {
+                return baseFontSize - 8
+            } else if text.count >= 4 {
+                return baseFontSize
+            } else {
+                return baseFontSize + 4
+            }
+        }
+    }
+}
+
+
 struct LevelRankingView: View {
     @ObservedObject var viewModel: RankingViewModel
     @State private var rankNum: Int = 0
@@ -382,10 +477,14 @@ struct LevelRankingView: View {
                                 .font(.system(size: fontSize1(for: user.userName, isIPad: isIPad())))
                             Spacer()
                             VStack{
-                                //                            Spacer()
-                                Text("レベル: \(user.level)")
-                                    .font(.system(size:20))
+                                HStack{
+                                    Image("星")
+                                        .resizable()
+                                        .frame(width:23,height:23)
+                                    Text("\(user.level)レベル")
+                                }
                             }
+                            .font(.system(size:16))
                         }
                         .padding(.horizontal)
                         Divider()
@@ -492,8 +591,13 @@ struct MonthlyAnswersRankingView: View {
                             Text(userAnswerData.userName)
                                 .font(.system(size: fontSize(for: userAnswerData.userName, isIPad: isIPad())))
                             Spacer()
-                            Text("回答数: \(userAnswerData.answerCount)")
-                                .font(.system(size: 20))
+                            VStack{
+                                HStack {
+                                    Image(systemName: "checkmark.square")
+                                        .foregroundColor(.blue)
+                                    Text("\(userAnswerData.answerCount)問")
+                                }
+                            }.font(.system(size: 20))
                         }
                         .padding(.horizontal)
                         Divider()
@@ -581,7 +685,14 @@ struct AvatarRankingView: View {
                         Text(userAvatarCount.userName)
                             .font(.system(size: fontSize(for: userAvatarCount.userName, isIPad: isIPad())))
                         Spacer()
-                        Text("おとも：\(userAvatarCount.avatarCount)")
+                        VStack{
+                            HStack{
+                                Image("ライム")
+                                    .resizable()
+                                    .frame(width: 30, height: 30)
+                                Text("\(userAvatarCount.avatarCount)体")
+                            }
+                        }
                             .font(.system(size: 20))
                     }
                     .padding(.horizontal)
@@ -672,31 +783,33 @@ struct TopTabView: View {
 
 struct RankingView: View {
     @StateObject var viewModel = RankingViewModel()
-    @ObservedObject var audioManager : AudioManager
+    @ObservedObject var audioManager: AudioManager
     @Environment(\.presentationMode) var presentationMode
     @State private var selectedTab: Int = 0
     @State private var canSwipe: Bool = false
-    let list: [String] = ["レベル", "回答数(月間)", "おともの数"]
+    let list: [String] = ["レベル", "回答数(月間)", "おともの数", "ランク"]
     
     var body: some View {
         NavigationView {
-            VStack{
+            VStack {
                 TopTabView(list: list, selectedTab: $selectedTab)
-               
+                
                 TabView(selection: $selectedTab,
-                                    content: {
-                    LevelRankingView(viewModel: viewModel)
-                        .padding(.top)
-                                    .tag(0)
-                    MonthlyAnswersRankingView(viewModel: viewModel)
-                        .padding(.top)
-                                    .tag(1)
-                    AvatarRankingView(viewModel: viewModel)
-                        .padding(.top)
-                                    .tag(2)
-                            })
-                            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-//                LevelRankingView(viewModel: viewModel)
+                        content: {
+                            LevelRankingView(viewModel: viewModel)
+                                .padding(.top)
+                                .tag(0)
+                            MonthlyAnswersRankingView(viewModel: viewModel)
+                                .padding(.top)
+                                .tag(1)
+                            AvatarRankingView(viewModel: viewModel)
+                                .padding(.top)
+                                .tag(2)
+                            RankRankingView(viewModel: viewModel)
+                                .padding(.top)
+                                .tag(3)
+                        })
+                        .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
             }
             .background(Color("Color2"))
         }
@@ -711,14 +824,15 @@ struct RankingView: View {
                 .foregroundColor(Color("fontGray"))
         })
         .toolbar {
-                ToolbarItem(placement: .principal) {
-                    Text("ランキング")
-                        .font(.system(size: 20)) // ここでフォントサイズを指定
-                        .foregroundColor(Color("fontGray"))
-                }
+            ToolbarItem(placement: .principal) {
+                Text("ランキング")
+                    .font(.system(size: 20))
+                    .foregroundColor(Color("fontGray"))
             }
+        }
     }
 }
+
 
 struct RankingView_Previews: PreviewProvider {
     static var previews: some View {

@@ -120,6 +120,42 @@ struct ModalTittleView: View {
                         .font(.system(size: 20))
                         .multilineTextAlignment(.center)
                     .foregroundColor(Color("fontGray"))
+                } else if tittleNumber == 44 {
+                    Text("称号獲得")
+                        .font(.system(size: 28))
+                        .fontWeight(.medium)
+                    .foregroundColor(Color("fontGray"))
+                    Image("ゴブリン")
+                        .resizable()
+                        .frame(width:200,height:200)
+                    Text("ゴブリンリーダーを倒した\n「ゴブリンの財産」を獲得しました")
+                        .font(.system(size: 18))
+                        .multilineTextAlignment(.center)
+                    .foregroundColor(Color("fontGray"))
+                } else if tittleNumber == 55 {
+                    Text("称号獲得")
+                        .font(.system(size: 28))
+                        .fontWeight(.medium)
+                    .foregroundColor(Color("fontGray"))
+                    Image("ガルーラ")
+                        .resizable()
+                        .frame(width:200,height:200)
+                    Text("海獣ガルーンを倒した\n「神秘の海藻」を獲得しました")
+                        .font(.system(size: 20))
+                        .multilineTextAlignment(.center)
+                    .foregroundColor(Color("fontGray"))
+                } else if tittleNumber == 66 {
+                    Text("称号獲得")
+                        .font(.system(size: 28))
+                        .fontWeight(.medium)
+                    .foregroundColor(Color("fontGray"))
+                    Image("ルーン")
+                        .resizable()
+                        .frame(width:200,height:200)
+                    Text("神竜ルーンを倒した\n「神玉」を獲得しました")
+                        .font(.system(size: 20))
+                        .multilineTextAlignment(.center)
+                    .foregroundColor(Color("fontGray"))
                 }
 //                else if tittleNumber == 03 {
 //                    Text("称号獲得")
@@ -133,6 +169,7 @@ struct ModalTittleView: View {
 //                        .multilineTextAlignment(.center)
 //                }
             }
+            .frame(width:300,height:330)
             .padding()
             .background(Color.white)
             .cornerRadius(20)
@@ -165,6 +202,6 @@ struct ModalTittleView: View {
 struct ModalTittleView_Previews: PreviewProvider {
     static var previews: some View {
         let authManager = AuthManager()
-        ModalTittleView(showLevelUpModal: .constant(true), authManager: authManager, tittleNumber: .constant(02))
+        ModalTittleView(showLevelUpModal: .constant(true), authManager: authManager, tittleNumber: .constant(66))
     }
 }

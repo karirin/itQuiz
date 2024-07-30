@@ -14,7 +14,7 @@ struct ManagerTabView: View {
 //    @ObservedObject var viewModel: RankingViewModel
     @ObservedObject var authManager = AuthManager.shared
 //    @ObservedObject var viewModel: QuizBeginnerStoryViewModel
-    let list: [String] = ["ダンジョン","ランクマッチ"]
+    let list: [String] = ["ダンジョン","ランクマッチ","ボス戦"]
     
     var body: some View {
         NavigationView {
@@ -32,6 +32,9 @@ struct ManagerTabView: View {
 //                    TopView()
                         .padding(.top)
                                     .tag(1)
+                    BossManagerListView(isPresenting: .constant(false))
+                        .padding(.top)
+                                    .tag(2)
                             })
                             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
 //                LevelRankingView(viewModel: viewModel)

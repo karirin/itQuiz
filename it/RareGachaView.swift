@@ -115,14 +115,26 @@ struct RareGachaView: View {
         ZStack{
             VStack{
                 HStack{
+                    Button(action: {
+                        self.presentationMode.wrappedValue.dismiss()
+                        audioManager.playCancelSound()
+                    }) {
+                        Image(systemName: "chevron.left")
+                            .foregroundColor(Color("fontGray"))
+                        Text("戻る")
+                            .foregroundColor(Color("fontGray"))
+                    }
+                    .padding(.leading)
                     Spacer()
-                    Image("コイン")
-                    .resizable()
-                    .frame(width:20,height:20)
-                    .padding(.top,3)
-                    Text("+").padding(.top,3)
-                    Text(" \(userMoney)")
-                        .padding(.top,3)
+                    ZStack {
+                        Image("コインバー")
+                            .resizable()
+                            .frame(width:80,height:30)
+                        Text(" \(userMoney)")
+                            .foregroundColor(Color("fontGray"))
+                            .padding(.leading,25)
+                            .padding(.top,3)
+                    }
                     Button(action: {
                     audioManager.playSound()
                     self.showCoinModal = true
@@ -130,7 +142,7 @@ struct RareGachaView: View {
                     }) {
                     Image("コイン購入")
                     .resizable()
-                    .frame(maxWidth:110,maxHeight:40)
+                    .frame(maxWidth:110,maxHeight:35)
                     .shadow(radius: 3)
                     }
                     .padding(.top,3)
@@ -161,16 +173,28 @@ struct RareGachaView: View {
                         }
                         
                         HStack{
-                            Image("ハート")
-                                .resizable()
-                                .frame(width: 30,height:30)
-                            Text("体力：\(item.health)")
-                                .font(.system(size: 24))
-                            Image("ソード")
-                                .resizable()
-                                .frame(width: 40,height:30)
-                            Text("攻撃力：\(item.attack)")
-                                .font(.system(size: 24))
+                            ZStack {
+                                Image("ハートバー")
+                                    .resizable()
+                                    .frame(width:140,height:50)
+                                Text("\(item.health)")
+                                    .multilineTextAlignment(.leading)
+                                    .font(.system(size: 26))
+                                    .foregroundColor(Color("fontGray"))
+                                    .padding(.leading,65)
+                                    .padding(.top,15)
+                            }
+                            ZStack {
+                                Image("攻撃バー")
+                                    .resizable()
+                                    .frame(width:136,height:48)
+                                Text("\(item.attack)")
+                                    .multilineTextAlignment(.leading)
+                                    .font(.system(size: 26))
+                                    .foregroundColor(Color("fontGray"))
+                                    .padding(.leading,65)
+                                    .padding(.top,10)
+                            }
                         }
                         .foregroundColor(Color("fontGray"))
                     }
@@ -217,7 +241,7 @@ struct RareGachaView: View {
                             
                             Image("600コイン")
                                 .resizable()
-                                .frame(maxWidth:150,maxHeight:50)
+                                .frame(maxWidth:130,maxHeight:50)
                         }
                         Spacer()
                         Button(action: {
@@ -284,7 +308,7 @@ struct RareGachaView: View {
                                 .disabled(!isGachaButtonDisabled)
                                 Image("600コイン")
                                     .resizable()
-                                    .frame(maxWidth:150,maxHeight:50)
+                                    .frame(maxWidth:130,maxHeight:50)
                             }
                             Spacer()
                             Button(action: {
@@ -461,16 +485,16 @@ struct RareGachaView: View {
         }
 
         .frame(maxWidth: .infinity,maxHeight: .infinity)
-        .navigationBarBackButtonHidden(true)
-                .navigationBarItems(leading: Button(action: {
-                    self.presentationMode.wrappedValue.dismiss()
-                    audioManager.playCancelSound()
-                }) {
-                    Image(systemName: "chevron.left")
-                        .foregroundColor(Color("fontGray"))
-                    Text("戻る")
-                        .foregroundColor(Color("fontGray"))
-                })
+//        .navigationBarBackButtonHidden(true)
+//                .navigationBarItems(leading: Button(action: {
+//                    self.presentationMode.wrappedValue.dismiss()
+//                    audioManager.playCancelSound()
+//                }) {
+//                    Image(systemName: "chevron.left")
+//                        .foregroundColor(Color("fontGray"))
+//                    Text("戻る")
+//                        .foregroundColor(Color("fontGray"))
+//                })
         .background(Color("RareGachaBackgroundColor"))
            .onChange(of: animationFinished) { finished in
                if finished {

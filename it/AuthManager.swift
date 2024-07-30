@@ -79,7 +79,7 @@ class AuthManager: ObservableObject {
     
     var onLoginCompleted: (() -> Void)?
     var currentUserId: String? {
-        print("user?.uid:\(user?.uid)")
+//        print("user?.uid:\(user?.uid)")
         return user?.uid
     }
     

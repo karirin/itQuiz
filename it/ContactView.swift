@@ -86,6 +86,8 @@ struct ContactView: View {
                     })
                     .shadow(radius: 3)
                     .padding(.top,10)
+                    .opacity(text.isEmpty ? 0.5 : 1)
+                    .disabled(text.isEmpty)
                     .alert(isPresented: $showAlert) { // アラートを表示する
                         Alert(
                             title: Text("送信されました"),
@@ -97,16 +99,6 @@ struct ContactView: View {
                 Spacer()
             }
         }
-//        .navigationViewStyle(StackNavigationViewStyle())
-//        .navigationBarItems(leading: Button(action: {
-//            self.presentationMode.wrappedValue.dismiss()
-//            audioManager.playCancelSound()
-//        }) {
-//            Image(systemName: "chevron.left")
-//                .foregroundColor(Color("fontGray"))
-//            Text("戻る")
-//                .foregroundColor(Color("fontGray"))
-//        })
         .onTapGesture {
             UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
         }
@@ -123,4 +115,3 @@ struct ContactView: View {
 #Preview {
     ContactView(audioManager: AudioManager())
 }
-

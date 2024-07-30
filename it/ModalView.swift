@@ -27,9 +27,6 @@ struct ModalView: View {
             VStack(spacing: 10) {
                 Button(action: {
                     isPresenting = false
-                    if isDaily {
-                        isContentView = true
-                    }
                     audioManager.playReturnSound()
                 }) {
                     HStack{

@@ -116,18 +116,28 @@ struct IllustratedView: View {
                                 .cornerRadius(15)
                                 .frame(height:180)
                             HStack{
-                                Image("ハート")
-                                    .resizable()
-                                    .frame(width: 20,height:20)
-                                Text("\(selected.health)")
-                                    .font(.system(size:24))
-                                    .foregroundColor(Color("fontGray"))
-                                Image("ソード")
-                                    .resizable()
-                                    .frame(width: 25,height:20)
-                                Text("\(selected.attack)")
-                                    .font(.system(size:24))
-                                    .foregroundColor(Color("fontGray"))
+                                ZStack {
+                                    Image("ハートバー")
+                                        .resizable()
+                                        .frame(width:120,height:40)
+                                    Text("\(selected.health)")
+                                        .multilineTextAlignment(.leading)
+                                        .font(.system(size: 26))
+                                        .foregroundColor(Color("fontGray"))
+                                        .padding(.leading,65)
+                                        .padding(.top,15)
+                                }
+                                ZStack {
+                                    Image("攻撃バー")
+                                        .resizable()
+                                        .frame(width:116,height:40)
+                                    Text("\(selected.attack)")
+                                        .multilineTextAlignment(.leading)
+                                        .font(.system(size: 26))
+                                        .foregroundColor(Color("fontGray"))
+                                        .padding(.leading,65)
+                                        .padding(.top,10)
+                                }.padding(.top,5)
                             }
                         }
                     }
@@ -151,18 +161,28 @@ struct IllustratedView: View {
                                 .cornerRadius(15)
                                 .frame(height:180)
                             HStack{
-                                Image("ハート")
-                                    .resizable()
-                                    .frame(width: 20,height:20)
-                                Text("???")
-                                    .font(.system(size:24))
-                                    .foregroundColor(Color("fontGray"))
-                                Image("ソード")
-                                    .resizable()
-                                    .frame(width: 25,height:20)
-                                Text("???")
-                                    .font(.system(size:24))
-                                    .foregroundColor(Color("fontGray"))
+                                ZStack {
+                                    Image("ハートバー")
+                                        .resizable()
+                                        .frame(width:120,height:40)
+                                    Text("???")
+                                        .multilineTextAlignment(.leading)
+                                        .font(.system(size: 26))
+                                        .foregroundColor(Color("fontGray"))
+                                        .padding(.leading,65)
+                                        .padding(.top,15)
+                                }
+                                ZStack {
+                                    Image("攻撃バー")
+                                        .resizable()
+                                        .frame(width:116,height:40)
+                                    Text("???")
+                                        .multilineTextAlignment(.leading)
+                                        .font(.system(size: 26))
+                                        .foregroundColor(Color("fontGray"))
+                                        .padding(.leading,65)
+                                        .padding(.top,10)
+                                }.padding(.top,5)
                             }
                         }
                     }

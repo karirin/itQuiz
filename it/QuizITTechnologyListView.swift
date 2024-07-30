@@ -317,96 +317,96 @@ struct QuizITTechnologyListView: View {
            correctAnswerIndex: 2,
            explanation: "フィッシングは、詐欺的な手段を用いて個人情報を盗み出す攻撃手法であり、マルウェア（悪意のあるソフトウェア）そのものではありません。"
          ),
-//          QuizQuestion(
-//           question: "IPv6アドレスの長さは何ビットか？",
-//           choices: [
-//             "32ビット",
-//             "64ビット",
-//             "128ビット",
-//             "256ビット"
-//           ],
-//           correctAnswerIndex: 2,
-//           explanation: "IPv6アドレスは128ビットの長さがあり、より広大なアドレス空間を提供し、インターネットの成長を支える設計となっています。"
-//         ),
-//
-//          QuizQuestion(
-//           question: "オペレーティングシステム(OS)の主な役割は何か？",
-//           choices: [
-//             "文書作成ソフトウェアを提供する",
-//             "ネットワーク接続の速度を上げる",
-//             "ハードウェアとアプリケーションソフトウェアの仲介役をする",
-//             "ウイルスからコンピュータを守る"
-//           ],
-//           correctAnswerIndex: 2,
-//           explanation: "オペレーティングシステムは、コンピュータのハードウェアリソースを管理し、アプリケーションソフトウェアがこれらのリソースを効率的に利用できるようにする仲介者の役割を果たします。"
-//         ),
-//          QuizQuestion(
-//           question: "ビッグデータの「3V」とは何を指すか？",
-//           choices: [
-//             "Velocity, Variety, Volume",
-//             "Validity, Veracity, Value",
-//             "Visibility, Velocity, Volume",
-//             "Volume, Value, Veracity"
-//           ],
-//           correctAnswerIndex: 0,
-//           explanation: "ビッグデータの「3V」は、データの大量性（Volume）、多様性（Variety）、速度（Velocity）を指し、ビッグデータを定義する上で重要な3つの特徴を表しています。"
-//         ),
-//          QuizQuestion(
-//           question: "RDBMSの「R」は何を意味しているか？",
-//           choices: [
-//             "Rapid",
-//             "Relational",
-//             "Real-time",
-//             "Recoverable"
-//           ],
-//           correctAnswerIndex: 1,
-//           explanation: "RDBMSはRelational Database Management Systemの略で、関係型データベース管理システムを意味します。これは、データを表形式で管理し、行と列の関係を利用して効率的な検索と更新を行うシステムです。"
-//         ),
-//          QuizQuestion(
-//           question: "ソフトウェア開発における「アジャイル」とは何か？",
-//           choices: [
-//             "プログラミング言語の一種",
-//             "開発プロジェクトを迅速かつ柔軟に進める方法論",
-//             "ソフトウェアのバグを自動的に修正するツール",
-//             "データを安全に暗号化する技術"
-//           ],
-//           correctAnswerIndex: 1,
-//           explanation: "アジャイルソフトウェア開発は、短い開発サイクル（スプリント）を通じて迅速かつ柔軟にソフトウェア開発プロジェクトを進めるための方法論です。顧客のフィードバックを積極的に取り入れ、変化に迅速に対応します。"
-//         ),
-//
-//          QuizQuestion(
-//           question: "次のうち、機密データを暗号化して安全に通信するために使用されるプロトコルはどれか？",
-//           choices: [
-//             "HTTP",
-//             "HTTPS",
-//             "FTP",
-//             "SMTP"
-//           ],
-//           correctAnswerIndex: 1,
-//           explanation: "HTTPS（Hyper Text Transfer Protocol Secure）は、通信を暗号化することによって、データの盗聴や改ざんを防ぐために使用されるプロトコルです。"
-//         ),
-//          QuizQuestion(
-//           question: "クラウドコンピューティングのサービスモデルで、インフラストラクチャ（サーバーやストレージなど）をインターネット経由で提供するものは何か？",
-//           choices: [
-//             "Software as a Service (SaaS)",
-//             "Platform as a Service (PaaS)",
-//             "Infrastructure as a Service (IaaS)",
-//             "Database as a Service (DaaS)"
-//           ],
-//           correctAnswerIndex: 2,
-//           explanation: "IaaS（Infrastructure as a Service）は、仮想化されたコンピューティングリソースをインターネット経由で提供するクラウドサービスモデルです。"
-//         ),
-//          QuizQuestion(
-//           question: "デジタル証明書を発行することで、ウェブサイトの身元を証明し、通信の安全を保証する組織は何か？",
-//           choices: [
-//             "インターネットサービスプロバイダ",
-//             "ネットワーク管理者",
-//             "認証局（Certificate Authority, CA）",
-//             "ウェブホスティングサービス"
-//           ],
-//           correctAnswerIndex: 2,
-//           explanation: "認証局（CA）は、デジタル証明書を発行することによって、ウェブサイトの身元を証明し、通信が安全であることを保証する組織です。"
-//         )
+          QuizQuestion(
+           question: "IPv6アドレスの長さは何ビットか？",
+           choices: [
+             "32ビット",
+             "64ビット",
+             "128ビット",
+             "256ビット"
+           ],
+           correctAnswerIndex: 2,
+           explanation: "IPv6アドレスは128ビットの長さがあり、より広大なアドレス空間を提供し、インターネットの成長を支える設計となっています。"
+         ),
+
+          QuizQuestion(
+           question: "オペレーティングシステム(OS)の主な役割は何か？",
+           choices: [
+             "文書作成ソフトウェアを提供する",
+             "ネットワーク接続の速度を上げる",
+             "ハードウェアとアプリケーションソフトウェアの仲介役をする",
+             "ウイルスからコンピュータを守る"
+           ],
+           correctAnswerIndex: 2,
+           explanation: "オペレーティングシステムは、コンピュータのハードウェアリソースを管理し、アプリケーションソフトウェアがこれらのリソースを効率的に利用できるようにする仲介者の役割を果たします。"
+         ),
+          QuizQuestion(
+           question: "ビッグデータの「3V」とは何を指すか？",
+           choices: [
+             "Velocity, Variety, Volume",
+             "Validity, Veracity, Value",
+             "Visibility, Velocity, Volume",
+             "Volume, Value, Veracity"
+           ],
+           correctAnswerIndex: 0,
+           explanation: "ビッグデータの「3V」は、データの大量性（Volume）、多様性（Variety）、速度（Velocity）を指し、ビッグデータを定義する上で重要な3つの特徴を表しています。"
+         ),
+          QuizQuestion(
+           question: "RDBMSの「R」は何を意味しているか？",
+           choices: [
+             "Rapid",
+             "Relational",
+             "Real-time",
+             "Recoverable"
+           ],
+           correctAnswerIndex: 1,
+           explanation: "RDBMSはRelational Database Management Systemの略で、関係型データベース管理システムを意味します。これは、データを表形式で管理し、行と列の関係を利用して効率的な検索と更新を行うシステムです。"
+         ),
+          QuizQuestion(
+           question: "ソフトウェア開発における「アジャイル」とは何か？",
+           choices: [
+             "プログラミング言語の一種",
+             "開発プロジェクトを迅速かつ柔軟に進める方法論",
+             "ソフトウェアのバグを自動的に修正するツール",
+             "データを安全に暗号化する技術"
+           ],
+           correctAnswerIndex: 1,
+           explanation: "アジャイルソフトウェア開発は、短い開発サイクル（スプリント）を通じて迅速かつ柔軟にソフトウェア開発プロジェクトを進めるための方法論です。顧客のフィードバックを積極的に取り入れ、変化に迅速に対応します。"
+         ),
+
+          QuizQuestion(
+           question: "次のうち、機密データを暗号化して安全に通信するために使用されるプロトコルはどれか？",
+           choices: [
+             "HTTP",
+             "HTTPS",
+             "FTP",
+             "SMTP"
+           ],
+           correctAnswerIndex: 1,
+           explanation: "HTTPS（Hyper Text Transfer Protocol Secure）は、通信を暗号化することによって、データの盗聴や改ざんを防ぐために使用されるプロトコルです。"
+         ),
+          QuizQuestion(
+           question: "クラウドコンピューティングのサービスモデルで、インフラストラクチャ（サーバーやストレージなど）をインターネット経由で提供するものは何か？",
+           choices: [
+             "Software as a Service (SaaS)",
+             "Platform as a Service (PaaS)",
+             "Infrastructure as a Service (IaaS)",
+             "Database as a Service (DaaS)"
+           ],
+           correctAnswerIndex: 2,
+           explanation: "IaaS（Infrastructure as a Service）は、仮想化されたコンピューティングリソースをインターネット経由で提供するクラウドサービスモデルです。"
+         ),
+          QuizQuestion(
+           question: "デジタル証明書を発行することで、ウェブサイトの身元を証明し、通信の安全を保証する組織は何か？",
+           choices: [
+             "インターネットサービスプロバイダ",
+             "ネットワーク管理者",
+             "認証局（Certificate Authority, CA）",
+             "ウェブホスティングサービス"
+           ],
+           correctAnswerIndex: 2,
+           explanation: "認証局（CA）は、デジタル証明書を発行することによって、ウェブサイトの身元を証明し、通信が安全であることを保証する組織です。"
+         )
 
     ]
         

@@ -48,7 +48,7 @@ struct GachaManagerView: View {
                     HStack{
                         Image("300コイン")
                             .resizable()
-                            .frame(maxWidth:150,maxHeight:50)
+                            .frame(maxWidth:150,maxHeight:60)
                         Spacer()
                     }
                     .padding(.leading)
@@ -71,7 +71,7 @@ struct GachaManagerView: View {
                     HStack{
                         Image("600コイン")
                             .resizable()
-                            .frame(maxWidth:150,maxHeight:50)
+                            .frame(maxWidth:150,maxHeight:60)
                         Spacer()
                     }
                     .padding(.leading)

@@ -14,9 +14,10 @@ struct ManagerView: View {
     @State private var selectedTab: Int = 0
     @State private var canSwipe: Bool = false
     @ObservedObject var viewModel: RankingViewModel
-    @ObservedObject var reward = Reward()
+    @StateObject var reward = Reward()
+    @State private var showAlert: Bool = false
     
-    let list: [String] = ["ダンジョン", "ランクマッチ"]
+    let list: [String] = ["ダンジョン","ランクマッチ", "ボス戦"]
     
     var body: some View {
             VStack{
@@ -44,12 +45,12 @@ struct ManagerView: View {
 //                                    .tag(0)
                     ManagerListView(isPresenting: .constant(false))
                                     .tag(0)
-//                    Test(isPresenting: .constant(false), viewModel: QuizBeginnerStoryViewModel())
-//                        .padding(.top)
-//                                    .tag(2)
                     RankMatchListView(authManager: authManager)
 //                    TopView()
                         .tag(1)
+                    BossManagerListView(isPresenting: .constant(false))
+                        .padding(.top)
+                                    .tag(2)
                 })
                             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
 //                LevelRankingView(viewModel: viewModel)
@@ -58,24 +59,6 @@ struct ManagerView: View {
                 reward.LoadReward()
             }
             .background(Color("Color2"))
-//        }
-//        .navigationBarBackButtonHidden(true)
-//        .navigationBarItems(leading: Button(action: {
-//            self.presentationMode.wrappedValue.dismiss()
-//            audioManager.playCancelSound()
-//        }) {
-//            Image(systemName: "chevron.left")
-//                .foregroundColor(.gray)
-//            Text("戻る")
-//                .foregroundColor(Color("fontGray"))
-//        })
-//        .toolbar {
-//                ToolbarItem(placement: .principal) {
-//                    Text("ランキング")
-//                        .font(.system(size: 20)) // ここでフォントサイズを指定
-//                        .foregroundColor(Color("fontGray"))
-//                }
-//            }
     }
 }
 

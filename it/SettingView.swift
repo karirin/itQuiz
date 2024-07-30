@@ -17,7 +17,8 @@ struct OtherApp: Identifiable {
 
 extension OtherApp {
     static let allApps = [
-        OtherApp(name: "お金クエスト", description: "ゲーム感覚でお金の知識が学べるアプリ。税金、投資、節約、予算管理などお金周りの勉強をゲーム感覚で学べます。", appStoreLink: "https://apps.apple.com/us/app/%E3%81%8A%E9%87%91%E3%82%AF%E3%82%A8%E3%82%B9%E3%83%88/id6476828253")
+        OtherApp(name: "お金クエスト", description: "ゲーム感覚でお金の知識が学べるアプリ。税金、投資、節約、予算管理などお金周りの勉強をゲーム感覚で学べます。", appStoreLink: "https://apps.apple.com/us/app/%E3%81%8A%E9%87%91%E3%82%AF%E3%82%A8%E3%82%B9%E3%83%88/id6476828253"),
+        OtherApp(name: "英語クエスト", description: "ゲーム感覚で英語の知識が学べるアプリ。「英単語」「英熟語」「英文法」に分かれており、それぞれ『英検』『TOIEC』の難易度別に勉強をゲーム感覚で学べます。", appStoreLink: "https://apps.apple.com/us/app/%E8%8B%B1%E8%AA%9E%E3%82%AF%E3%82%A8%E3%82%B9%E3%83%88-%E8%8B%B1%E8%AA%9E%E3%81%AE%E5%95%8F%E9%A1%8C%E3%81%AE%E5%8B%89%E5%BC%B7%E3%81%A8%E5%AD%A6%E7%BF%92%E3%81%8C%E3%81%A7%E3%81%8D%E3%82%8B%E3%82%A2%E3%83%97%E3%83%AA/id6477769441"),
     ]
 }
 
@@ -110,7 +111,7 @@ struct SettingView: View {
                     ForEach(OtherApp.allApps) { app in
                         Link(destination: URL(string: app.appStoreLink)!) {
                             HStack {
-                                Image("お金クエスト")
+                                Image(app.name)
                                     .resizable()
                                     .frame(width:80,height: 80)
                                     .cornerRadius(15)

@@ -7,6 +7,26 @@
 
 import SwiftUI
 
+enum QuizBossLevel {
+    case goburin
+    case kaijyu
+    case shinjyu
+    case none
+    
+    var description: String {
+        switch self {
+        case .goburin:
+            return "goburin"
+        case .kaijyu:
+            return "kaijyu"
+        case .shinjyu:
+            return "shinjyu"
+        case .none:
+            return "none"
+        }
+    }
+}
+    
 enum QuizLevel {
     case beginner
     case beginnerStory1
@@ -23,6 +43,8 @@ enum QuizLevel {
     case incorrectITAnswer
     case incorrectInfoAnswer
     case incorrectAppliedAnswer
+    case incorrectESAnswer
+    case incorrectITStrategyAnswer
     case timeBeginner
     case timeIntermediate
     case timeAdvanced
@@ -38,6 +60,15 @@ enum QuizLevel {
     case itManagement
     case infoManagement
     case appliedManagement
+    case mugen
+    case computerSystem
+    case softHard
+    case netwarkTusin
+    case ESsecurity
+    case kikaku
+    case sekkei
+    case kaihatu
+    case unyouhoshu
     
     var description: String {
         switch self {
@@ -101,6 +132,28 @@ enum QuizLevel {
             return "infoBasic"
         case .appliedBasic:
             return "appliedBasic"
+        case .mugen:
+            return "mugen"
+        case .computerSystem:
+            return "computerSystem"
+        case .softHard:
+            return "softHard"
+        case .netwarkTusin:
+            return "netwarkTusin"
+        case .ESsecurity:
+            return "ESsecurity"
+        case .kikaku:
+            return "kikaku"
+        case .sekkei:
+            return "sekkei"
+        case .kaihatu:
+            return "kaihatu"
+        case .unyouhoshu:
+            return "unyouhoshu"
+        case .incorrectESAnswer:
+            return "incorrectESAnswer"
+        case .incorrectITStrategyAnswer:
+            return "incorrectITStrategyAnswer"
         }
     }
 }
