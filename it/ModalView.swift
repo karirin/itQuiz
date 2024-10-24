@@ -70,8 +70,8 @@ struct ModalView: View {
                 
                 Button(action: {
                     showHomeModal = false
-                    tutorialNum = 3
-                    authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 3) { success in
+                    tutorialNum = 4
+                    authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 4) { success in
                     }
                     audioManager.playSound()
                 }) {

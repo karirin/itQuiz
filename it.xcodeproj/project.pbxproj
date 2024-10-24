@@ -18,8 +18,18 @@
 		1820AE212B518D8D00BBA679 /* 敵攻撃.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1820AE132B518D8D00BBA679 /* 敵攻撃.mp3 */; };
 		1820AE222B518D8D00BBA679 /* ホームに戻る.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1820AE142B518D8D00BBA679 /* ホームに戻る.mp3 */; };
 		1820AE232B518D8D00BBA679 /* レベルアップ.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1820AE152B518D8D00BBA679 /* レベルアップ.mp3 */; };
-		1820AE282B518E4700BBA679 /* PrivacyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1820AE262B518E4700BBA679 /* PrivacyView.swift */; };
-		1820AE292B518E4700BBA679 /* TermsOfServiceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1820AE272B518E4700BBA679 /* TermsOfServiceView.swift */; };
+		18236D642BC195F3009C6CEB /* TermsOfServiceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18236D632BC195F3009C6CEB /* TermsOfServiceView.swift */; };
+		18236D662BC19613009C6CEB /* PrivacyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18236D652BC19613009C6CEB /* PrivacyView.swift */; };
+		18236D682BC1964A009C6CEB /* TimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18236D672BC1964A009C6CEB /* TimerView.swift */; };
+		18236D6B2BC1967E009C6CEB /* ゲームオーバー.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18236D692BC1967E009C6CEB /* ゲームオーバー.mp3 */; };
+		18236D6C2BC1967E009C6CEB /* ゲームクリア.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18236D6A2BC1967E009C6CEB /* ゲームクリア.mp3 */; };
+		18236D6E2BC1968B009C6CEB /* 称号.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18236D6D2BC1968B009C6CEB /* 称号.mp3 */; };
+		18236D722BC26BC8009C6CEB /* QuizGoburinListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18236D712BC26BC8009C6CEB /* QuizGoburinListView.swift */; };
+		18236D742BC26DFA009C6CEB /* QuizBossView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18236D732BC26DFA009C6CEB /* QuizBossView.swift */; };
+		18236D762BC27810009C6CEB /* QuizKaijyuListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18236D752BC27810009C6CEB /* QuizKaijyuListView.swift */; };
+		18236D782BC27991009C6CEB /* QuizShinjyuListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18236D772BC27991009C6CEB /* QuizShinjyuListView.swift */; };
+		18236D7A2BC27A07009C6CEB /* BossManagerListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18236D792BC27A07009C6CEB /* BossManagerListView.swift */; };
+		182899CA2CC36733001BD535 /* SplashScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182899C92CC36733001BD535 /* SplashScreenView.swift */; };
 		1832115D2B9C88E80064F10A /* ITManagerListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1832115C2B9C88E80064F10A /* ITManagerListView.swift */; };
 		1832115F2B9C9E1D0064F10A /* InfoManagerListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1832115E2B9C9E1D0064F10A /* InfoManagerListView.swift */; };
 		183211612B9CA0420064F10A /* AppliedManagerListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 183211602B9CA0420064F10A /* AppliedManagerListView.swift */; };
@@ -43,27 +53,40 @@
 		183211852BA0138E0064F10A /* QuizITBasicListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 183211842BA0138E0064F10A /* QuizITBasicListView.swift */; };
 		183211872BA013EC0064F10A /* QuizInfoBasicListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 183211862BA013EC0064F10A /* QuizInfoBasicListView.swift */; };
 		183211892BA0142D0064F10A /* QuizAppliedBasicListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 183211882BA0142D0064F10A /* QuizAppliedBasicListView.swift */; };
+		183A778B2CBA3D1D0000B839 /* MockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 183A778A2CBA3D1D0000B839 /* MockView.swift */; };
+		183A778D2CBA8D280000B839 /* ReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 183A778C2CBA8D270000B839 /* ReviewView.swift */; };
 		1852AA152BA84DEF0022BD75 /* RankMatchHelpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1852AA142BA84DEF0022BD75 /* RankMatchHelpView.swift */; };
 		1852AA172BA867CD0022BD75 /* RankModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1852AA162BA867CD0022BD75 /* RankModalView.swift */; };
 		1867D3B22B8844790021ED5D /* ContactView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1867D3B12B8844790021ED5D /* ContactView.swift */; };
 		1867D3B42B8847E60021ED5D /* HelpModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1867D3B32B8847E60021ED5D /* HelpModalView.swift */; };
 		186C39AA2B70B576007F625E /* StoreKitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186C39A92B70B576007F625E /* StoreKitView.swift */; };
 		186C39AC2B71235B007F625E /* CoinModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186C39AB2B71235B007F625E /* CoinModalView.swift */; };
+		187E7C932C57BD110071621F /* QuizITStrategyIncorrectAnswerListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187E7C922C57BD110071621F /* QuizITStrategyIncorrectAnswerListView.swift */; };
+		187E7C952C57BD7C0071621F /* QuizESIncorrectAnswerListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187E7C942C57BD7C0071621F /* QuizESIncorrectAnswerListView.swift */; };
 		1896A1FF2BAD3B170072F12B /* ManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1896A1FE2BAD3B170072F12B /* ManagerView.swift */; };
 		1896A2012BAD77E40072F12B /* ManagerListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1896A2002BAD77E40072F12B /* ManagerListView.swift */; };
-		1896A2032BAD7B5E0072F12B /* TimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1896A2022BAD7B5E0072F12B /* TimerView.swift */; };
 		1896A2052BAD7BD30072F12B /* ManagerTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1896A2042BAD7BD30072F12B /* ManagerTabView.swift */; };
-		1898ECD32BB7DC2B0085D467 /* ゲームオーバー.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1898ECD02BB7DC2B0085D467 /* ゲームオーバー.mp3 */; };
-		1898ECD42BB7DC2B0085D467 /* ゲームクリア.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1898ECD12BB7DC2B0085D467 /* ゲームクリア.mp3 */; };
-		1898ECD52BB7DC2B0085D467 /* 称号.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1898ECD22BB7DC2B0085D467 /* 称号.mp3 */; };
+		189892482C4FD84A00970794 /* ESManagerListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189892472C4FD84A00970794 /* ESManagerListView.swift */; };
+		1898924A2C51128200970794 /* QuizComputerSystemListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189892492C51128200970794 /* QuizComputerSystemListView.swift */; };
+		1898924C2C51132600970794 /* QuizSoftHardListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1898924B2C51132600970794 /* QuizSoftHardListView.swift */; };
+		1898924E2C51138600970794 /* QuizTusinNetworkListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1898924D2C51138600970794 /* QuizTusinNetworkListView.swift */; };
+		189892502C51296A00970794 /* QuizESsecurityListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1898924F2C51296A00970794 /* QuizESsecurityListView.swift */; };
+		189892522C52677400970794 /* ITStoratagyManagerListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189892512C52677400970794 /* ITStoratagyManagerListView.swift */; };
+		189892542C526DB800970794 /* QuizSystemKikakuListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189892532C526DB800970794 /* QuizSystemKikakuListView.swift */; };
+		189892562C526FA500970794 /* QuizSystemSekkeiListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189892552C526FA500970794 /* QuizSystemSekkeiListView.swift */; };
+		189892582C526FFC00970794 /* QuizSystemKaihatuListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189892572C526FFC00970794 /* QuizSystemKaihatuListView.swift */; };
+		1898925A2C52729200970794 /* QuizSystemUnyouHoshuListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189892592C52729200970794 /* QuizSystemUnyouHoshuListView.swift */; };
 		189F82C42BA4689D00C0247A /* RankMatchListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189F82C32BA4689D00C0247A /* RankMatchListView.swift */; };
 		189F82C62BA549AC00C0247A /* RankMatchQuizView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189F82C52BA549AC00C0247A /* RankMatchQuizView.swift */; };
 		189F82C82BA550E100C0247A /* RankMatchQuizListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189F82C72BA550E100C0247A /* RankMatchQuizListView.swift */; };
 		189F82CA2BA5B56000C0247A /* RankMatchQuizResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189F82C92BA5B56000C0247A /* RankMatchQuizResultView.swift */; };
-		18A5A4B42B7C6918009EFAB6 /* Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A5A4B32B7C6918009EFAB6 /* Test.swift */; };
+		18A5A4B42B7C6918009EFAB6 /* Story.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A5A4B32B7C6918009EFAB6 /* Story.swift */; };
 		18A5A4B62B7C6A0D009EFAB6 /* TestAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A5A4B52B7C6A0D009EFAB6 /* TestAnimationView.swift */; };
 		18A5A4B82B7C728C009EFAB6 /* TestModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A5A4B72B7C728C009EFAB6 /* TestModalView.swift */; };
 		18A5A4BC2B7C859C009EFAB6 /* QuizBeginnerStoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A5A4BB2B7C859C009EFAB6 /* QuizBeginnerStoryView.swift */; };
+		18A81E442C8C77A7007A91E1 /* PreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A81E432C8C77A7007A91E1 /* PreView.swift */; };
+		18A8D06A2C19C453004DB532 /* MugenQuizListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A8D0692C19C453004DB532 /* MugenQuizListView.swift */; };
+		18A8D06C2C1B044B004DB532 /* MugenQuizView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A8D06B2C1B044B004DB532 /* MugenQuizView.swift */; };
 		18BD10B82B6B601500ABB28F /* sound.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18BD10B72B6B601500ABB28F /* sound.mp3 */; };
 		18E818572B5EBDFC00595669 /* RewardTimesModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E818562B5EBDFC00595669 /* RewardTimesModal.swift */; };
 		18EA883E2B8C48AE00067FE7 /* SubModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18EA883D2B8C48AE00067FE7 /* SubModalView.swift */; };
@@ -128,8 +151,18 @@
 		1820AE132B518D8D00BBA679 /* 敵攻撃.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "敵攻撃.mp3"; path = "../../../Downloads/it 効果音/敵攻撃.mp3"; sourceTree = "<group>"; };
 		1820AE142B518D8D00BBA679 /* ホームに戻る.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "ホームに戻る.mp3"; path = "../../../Downloads/it 効果音/ホームに戻る.mp3"; sourceTree = "<group>"; };
 		1820AE152B518D8D00BBA679 /* レベルアップ.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "レベルアップ.mp3"; path = "../../../Downloads/it 効果音/レベルアップ.mp3"; sourceTree = "<group>"; };
-		1820AE262B518E4700BBA679 /* PrivacyView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PrivacyView.swift; path = "../../名称未設定フォルダ/PrivacyView.swift"; sourceTree = "<group>"; };
-		1820AE272B518E4700BBA679 /* TermsOfServiceView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TermsOfServiceView.swift; path = "../../名称未設定フォルダ/TermsOfServiceView.swift"; sourceTree = "<group>"; };
+		18236D632BC195F3009C6CEB /* TermsOfServiceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TermsOfServiceView.swift; sourceTree = "<group>"; };
+		18236D652BC19613009C6CEB /* PrivacyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyView.swift; sourceTree = "<group>"; };
+		18236D672BC1964A009C6CEB /* TimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerView.swift; sourceTree = "<group>"; };
+		18236D692BC1967E009C6CEB /* ゲームオーバー.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "ゲームオーバー.mp3"; path = "../../その他/音声 2/ゲームオーバー.mp3"; sourceTree = "<group>"; };
+		18236D6A2BC1967E009C6CEB /* ゲームクリア.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "ゲームクリア.mp3"; path = "../../その他/音声 2/ゲームクリア.mp3"; sourceTree = "<group>"; };
+		18236D6D2BC1968B009C6CEB /* 称号.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "称号.mp3"; path = "../../その他/音声 2/称号.mp3"; sourceTree = "<group>"; };
+		18236D712BC26BC8009C6CEB /* QuizGoburinListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizGoburinListView.swift; sourceTree = "<group>"; };
+		18236D732BC26DFA009C6CEB /* QuizBossView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizBossView.swift; sourceTree = "<group>"; };
+		18236D752BC27810009C6CEB /* QuizKaijyuListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizKaijyuListView.swift; sourceTree = "<group>"; };
+		18236D772BC27991009C6CEB /* QuizShinjyuListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizShinjyuListView.swift; sourceTree = "<group>"; };
+		18236D792BC27A07009C6CEB /* BossManagerListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BossManagerListView.swift; sourceTree = "<group>"; };
+		182899C92CC36733001BD535 /* SplashScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashScreenView.swift; sourceTree = "<group>"; };
 		1832115C2B9C88E80064F10A /* ITManagerListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ITManagerListView.swift; sourceTree = "<group>"; };
 		1832115E2B9C9E1D0064F10A /* InfoManagerListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoManagerListView.swift; sourceTree = "<group>"; };
 		183211602B9CA0420064F10A /* AppliedManagerListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppliedManagerListView.swift; sourceTree = "<group>"; };
@@ -153,6 +186,8 @@
 		183211842BA0138E0064F10A /* QuizITBasicListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizITBasicListView.swift; sourceTree = "<group>"; };
 		183211862BA013EC0064F10A /* QuizInfoBasicListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizInfoBasicListView.swift; sourceTree = "<group>"; };
 		183211882BA0142D0064F10A /* QuizAppliedBasicListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizAppliedBasicListView.swift; sourceTree = "<group>"; };
+		183A778A2CBA3D1D0000B839 /* MockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockView.swift; sourceTree = "<group>"; };
+		183A778C2CBA8D270000B839 /* ReviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewView.swift; sourceTree = "<group>"; };
 		1852AA142BA84DEF0022BD75 /* RankMatchHelpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RankMatchHelpView.swift; sourceTree = "<group>"; };
 		1852AA162BA867CD0022BD75 /* RankModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RankModalView.swift; sourceTree = "<group>"; };
 		1867D3B12B8844790021ED5D /* ContactView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactView.swift; sourceTree = "<group>"; };
@@ -161,21 +196,32 @@
 		186C39A92B70B576007F625E /* StoreKitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreKitView.swift; sourceTree = "<group>"; };
 		186C39AB2B71235B007F625E /* CoinModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinModalView.swift; sourceTree = "<group>"; };
 		186C39AD2B71D2B3007F625E /* it.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = it.entitlements; sourceTree = "<group>"; };
+		187E7C922C57BD110071621F /* QuizITStrategyIncorrectAnswerListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizITStrategyIncorrectAnswerListView.swift; sourceTree = "<group>"; };
+		187E7C942C57BD7C0071621F /* QuizESIncorrectAnswerListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizESIncorrectAnswerListView.swift; sourceTree = "<group>"; };
 		1896A1FE2BAD3B170072F12B /* ManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagerView.swift; sourceTree = "<group>"; };
 		1896A2002BAD77E40072F12B /* ManagerListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagerListView.swift; sourceTree = "<group>"; };
-		1896A2022BAD7B5E0072F12B /* TimerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TimerView.swift; path = "../../itQuiz 余分コード/TimerView.swift"; sourceTree = "<group>"; };
 		1896A2042BAD7BD30072F12B /* ManagerTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagerTabView.swift; sourceTree = "<group>"; };
-		1898ECD02BB7DC2B0085D467 /* ゲームオーバー.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "ゲームオーバー.mp3"; path = "../../音声/ゲームオーバー.mp3"; sourceTree = "<group>"; };
-		1898ECD12BB7DC2B0085D467 /* ゲームクリア.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "ゲームクリア.mp3"; path = "../../音声/ゲームクリア.mp3"; sourceTree = "<group>"; };
-		1898ECD22BB7DC2B0085D467 /* 称号.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "称号.mp3"; path = "../../音声/称号.mp3"; sourceTree = "<group>"; };
+		189892472C4FD84A00970794 /* ESManagerListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ESManagerListView.swift; sourceTree = "<group>"; };
+		189892492C51128200970794 /* QuizComputerSystemListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizComputerSystemListView.swift; sourceTree = "<group>"; };
+		1898924B2C51132600970794 /* QuizSoftHardListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizSoftHardListView.swift; sourceTree = "<group>"; };
+		1898924D2C51138600970794 /* QuizTusinNetworkListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizTusinNetworkListView.swift; sourceTree = "<group>"; };
+		1898924F2C51296A00970794 /* QuizESsecurityListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizESsecurityListView.swift; sourceTree = "<group>"; };
+		189892512C52677400970794 /* ITStoratagyManagerListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ITStoratagyManagerListView.swift; sourceTree = "<group>"; };
+		189892532C526DB800970794 /* QuizSystemKikakuListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizSystemKikakuListView.swift; sourceTree = "<group>"; };
+		189892552C526FA500970794 /* QuizSystemSekkeiListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizSystemSekkeiListView.swift; sourceTree = "<group>"; };
+		189892572C526FFC00970794 /* QuizSystemKaihatuListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizSystemKaihatuListView.swift; sourceTree = "<group>"; };
+		189892592C52729200970794 /* QuizSystemUnyouHoshuListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizSystemUnyouHoshuListView.swift; sourceTree = "<group>"; };
 		189F82C32BA4689D00C0247A /* RankMatchListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RankMatchListView.swift; sourceTree = "<group>"; };
 		189F82C52BA549AC00C0247A /* RankMatchQuizView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RankMatchQuizView.swift; sourceTree = "<group>"; };
 		189F82C72BA550E100C0247A /* RankMatchQuizListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RankMatchQuizListView.swift; sourceTree = "<group>"; };
 		189F82C92BA5B56000C0247A /* RankMatchQuizResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RankMatchQuizResultView.swift; sourceTree = "<group>"; };
-		18A5A4B32B7C6918009EFAB6 /* Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Test.swift; sourceTree = "<group>"; };
+		18A5A4B32B7C6918009EFAB6 /* Story.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Story.swift; sourceTree = "<group>"; };
 		18A5A4B52B7C6A0D009EFAB6 /* TestAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestAnimationView.swift; sourceTree = "<group>"; };
 		18A5A4B72B7C728C009EFAB6 /* TestModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestModalView.swift; sourceTree = "<group>"; };
 		18A5A4BB2B7C859C009EFAB6 /* QuizBeginnerStoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizBeginnerStoryView.swift; sourceTree = "<group>"; };
+		18A81E432C8C77A7007A91E1 /* PreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreView.swift; sourceTree = "<group>"; };
+		18A8D0692C19C453004DB532 /* MugenQuizListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MugenQuizListView.swift; sourceTree = "<group>"; };
+		18A8D06B2C1B044B004DB532 /* MugenQuizView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MugenQuizView.swift; sourceTree = "<group>"; };
 		18BD10B72B6B601500ABB28F /* sound.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = sound.mp3; path = ../../../Downloads/sound.mp3; sourceTree = "<group>"; };
 		18E818562B5EBDFC00595669 /* RewardTimesModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardTimesModal.swift; sourceTree = "<group>"; };
 		18EA883D2B8C48AE00067FE7 /* SubModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubModalView.swift; sourceTree = "<group>"; };
@@ -273,23 +319,40 @@
 				186C39AD2B71D2B3007F625E /* it.entitlements */,
 				267E708A2AD5ACDF00EA7AA2 /* Info.plist */,
 				260E44122AB572DC00FBB487 /* itApp.swift */,
+				18A81E432C8C77A7007A91E1 /* PreView.swift */,
 				26B9BA1C2AEFDEFD00AC7C40 /* RewardView.swift */,
 				26B5BEF32AB6CFA600056E79 /* RootView.swift */,
 				26A026DD2ABDD1EA00119F2B /* TopView.swift */,
 				1867D3B12B8844790021ED5D /* ContactView.swift */,
 				186C39A92B70B576007F625E /* StoreKitView.swift */,
 				1867D3B32B8847E60021ED5D /* HelpModalView.swift */,
+				183A778C2CBA8D270000B839 /* ReviewView.swift */,
 				266A07292AC6FBC800B85D4E /* AnswerSelectionView.swift */,
 				189F82C32BA4689D00C0247A /* RankMatchListView.swift */,
 				264F19142AF2824700B6FB10 /* RankingView.swift */,
 				267E708F2AD6FD0200EA7AA2 /* LoadingView.swift */,
 				1832115C2B9C88E80064F10A /* ITManagerListView.swift */,
+				18236D792BC27A07009C6CEB /* BossManagerListView.swift */,
 				1896A2002BAD77E40072F12B /* ManagerListView.swift */,
 				1832115E2B9C9E1D0064F10A /* InfoManagerListView.swift */,
 				183211602B9CA0420064F10A /* AppliedManagerListView.swift */,
+				189892472C4FD84A00970794 /* ESManagerListView.swift */,
+				1898924D2C51138600970794 /* QuizTusinNetworkListView.swift */,
+				1898924F2C51296A00970794 /* QuizESsecurityListView.swift */,
+				189892512C52677400970794 /* ITStoratagyManagerListView.swift */,
+				1898924B2C51132600970794 /* QuizSoftHardListView.swift */,
+				189892532C526DB800970794 /* QuizSystemKikakuListView.swift */,
+				189892572C526FFC00970794 /* QuizSystemKaihatuListView.swift */,
+				189892592C52729200970794 /* QuizSystemUnyouHoshuListView.swift */,
+				189892552C526FA500970794 /* QuizSystemSekkeiListView.swift */,
+				189892492C51128200970794 /* QuizComputerSystemListView.swift */,
 				183211622B9CB7B60064F10A /* QuizITStrategyListView.swift */,
 				189F82C72BA550E100C0247A /* RankMatchQuizListView.swift */,
+				18A8D0692C19C453004DB532 /* MugenQuizListView.swift */,
 				183211842BA0138E0064F10A /* QuizITBasicListView.swift */,
+				18236D712BC26BC8009C6CEB /* QuizGoburinListView.swift */,
+				18236D752BC27810009C6CEB /* QuizKaijyuListView.swift */,
+				18236D772BC27991009C6CEB /* QuizShinjyuListView.swift */,
 				183211862BA013EC0064F10A /* QuizInfoBasicListView.swift */,
 				183211882BA0142D0064F10A /* QuizAppliedBasicListView.swift */,
 				183211642B9CB7DF0064F10A /* QuizInfoStrategyListView.swift */,
@@ -302,7 +365,9 @@
 				183211722B9CB8990064F10A /* QuizAppliedManagementListView.swift */,
 				26D0C36D2AFE6F0500C6AF07 /* GachaManagerView.swift */,
 				260E44242AB59A7900FBB487 /* QuizView.swift */,
+				18236D732BC26DFA009C6CEB /* QuizBossView.swift */,
 				189F82C52BA549AC00C0247A /* RankMatchQuizView.swift */,
+				18A8D06B2C1B044B004DB532 /* MugenQuizView.swift */,
 				26071BF32B2B4BC60012B836 /* ModalExplanationView.swift */,
 				26AA130B2ACD74660035F5F4 /* ModalView.swift */,
 				1852AA162BA867CD0022BD75 /* RankModalView.swift */,
@@ -319,7 +384,8 @@
 				189F82C92BA5B56000C0247A /* RankMatchQuizResultView.swift */,
 				262F0FED2B178F02004C0C47 /* Banner.swift */,
 				18A5A4BB2B7C859C009EFAB6 /* QuizBeginnerStoryView.swift */,
-				18A5A4B32B7C6918009EFAB6 /* Test.swift */,
+				18A5A4B32B7C6918009EFAB6 /* Story.swift */,
+				182899C92CC36733001BD535 /* SplashScreenView.swift */,
 				260E44222AB5963A00FBB487 /* AuthManager.swift */,
 				26A25D4F2AB9FB1A006B368F /* TitleListView.swift */,
 				2641992B2AC2572F002013B9 /* AvatarListView.swift */,
@@ -329,9 +395,9 @@
 				263C6AC22AFD1DC300564FF2 /* RareGachaView.swift */,
 				18F95C472B51AB7800F8DBBB /* ContentView.swift */,
 				267743652B16371800043010 /* Interstitial.swift */,
-				1820AE262B518E4700BBA679 /* PrivacyView.swift */,
+				18236D652BC19613009C6CEB /* PrivacyView.swift */,
 				18A5A4B52B7C6A0D009EFAB6 /* TestAnimationView.swift */,
-				1820AE272B518E4700BBA679 /* TermsOfServiceView.swift */,
+				18236D632BC195F3009C6CEB /* TermsOfServiceView.swift */,
 				26ADE3412ADC382F009BDF48 /* SettingView.swift */,
 				269A878B2AB873CC00F33C9E /* GachaAnimationView.swift */,
 				269D44E12AB60D6800CAA91A /* SignUp.swift */,
@@ -340,7 +406,7 @@
 				262F0FF12B18C72A004C0C47 /* RateManager.swift */,
 				262F0FEF2B18B6C8004C0C47 /* PentagonShape.swift */,
 				183211742B9DB3880064F10A /* PentagonITShape.swift */,
-				1896A2022BAD7B5E0072F12B /* TimerView.swift */,
+				18236D672BC1964A009C6CEB /* TimerView.swift */,
 				183211762B9DBCA30064F10A /* PentagonInfoShape.swift */,
 				183211782B9DBE4E0064F10A /* PentagonAppliedShape.swift */,
 				1832117A2B9DC0280064F10A /* PentagonManagerView.swift */,
@@ -351,21 +417,24 @@
 				1832117E2B9DD4B80064F10A /* QuizITIncorrectAnswerListView.swift */,
 				183211802B9DD4F80064F10A /* QuizInfoIncorrectAnswerListView.swift */,
 				183211822B9DD54A0064F10A /* QuizAppliedIncorrectAnswerListView.swift */,
+				187E7C922C57BD110071621F /* QuizITStrategyIncorrectAnswerListView.swift */,
+				187E7C942C57BD7C0071621F /* QuizESIncorrectAnswerListView.swift */,
 				261387032B3D7E14003495AB /* ModalReturnView.swift */,
 				26266B2A2B4A527F007B5964 /* ModalTitleView.swift */,
 				26266B2C2B4A5395007B5964 /* GraphManagerView.swift */,
 				26266B2E2B4A53F8007B5964 /* BarChartView.swift */,
 				1896A2042BAD7BD30072F12B /* ManagerTabView.swift */,
+				183A778A2CBA3D1D0000B839 /* MockView.swift */,
 				260E44162AB572DE00FBB487 /* Assets.xcassets */,
 				1820AE102B518D8D00BBA679 /* soundKettei.mp3 */,
 				1820AE0D2B518D8C00BBA679 /* おとも切り替え.mp3 */,
 				1820AE0A2B518D8C00BBA679 /* カウントダウン.mp3 */,
 				18BD10B72B6B601500ABB28F /* sound.mp3 */,
 				1820AE0F2B518D8D00BBA679 /* キャンセル.mp3 */,
-				1898ECD02BB7DC2B0085D467 /* ゲームオーバー.mp3 */,
-				1898ECD12BB7DC2B0085D467 /* ゲームクリア.mp3 */,
-				1898ECD22BB7DC2B0085D467 /* 称号.mp3 */,
+				18236D6D2BC1968B009C6CEB /* 称号.mp3 */,
 				1820AE142B518D8D00BBA679 /* ホームに戻る.mp3 */,
+				18236D692BC1967E009C6CEB /* ゲームオーバー.mp3 */,
+				18236D6A2BC1967E009C6CEB /* ゲームクリア.mp3 */,
 				1820AE152B518D8D00BBA679 /* レベルアップ.mp3 */,
 				1820AE132B518D8D00BBA679 /* 敵攻撃.mp3 */,
 				1820AE092B518D8C00BBA679 /* 正解.mp3 */,
@@ -478,18 +547,18 @@
 				1820AE172B518D8D00BBA679 /* 正解.mp3 in Resources */,
 				1820AE202B518D8D00BBA679 /* 味方攻撃.mp3 in Resources */,
 				260E441A2AB572DE00FBB487 /* Preview Assets.xcassets in Resources */,
+				18236D6E2BC1968B009C6CEB /* 称号.mp3 in Resources */,
 				1820AE1F2B518D8D00BBA679 /* 不正解.mp3 in Resources */,
 				1820AE192B518D8D00BBA679 /* 倒れる.mp3 in Resources */,
 				1820AE1B2B518D8D00BBA679 /* おとも切り替え.mp3 in Resources */,
 				1820AE1D2B518D8D00BBA679 /* キャンセル.mp3 in Resources */,
-				1898ECD32BB7DC2B0085D467 /* ゲームオーバー.mp3 in Resources */,
+				18236D6B2BC1967E009C6CEB /* ゲームオーバー.mp3 in Resources */,
 				1820AE232B518D8D00BBA679 /* レベルアップ.mp3 in Resources */,
 				1820AE182B518D8D00BBA679 /* カウントダウン.mp3 in Resources */,
 				18BD10B82B6B601500ABB28F /* sound.mp3 in Resources */,
 				1820AE222B518D8D00BBA679 /* ホームに戻る.mp3 in Resources */,
-				1898ECD42BB7DC2B0085D467 /* ゲームクリア.mp3 in Resources */,
+				18236D6C2BC1967E009C6CEB /* ゲームクリア.mp3 in Resources */,
 				260E44172AB572DE00FBB487 /* Assets.xcassets in Resources */,
-				1898ECD52BB7DC2B0085D467 /* 称号.mp3 in Resources */,
 				260E44212AB5958300FBB487 /* GoogleService-Info.plist in Resources */,
 				1820AE1E2B518D8D00BBA679 /* soundKettei.mp3 in Resources */,
 				1820AE212B518D8D00BBA679 /* 敵攻撃.mp3 in Resources */,
@@ -568,10 +637,13 @@
 				183211732B9CB8990064F10A /* QuizAppliedManagementListView.swift in Sources */,
 				26B5BEF42AB6CFA600056E79 /* RootView.swift in Sources */,
 				1832116F2B9CB8570064F10A /* QuizITManagementListView.swift in Sources */,
+				187E7C932C57BD110071621F /* QuizITStrategyIncorrectAnswerListView.swift in Sources */,
 				183211692B9CB8130064F10A /* QuizITTechnologyListView.swift in Sources */,
 				262F0FF62B1ADBC5004C0C47 /* SubscriptionView.swift in Sources */,
 				1832117B2B9DC0280064F10A /* PentagonManagerView.swift in Sources */,
 				264F19152AF2824700B6FB10 /* RankingView.swift in Sources */,
+				187E7C952C57BD7C0071621F /* QuizESIncorrectAnswerListView.swift in Sources */,
+				18A8D06C2C1B044B004DB532 /* MugenQuizView.swift in Sources */,
 				267283132AFA84C600549219 /* IllustratedView.swift in Sources */,
 				269A87882AB7757C00F33C9E /* QuizResultView.swift in Sources */,
 				1832115D2B9C88E80064F10A /* ITManagerListView.swift in Sources */,
@@ -585,12 +657,19 @@
 				18A5A4BC2B7C859C009EFAB6 /* QuizBeginnerStoryView.swift in Sources */,
 				186C39AC2B71235B007F625E /* CoinModalView.swift in Sources */,
 				269D44E22AB60D6800CAA91A /* SignUp.swift in Sources */,
+				183A778B2CBA3D1D0000B839 /* MockView.swift in Sources */,
+				18236D642BC195F3009C6CEB /* TermsOfServiceView.swift in Sources */,
 				1896A2052BAD7BD30072F12B /* ManagerTabView.swift in Sources */,
-				1896A2032BAD7B5E0072F12B /* TimerView.swift in Sources */,
+				189892562C526FA500970794 /* QuizSystemSekkeiListView.swift in Sources */,
+				18A81E442C8C77A7007A91E1 /* PreView.swift in Sources */,
+				189892522C52677400970794 /* ITStoratagyManagerListView.swift in Sources */,
 				267743662B16371800043010 /* Interstitial.swift in Sources */,
+				18236D662BC19613009C6CEB /* PrivacyView.swift in Sources */,
+				183A778D2CBA8D280000B839 /* ReviewView.swift in Sources */,
 				18A5A4B62B7C6A0D009EFAB6 /* TestAnimationView.swift in Sources */,
 				18A5A4B82B7C728C009EFAB6 /* TestModalView.swift in Sources */,
 				26071BF42B2B4BC60012B836 /* ModalExplanationView.swift in Sources */,
+				18236D722BC26BC8009C6CEB /* QuizGoburinListView.swift in Sources */,
 				189F82CA2BA5B56000C0247A /* RankMatchQuizResultView.swift in Sources */,
 				1852AA152BA84DEF0022BD75 /* RankMatchHelpView.swift in Sources */,
 				2650137F2B3FE04B006B81D6 /* HelpView1.swift in Sources */,
@@ -598,19 +677,22 @@
 				18F95C462B51AB7200F8DBBB /* TittlesView.swift in Sources */,
 				26266B2D2B4A5395007B5964 /* GraphManagerView.swift in Sources */,
 				26266B2F2B4A53F8007B5964 /* BarChartView.swift in Sources */,
+				189892482C4FD84A00970794 /* ESManagerListView.swift in Sources */,
 				269A878A2AB86FC900F33C9E /* GachaView.swift in Sources */,
 				26A026DE2ABDD1EB00119F2B /* TopView.swift in Sources */,
 				183211712B9CB87D0064F10A /* QuizInfoManagementListView.swift in Sources */,
 				18E818572B5EBDFC00595669 /* RewardTimesModal.swift in Sources */,
 				183211852BA0138E0064F10A /* QuizITBasicListView.swift in Sources */,
+				1898924C2C51132600970794 /* QuizSoftHardListView.swift in Sources */,
 				1896A1FF2BAD3B170072F12B /* ManagerView.swift in Sources */,
 				183211892BA0142D0064F10A /* QuizAppliedBasicListView.swift in Sources */,
 				183211752B9DB3880064F10A /* PentagonITShape.swift in Sources */,
 				26A25D502AB9FB1A006B368F /* TitleListView.swift in Sources */,
 				183211672B9CB7F00064F10A /* QuizAppliedStrategyListView.swift in Sources */,
-				18A5A4B42B7C6918009EFAB6 /* Test.swift in Sources */,
+				18236D7A2BC27A07009C6CEB /* BossManagerListView.swift in Sources */,
+				18A5A4B42B7C6918009EFAB6 /* Story.swift in Sources */,
+				18236D742BC26DFA009C6CEB /* QuizBossView.swift in Sources */,
 				1832116D2B9CB82E0064F10A /* QuizAppliedTechnologyListView.swift in Sources */,
-				1820AE282B518E4700BBA679 /* PrivacyView.swift in Sources */,
 				26B9BA1D2AEFDEFD00AC7C40 /* RewardView.swift in Sources */,
 				183211612B9CA0420064F10A /* AppliedManagerListView.swift in Sources */,
 				263C6AC32AFD1DC400564FF2 /* RareGachaView.swift in Sources */,
@@ -619,27 +701,37 @@
 				18F95C482B51AB7800F8DBBB /* ContentView.swift in Sources */,
 				189F82C62BA549AC00C0247A /* RankMatchQuizView.swift in Sources */,
 				183211632B9CB7B60064F10A /* QuizITStrategyListView.swift in Sources */,
+				182899CA2CC36733001BD535 /* SplashScreenView.swift in Sources */,
 				260E44252AB59A7900FBB487 /* QuizView.swift in Sources */,
 				26AA130C2ACD74660035F5F4 /* ModalView.swift in Sources */,
+				189892582C526FFC00970794 /* QuizSystemKaihatuListView.swift in Sources */,
 				1832117D2B9DD20E0064F10A /* ManagerListTabView.swift in Sources */,
 				266A072A2AC6FBC800B85D4E /* AnswerSelectionView.swift in Sources */,
 				26266B2B2B4A527F007B5964 /* ModalTitleView.swift in Sources */,
 				189F82C42BA4689D00C0247A /* RankMatchListView.swift in Sources */,
+				1898924A2C51128200970794 /* QuizComputerSystemListView.swift in Sources */,
+				1898924E2C51138600970794 /* QuizTusinNetworkListView.swift in Sources */,
 				18EA883E2B8C48AE00067FE7 /* SubModalView.swift in Sources */,
 				261387022B3D5819003495AB /* QuizIncorrectAnswerListView.swift in Sources */,
 				1832117F2B9DD4B80064F10A /* QuizITIncorrectAnswerListView.swift in Sources */,
+				189892502C51296A00970794 /* QuizESsecurityListView.swift in Sources */,
 				260E44232AB5963A00FBB487 /* AuthManager.swift in Sources */,
 				269A878C2AB873CC00F33C9E /* GachaAnimationView.swift in Sources */,
 				183211832B9DD54A0064F10A /* QuizAppliedIncorrectAnswerListView.swift in Sources */,
 				261387042B3D7E14003495AB /* ModalReturnView.swift in Sources */,
+				18A8D06A2C19C453004DB532 /* MugenQuizListView.swift in Sources */,
 				1867D3B22B8844790021ED5D /* ContactView.swift in Sources */,
 				26A026EC2ABF16E600119F2B /* AudioManager.swift in Sources */,
 				267E70902AD6FD0200EA7AA2 /* LoadingView.swift in Sources */,
 				186C39AA2B70B576007F625E /* StoreKitView.swift in Sources */,
+				189892542C526DB800970794 /* QuizSystemKikakuListView.swift in Sources */,
 				260E44132AB572DC00FBB487 /* itApp.swift in Sources */,
-				1820AE292B518E4700BBA679 /* TermsOfServiceView.swift in Sources */,
 				266A07282AC6E10200B85D4E /* ProgressBar3.swift in Sources */,
+				1898925A2C52729200970794 /* QuizSystemUnyouHoshuListView.swift in Sources */,
 				26B9BA232AF2647300AC7C40 /* LoginModalView.swift in Sources */,
+				18236D762BC27810009C6CEB /* QuizKaijyuListView.swift in Sources */,
+				18236D682BC1964A009C6CEB /* TimerView.swift in Sources */,
+				18236D782BC27991009C6CEB /* QuizShinjyuListView.swift in Sources */,
 				183211812B9DD4F80064F10A /* QuizInfoIncorrectAnswerListView.swift in Sources */,
 				189F82C82BA550E100C0247A /* RankMatchQuizListView.swift in Sources */,
 				1832116B2B9CB81D0064F10A /* QuizInfoTechnologyListView.swift in Sources */,
@@ -778,7 +870,7 @@
 				CODE_SIGN_ENTITLEMENTS = it/it.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 4.4;
+				CURRENT_PROJECT_VERSION = 6.5;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"it/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
@@ -797,7 +889,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.4;
+				MARKETING_VERSION = 6.5;
 				PRODUCT_BUNDLE_IDENTIFIER = "Swift-Beginners-app.it";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -817,7 +909,7 @@
 				CODE_SIGN_ENTITLEMENTS = it/it.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 4.4;
+				CURRENT_PROJECT_VERSION = 6.5;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"it/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
@@ -836,7 +928,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4.4;
+				MARKETING_VERSION = 6.5;
 				PRODUCT_BUNDLE_IDENTIFIER = "Swift-Beginners-app.it";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

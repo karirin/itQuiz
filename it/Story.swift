@@ -17,7 +17,7 @@ import SwiftUI
 import SwiftUI
 import AVFoundation
 
-struct Test: View {
+struct Story: View {
     @State private var isIntermediateQuizActive: Bool = false
     @State private var isPresentingQuizBeginnerList: Bool = false
     @ObservedObject var authManager = AuthManager.shared
@@ -390,11 +390,11 @@ struct Test: View {
 }
 
 
-struct Test_Previews: PreviewProvider {
+struct Story_Previews: PreviewProvider {
     static var previews: some View {
         // プレビュー用のViewModelのインスタンスを作成
         let viewModel = QuizBeginnerStoryViewModel()
         // このインスタンスをTestビューの初期化時に渡す
-        Test(isPresenting: .constant(false), viewModel: viewModel)
+        Story(isPresenting: .constant(false), viewModel: viewModel)
     }
 }

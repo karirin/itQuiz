@@ -12,17 +12,15 @@ class AppState: ObservableObject {
     @Published var isBannerVisible = true
 
     init() {
-    
-        
         DispatchQueue.main.async {
             self.checkSubscription()
         }
         
         Task {
-                await checkCurrentSubscription()
-            }
+            await checkCurrentSubscription()
+        }
     }
-    // サブスクリプションの状態を確認する非同期メソッド
+
      func checkCurrentSubscription() async {
          for await result in Transaction.currentEntitlements {
              switch result {
@@ -166,10 +164,13 @@ class SubscriptionViewModel: ObservableObject {
         }
     }
     
-    func purchaseProduct(_ product: Product) async throws {
+    func purchaseProduct(_ product: Product, showAlert: Binding<Bool>) async throws {
         do {
             let transaction = try await purchase(product: product)
             authManager.updatePreFlag(userId: authManager.currentUserId!, userPreFlag: 1){ success in
+            }
+            DispatchQueue.main.async {
+                showAlert.wrappedValue = true
             }
             print("購入が完了しました: \(transaction)")
         } catch {
@@ -304,6 +305,7 @@ struct SubscriptionView: View {
     @StateObject var appState = AppState()
     @Environment(\.presentationMode) var presentationMode
     @ObservedObject var audioManager:AudioManager
+    @State private var showAlert = false
 
     var body: some View {
         ScrollView { // Listの代わりにScrollViewを使用
@@ -358,7 +360,6 @@ struct SubscriptionView: View {
                 Text("※プレミアムプランはいつでも解約できます")
                         .font(.system(size: 18))
                         .padding(.bottom)
-//                ForEach(viewModel.products.sorted(by: { $0.displayName == "お試しプラン" && $1.displayName != "お試しプラン" }), id: \.id) { product in
                 ForEach(viewModel.products, id: \.id) { product in
                     VStack{ // 各商品情報をVStackで囲む
 //                        if product.displayName == "広告非表示" {
@@ -366,7 +367,7 @@ struct SubscriptionView: View {
                                     Task {
                                         do {
                                             try await AppStore.sync()
-                                            try await viewModel.purchaseProduct(product)
+                                            try await viewModel.purchaseProduct(product, showAlert: $showAlert)
                                             appState.isBannerVisible = false
                                         } catch {
                                             print("購入処理中にエラーが発生しました: \(error)")
@@ -440,59 +441,6 @@ struct SubscriptionView: View {
         .background(Color("Color2"))
     }
 }
-
-//struct SubscriptionView: View {
-//    @StateObject private var viewModel = SubscriptionViewModel()
-////    @StateObject var appState = AppState()
-//    @EnvironmentObject var appState: AppState
-//    
-//    var body: some View {
-//        VStack {
-//            List(viewModel.products, id: \.id) { product in
-//                    Text("特典内容：広告を非表示にする")
-//                    Text("金額：200円")
-//                    Text("期間：1ヶ月")
-//                HStack{
-//                    Spacer()
-//                    Button(action: {
-//                        Task {
-//                            do {
-//                                try await AppStore.sync()
-//                                try await viewModel.purchaseProduct(product)
-////                                appState.isBannerVisible = false
-//                                appState.isBannerVisible = false
-//                            } catch {
-//                                // ここでエラー処理を行います。
-//                                print("購入処理中にエラーが発生しました: \(error)")
-//                            }
-//                        }
-//                    }) {
-//                        Text("サブスクリプション登録")
-//                    }
-//                }
-//                Button(action: {
-//                    Task {
-//                        do {
-////                            try await viewModel.purchaseProduct(product)
-//                            try await AppStore.sync()
-//                        } catch {
-//                            // ここでエラー処理を行います。
-//                            print("購入処理中にエラーが発生しました: \(error)")
-//                        }
-//                    }
-//                }) {
-//                    Text("購入の復元")
-//                }
-//            }
-//            .onAppear {
-//                Task {
-//                    await viewModel.loadProducts()
-//                }
-//            }
-//        }
-//    }
-//}
-
 
 struct SubscriptionView_Previews: PreviewProvider {
     static var previews: some View {

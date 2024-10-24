@@ -80,7 +80,7 @@ struct HelpModalView: View {
             .alert(isPresented: $showAlert) { // アラートを表示する
                 Alert(
                     title: Text("送信されました"),
-                    message: Text("お問い合わせありがとうございました。"),
+                    message: Text("お問い合わせありがとうございます！"),
                     dismissButton: .default(Text("OK")) {
                         isPresented = false
                     }
@@ -90,10 +90,10 @@ struct HelpModalView: View {
             .foregroundColor(Color("fontGray"))
             .padding()
         .background(Color("Color2"))
-        .overlay(
-            RoundedRectangle(cornerRadius: 20)
-                .stroke(Color.gray, lineWidth: 15)
-        )
+//        .overlay(
+//            RoundedRectangle(cornerRadius: 20)
+//                .stroke(Color.gray, lineWidth: 15)
+//        )
         .cornerRadius(20)
         .shadow(radius: 10)
         .overlay(

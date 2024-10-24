@@ -7,6 +7,7 @@
 
 import SwiftUI
 import StoreKit
+import UIKit
 
 // 現在のデバイスがiPadかどうかを判定する関数
 func isIPad() -> Bool {
@@ -30,6 +31,11 @@ struct AnswerSelectionView: View {
             ForEach(0..<choices.count, id: \.self) { index in
                 Spacer()
                 Button(action: {
+                    if index == correctAnswerIndex {
+                        // 正解の場合、ハプティックフィードバックを生成
+                        let generator = UINotificationFeedbackGenerator()
+                        generator.notificationOccurred(.success)
+                    }
                     self.action(index)
                 }) {
                     Text(self.choices[index])

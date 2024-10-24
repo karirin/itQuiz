@@ -175,7 +175,6 @@ struct ImagePickerView: View {
                                 if success {
                                     self.navigateToContentView = true
                                 } else {
-                                    // アバターの追加に失敗した場合の処理をここに書く
                                 }
                             }
                         } else {

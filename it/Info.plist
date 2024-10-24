@@ -162,7 +162,7 @@
 	<key>UILaunchScreen</key>
 	<dict>
 		<key>UIImageName</key>
-		<string>LaunchScreenImage</string>
+		<string></string>
 		<key>UILaunchScreen</key>
 		<dict/>
 	</dict>

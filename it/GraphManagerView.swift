@@ -31,27 +31,78 @@ struct GraphManagerView: View {
     let sampleData = createSampleData()
     let list: [String] = ["回答数(月間)","正答率"]
     @State private var selectedTab: Int = 0
+    @State private var preFlag: Bool = false
+    @State private var userPreFlag: Int = 0
+    @State private var isLoading: Bool = true
 
     var body: some View {
-            VStack{
-                    TopTabView(list: list, selectedTab: $selectedTab)
-                TabView(selection: $selectedTab,
-                                    content: {
-                    
-    BarChartView(authManager: authManager, data: sampleData)
-        .navigationViewStyle(StackNavigationViewStyle())
-                                    .tag(0)
-                    
-//    PentagonView(authManager: authManager, flag: .constant(false))
-                    PentagonManagerView()
-                                    .tag(1)
-                            })
-                            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+        ZStack{
+            if isLoading {
+                VStack{
+                    ActivityIndicator()
+                }
+                .background(Color("Color2"))
+                .frame(maxWidth: .infinity,maxHeight: .infinity)
+            } else {
+                if userPreFlag != 1 {
+                    VStack{
+                        TopTabView(list: list, selectedTab: $selectedTab)
+                        TabView(selection: $selectedTab,
+                                content: {
+                            
+                            BarChartView(authManager: authManager, data: sampleData)
+                                .navigationViewStyle(StackNavigationViewStyle())
+                                .tag(0)
+                            
+                            //    PentagonView(authManager: authManager, flag: .constant(false))
+                            PentagonManagerView()
+                                .tag(1)
+                        })
+                        .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+                    }
+                    Color.black.opacity(0.45)
+                        .onTapGesture {
+                            preFlag = true
+                        }
+                    VStack{
+                        Image(systemName: "lock.fill")
+                            .font(.system(size: 44))
+                            .foregroundColor(.white)
+                        Text("プレミアムプランに登録すると\n毎日の回答数や問題の正答率をグラフで確認することができます")
+                            .bold()
+                            .foregroundColor(.white)
+                    }
+                }
+                else{
+                    VStack{
+                        TopTabView(list: list, selectedTab: $selectedTab)
+                        TabView(selection: $selectedTab,
+                                content: {
+                            
+                            BarChartView(authManager: authManager, data: sampleData)
+                                .navigationViewStyle(StackNavigationViewStyle())
+                                .tag(0)
+                            
+                            //    PentagonView(authManager: authManager, flag: .constant(false))
+                            PentagonManagerView()
+                                .tag(1)
+                        })
+                        .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+                    }
+                }
+            }
+        }
+            .sheet(isPresented: $preFlag) {
+                PreView(audioManager: audioManager)
             }
         .frame(maxWidth:.infinity,maxHeight: .infinity)
         .background(Color("Color2"))
         .onAppear {
-          
+            authManager.fetchPreFlag()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                userPreFlag = authManager.userPreFlag
+                isLoading = false
+            }
             if let soundURL = Bundle.main.url(forResource: "soundKettei", withExtension: "mp3") {
                 do {
                     audioPlayerKettei = try AVAudioPlayer(contentsOf: soundURL)

@@ -113,19 +113,15 @@ struct itApp: App {
     var body: some Scene {
         WindowGroup {
             RootView(authManager: authManager)
+//            SplashScreenView(authManager: authManager)
                 .onAppear{
                     DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                        print("appState.isBannerVisible:\(appState.isBannerVisible)")
-          //              isLoading = false
                         if appState.isBannerVisible {
                             AuthManager.shared.updatePreFlag(userId: AuthManager.shared.currentUserId!, userPreFlag: 0){ success in
                             }
                         }
                     }
                 }
-//            RewardView()
-//            GachaView()
-//            Interstitial1()
         }
     }
 }

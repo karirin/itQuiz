@@ -540,42 +540,6 @@ struct QuizBossView: View {
                             .background(GeometryReader { geometry in
                                 Color.clear.preference(key: ViewPositionKey1.self, value: [geometry.frame(in: .global)])
                             })
-                            
-                            if userPreFlag != 1 {
-                                //                               ZStack{
-                                BannerView()
-                                    .frame(height: 60)
-                                //                                   VStack{
-                                //                                       HStack{
-                                //                                           Spacer()
-                                //                                           Button(action: {
-                                //                                               showSubFlag = true
-                                //                                               audioManager.playSound()
-                                //                                               pauseTimer()
-                                //                                           }) {
-                                //                                               Text("広告を閉じる")
-                                //                                                   .font(.system(size:16)).fontWeight(.semibold)
-                                //                                                   .frame(height:20)
-                                //                                                   .padding(8)
-                                //                                                   .padding(.horizontal)
-                                //                                                   .foregroundColor(Color.white)
-                                //                                                   .background(Color("adColor"))
-                                //                                                   .cornerRadius(24)
-                                //                                                   .shadow(radius: 10)
-                                //                                           }
-                                ////                                           .fullScreenCover(isPresented: $showSubFlag) {
-                                ////                                               SubscriptionView(audioManager: audioManager)
-                                ////                                                       }
-                                ////                                           .onChange(of: showSubFlag) { flag in
-                                ////                                               resumeTimer()
-                                ////                                           }
-                                //                                       }
-                                //                                       Spacer()
-                                //                                   }
-                                //                                   .padding()
-                                //                                   .padding(.bottom,30)
-                                //                               }
-                            }
                             Spacer()
                             
                             if showCompletionMessage {

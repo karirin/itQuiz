@@ -36,6 +36,9 @@ struct ESManagerListView: View {
     @State private var showLoginModal: Bool = false
     @State private var isButtonClickable: Bool = false
     @State private var showAlert: Bool = false
+    @State private var preFlag: Bool = false
+    @State private var userPreFlag: Int = 0
+    @State private var isLoading: Bool = true
 
     init(isPresenting: Binding<Bool>) {
         _isPresenting = isPresenting
@@ -63,21 +66,50 @@ struct ESManagerListView: View {
                             .padding(.top)
                             Button(action: {
                                 audioManager.playKetteiSound()
-                                // 画面遷移のトリガーをオンにする
-                                self.isPresentingQuizIncorrectAnswer = true
+                                if userPreFlag != 1 {
+                                    preFlag = true
+                                } else {
+                                    if !isIncorrectAnswersEmpty {
+                                        self.isPresentingQuizIncorrectAnswer = true
+                                    }
+                                }
                             }) {
-                                //                        Image("IT基礎知識の問題の初級")
-                                if isIncorrectAnswersEmpty == true {
-                                Image("ES復習ボタン白黒")
-                                    .resizable()
-                                    .frame(height: isIPad() ? 200 : 70)
-                                }else{
-                                    Image("ES復習ボタン")
-                                        .resizable()
-                                        .frame(height: isIPad() ? 200 : 70)
+                                if isLoading {
+                                    ZStack{
+                                        Image("ES復習ボタン白黒")
+                                            .resizable()
+                                            .frame(height: isIPad() ? 200 : 70)
+                                        ProgressView()
+                                            .scaleEffect(2)
+                                    }
+                                } else {
+                                    ZStack {
+                                        if isIncorrectAnswersEmpty == true {
+                                            Image("ES復習ボタン白黒")
+                                                .resizable()
+                                                .frame(height: isIPad() ? 200 : 70)
+                                        }else{
+                                            Image("ES復習ボタン")
+                                                .resizable()
+                                                .frame(height: isIPad() ? 200 : 70)
+                                        }
+                                        if userPreFlag != 1 {
+                                            ZStack{
+                                                Color.black.opacity(0.45)
+                                                    .cornerRadius(30)
+                                                Text("プレミアムプランを登録すると\n復習機能が開放されます")
+                                                    .font(.system(size: isIPad() ? 50 : 20))
+                                                    .foregroundStyle(.white)
+                                                    .bold()
+                                                    .multilineTextAlignment(.center)
+                                            }
+                                            .onTapGesture {
+                                                preFlag = true
+                                            }
+                                        }
+                                    }
                                 }
                             }
-                            .disabled(isIncorrectAnswersEmpty)
                             .frame(maxWidth: .infinity)
                             .padding(.horizontal)
                             .padding(.bottom)
@@ -199,60 +231,6 @@ struct ESManagerListView: View {
                             .fullScreenCover(isPresented: $isPresentingQuizGod) {
                                 QuizESsecurityListView(isPresenting: $isPresentingQuizGod)
                                         }
-                            // ネットワーク系の問題
-    //                            Button(action: {
-    //                                audioManager.playKetteiSound()
-    //                                self.isPresentingQuizNetwork = true
-    //                            }) {
-    //                                //                    Image("ネットワーク系の問題")
-    //                                Image("選択肢4")
-    //                                    .resizable()
-    //                                    .frame(height: isIPad() ? 200 : 70)
-    //                            }
-    //                            .frame(maxWidth: .infinity)
-    //                            .padding(.horizontal)
-    //                            .padding(.bottom)
-    //                            .shadow(radius: 1)
-    //                            .fullScreenCover(isPresented: $isPresentingQuizNetwork) {
-    //                                            QuizNetworkList(isPresenting: $isPresentingQuizNetwork)
-    //                                        }
-    //
-    //                            // セキュリティ系の問題
-    //                            Button(action: {
-    //                                audioManager.playKetteiSound()
-    //                                self.isPresentingQuizSecurity = true
-    //                            }) {
-    //                                //                    Image("セキュリティ系の問題")
-    //                                Image("選択肢5")
-    //                                    .resizable()
-    //                                    .frame(height: isIPad() ? 200 : 70)
-    //                            }
-    //                            .frame(maxWidth: .infinity)
-    //                            .padding(.horizontal)
-    //                            .padding(.bottom)
-    //                            .shadow(radius: 3)
-    //                            .fullScreenCover(isPresented: $isPresentingQuizSecurity) {
-    //                                            QuizSecurityList(isPresenting: $isPresentingQuizSecurity)
-    //                                        }
-    //
-    //                            // データベース系の問題
-    //                            Button(action: {
-    //                                audioManager.playKetteiSound()
-    //                                self.isPresentingQuizDatabase = true
-    //                            }) {
-    //                                //                    Image("データベース系の問題")
-    //                                Image("選択肢6")
-    //                                    .resizable()
-    //                                    .frame(height: isIPad() ? 200 : 70)
-    //                            }
-    //                            .frame(maxWidth: .infinity)
-    //                            .padding(.horizontal)
-    //                            .padding(.bottom,120)
-    //                            .shadow(radius: 3)
-    //                            .fullScreenCover(isPresented: $isPresentingQuizDatabase) {
-    //                                            QuizDatabaseList(isPresenting: $isPresentingQuizDatabase)
-    //                                        }
-    //
                             .padding(.bottom,130)
                         }
                     }
@@ -297,9 +275,6 @@ struct ESManagerListView: View {
                                                 Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
                                             })
                                             .padding(.bottom)
-    //                                                .fullScreenCover(isPresented: $showAnotherView_post, content: {
-    //                                                    RewardRegistrationView()
-    //                                                })
                                         
                                             Spacer()
                                     }
@@ -399,8 +374,11 @@ struct ESManagerListView: View {
 //                print("isButtonClickable:\(isButtonClickable)")
                 reward.LoadReward()
                 fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
-    //                self.incorrectAnswerCount = count
-    //                incorrectCount = count
+                    authManager.fetchPreFlag()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                        userPreFlag = authManager.userPreFlag
+                        isLoading = false
+                    }
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { // 1秒後に
                     self.isButtonClickable = true // ボタンをクリック可能に設定
@@ -436,6 +414,9 @@ struct ESManagerListView: View {
                 } else {
                     audioPlayerKettei?.volume = 1.0
                 }
+            }
+            .sheet(isPresented: $preFlag) {
+                PreView(audioManager: audioManager)
             }
                 .navigationBarBackButtonHidden(true)
                 .navigationBarItems(leading: Button(action: {

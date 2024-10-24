@@ -1,0 +1,21 @@
+{
+  "images" : [
+    {
+      "filename" : "名称未設定のデザイン - 2024-09-28T171023.081.png",
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
+      "idiom" : "universal",
+      "scale" : "3x"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

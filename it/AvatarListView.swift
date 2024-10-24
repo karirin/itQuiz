@@ -31,6 +31,7 @@ struct AvatarListView: View {
     var columns: [GridItem] = [
         GridItem(.flexible()),
         GridItem(.flexible()),
+        GridItem(.flexible()),
         GridItem(.flexible())
     ]
 
@@ -55,13 +56,13 @@ struct AvatarListView: View {
                             Image(selected.name)
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
-                                .frame(height: 180)
+                                .frame(height: 160)
                                 .cornerRadius(15)
                             if selected.usedFlag == 1 {
                                 Image("おとも選択中")
                                     .resizable()
                                     .frame(width: 80, height: 40)
-                                    .position(x: UIScreen.main.bounds.width / 1.3, y: UIScreen.main.bounds.height / 4.7)
+                                    .position(x: UIScreen.main.bounds.width / 1.3, y: UIScreen.main.bounds.height / 6.0)
                             } else {
                                 Button(action: {
                                     audioManager.playSound()
@@ -94,7 +95,7 @@ struct AvatarListView: View {
                                 }
                             }
                         }
-                        .frame(height:180)
+                        .frame(height:140)
                         HStack{
                             ZStack {
                                 Image("ハートバー")
@@ -119,7 +120,7 @@ struct AvatarListView: View {
                                     .padding(.top,10)
                             }.padding(.top,5)
                         }
-                        .padding(.top)
+//                        .padding(.top)
                 }
             }
             ScrollView {
@@ -129,7 +130,7 @@ struct AvatarListView: View {
                             ZStack{
                                 if avatar.usedFlag == 1 {
                                                 Color("Color")
-                                                    .frame(width: 100, height: 100)
+                                                    .frame(width: 80, height: 80)
                                                     .cornerRadius(8)
                                             }
                                 Button(action: {
@@ -146,7 +147,7 @@ struct AvatarListView: View {
                                     Image(avatar.name) // avatarのnameを使用
                                         .resizable()
                                         .aspectRatio(contentMode: .fit)
-                                        .frame(width: 100, height: 100)
+                                        .frame(width: 80, height: 80)
                                         .padding(5)
                                         .cornerRadius(8)
                                 }
@@ -192,6 +193,7 @@ struct AvatarListView: View {
                         .padding()
                     }
                 }
+                .padding(.horizontal)
             }
             .frame(maxWidth:.infinity,maxHeight:.infinity)
             .onReceive(authManager.$avatars) { newAvatars in

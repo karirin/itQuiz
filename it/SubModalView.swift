@@ -24,6 +24,7 @@ struct SubModalView: View {
     @StateObject private var viewModel = SubscriptionViewModel()
     @StateObject var appState = AppState()
     @Environment(\.presentationMode) var presentationMode
+    @State private var showAlert = false
     
     var body: some View {
         ZStack {
@@ -87,7 +88,7 @@ struct SubModalView: View {
                                         Task {
                                             do {
                                                 try await AppStore.sync()
-                                                try await viewModel.purchaseProduct(product)
+                                                try await viewModel.purchaseProduct(product, showAlert: $showAlert)
                                                 appState.isBannerVisible = false
                                             } catch {
                                                 print("購入処理中にエラーが発生しました: \(error)")

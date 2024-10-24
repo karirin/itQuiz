@@ -115,7 +115,7 @@ struct CoinModalView: View {
             }
                 .onAppear{
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-//                        print(store.productList)
+                        print(store.productList)
                     }
                 }
             //            .padding(50)

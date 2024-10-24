@@ -90,6 +90,7 @@ struct IllustratedView: View {
     var columns: [GridItem] = [
         GridItem(.flexible()),
         GridItem(.flexible()),
+        GridItem(.flexible()),
         GridItem(.flexible())
     ]
 
@@ -112,9 +113,8 @@ struct IllustratedView: View {
                             Image(selected.name)
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
-                                .frame(height: 180)
+                                .frame(height: 150)
                                 .cornerRadius(15)
-                                .frame(height:180)
                             HStack{
                                 ZStack {
                                     Image("ハートバー")
@@ -157,9 +157,8 @@ struct IllustratedView: View {
                             Image("\(selected.name)_シルエット")
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
-                                .frame(height: 180)
+                                .frame(height: 150)
                                 .cornerRadius(15)
-                                .frame(height:180)
                             HStack{
                                 ZStack {
                                     Image("ハートバー")
@@ -202,7 +201,7 @@ struct IllustratedView: View {
                                             Image(item.name)
                                                 .resizable()
                                                 .aspectRatio(contentMode: .fit)
-                                                .frame(width: 100, height: 100)
+                                                .frame(width: 80, height: 80)
                                                 .padding(5)
                                                 .cornerRadius(8)
                                         }
@@ -215,7 +214,9 @@ struct IllustratedView: View {
                                             Image("\(item.name)_シルエット") // シルエット画像は適宜用意してください
                                                 .resizable()
                                                 .aspectRatio(contentMode: .fit)
-                                                .frame(width: 100, height: 100)
+                                                .frame(width: 80, height: 80)
+                                                .padding(5)
+                                                .cornerRadius(8)
                                         }
                                     }
                                 }
@@ -225,6 +226,7 @@ struct IllustratedView: View {
                                )
                             }
                         }
+                        .padding(5)
                     }
             .frame(maxWidth:.infinity,maxHeight:.infinity)
 //            .onReceive(authManager.$avatars) { newAvatars in

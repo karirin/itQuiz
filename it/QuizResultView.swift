@@ -41,6 +41,7 @@ struct QuizResultView: View {
     let quizBossLevel: QuizBossLevel
     @State private var isShow: Bool = true
     @State private var flag: Bool = false
+    @State private var preFlag: Bool = false
     @State private var showSubFlag: Bool = false
     @State private var level3flag: Bool = false
     @State private var level5flag: Bool = false
@@ -91,7 +92,7 @@ struct QuizResultView: View {
                             }
                             .shadow(radius: 3)
                             .fullScreenCover(isPresented: $showSubFlag) {
-                                SubscriptionView(audioManager: audioManager)
+                                PreView(audioManager: audioManager)
                             }
                             Spacer()
                         }.padding(5)
@@ -197,9 +198,11 @@ struct QuizResultView: View {
                         .foregroundColor(Color("fontGray1"))
                     }
                 }
+                .sheet(isPresented: $preFlag) {
+                    PreView(audioManager: audioManager)
+                }
                 .onChange(of: authManager.didLevelUp) { newValue in
                     if newValue {
-                        // レベルアップ通知を表示した後、フラグをリセット
                         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                             showLevelUpModal = true
                             audioManager.playLevelUpSound()
@@ -209,9 +212,11 @@ struct QuizResultView: View {
                 .onAppear {
                     authManager.fetchPreFlag()
                     authManager.fetchUserStory()
-                    executeProcessEveryThreeTimes()
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                         userPreFlag = authManager.userPreFlag
+                        if userPreFlag != 1 {
+                            executeProcessEveryFortyTimes()
+                        }
                     }
                     if playerExperience != 5 {
                         if quizBossLevel == .goburin {
@@ -239,14 +244,16 @@ struct QuizResultView: View {
                             }
                         }
                     }
-                    if !interstitial.interstitialAdLoaded {
-                        interstitial.loadInterstitial(completion: { isLoaded in
-                            if isLoaded {
-                                self.interstitial.presentInterstitial(from: adViewControllerRepresentable.viewController)
-                            }
-                        })
-                    } else if !interstitial.wasAdDismissed {
-                        interstitial.presentInterstitial(from: adViewControllerRepresentable.viewController)
+                    DispatchQueue.main.async {
+                        if !interstitial.interstitialAdLoaded && interstitial.wasAdDismissed == false {
+                            interstitial.loadInterstitial(completion: { isLoaded in
+                                if isLoaded {
+                                    self.interstitial.presentInterstitial(from: adViewControllerRepresentable.viewController)
+                                }
+                            })
+                        } else if !interstitial.wasAdDismissed {
+                            interstitial.presentInterstitial(from: adViewControllerRepresentable.viewController)
+                        }
                     }
                     authManager.fetchUserExperienceAndLevel()
                       DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -376,17 +383,16 @@ struct QuizResultView: View {
         return formatter.string(from: duration) ?? ""
     }
     
-    func executeProcessEveryThreeTimes() {
+    func executeProcessEveryFortyTimes() {
         // UserDefaultsからカウンターを取得
-        let count = UserDefaults.standard.integer(forKey: "launchCountFlag") + 1
+        let count = UserDefaults.standard.integer(forKey: "launchPreCount") + 1
         
         // カウンターを更新
-        UserDefaults.standard.set(count, forKey: "launchCountFlag")
+        UserDefaults.standard.set(count, forKey: "launchPreCount")
         
         // 3回に1回の割合で処理を実行
-        print("count:\(count)")
-        if count % 4 == 0 {
-            adFlag = true
+        if count % 5 == 0 {
+            preFlag = true
         }
     }
 }
