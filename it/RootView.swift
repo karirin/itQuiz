@@ -17,19 +17,12 @@ struct RootView: View {
 
     var body: some View {
         Group {
-            if !isActive && isUserExists == nil {
-                // ユーザー存在チェック中の表示 (例: ローディングインジケータ)
-//                ActivityIndicator()
+            if !isActive {
                 SplashScreenView()
             } else if isUserExists == false || isUserExists == nil {
-                SignUp()
-            } else {
-//                ContentView(isPresentingQuizBeginnerList: .constant(false), isPresentingAvatarList: .constant(false))
-//                ContentView()
                 TopView()
-//                    .onAppear{
-//                            requestReview()
-//                    }
+            } else {
+                TopView()
             }
         }
         .onAppear {
@@ -40,7 +33,7 @@ struct RootView: View {
             } else {
                 self.isUserExists = false
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                 withAnimation {
                     self.isActive = true
                 }

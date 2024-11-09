@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		180A9FBB2CD640ED00B35C83 /* ChangeNameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180A9FBA2CD640ED00B35C83 /* ChangeNameView.swift */; };
+		180A9FBD2CD66C5A00B35C83 /* TutorialModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180A9FBC2CD66C5A00B35C83 /* TutorialModalView.swift */; };
 		1820AE172B518D8D00BBA679 /* 正解.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1820AE092B518D8C00BBA679 /* 正解.mp3 */; };
 		1820AE182B518D8D00BBA679 /* カウントダウン.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1820AE0A2B518D8C00BBA679 /* カウントダウン.mp3 */; };
 		1820AE192B518D8D00BBA679 /* 倒れる.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1820AE0B2B518D8C00BBA679 /* 倒れる.mp3 */; };
@@ -140,6 +142,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		180A9FBA2CD640ED00B35C83 /* ChangeNameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeNameView.swift; sourceTree = "<group>"; };
+		180A9FBC2CD66C5A00B35C83 /* TutorialModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialModalView.swift; sourceTree = "<group>"; };
 		1820AE092B518D8C00BBA679 /* 正解.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "正解.mp3"; path = "../../../Downloads/it 効果音/正解.mp3"; sourceTree = "<group>"; };
 		1820AE0A2B518D8C00BBA679 /* カウントダウン.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "カウントダウン.mp3"; path = "../../../Downloads/it 効果音/カウントダウン.mp3"; sourceTree = "<group>"; };
 		1820AE0B2B518D8C00BBA679 /* 倒れる.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "倒れる.mp3"; path = "../../../Downloads/it 効果音/倒れる.mp3"; sourceTree = "<group>"; };
@@ -320,6 +324,8 @@
 				267E708A2AD5ACDF00EA7AA2 /* Info.plist */,
 				260E44122AB572DC00FBB487 /* itApp.swift */,
 				18A81E432C8C77A7007A91E1 /* PreView.swift */,
+				180A9FBA2CD640ED00B35C83 /* ChangeNameView.swift */,
+				180A9FBC2CD66C5A00B35C83 /* TutorialModalView.swift */,
 				26B9BA1C2AEFDEFD00AC7C40 /* RewardView.swift */,
 				26B5BEF32AB6CFA600056E79 /* RootView.swift */,
 				26A026DD2ABDD1EA00119F2B /* TopView.swift */,
@@ -635,6 +641,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				183211732B9CB8990064F10A /* QuizAppliedManagementListView.swift in Sources */,
+				180A9FBD2CD66C5A00B35C83 /* TutorialModalView.swift in Sources */,
 				26B5BEF42AB6CFA600056E79 /* RootView.swift in Sources */,
 				1832116F2B9CB8570064F10A /* QuizITManagementListView.swift in Sources */,
 				187E7C932C57BD110071621F /* QuizITStrategyIncorrectAnswerListView.swift in Sources */,
@@ -647,6 +654,7 @@
 				267283132AFA84C600549219 /* IllustratedView.swift in Sources */,
 				269A87882AB7757C00F33C9E /* QuizResultView.swift in Sources */,
 				1832115D2B9C88E80064F10A /* ITManagerListView.swift in Sources */,
+				180A9FBB2CD640ED00B35C83 /* ChangeNameView.swift in Sources */,
 				264F19172AF3B1A900B6FB10 /* RewardModalView.swift in Sources */,
 				2641992C2AC2572F002013B9 /* AvatarListView.swift in Sources */,
 				1896A2012BAD77E40072F12B /* ManagerListView.swift in Sources */,
@@ -870,7 +878,7 @@
 				CODE_SIGN_ENTITLEMENTS = it/it.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 6.8;
+				CURRENT_PROJECT_VERSION = 7.0;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"it/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
@@ -889,7 +897,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 6.8;
+				MARKETING_VERSION = 7.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "Swift-Beginners-app.it";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -909,7 +917,7 @@
 				CODE_SIGN_ENTITLEMENTS = it/it.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 6.8;
+				CURRENT_PROJECT_VERSION = 7.0;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"it/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
@@ -928,7 +936,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 6.8;
+				MARKETING_VERSION = 7.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "Swift-Beginners-app.it";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

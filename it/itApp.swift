@@ -112,14 +112,18 @@ struct itApp: App {
     
     var body: some Scene {
         WindowGroup {
+//            TopView(authManager: authManager)
             RootView(authManager: authManager)
-//            SplashScreenView(authManager: authManager)
                 .onAppear{
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                        if appState.isBannerVisible {
-                            AuthManager.shared.updatePreFlag(userId: AuthManager.shared.currentUserId!, userPreFlag: 0){ success in
+                    if let userId = authManager.currentUserId {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                            if appState.isBannerVisible {
+                                AuthManager.shared.updatePreFlag(userId: AuthManager.shared.currentUserId!, userPreFlag: 0){ success in
+                                }
                             }
                         }
+                    } else {
+                        authManager.anonymousSignIn(){}
                     }
                 }
         }

@@ -64,12 +64,13 @@ class AuthManager: ObservableObject {
     @Published var rewardFlag: Int = 1
     @Published var story: Int = 0
     @Published var userPreFlag: Int = 0
+    @State private var selectedAvatar: Avatar?
     
     init() {
         user = Auth.auth().currentUser
-        if user == nil {
-            anonymousSignIn()
-        }
+//        if user == nil {
+//            anonymousSignIn()
+//        }
     }
     
     static let shared: AuthManager = {
@@ -149,7 +150,7 @@ class AuthManager: ObservableObject {
         }
     }
     
-    func anonymousSignIn() {
+    func anonymousSignIn(completion: @escaping () -> Void) {
         Auth.auth().signInAnonymously { result, error in
             if let error = error {
                 print("Error: \(error.localizedDescription)")
@@ -207,20 +208,74 @@ class AuthManager: ObservableObject {
             }
         }
     
+//    func saveUserToDatabase(userName: String, completion: @escaping (Bool) -> Void) {
+//        guard let userId = user?.uid else { return }
+//        
+//        let userRef = Database.database().reference().child("users").child(userId)
+//        let userData: [String: Any] = ["userName": userName, "userMoney": 0, "userHp": 100, "userAttack": 20, "tutorialNum": 1, "userFlag": 0]
+//        
+//        userRef.setValue(userData) { (error, ref) in
+//            if let error = error {
+//                print("Failed to save user to database:", error.localizedDescription)
+//                return
+//            }
+//            print("Successfully saved user to database.")
+//        }
+//        completion(true)
+//    }
+    
     func saveUserToDatabase(userName: String, completion: @escaping (Bool) -> Void) {
-        guard let userId = user?.uid else { return }
-        
+        guard let userId = user?.uid else {
+            print("saveUserToDatabase")
+            completion(false)
+            return
+        }
+
+        // ユーザーのリファレンスを作成
         let userRef = Database.database().reference().child("users").child(userId)
-        let userData: [String: Any] = ["userName": userName, "userMoney": 0, "userHp": 100, "userAttack": 20, "tutorialNum": 1, "userFlag": 0]
         
+        // 選択されたアバターの作成
+        let selectedAvatar = Avatar(name: self.selectedAvatar?.name ?? "ネッキー", attack: 20, health: 20, usedFlag: 1, count: 1)
+        
+        // ユーザーデータを設定（アバターデータは後で設定）
+        let userData: [String: Any] = [
+            "userName": userName,
+            "userMoney": 300,
+            "userHp": 100,
+            "userAttack": 20,
+            "tutorialNum": 0,
+            "userFlag": 0
+        ]
+
+        // ユーザーデータを保存
         userRef.setValue(userData) { (error, ref) in
             if let error = error {
                 print("Failed to save user to database:", error.localizedDescription)
+                completion(false)
                 return
             }
             print("Successfully saved user to database.")
+            
+            // アバターデータを保存
+            let avatarRef = userRef.child("avatars").childByAutoId()
+            let avatarData: [String: Any] = [
+                "name": selectedAvatar.name,
+                "attack": selectedAvatar.attack,
+                "health": selectedAvatar.health,
+                "usedFlag": selectedAvatar.usedFlag,
+                "count": selectedAvatar.count
+            ]
+            
+            avatarRef.setValue(avatarData) { (error, ref) in
+                if let error = error {
+                    print("Failed to save avatar to database:", error.localizedDescription)
+                    completion(false)
+                    return
+                }
+                print("Successfully saved avatar to database.")
+                completion(true)
+            }
         }
-        completion(true)
     }
     
     func fetchUserInfo(completion: @escaping (String?, [[String: Any]]?, Int?, Int?, Int?, Int?) -> Void) {
@@ -292,6 +347,26 @@ class AuthManager: ObservableObject {
                 print("Error updating tutorialNum: \(error)")
                 completion(false)
             } else {
+                completion(true)
+            }
+        }
+    }
+    
+    func updateUserName(userName: String, completion: @escaping (Bool) -> Void) {
+        guard let userId = user?.uid else {
+            completion(false)
+            return
+        }
+        
+        let userRef = Database.database().reference().child("users").child(userId)
+        let updates = ["userName": userName]
+        
+        userRef.updateChildValues(updates) { error, _ in
+            if let error = error {
+                print("Failed to update userName: \(error.localizedDescription)")
+                completion(false)
+            } else {
+                print("Successfully updated userName.")
                 completion(true)
             }
         }
@@ -1080,7 +1155,7 @@ struct AuthManager1: View {
             }
             Button(action: {
                 if self.authManager.user == nil {
-                    self.authManager.anonymousSignIn()
+                    self.authManager.anonymousSignIn(){}
                 }
             }) {
                 Text("Log in anonymously")

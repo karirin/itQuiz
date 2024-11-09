@@ -514,7 +514,7 @@ struct ITManagerListView: View {
     }
 
 #Preview {
-    ITManagerListView(isPresenting: .constant(false))
+//    ITManagerListView(isPresenting: .constant(false))
 //    ManagerListView(isPresenting: .constant(false))
-//    TopView()
+    TopView()
 }
