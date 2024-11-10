@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		180A9FBB2CD640ED00B35C83 /* ChangeNameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180A9FBA2CD640ED00B35C83 /* ChangeNameView.swift */; };
 		180A9FBD2CD66C5A00B35C83 /* TutorialModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180A9FBC2CD66C5A00B35C83 /* TutorialModalView.swift */; };
+		180A9FC72CDF5CCA00B35C83 /* StampAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180A9FC62CDF5CCA00B35C83 /* StampAnimationView.swift */; };
 		1820AE172B518D8D00BBA679 /* 正解.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1820AE092B518D8C00BBA679 /* 正解.mp3 */; };
 		1820AE182B518D8D00BBA679 /* カウントダウン.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1820AE0A2B518D8C00BBA679 /* カウントダウン.mp3 */; };
 		1820AE192B518D8D00BBA679 /* 倒れる.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1820AE0B2B518D8C00BBA679 /* 倒れる.mp3 */; };
@@ -144,6 +145,7 @@
 /* Begin PBXFileReference section */
 		180A9FBA2CD640ED00B35C83 /* ChangeNameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeNameView.swift; sourceTree = "<group>"; };
 		180A9FBC2CD66C5A00B35C83 /* TutorialModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialModalView.swift; sourceTree = "<group>"; };
+		180A9FC62CDF5CCA00B35C83 /* StampAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StampAnimationView.swift; sourceTree = "<group>"; };
 		1820AE092B518D8C00BBA679 /* 正解.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "正解.mp3"; path = "../../../Downloads/it 効果音/正解.mp3"; sourceTree = "<group>"; };
 		1820AE0A2B518D8C00BBA679 /* カウントダウン.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "カウントダウン.mp3"; path = "../../../Downloads/it 効果音/カウントダウン.mp3"; sourceTree = "<group>"; };
 		1820AE0B2B518D8C00BBA679 /* 倒れる.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "倒れる.mp3"; path = "../../../Downloads/it 効果音/倒れる.mp3"; sourceTree = "<group>"; };
@@ -429,6 +431,7 @@
 				26266B2A2B4A527F007B5964 /* ModalTitleView.swift */,
 				26266B2C2B4A5395007B5964 /* GraphManagerView.swift */,
 				26266B2E2B4A53F8007B5964 /* BarChartView.swift */,
+				180A9FC62CDF5CCA00B35C83 /* StampAnimationView.swift */,
 				1896A2042BAD7BD30072F12B /* ManagerTabView.swift */,
 				183A778A2CBA3D1D0000B839 /* MockView.swift */,
 				260E44162AB572DE00FBB487 /* Assets.xcassets */,
@@ -746,6 +749,7 @@
 				269A878E2AB87CBA00F33C9E /* MemoView.swift in Sources */,
 				262F0FF02B18B6C8004C0C47 /* PentagonShape.swift in Sources */,
 				26D0C36E2AFE6F0600C6AF07 /* GachaManagerView.swift in Sources */,
+				180A9FC72CDF5CCA00B35C83 /* StampAnimationView.swift in Sources */,
 				1867D3B42B8847E60021ED5D /* HelpModalView.swift in Sources */,
 				1852AA172BA867CD0022BD75 /* RankModalView.swift in Sources */,
 				262F0FEE2B178F03004C0C47 /* Banner.swift in Sources */,
