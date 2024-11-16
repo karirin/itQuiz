@@ -47,9 +47,9 @@ struct TestModalView: View {
     }
 }
 
-struct TestView_Previews: PreviewProvider {
-    static var previews: some View {
-        TestModalView(audioManager: AudioManager(), isPresented: .constant(true))
-    }
-}
+//struct TestView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        TestModalView(audioManager: AudioManager(), isPresented: .constant(true))
+//    }
+//}
 

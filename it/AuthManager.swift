@@ -210,25 +210,8 @@ class AuthManager: ObservableObject {
             }
         }
     
-//    func saveUserToDatabase(userName: String, completion: @escaping (Bool) -> Void) {
-//        guard let userId = user?.uid else { return }
-//        
-//        let userRef = Database.database().reference().child("users").child(userId)
-//        let userData: [String: Any] = ["userName": userName, "userMoney": 0, "userHp": 100, "userAttack": 20, "tutorialNum": 1, "userFlag": 0]
-//        
-//        userRef.setValue(userData) { (error, ref) in
-//            if let error = error {
-//                print("Failed to save user to database:", error.localizedDescription)
-//                return
-//            }
-//            print("Successfully saved user to database.")
-//        }
-//        completion(true)
-//    }
-    
     func saveUserToDatabase(userName: String, completion: @escaping (Bool) -> Void) {
         guard let userId = user?.uid else {
-            print("saveUserToDatabase")
             completion(false)
             return
         }
