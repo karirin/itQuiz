@@ -9,13 +9,27 @@ import SwiftUI
 import Firebase
 import Combine
 
+struct QuizStoryData: Identifiable {
+    let id = UUID()
+    let monsterName: String
+    let backgroundName: String
+}
+
 // PositionViewModel の定義
 class PositionViewModel: ObservableObject {
     @Published var userPosition: Int = 1
+    @Published var stamina: Int = 100
+    @Published var showStaminaAlert: Bool = false
+    @Published var showCoinAlert: Bool = false
     
     private var dbRef: DatabaseReference
     private var handle: DatabaseHandle?
     private var cancellables = Set<AnyCancellable>()
+    
+    static let shared: PositionViewModel = {
+        let instance = PositionViewModel()
+        return instance
+    }()
     
     init() {
         self.dbRef = Database.database().reference()
@@ -25,6 +39,7 @@ class PositionViewModel: ObservableObject {
             .compactMap { $0?.uid } // Extract userId if user is logged in
             .sink { [weak self] userId in
                 self?.fetchPosition(for: userId)
+                self?.fetchUserStamina(for: userId)
             }
             .store(in: &cancellables)
     }
@@ -33,6 +48,23 @@ class PositionViewModel: ObservableObject {
         // Remove observer when the view model is deallocated
         if let userId = AuthManager.shared.currentUserId {
             dbRef.child("storys").child(userId).child("position").removeObserver(withHandle: handle!)
+        }
+    }
+    
+    func fetchUserStamina(for userId: String) {
+        
+        let staminaRef = Database.database().reference().child("storys").child(userId).child("stamina")
+        
+        staminaRef.observeSingleEvent(of: .value) { snapshot in
+            if let staminaValue = snapshot.value as? Int {
+                DispatchQueue.main.async {
+                    self.stamina = staminaValue
+                }
+            } else {
+                // スタミナが存在しない場合は初期値を設定
+                self.stamina = 100
+//                self.saveInitialStamina()
+            }
         }
     }
     
@@ -70,25 +102,91 @@ class PositionViewModel: ObservableObject {
             return
         }
         
+        // スタミナが十分か確認
+        guard self.stamina >= 10 else {
+            showStaminaAlert = true
+            return
+        }
+        
         let newPosition = userPosition + 1
-        // ローカルで即時に更新し、アニメーションをトリガー
+        let newStamina = self.stamina - 10
+        
+        // ローカルの状態を即時に更新し、アニメーションをトリガー
         DispatchQueue.main.async {
             withAnimation(.easeInOut(duration: 0.5)) { // アニメーションの調整
                 self.userPosition = newPosition
+                self.stamina = newStamina
             }
         }
-        // Firebase に新しい値を送信
-        dbRef.child("storys").child(userId).child("position").setValue(newPosition) { error, _ in
+        
+        let storyRef = dbRef.child("storys").child(userId)
+        
+        // 複数のフィールドを同時に更新するためのデータ構造
+        let updates = [
+            "position": newPosition,
+            "stamina": newStamina
+        ] as [String : Any]
+        
+        // Firebase に位置とスタミナを同時に更新
+        storyRef.updateChildValues(updates) { error, _ in
             if let error = error {
-                print("position の更新に失敗しました: \(error.localizedDescription)")
-                // 必要に応じてローカルの userPosition を元に戻す処理を追加
+                print("position と stamina の更新に失敗しました: \(error.localizedDescription)")
+                // 必要に応じてローカルの状態を元に戻す処理を追加
                 DispatchQueue.main.async {
                     withAnimation {
                         self.userPosition = newPosition - 1
+                        self.stamina = newStamina + 10
                     }
                 }
             } else {
-                print("position が更新されました: \(newPosition)")
+                print("position と stamina が更新されました: position=\(newPosition), stamina=\(newStamina)")
+            }
+        }
+    }
+
+    /// スタミナを減少させる関数
+    func decreaseStamina(by amount: Int = 10) {
+        guard let userId = AuthManager.shared.currentUserId else {
+            print("ユーザーがログインしていません。")
+            return
+        }
+        
+        // スタミナが十分か確認
+        guard self.stamina >= amount else {
+            DispatchQueue.main.async {
+                self.showStaminaAlert = true
+            }
+            return
+        }
+        
+        let newStamina = self.stamina - amount
+        
+        // ローカルの状態を即時に更新し、アニメーションをトリガー
+        DispatchQueue.main.async {
+            withAnimation(.easeInOut(duration: 0.5)) { // アニメーションの調整
+                self.stamina = newStamina
+            }
+        }
+        
+        let storyRef = dbRef.child("storys").child(userId)
+        
+        // スタミナのみを更新するためのデータ構造
+        let updates = [
+            "stamina": newStamina
+        ] as [String : Any]
+        
+        // Firebase にスタミナを更新
+        storyRef.updateChildValues(updates) { error, _ in
+            if let error = error {
+                print("スタミナの更新に失敗しました: \(error.localizedDescription)")
+                // 必要に応じてローカルの状態を元に戻す処理を追加
+                DispatchQueue.main.async {
+                    withAnimation {
+                        self.stamina = newStamina + amount
+                    }
+                }
+            } else {
+                print("スタミナが更新されました: stamina=\(newStamina)")
             }
         }
     }
@@ -97,18 +195,46 @@ class PositionViewModel: ObservableObject {
 // TestView の定義
 struct TestView: View {
     @StateObject var viewModel = PositionViewModel() // @StateObject として初期化
-    @Namespace private var animationNamespace // 名前空間を追加
+    @Namespace private var animationNamespace
     
     var body: some View {
-        ZStack{
-            Image("背景1")
-                .resizable()
-            ScrollView{
+        NavigationStack {
+            ZStack{
+                Image("背景1")
+                    .resizable()
+                // スタミナ表示
                 VStack {
-                    PlatformsContainer(viewModel: viewModel, namespace: animationNamespace)
+                    HStack {
+                        Text("スタミナ: \(viewModel.stamina)/100")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                    }
+                    .padding()
+                    .background(Color.black.opacity(0.5))
+                    .cornerRadius(10)
+                    
+                    // スタミナゲージ
+                    ProgressView(value: Double(viewModel.stamina), total: 100)
+                        .progressViewStyle(LinearProgressViewStyle(tint: .green))
+                        .padding([.leading, .trailing], 20)
+                        .padding(.bottom, 10)
+                    ScrollView{
+                        VStack {
+                            PlatformsContainer(viewModel: viewModel, namespace: animationNamespace)
+                        }
+                    }
                 }
-                .padding(.top,100)
+                if viewModel.showCoinAlert {
+                    StoryCoinModalView(isPresented: $viewModel.showCoinAlert)
+                }
             }
+        }
+        .alert(isPresented: $viewModel.showStaminaAlert) {
+            Alert(
+                title: Text("スタミナ不足"),
+                message: Text("スタミナが不足しています。スタミナを回復するまで先に進むことができません。"),
+                dismissButton: .default(Text("OK"))
+            )
         }
     }
 }
@@ -165,13 +291,13 @@ struct PlatformsContainer: View {
                 PlatformData(
                     imageName: self.platformImageName,
                     position: 17,
-                    padding: EdgeInsets(top: 0, leading: 0, bottom: 30, trailing: 0),
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
                     padding1: EdgeInsets(top: 0, leading: 0, bottom: 90, trailing: 0)
                 ),
                 PlatformData(
                     imageName: self.platformImageName,
                     position: 16,
-                    padding: EdgeInsets(top: 0, leading: 0, bottom: -30, trailing: 0),
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
                     padding1: EdgeInsets(top: 0, leading: 0, bottom:30, trailing: 0)
                 )
             ],
@@ -299,7 +425,8 @@ struct PlatformsContainer: View {
                             namespace: namespace,
                             treasure: platformData.treasure ?? 0, 
                             monster: platformData.monster ?? 0, 
-                            boss: platformData.boss ?? 0
+                            boss: platformData.boss ?? 0,
+                            viewModel: viewModel
                         )
                     }
                 }
@@ -334,8 +461,15 @@ struct PlatformView: View {
     let namespace: Namespace.ID
     @State private var isMovingUp = false
     @State private var isPulsing = false
+    @State private var avatarName: String = ""
+    @State private var showStaminaAlert: Bool = false
+    @State private var isPresentingQuizStory = false
+    @ObservedObject var viewModel: PositionViewModel
+    @State private var monsterName: String = ""
+    @State private var backgroundName: String = ""
+    @State private var quizStoryData: QuizStoryData? = nil
     
-    init(imageName: String, position: Int, padding: EdgeInsets = EdgeInsets(), padding1: EdgeInsets? = nil, userPosition: Int, onArrowTap: (() -> Void)? = nil, namespace: Namespace.ID,treasure: Int? = 0,monster: Int? = 0,boss: Int? = 0) {
+    init(imageName: String, position: Int, padding: EdgeInsets = EdgeInsets(), padding1: EdgeInsets? = nil, userPosition: Int, onArrowTap: (() -> Void)? = nil, namespace: Namespace.ID,treasure: Int? = 0,monster: Int? = 0,boss: Int? = 0, viewModel: PositionViewModel) {
         self.imageName = imageName
         self.position = position
         self.padding = padding
@@ -346,92 +480,166 @@ struct PlatformView: View {
         self.treasure = treasure
         self.monster = monster
         self.boss = boss
+        self.viewModel = viewModel
     }
     
     var body: some View {
         ZStack {
-            Image(imageName)
-                .resizable()
-                .frame(width: 80, height: 80)
-                .padding(padding)
-                .onTapGesture {
-                    if position == userPosition + 1 {
-                        onArrowTap?() // クロージャを呼び出す
-                    }
-                }
-            
-            if position == userPosition {
-                // 「ライム」に matchedGeometryEffect を適用
-                Image("ライム")
+                Image(imageName)
                     .resizable()
                     .frame(width: 80, height: 80)
-                    .padding(.top, -45)
-                    .padding(padding1 ?? EdgeInsets())
-//                    .matchedGeometryEffect(id: "lime", in: namespace)
-                    .offset(y: isMovingUp ? -3 : 3)
-                    .onAppear {
-                        withAnimation(Animation.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
-                            isMovingUp.toggle()
+                    .padding(padding)
+                    .onTapGesture {
+                        if position == userPosition + 1 {
+                            if viewModel.stamina >= 10 {
+                                if treasure == 1 && userPosition < 4 {
+                                    AuthManager.shared.addMoney(amount: 100)
+                                    viewModel.showCoinAlert = true
+                                }
+                                if let monster = monster, monster == 1 && userPosition < 7 {
+                                    let data = QuizStoryData(monsterName: "モンスター1", backgroundName: "ダンジョン背景1")
+                                    quizStoryData = data
+                                    isPresentingQuizStory = true
+                                } else {
+                                    onArrowTap?()
+                                }
+                            } else {
+                                    viewModel.showStaminaAlert = true
+                                }
+                            }
                         }
-                    }
-            }
-            
-            if let treasure = treasure, treasure != 0 {
-                if treasure == 1 && userPosition < 4 {
-                    Image("宝箱\(treasure)")
+                
+                if position == userPosition {
+                    // 「ライム」に matchedGeometryEffect を適用
+                    Image("\(avatarName)")
                         .resizable()
                         .frame(width: 80, height: 80)
-                        .padding(.top, -35)
-                        .onAppear{
-                            print("treasure:\(treasure)")
+                        .padding(.top, -45)
+                        .padding(padding1 ?? EdgeInsets())
+                        .offset(y: isMovingUp ? -3 : 3)
+                        .onAppear {
+                            withAnimation(Animation.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
+                                isMovingUp.toggle()
+                            }
                         }
                 }
-            }
-            
-            if let monster = monster, monster != 0 {
-                if monster == 1 && userPosition < 7 {
-                    Image("モンスター\(monster)")
-                        .resizable()
-                        .frame(width: 120, height: 120)
-                        .padding(.top, -90)
-                } else {
-                    Image("")
-                        .resizable()
-                        .frame(width: 120, height: 120)
-                        .padding(.top, -125)
+                
+                if let treasure = treasure, treasure != 0 {
+                    if treasure == 1 && userPosition < 4 {
+                        Image("宝箱\(treasure)")
+                            .resizable()
+                            .frame(width: 80, height: 80)
+                            .padding(.top, -35)
+                            .onTapGesture {
+                                if viewModel.stamina >= 10 {
+                                    if treasure == 1 && userPosition < 4 {
+                                        AuthManager.shared.addMoney(amount: 100)
+                                        viewModel.showCoinAlert = true
+                                    }
+                                } else {
+                                    viewModel.showStaminaAlert = true
+                                }
+                            }
+                    }
                 }
-            }
-            if let boss = boss, boss != 0 {
-                if boss == 1 && userPosition < 15 {
-                    Image("ボス\(boss)")
-                        .resizable()
-                        .frame(width: 150, height: 150)
-                        .padding(.top, -165)
-                } else {
-                    Image("")
-                        .resizable()
-                        .frame(width: 150, height: 150)
-                        .padding(.top, -165)
+                
+                if let monster = monster, monster != 0 {
+                    if monster == 1 && userPosition < 7 {
+                        Image("モンスター\(monster)")
+                            .resizable()
+                            .frame(width: 120, height: 120)
+                            .padding(.top, -80)
+                            .onTapGesture {
+                                if position == userPosition + 1 {
+                                    if viewModel.stamina >= 10 {
+                                        if monster == 1 && userPosition < 7 {
+                                            let data = QuizStoryData(monsterName: "モンスター1", backgroundName: "ダンジョン背景1")
+                                            quizStoryData = data
+                                            isPresentingQuizStory = true
+                                        } else {
+                                            onArrowTap?()
+                                        }
+                                    } else {
+                                        viewModel.showStaminaAlert = true
+                                    }
+                                }
+                            }
+                    } else {
+                        Image("")
+                            .resizable()
+                            .frame(width: 120, height: 120)
+                            .padding(.top, -125)
+                    }
                 }
-            }
-            if position == userPosition + 1 {
-                Image("下矢印")
-                    .resizable()
-                    .frame(width: 50, height: 50)
-                    .padding(.top, -30)
-                    .padding(padding1 ?? EdgeInsets())
-                    .scaleEffect(isPulsing ? 1.4 : 1.0)
-                    .onAppear {
-                        withAnimation(Animation.easeInOut(duration: 0.8).repeatForever(autoreverses: true)) {
-                            isPulsing.toggle()
+                if let boss = boss, boss != 0 {
+                    if boss == 1 && userPosition < 15 {
+                        Image("ボス\(boss)")
+                            .resizable()
+                            .frame(width: 150, height: 150)
+                            .padding(.top, -165)
+                    } else {
+                        Image("")
+                            .resizable()
+                            .frame(width: 150, height: 150)
+                            .padding(.top, -165)
+                    }
+                }
+                if position == userPosition + 1 {
+                    Image("下矢印")
+                        .resizable()
+                        .frame(width: 50, height: 50)
+                        .padding(.top, -30)
+                        .padding(padding1 ?? EdgeInsets())
+                        .scaleEffect(isPulsing ? 1.4 : 1.0)
+                        .onAppear {
+                            withAnimation(Animation.easeInOut(duration: 0.8).repeatForever(autoreverses: true)) {
+                                isPulsing.toggle()
+                            }
                         }
-                    }
-                    .onTapGesture {
-                        onArrowTap?()
-                    }
+                        .onTapGesture {
+                            if position == userPosition + 1 {
+                                if viewModel.stamina >= 10 {
+                                    if treasure == 1 && userPosition < 4 {
+                                        AuthManager.shared.addMoney(amount: 100)
+                                        viewModel.showCoinAlert = true
+                                    }
+                                    if monster == 1 && userPosition < 7 {
+                                        let data = QuizStoryData(monsterName: "モンスター1", backgroundName: "ダンジョン背景1")
+                                        quizStoryData = data
+                                        isPresentingQuizStory = true
+                                    } else {
+                                        onArrowTap?()
+                                    }
+                                } else {
+                                    viewModel.showStaminaAlert = true
+                                }
+                            }
+                        }
+                }
+                //            Text("\(position)")
+                //                .font(.system(size: 50))
             }
-//            Text("\(position)")
-//                .font(.system(size: 50))
+        
+        
+        .fullScreenCover(item: $quizStoryData) { data in
+            StoryListView(
+                isPresenting: Binding(
+                    get: { self.quizStoryData != nil },
+                    set: { if !$0 { self.quizStoryData = nil } }
+                ),
+                monsterName: data.monsterName,
+                backgroundName: data.backgroundName,
+                viewModel: viewModel
+            )
+        }
+        .onAppear{
+            AuthManager.shared.fetchUsedAvatars { usedAvatars in
+                if let firstAvatar = usedAvatars.first {
+                    self.avatarName = firstAvatar.name
+                } else {
+                    self.avatarName = "" // デフォルト値を設定
+                }
+            }
         }
     }
 }

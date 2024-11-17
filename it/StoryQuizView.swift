@@ -41,7 +41,7 @@ import Firebase
 //struct TimerArc: Shape {
 //    var startAngle: Angle
 //    var endAngle: Angle
-//    
+//
 //    func path(in rect: CGRect) -> Path {
 //        var path = Path()
 //        path.addArc(center: CGPoint(x: rect.midX, y: rect.midY), radius: rect.width / 2, startAngle: startAngle, endAngle: endAngle, clockwise: false)
@@ -49,9 +49,12 @@ import Firebase
 //    }
 //}
 
-struct RankMatchQuizView: View {
+struct StoryQuizView: View {
+    @ObservedObject var viewModel: PositionViewModel
     let quizzes: [QuizQuestion]
     let quizLevel: QuizLevel
+    let monsterName: String
+    let backgroundName: String
     @State private var selectedAnswerIndex: Int? = nil
     @State private var currentQuizIndex: Int = 0
     @State private var showCompletionMessage: Bool = false
@@ -118,8 +121,7 @@ struct RankMatchQuizView: View {
     @StateObject var appState = AppState()
     @State private var rewardFlag: Int = 0
     @Environment(\.presentationMode) var presentationMode
-//    @ObservedObject var viewModel: PositionViewModel
-    var user: User // ここでユーザー情報全体を受け取る
+//    var user: User // ここでユーザー情報全体を受け取る
 //    var userName2: String
 //    var user: User
     
@@ -225,7 +227,8 @@ struct RankMatchQuizView: View {
             playerExperience = 5
             playerMoney = 5
             navigateToQuizResultView = true  //ここで結果画面への遷移フラグをtrueに
-            
+            RateManager.shared.updateQuizData(userId: authManager.currentUserId!, quizType: quizLevel, newCorrectAnswers: correctAnswerCount, newTotalAnswers: answerCount)
+            RateManager.shared.updateAnswerData(userId: authManager.currentUserId!, quizType: quizLevel, newTotalAnswers: answerCount)
         } else if self.remainingSeconds == 0 {
             currentQuizIndex += 1
            selectedAnswerIndex = nil
@@ -446,12 +449,6 @@ struct RankMatchQuizView: View {
                     .padding(.leading)
                     .foregroundColor(.gray)
                     Spacer()
-                    if let selected = selectedAnswerIndex, selected != currentQuiz.correctAnswerIndex {
-                        Text("正解")
-                            .foregroundColor(Color("fontGray"))
-                        Text("\(currentQuiz.choices[currentQuiz.correctAnswerIndex])")
-                            .foregroundColor(Color("fontGray"))
-                    }
                     Spacer()
                     // 正解の場合の赤い円
                     if let selected = selectedAnswerIndex, selected == currentQuiz.correctAnswerIndex {
@@ -495,7 +492,7 @@ struct RankMatchQuizView: View {
                         }
                     }
                     ZStack{
-                        Image("闘技場")
+                        Image("\(backgroundName)")
                             .resizable()
                             .frame(height:100)
                             .opacity(1)
@@ -504,7 +501,7 @@ struct RankMatchQuizView: View {
                             ZStack{
                                 ZStack{
 //                                    Image("\(quizLevel)Monster\(monsterType)")
-                                    Image("\(user.avatars.first?["name"] as? String ?? "")")
+                                    Image("\(monsterName)")
                                         .resizable()
                                         .frame(width:80,height:80)
                                     // 敵キャラを倒した
@@ -585,14 +582,8 @@ struct RankMatchQuizView: View {
                         AnswerSelectionView(choices: currentQuiz.choices, correctAnswerIndex: hasAnswered ? currentQuiz.correctAnswerIndex : nil) { index in
                             answerSelectionAction(index: index)
                         }
-
-//            AnswerSelectionView(choices: currentQuiz.choices) { index in
-//                                            answerSelectionAction(index: index)
-//                                        }
         .onAppear{
-            
             showTutorial = true
-//                print("AnswerSelectionView currentQuiz.choices:\(currentQuiz.choices)")
         }
                         .frame(maxWidth: .infinity)
                         .shadow(radius: 1)
@@ -601,17 +592,6 @@ struct RankMatchQuizView: View {
                         })
                         
                         Spacer()
-                        
-                        if showCompletionMessage {
-                            // QuizView.swift
-                            if quizLevel == .timeBeginner {
-                                
-                                NavigationLink("", destination: RankMatchQuizResultView(results: quizResults, authManager: authManager, isPresenting: $isPresenting, navigateToQuizResultView: $navigateToQuizResultView, playerExperience: playerExperience, playerMoney: playerMoney, elapsedTime: self.elapsedTime ?? 0, quizLevel: quizLevel,victoryFlag:$victoryFlag).navigationBarBackButtonHidden(true), isActive: $navigateToQuizResultView)
-                            }else{
-                                NavigationLink("", destination: RankMatchQuizResultView(results: quizResults, authManager: authManager, isPresenting: $isPresenting, navigateToQuizResultView: $navigateToQuizResultView, playerExperience: playerExperience, playerMoney: playerMoney, elapsedTime: 0, quizLevel: quizLevel,victoryFlag:$victoryFlag).navigationBarBackButtonHidden(true), isActive: $navigateToQuizResultView)
-                            }
-                            
-                        }
                         Spacer()
                     }
                                         }
@@ -678,8 +658,8 @@ struct RankMatchQuizView: View {
                            .bold()
                    }
                }
+            NavigationLink("", destination: StoryQuizResultView(results: quizResults, authManager: authManager, isPresenting: $isPresenting, navigateToQuizResultView: $navigateToQuizResultView, playerExperience: playerExperience, playerMoney: playerMoney, elapsedTime: 0, quizLevel: quizLevel,victoryFlag:$victoryFlag, viewModel: viewModel).navigationBarBackButtonHidden(true), isActive: $navigateToQuizResultView)
     }
-        
         .onTapGesture {
 //                audioManager.playSound()
             if showCountdown == false {
@@ -703,15 +683,20 @@ struct RankMatchQuizView: View {
                 }
             }
         }
+        .onChange(of: showCompletionMessage) { newValue in
+            navigateToQuizResultView = true
+        }
         .onAppear {
-//            print("user:\(user)")
-//            Image("\(user.avatars.first?["name"] as? String ?? "")")
-//                print("interstitial.interstitialAdLoaded:\(interstitial.interstitialAdLoaded)")
-//                if !interstitial.interstitialAdLoaded {
-//                    print("onAppear interstitial.interstitialAdLoaded")
-//                    interstitial.presentInterstitial()
-//                }
-            startCountdown()
+            switch monsterName {
+                case "モンスター1":
+                    playerExperience = 20
+                    playerMoney = 10
+                    monsterHP = 100
+                    monsterUnderHP = 100
+                    monsterAttack = 10
+                default:
+                    monsterHP = 30
+            }
             self.monsterType = 1 // すぐに1に戻す
             authManager.fetchUserInfo { (name, avatar, money, hp, attack, tutorialNum) in
                 self.userName = name ?? ""
@@ -721,12 +706,14 @@ struct RankMatchQuizView: View {
                 self.userAttack = attack ?? 20
                 self.tutorialNum = tutorialNum ?? 0
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                    monsterHP = (user.avatars.first?["health"] as? Int ?? 0) + self.userHp
-                    print("user.avatars.first?[health]:\(user.avatars.first?["health"] as? Int  ?? 0)")
-                    print("userHP:\(self.userHp)")
-                    print("monsterHP:\(monsterHP)")
-                    monsterUnderHP = (user.avatars.first?["health"] as? Int ?? 0) + self.userHp
-                    monsterAttack = (user.avatars.first?["attack"] as? Int ?? 0) + self.userAttack
+//                    monsterHP = (user.avatars.first?["health"] as? Int ?? 0) + self.userHp
+//                    monsterUnderHP = (user.avatars.first?["health"] as? Int ?? 0) + self.userHp
+//                    monsterAttack = (user.avatars.first?["attack"] as? Int ?? 0) + self.userAttack
+                    if monsterName == "モンスター1" {
+                        monsterHP = 100
+                        monsterUnderHP = 100
+                        monsterAttack = 20
+                    }
                 }
                 if let additionalAttack = self.avator.first?["attack"] as? Int {
                     self.userAttack = self.userAttack + additionalAttack
@@ -786,11 +773,6 @@ struct RankMatchQuizView: View {
                 userAttack = 0
                 }
             }
-            
-//                fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
-//                self.incorrectAnswerCount = count
-//                incorrectCount = count
-//                }
             if quizLevel == .incorrectAnswer {
             userAttack = 0
             }
@@ -809,16 +791,9 @@ struct RankMatchQuizView: View {
                 self.elapsedTime = self.endTime?.timeIntervalSince(self.startTime)
                 // QuizResultViewへの遷移フラグを設定
                 self.navigateToQuizResult = true
-                // ここで経過時間を表示または保存する
-//                    print("経過時間: \(self.elapsedTime!) 秒")
-//                authManager.saveElapsedTime(category: quizLevel.description, elapsedTime: elapsedTime!) { success in
-//                    if success {
-//                        print("経過時間を保存しました。")
-//                    } else {
-//                        print("経過時間の保存に失敗しました。")
-//                    }
-//                }
             }
+            print("playerExperience\(playerExperience)")
+            print("playerMoney:\(playerMoney)")
         }
         .alert(isPresented: $showAlert) {
               Alert(
@@ -831,10 +806,6 @@ struct RankMatchQuizView: View {
                   })
               )
           }
-        .onChange(of: userFlag) { flag in
-//                          print("onchange userFlag:\(userFlag)")
-      //                userFlag = authManager.userFlag
-                  }
         .onChange(of: selectedAnswerIndex) { newValue in
             if let selected = newValue, selected != currentQuiz.correctAnswerIndex {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -848,14 +819,14 @@ struct RankMatchQuizView: View {
             // 味方のHPが０以下のとき
             if newValue && playerHP <= 0 {
 //                victoryFlag = false
-                authManager.addRankMatchPoints(for: user.id, points: 10, onSuccess: {
-                    print("@@@@@@@@@@@@@@@@@@@@@@@1")
-                }, onFailure: { error in
-                })
-                authManager.subtractRankMatchPoints(for: authManager.currentUserId!, points: 10, onSuccess: {
-                    print("@@@@@@@@@@@@@@@@@@@@@@@2")
-                    }, onFailure: { error in
-                    })
+//                authManager.addRankMatchPoints(for: user.id, points: 10, onSuccess: {
+//                    print("@@@@@@@@@@@@@@@@@@@@@@@1")
+//                }, onFailure: { error in
+//                })
+//                authManager.subtractRankMatchPoints(for: authManager.currentUserId!, points: 10, onSuccess: {
+//                    print("@@@@@@@@@@@@@@@@@@@@@@@2")
+//                    }, onFailure: { error in
+//                    })
 //                DispatchQueue.global(qos: .background).async {
 //                    authManager.addExperience(points: 5, onSuccess: {
 //                        // 成功した時の処理をここに書きます
@@ -863,23 +834,23 @@ struct RankMatchQuizView: View {
 //                        // 失敗した時の処理をここに書きます。`error`は失敗の原因を示す情報が含まれている可能性があります。
 //                    })
 //                    authManager.addMoney(amount: 5)
-//                    
+//
 //                    DispatchQueue.main.async {
 //                    }
 //                }
             } else {
                 victoryFlag = true
                 DispatchQueue.global(qos: .background).async {
-                    print("userId:\(user.id)")
-                    authManager.addRankMatchPoints(for: authManager.currentUserId!, points: 10, onSuccess: {
-                        print("@@@@@@@@@@@@@@@@@@@@@@@3")
-                    }, onFailure: { error in
-                       
-                    })
-                authManager.subtractRankMatchPoints(for: user.id, points: 10, onSuccess: {
-                    print("@@@@@@@@@@@@@@@@@@@@@@@4")
-                    }, onFailure: { error in
-                    })
+//                    print("userId:\(user.id)")
+//                    authManager.addRankMatchPoints(for: authManager.currentUserId!, points: 10, onSuccess: {
+//                        print("@@@@@@@@@@@@@@@@@@@@@@@3")
+//                    }, onFailure: { error in
+//                       
+//                    })
+//                authManager.subtractRankMatchPoints(for: user.id, points: 10, onSuccess: {
+//                    print("@@@@@@@@@@@@@@@@@@@@@@@4")
+//                    }, onFailure: { error in
+//                    })
 //                    authManager.addExperience(points: playerExperience * authManager.rewardFlag, onSuccess: {
 ////                            print("addExperience \(authManager.rewardFlag)")
 //                    }, onFailure: { error in
@@ -910,7 +881,3 @@ struct RankMatchQuizView: View {
 //    RankMatchListView(viewModel: RankingViewModel())
 //}
 //}
-
-#Preview {
-    RankMatchListView()
-}

@@ -67,6 +67,7 @@ class AuthManager: ObservableObject {
     @State private var selectedAvatar: Avatar?
     @Published var loginCount: Int = 0 // 追加: ログイン回数を保持
     @Published var loginBonus: Int = 0  // 追加: 現在のボーナス額を保持
+    @Published var usedAvatars: [Avatar] = []
     
     init() {
         user = Auth.auth().currentUser
@@ -262,6 +263,41 @@ class AuthManager: ObservableObject {
             }
         }
     }
+    
+    func fetchUsedAvatars(completion: @escaping ([Avatar]) -> Void) {
+            guard let userId = user?.uid else {
+                completion([])
+                return
+            }
+            
+            let avatarsRef = Database.database().reference()
+                .child("users")
+                .child(userId)
+                .child("avatars")
+            
+            // usedFlag が 1 のアバターのみを取得するクエリ
+            let query = avatarsRef.queryOrdered(byChild: "usedFlag").queryEqual(toValue: 1)
+            
+            query.observeSingleEvent(of: .value) { snapshot in
+                var usedAvatars: [Avatar] = []
+                for child in snapshot.children {
+                    if let childSnapshot = child as? DataSnapshot,
+                       let avatarData = childSnapshot.value as? [String: Any],
+                       let name = avatarData["name"] as? String,
+                       let attack = avatarData["attack"] as? Int,
+                       let health = avatarData["health"] as? Int,
+                       let usedFlag = avatarData["usedFlag"] as? Int,
+                       let count = avatarData["count"] as? Int {
+                        let avatar = Avatar(name: name, attack: attack, health: health, usedFlag: usedFlag, count: count)
+                        usedAvatars.append(avatar)
+                    }
+                }
+                DispatchQueue.main.async {
+                    self.usedAvatars = usedAvatars
+                    completion(usedAvatars)
+                }
+            }
+        }
     
     func fetchUserInfo(completion: @escaping (String?, [[String: Any]]?, Int?, Int?, Int?, Int?) -> Void) {
             guard let userId = user?.uid else {
@@ -731,7 +767,7 @@ class AuthManager: ObservableObject {
     
     func addMoney(amount: Int) {
             guard let userId = user?.uid else { return }
-            
+            print("addMoney")
             let userRef = Database.database().reference().child("users").child(userId)
             
             // 現在の所持金を取得
