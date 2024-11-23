@@ -9,9 +9,11 @@ import SwiftUI
 
 struct StoryCoinModalView: View {
     @ObservedObject var authManager = AuthManager()
+    let coin: Int
     @Binding var isPresented: Bool
     @State var toggle = false
     @State private var text: String = ""
+    @State private var isMovingUp = false
     
     var body: some View {
         ZStack {
@@ -21,27 +23,30 @@ struct StoryCoinModalView: View {
                     isPresented = false
                 }
                 ZStack{
-                    Image("コイン1")
-                        .resizable()
-//                        .frame(height: isSmallDevice() ? 160 : 170)
-                        .frame(height: 150)
-                        .padding(-15)
                     VStack {
-                    Text("100コインゲット！！")
-//                        .font(.system(size: isSmallDevice() ? 17 : 18))
+                    Image("コイン\(coin)")
+//                        Image("コイン1")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 200)
+                        .offset(y: isMovingUp ? -5 : 5)
+                        .onAppear {
+                            withAnimation(Animation.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
+                                isMovingUp.toggle()
+                            }
+                        }
+                    Text("\(coin)00コインゲット！！")
+//                        Text("100コインゲット！！")
                         .font(.system(size: 30))
+                        .foregroundStyle(.white)
                         .fontWeight(.bold)
                         .multilineTextAlignment(.center)
-                        .padding(10)
-                        Spacer()
                 }
             }.frame(height: 150)
 //            .frame(width: isSmallDevice() ? 330: 350,height: isSmallDevice() ? 310: 350)
             
             .foregroundColor(Color("fontGray"))
 //            .padding()
-        .background(Color("Color2"))
-        .cornerRadius(20)
         .shadow(radius: 10)
         .overlay(
             // 「×」ボタンを右上に配置
@@ -50,13 +55,13 @@ struct StoryCoinModalView: View {
             }) {
                 Image(systemName: "xmark.circle.fill")
                     .resizable()
-                    .frame(width: 50, height: 50)
+                    .frame(width: 60, height: 60)
                     .foregroundColor(.gray)
                     .background(.white)
-                    .cornerRadius(30)
+                    .cornerRadius(50)
                     .padding()
             }
-                .offset(x: 35, y: -35), // この値を調整してボタンを正しい位置に移動させます
+                .offset(x: 35, y: -70), // この値を調整してボタンを正しい位置に移動させます
             alignment: .topTrailing // 枠の右上を基準に位置を調整します
         )
         .padding(25)
@@ -65,5 +70,5 @@ struct StoryCoinModalView: View {
         }
 
 #Preview {
-    StoryCoinModalView(isPresented: .constant(true))
+    StoryCoinModalView(coin: 1, isPresented: .constant(true))
 }

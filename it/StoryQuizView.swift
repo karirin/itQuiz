@@ -503,7 +503,9 @@ struct StoryQuizView: View {
 //                                    Image("\(quizLevel)Monster\(monsterType)")
                                     Image("\(monsterName)")
                                         .resizable()
-                                        .frame(width:80,height:80)
+                                        .scaledToFit()
+//                                        .frame(width:80,height:80)
+                                        .frame(width:80)
                                     // 敵キャラを倒した
                                     if showMonsterDownImage && monsterHP <= 0 {
                                         Image("倒す")
@@ -688,12 +690,18 @@ struct StoryQuizView: View {
         }
         .onAppear {
             switch monsterName {
-                case "モンスター1":
+                case "モンスター2":
                     playerExperience = 20
+                    playerMoney = 10
+                    monsterHP = 80
+                    monsterUnderHP = 80
+                    monsterAttack = 10
+                case "モンスター1":
+                    playerExperience = 30
                     playerMoney = 10
                     monsterHP = 100
                     monsterUnderHP = 100
-                    monsterAttack = 10
+                    monsterAttack = 20
                 default:
                     monsterHP = 30
             }
@@ -705,16 +713,6 @@ struct StoryQuizView: View {
                 self.userHp = hp ?? 100
                 self.userAttack = attack ?? 20
                 self.tutorialNum = tutorialNum ?? 0
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-//                    monsterHP = (user.avatars.first?["health"] as? Int ?? 0) + self.userHp
-//                    monsterUnderHP = (user.avatars.first?["health"] as? Int ?? 0) + self.userHp
-//                    monsterAttack = (user.avatars.first?["attack"] as? Int ?? 0) + self.userAttack
-                    if monsterName == "モンスター1" {
-                        monsterHP = 100
-                        monsterUnderHP = 100
-                        monsterAttack = 20
-                    }
-                }
                 if let additionalAttack = self.avator.first?["attack"] as? Int {
                     self.userAttack = self.userAttack + additionalAttack
                 }
@@ -881,3 +879,10 @@ struct StoryQuizView: View {
 //    RankMatchListView(viewModel: RankingViewModel())
 //}
 //}
+struct StoryListView_Previews: PreviewProvider {
+    static var previews: some View {
+        @State var selectedUser = User(id: "1", userName: "SampleUser", level: 1, experience: 100, avatars: [], userMoney: 1000, userHp: 100, userAttack: 20, userFlag: 0, adminFlag: 0, rankMatchPoint: 100, rank: 1)
+
+        StoryListView(isPresenting: .constant(false), monsterName: "モンスター1", backgroundName: "ダンジョン背景1", viewModel: PositionViewModel())
+    }
+}

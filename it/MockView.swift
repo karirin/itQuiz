@@ -9,76 +9,49 @@ import SwiftUI
 import StoreKit
 
 struct MockView: View {
-    @State private var showFeedbackAlert = false
-    @State private var navigateToContact = false
-    @Environment(\.requestReview) var requestReview
-    
+    @Binding var progress: Float
+    @State private var animateGradient = false
+
     var body: some View {
-        NavigationView {
-            VStack {
-                // メインコンテンツ
-                Text("メイン画面")
-                    .padding()
-                
-                Button(action: {
-                    showFeedbackAlert = true
-                }) {
-                    Text("フィードバックを送る")
-                        .padding()
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
-                }
-                
-                NavigationLink(
-                    destination: MockContactView(),
-                    isActive: $navigateToContact,
-                    label: {
-                        EmptyView()
-                    })
-            }
-            .navigationTitle("ホーム")
-            .alert(isPresented: $showFeedbackAlert) {
-                Alert(
-                    title: Text("アプリの使い心地はどうですか"),
-                    message: nil,
-                    primaryButton: .default(Text("はい"), action: {
-                        requestReview()
-                    }),
-                    secondaryButton: .cancel(Text("いいえ"), action: {
-                        navigateToContact = true
-                    })
+        ZStack {
+            // 背景バー
+            RoundedRectangle(cornerRadius: 10)
+                .fill(Color.gray.opacity(0.3))
+                .frame(height: 20)
+
+            // 進捗バー
+            RoundedRectangle(cornerRadius: 10)
+                .fill(
+                    LinearGradient(
+                        gradient: Gradient(colors: [Color.orange, Color.yellow, Color.orange]),
+                        startPoint: animateGradient ? .leading : .trailing,
+                        endPoint: animateGradient ? .trailing : .leading
+                    )
                 )
-            }
+                .frame(width: UIScreen.main.bounds.width * 0.8 * CGFloat(progress), height: 20)
+                .animation(.linear(duration: 1.5).repeatForever(autoreverses: false), value: animateGradient)
+                .onAppear {
+                    animateGradient = true
+                }
+
+            // パーセンテージテキスト
+            Text(String(format: "%.0f%%", progress * 100))
+                .font(.caption)
+                .foregroundColor(.black)
+                .bold()
+                .frame(width: UIScreen.main.bounds.width * 0.8, height: 20, alignment: .center)
         }
-    }
-    
-    func redirectToAppStoreReview() {
-        // App Storeのレビュー画面に遷移
-        // 自分のアプリのApple IDを以下のURLに置き換えてください
-        if let url = URL(string: "itms-apps://itunes.apple.com/app/id6711333088?action=write-review") {
-            if UIApplication.shared.canOpenURL(url) {
-                UIApplication.shared.open(url, options: [:], completionHandler: nil)
-            }
-        }
+        .frame(width: UIScreen.main.bounds.width * 0.8, height: 20)
     }
 }
 
-struct MockContactView: View {
-    var body: some View {
-        VStack {
-            Text("問い合わせ画面")
-                .font(.title)
-                .padding()
-            // ここに問い合わせフォームなどを追加
-        }
-        .navigationTitle("お問い合わせ")
-    }
-}
 
 struct MockView_Previews: PreviewProvider {
+    @State static var progress: Float = 0.5
+    
     static var previews: some View {
-        MockView()
+        MockView(progress: $progress)
+            .previewLayout(.sizeThatFits)
     }
 }
 
