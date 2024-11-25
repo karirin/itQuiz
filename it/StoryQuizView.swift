@@ -49,6 +49,52 @@ import Firebase
 //    }
 //}
 
+struct Monster {
+    let name: String
+    let playerExperience: Int
+    let playerMoney: Int
+    let monsterHP: Int
+    let monsterUnderHP: Int
+    let monsterAttack: Int
+}
+
+// 2. monsters辞書の定義
+let monsters: [String: Monster] = [
+    "モンスター1": Monster(name: "モンスター1", playerExperience: 30, playerMoney: 30, monsterHP: 140, monsterUnderHP: 140, monsterAttack: 20),
+    "モンスター2": Monster(name: "モンスター2", playerExperience: 20, playerMoney: 20, monsterHP: 100, monsterUnderHP: 100, monsterAttack: 10),
+    "モンスター3": Monster(name: "モンスター3", playerExperience: 15, playerMoney: 15, monsterHP: 120, monsterUnderHP: 120, monsterAttack: 15),
+    "モンスター4": Monster(name: "モンスター4", playerExperience: 25, playerMoney: 25, monsterHP: 110, monsterUnderHP: 110, monsterAttack: 12),
+    "モンスター5": Monster(name: "モンスター5", playerExperience: 22, playerMoney: 22, monsterHP: 115, monsterUnderHP: 115, monsterAttack: 14),
+    "モンスター6": Monster(name: "モンスター6", playerExperience: 28, playerMoney: 28, monsterHP: 125, monsterUnderHP: 125, monsterAttack: 18),
+    "モンスター7": Monster(name: "モンスター7", playerExperience: 35, playerMoney: 35, monsterHP: 150, monsterUnderHP: 150, monsterAttack: 25),
+    "モンスター8": Monster(name: "モンスター8", playerExperience: 18, playerMoney: 18, monsterHP: 95, monsterUnderHP: 95, monsterAttack: 9),
+    "モンスター9": Monster(name: "モンスター9", playerExperience: 40, playerMoney: 40, monsterHP: 160, monsterUnderHP: 160, monsterAttack: 28),
+    "モンスター10": Monster(name: "モンスター10", playerExperience: 45, playerMoney: 45, monsterHP: 170, monsterUnderHP: 170, monsterAttack: 30),
+    "モンスター11": Monster(name: "モンスター11", playerExperience: 50, playerMoney: 50, monsterHP: 180, monsterUnderHP: 180, monsterAttack: 32),
+    "モンスター12": Monster(name: "モンスター12", playerExperience: 55, playerMoney: 55, monsterHP: 190, monsterUnderHP: 190, monsterAttack: 35),
+    "モンスター13": Monster(name: "モンスター13", playerExperience: 60, playerMoney: 60, monsterHP: 200, monsterUnderHP: 200, monsterAttack: 38),
+    "モンスター14": Monster(name: "モンスター14", playerExperience: 65, playerMoney: 65, monsterHP: 210, monsterUnderHP: 210, monsterAttack: 40),
+    "モンスター15": Monster(name: "モンスター15", playerExperience: 70, playerMoney: 70, monsterHP: 220, monsterUnderHP: 220, monsterAttack: 42),
+    "モンスター16": Monster(name: "モンスター16", playerExperience: 75, playerMoney: 75, monsterHP: 230, monsterUnderHP: 230, monsterAttack: 45),
+    "モンスター17": Monster(name: "モンスター17", playerExperience: 80, playerMoney: 80, monsterHP: 240, monsterUnderHP: 240, monsterAttack: 48),
+    "モンスター18": Monster(name: "モンスター18", playerExperience: 85, playerMoney: 85, monsterHP: 250, monsterUnderHP: 250, monsterAttack: 50),
+    "モンスター19": Monster(name: "モンスター19", playerExperience: 90, playerMoney: 90, monsterHP: 260, monsterUnderHP: 260, monsterAttack: 52),
+    "モンスター20": Monster(name: "モンスター20", playerExperience: 95, playerMoney: 95, monsterHP: 270, monsterUnderHP: 270, monsterAttack: 55),
+    "モンスター21": Monster(name: "モンスター21", playerExperience: 100, playerMoney: 100, monsterHP: 280, monsterUnderHP: 280, monsterAttack: 58),
+    "モンスター22": Monster(name: "モンスター22", playerExperience: 105, playerMoney: 105, monsterHP: 290, monsterUnderHP: 290, monsterAttack: 60),
+    "モンスター23": Monster(name: "モンスター23", playerExperience: 110, playerMoney: 110, monsterHP: 300, monsterUnderHP: 300, monsterAttack: 62),
+    "モンスター24": Monster(name: "モンスター24", playerExperience: 115, playerMoney: 115, monsterHP: 310, monsterUnderHP: 310, monsterAttack: 65),
+    "モンスター25": Monster(name: "モンスター25", playerExperience: 120, playerMoney: 120, monsterHP: 320, monsterUnderHP: 320, monsterAttack: 68),
+    "モンスター26": Monster(name: "モンスター26", playerExperience: 125, playerMoney: 125, monsterHP: 330, monsterUnderHP: 330, monsterAttack: 70),
+    "ボス1": Monster(name: "ボス1", playerExperience: 150, playerMoney: 150, monsterHP: 300, monsterUnderHP: 300, monsterAttack: 80),
+    "モンスター27": Monster(name: "モンスター27", playerExperience: 130, playerMoney: 130, monsterHP: 340, monsterUnderHP: 340, monsterAttack: 72),
+    "モンスター28": Monster(name: "モンスター28", playerExperience: 135, playerMoney: 135, monsterHP: 350, monsterUnderHP: 350, monsterAttack: 75),
+    "モンスター29": Monster(name: "モンスター29", playerExperience: 140, playerMoney: 140, monsterHP: 360, monsterUnderHP: 360, monsterAttack: 78),
+    "モンスター30": Monster(name: "モンスター30", playerExperience: 145, playerMoney: 145, monsterHP: 370, monsterUnderHP: 370, monsterAttack: 80),
+    "モンスター31": Monster(name: "モンスター31", playerExperience: 150, playerMoney: 150, monsterHP: 380, monsterUnderHP: 380, monsterAttack: 82),
+    "モンスター32": Monster(name: "モンスター32", playerExperience: 155, playerMoney: 155, monsterHP: 390, monsterUnderHP: 390, monsterAttack: 85)
+]
+
 struct StoryQuizView: View {
     @ObservedObject var viewModel: PositionViewModel
     let quizzes: [QuizQuestion]
@@ -505,7 +551,7 @@ struct StoryQuizView: View {
                                         .resizable()
                                         .scaledToFit()
 //                                        .frame(width:80,height:80)
-                                        .frame(width:80)
+                                        .frame(width: monsterName == "ボス1" ? 100 : 80)
                                     // 敵キャラを倒した
                                     if showMonsterDownImage && monsterHP <= 0 {
                                         Image("倒す")
@@ -689,21 +735,20 @@ struct StoryQuizView: View {
             navigateToQuizResultView = true
         }
         .onAppear {
-            switch monsterName {
-                case "モンスター2":
-                    playerExperience = 20
-                    playerMoney = 10
-                    monsterHP = 80
-                    monsterUnderHP = 80
-                    monsterAttack = 10
-                case "モンスター1":
-                    playerExperience = 30
-                    playerMoney = 10
-                    monsterHP = 100
-                    monsterUnderHP = 100
-                    monsterAttack = 20
-                default:
-                    monsterHP = 30
+            if let monster = monsters[monsterName] {
+                playerExperience = monster.playerExperience
+                playerMoney = monster.playerMoney
+                monsterHP = monster.monsterHP
+                monsterUnderHP = monster.monsterUnderHP
+                monsterAttack = monster.monsterAttack
+            } else {
+                // 未定義のモンスターの場合のデフォルト値
+                print("未知のモンスター: \(monsterName)")
+                playerExperience = 0
+                playerMoney = 0
+                monsterHP = 30
+                monsterUnderHP = 30
+                monsterAttack = 0
             }
             self.monsterType = 1 // すぐに1に戻す
             authManager.fetchUserInfo { (name, avatar, money, hp, attack, tutorialNum) in
@@ -781,9 +826,6 @@ struct StoryQuizView: View {
                 userPreFlag = authManager.userPreFlag
             }            }
         .onDisappear {
-            // QuizViewが閉じるときの時刻を記録する
-            // ただし、playerExperienceとplayerMoneyが5以外の時だけ
-            // ここで条件を確認してください
             if playerExperience != 5 && playerMoney != 5 {
                 self.endTime = Date()
                 self.elapsedTime = self.endTime?.timeIntervalSince(self.startTime)
@@ -883,6 +925,6 @@ struct StoryListView_Previews: PreviewProvider {
     static var previews: some View {
         @State var selectedUser = User(id: "1", userName: "SampleUser", level: 1, experience: 100, avatars: [], userMoney: 1000, userHp: 100, userAttack: 20, userFlag: 0, adminFlag: 0, rankMatchPoint: 100, rank: 1)
 
-        StoryListView(isPresenting: .constant(false), monsterName: "モンスター1", backgroundName: "ダンジョン背景1", viewModel: PositionViewModel())
+        StoryListView(isPresenting: .constant(false), monsterName: "ボス1", backgroundName: "ダンジョン背景1", viewModel: PositionViewModel())
     }
 }

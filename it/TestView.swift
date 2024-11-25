@@ -195,143 +195,143 @@ class PositionViewModel: ObservableObject {
     }
 }
 
+// Viewの中心に近いPlatformViewを特定するためのPreferenceKey
+struct ViewOffsetKey: PreferenceKey {
+    typealias Value = [Int: CGFloat]
+    
+    static var defaultValue: [Int: CGFloat] = [:]
+    
+    static func reduce(value: inout [Int: CGFloat], nextValue: () -> [Int: CGFloat]) {
+        value.merge(nextValue(), uniquingKeysWith: { $1 })
+    }
+}
+
+struct ScrollOffsetKey: PreferenceKey {
+    typealias Value = CGFloat
+
+    static var defaultValue: CGFloat = 0
+
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
+    }
+}
 
 // TestView の定義
 struct TestView: View {
     @StateObject var viewModel = PositionViewModel.shared // 共有インスタンスを使用
     @Namespace private var animationNamespace
     @State private var initialScrollDone = false
-    @State private var isLoading = false
+    @State private var isLoading = true
     @State private var position: Int = 1
     @State private var index: Int = 1
+    @State private var currentVisiblePosition: Int = 1
 
     var body: some View {
         NavigationStack {
             ScrollViewReader { proxy in
                 ZStack {
-                    Image("背景1")
+                    Image(backgroundImageName(for: currentVisiblePosition))
                         .resizable()
-                        .edgesIgnoringSafeArea(.all) // 背景画像を全体に表示
-                    if !isLoading {
-                        ActivityIndicator()
-                    } else {
+                        .edgesIgnoringSafeArea(.all)
+                        .transition(.opacity)
+                        .animation(.easeInOut(duration: 0.5), value: currentVisiblePosition)
+
+                    VStack {
                         VStack {
-                            VStack {
-                                // スタミナ表示
-                                HStack{
-                                    HStack {
-                                        
-                                        Image("スタミナ")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(height: 20)
-                                        Text("スタミナ: \(viewModel.stamina)/100")
-                                            .fontWeight(.bold)
-                                            .foregroundColor(.white)
-                                    }
-                                    .padding(10)
-                                    .background(Color.black.opacity(0.5))
-                                    .cornerRadius(10)
-                                    Spacer()
+                            // スタミナ表示
+                            HStack{
+                                HStack {
+                                    Image("スタミナ")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(height: 20)
+                                    Text("スタミナ: \(viewModel.stamina)/100")
+                                        .fontWeight(.bold)
+                                        .foregroundColor(.white)
                                 }
-                            }.padding(.leading,50)
-                            // スタミナゲージ
-                            ProgressStoryView(progress: .constant((Float(viewModel.stamina) / 100)))
-                                .progressViewStyle(LinearProgressViewStyle(tint: .green))
-                                .padding(.bottom, 10)
-                                .onChange(of: viewModel.userPosition) { newPosition in                                print("viewmodel1:\(viewModel.stamina)")
-                                    print("Float(viewModel.stamina / 100):\(Float(viewModel.stamina / 100))")
-                                }
-                            // スクロールビュー
-                            ScrollView {
-                                VStack {
-                                    PlatformsContainer(viewModel: viewModel, namespace: animationNamespace)
-                                }
-                                .padding(.top, 100)
+                                .padding(10)
+                                .background(Color.black.opacity(0.5))
+                                .cornerRadius(10)
+                                Spacer()
                             }
-                            
                         }
-                        if viewModel.showCoinAlert {
-                            StoryCoinModalView(coin: viewModel.coin, isPresented: $viewModel.showCoinAlert)
+                        .padding(.leading, 50)
+                        
+                        // スタミナゲージ
+                        ProgressStoryView(progress: .constant((Float(viewModel.stamina) / 100)))
+                            .progressViewStyle(LinearProgressViewStyle(tint: .green))
+                            .padding(.bottom, 10)
+                        
+                        // スクロールビュー
+                        ScrollView {
+                            VStack {
+                                PlatformsContainer(viewModel: viewModel, namespace: animationNamespace)
+                            }
+                            .padding(.top, 100)
                         }
+                        .background(
+                            GeometryReader { geometry in
+                                Color.clear
+                                    .preference(key: ScrollOffsetKey.self, value: geometry.frame(in: .global).minY)
+                            }
+                        )
+                        .onPreferenceChange(ScrollOffsetKey.self) { offset in
+                            updateBackgroundImageBasedOnScroll(offset: offset)
+                        }
+                        
+                    }
+                    if viewModel.showCoinAlert {
+                        StoryCoinModalView(coin: viewModel.coin, isPresented: $viewModel.showCoinAlert)
+                    }
+                    
+                    if isLoading {
+                        VStack {
+                            ActivityIndicator()
+                        }
+                        .background(Color("Color2"))
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
                 }
                 .onAppear{
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                         position = viewModel.userPosition
                         index = viewModel.userPosition
-                        isLoading = true
-                        viewModel.fetchUserStamina(for: AuthManager.shared.currentUserId!)
+                        if let userId = AuthManager.shared.currentUserId {
+                             viewModel.fetchUserStamina(for: userId)
+                        }
                     }
                 }
                 // userPosition が取得されたときにスクロール
                 .onReceive(viewModel.$isPositionFetched) { fetched in
                     if fetched && !initialScrollDone {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                            withAnimation {
-                                if viewModel.userPosition < 11 {
-                                    proxy.scrollTo(15, anchor: .top)
-                                } else if 11 <= viewModel.userPosition && viewModel.userPosition <= 12 {
-                                    proxy.scrollTo(15 , anchor: .bottom)
-                                } else if 13 <= viewModel.userPosition && viewModel.userPosition <= 15 {
-                                    proxy.scrollTo(14 , anchor: .bottom)
-                                } else if 16 <= viewModel.userPosition && viewModel.userPosition <= 18 {
-                                    proxy.scrollTo(13 , anchor: .bottom)
-                                } else if 19 <= viewModel.userPosition && viewModel.userPosition <= 20 {
-                                    proxy.scrollTo(12, anchor: .bottom)
-                                } else {
-                                    if index % 3 == 0  {
-                                        position = viewModel.userPosition
-                                        proxy.scrollTo(isSmallDevice() ? viewModel.userPosition : viewModel.userPosition, anchor: .bottom)
-                                    } else {
-                                        if viewModel.userPosition == 21 {
-                                            position = viewModel.userPosition
-                                            proxy.scrollTo(isSmallDevice() ? viewModel.userPosition : viewModel.userPosition, anchor: .bottom)
-                                        } else {
-                                            proxy.scrollTo(isSmallDevice() ? position : position, anchor: .bottom)
-                                        }
-                                    }
-                                    index += 1
-                                }
-                            }
-                        }
+                        print("proxy:\(proxy)")
+                        scrollToPosition(proxy: proxy)
+                        initialScrollDone = true
                     }
-                    initialScrollDone = true
                 }
                 // userPosition が変更されたときにスクロール
                 .onChange(of: viewModel.userPosition) { newPosition in
-                    viewModel.fetchUserStamina(for: AuthManager.shared.currentUserId!)
+                    if let userId = AuthManager.shared.currentUserId {
+                        viewModel.fetchUserStamina(for: userId)
+                    }
                     if initialScrollDone {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                            withAnimation {
-                                if viewModel.userPosition < 11 {
-                                    proxy.scrollTo(15, anchor: .top)
-                                } else if 11 <= viewModel.userPosition && viewModel.userPosition <= 12 {
-                                    proxy.scrollTo(15 , anchor: .bottom)
-                                } else if 13 <= viewModel.userPosition && viewModel.userPosition <= 15 {
-                                    proxy.scrollTo(14 , anchor: .bottom)
-                                } else if 16 <= viewModel.userPosition && viewModel.userPosition <= 18 {
-                                    proxy.scrollTo(13 , anchor: .bottom)
-                                } else if 19 <= viewModel.userPosition && viewModel.userPosition <= 20 {
-                                    proxy.scrollTo(12, anchor: .bottom)
-                                } else {
-                                    if index % 3 == 0  {
-                                        position = viewModel.userPosition
-                                        proxy.scrollTo(isSmallDevice() ? viewModel.userPosition : viewModel.userPosition, anchor: .bottom)
-                                    } else {
-                                        if viewModel.userPosition == 21 {
-                                            position = viewModel.userPosition
-                                            proxy.scrollTo(isSmallDevice() ? viewModel.userPosition : viewModel.userPosition, anchor: .bottom)
-                                        } else {
-                                            proxy.scrollTo(isSmallDevice() ? position : position, anchor: .bottom)
-                                        }
-                                    }
-                                    index += 1
-                                }
-                            }
-                        }
+                        scrollToPosition(proxy: proxy)
                     }
                 }
+//                .onPreferenceChange(ViewOffsetKey.self) { offsets in
+//                    // 現在のスクリーン中央のY座標
+//                    let screenHeight = UIScreen.main.bounds.height
+//                    let centerY = screenHeight / 2
+//
+//                    // 各PlatformViewのmidYとスクリーン中央との距離を計算
+//                    let closest = offsets.min { abs($0.value - centerY) < abs($1.value - centerY) }
+//
+//                    if let closestPosition = closest?.key {
+//                        if currentVisiblePosition != closestPosition {
+//                            currentVisiblePosition = closestPosition
+//                        }
+//                    }
+//                }
             }
         }
         .alert(isPresented: $viewModel.showStaminaAlert) {
@@ -342,7 +342,66 @@ struct TestView: View {
             )
         }
     }
+    private func updateBackgroundImageBasedOnScroll(offset: CGFloat) {
+        if offset < -300 {
+            currentVisiblePosition = 21
+        } else if offset < -200 {
+            currentVisiblePosition = 11
+        } else {
+            currentVisiblePosition = 1
+        }
+    }
+    
+    private func backgroundImageName(for position: Int) -> String {
+        switch position {
+        case 1...27:
+            return "背景1"
+        case 28...51:
+            return "背景2"
+        case 52...60:
+            return "背景3"
+        default:
+            return "背景1" // デフォルトの背景
+        }
+    }
+    /// スクロール処理と isLoading の設定を行う関数
+    private func scrollToPosition(proxy: ScrollViewProxy) {
+        print("scrollToPosition")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            withAnimation { // アニメーションの明示的な時間設定
+                if viewModel.userPosition < 11 {
+                    proxy.scrollTo(15, anchor: .top)
+                } else if 11 <= viewModel.userPosition && viewModel.userPosition <= 12 {
+                    proxy.scrollTo(15, anchor: .bottom)
+                } else if 13 <= viewModel.userPosition && viewModel.userPosition <= 15 {
+                    proxy.scrollTo(14, anchor: .bottom)
+                } else if 16 <= viewModel.userPosition && viewModel.userPosition <= 18 {
+                    proxy.scrollTo(13, anchor: .bottom)
+                } else if 19 <= viewModel.userPosition && viewModel.userPosition <= 20 {
+                    proxy.scrollTo(12, anchor: .bottom)
+                } else {
+                    if index % 3 == 0  {
+                        position = viewModel.userPosition
+                        proxy.scrollTo(isSmallDevice() ? viewModel.userPosition : viewModel.userPosition, anchor: .bottom)
+                    } else {
+                        if viewModel.userPosition == 21 {
+                            position = viewModel.userPosition
+                            proxy.scrollTo(isSmallDevice() ? viewModel.userPosition : viewModel.userPosition, anchor: .bottom)
+                        } else {
+                            proxy.scrollTo(isSmallDevice() ? position : position, anchor: .bottom)
+                        }
+                    }
+                    index += 1
+                }
+            }
+//            // アニメーション完了後に isLoading を true に設定
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { // アニメーション時間と合わせる
+                isLoading = false
+            }
+        }
+    }
 }
+
 
 struct PlatformData: Identifiable {
     let id = UUID()
@@ -718,8 +777,8 @@ struct PlatformsContainer: View {
                     position: 49,
                     padding: EdgeInsets(top: 0, leading: 40, bottom: -60, trailing: -30),
                     padding1: EdgeInsets(top: 0, leading: 60, bottom: 0, trailing: 0),
-                    paddingTreasure: EdgeInsets(top: 0, leading: 40, bottom: 0, trailing: 0),
-                    treasure: 3
+                    paddingTreasure: EdgeInsets(top: 0, leading: 60, bottom: 0, trailing: 0),
+                    treasure: 12
                 ),
                 PlatformData(
                     imageName: self.platformImageName,
@@ -789,7 +848,8 @@ struct PlatformsContainer: View {
                     position: 44,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
                     padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
-                    treasure: 10
+                    paddingTreasure: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    treasure: 11
                 ),
                 PlatformData(
                     imageName: self.platformImageName,
@@ -818,7 +878,7 @@ struct PlatformsContainer: View {
                     position: 40,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
                     padding1: nil,
-                    treasure: 9
+                    treasure: 10
                 )
             ],
             [
@@ -826,7 +886,8 @@ struct PlatformsContainer: View {
                     imageName: self.platformImageName,
                     position: 37,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
-                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    treasure: 9
                 ),
                 PlatformData(
                     imageName: self.platformImageName,
@@ -863,7 +924,7 @@ struct PlatformsContainer: View {
                     position: 34,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
                     padding1: nil,
-                    treasure: 6
+                    treasure: 8
                 )
             ],
             [
@@ -901,7 +962,7 @@ struct PlatformsContainer: View {
                     padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
                     padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
                     paddingTreasure: EdgeInsets(top: -60, leading: 0, bottom: 0, trailing: 0),
-                    treasure: 5
+                    treasure: 7
                 ),
                 PlatformData(
                     imageName: self.platformImageName,
@@ -914,8 +975,8 @@ struct PlatformsContainer: View {
                 PlatformData(
                     imageName: self.platformImageName,
                     position: 25,
-                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
-                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
+                    padding: EdgeInsets(top: 0, leading: 60, bottom: -60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 60, bottom: 0, trailing: 0)
                 ),
                 PlatformData(
                     imageName: self.platformImageName,
@@ -926,10 +987,9 @@ struct PlatformsContainer: View {
                 PlatformData(
                     imageName: self.platformImageName,
                     position: 27,
-                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 60),
                     padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0),
-                    paddingMonster: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0),
-                    monster: 8
+                    boss: 1
                 )
             ],
             [
@@ -952,7 +1012,7 @@ struct PlatformsContainer: View {
                     position: 22,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
                     padding1: nil,
-                    treasure: 4
+                    treasure: 5
                 )
             ],
             [
@@ -960,7 +1020,8 @@ struct PlatformsContainer: View {
                     imageName: self.platformImageName,
                     position: 19,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
-                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    treasure: 4
                 ),
                 PlatformData(
                     imageName: self.platformImageName,
@@ -1004,23 +1065,24 @@ struct PlatformsContainer: View {
                 PlatformData(
                     imageName: self.platformImageName,
                     position: 13,
-                    padding: EdgeInsets(top: 0, leading: 40, bottom: -60, trailing: -30),
-                    padding1: EdgeInsets(top: 0, leading: 60, bottom: 0, trailing: 0),
-                    paddingTreasure: EdgeInsets(top: 0, leading: 40, bottom: 0, trailing: 0),
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    paddingTreasure: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
                     treasure: 3
                 ),
                 PlatformData(
                     imageName: self.platformImageName,
                     position: 14,
-                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: -30),
-                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: -30)
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
                 ),
                 PlatformData(
                     imageName: self.platformImageName,
                     position: 15,
-                    padding: EdgeInsets(top: 0, leading: -30, bottom: 60, trailing: 30),
-                    padding1: EdgeInsets(top: 0, leading: -30, bottom: 120, trailing: 20),
-                    boss: 1
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0),
+                    paddingMonster: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0),
+                    monster: 8
                 )
             ],
             [
@@ -1154,7 +1216,7 @@ struct PlatformsContainer: View {
 
 // PlatformView の定義
 struct PlatformView: View {
-    let imageName: String
+//    let imageName: String
     let position: Int
     let padding: EdgeInsets
     let padding1: EdgeInsets?
@@ -1177,8 +1239,12 @@ struct PlatformView: View {
     @State private var quizStoryData: QuizStoryData? = nil
     @State private var coin: Int = 1
     
+    var imageName: String {
+        position >= 28 ? "足場2" : position == 27 ? "ボス足場1" : "足場1"
+    }
+    
     init(imageName: String, position: Int, padding: EdgeInsets = EdgeInsets(), padding1: EdgeInsets? = nil, paddingMonster: EdgeInsets? = nil, paddingTreasure: EdgeInsets? = nil, userPosition: Int, onArrowTap: (() -> Void)? = nil, namespace: Namespace.ID, treasure: Int? = 0, monster: Int? = 0, boss: Int? = 0, viewModel: PositionViewModel) {
-        self.imageName = imageName
+//        self.imageName = imageName
         self.position = position
         self.padding = padding
         self.padding1 = padding1
@@ -1200,12 +1266,19 @@ struct PlatformView: View {
                 .resizable()
                 .frame(width: 80, height: 80)
                 .padding(padding)
+                .background(
+                    GeometryReader { geometry in
+                        Color.clear
+                            .preference(key: ViewOffsetKey.self, value: [position: geometry.frame(in: .global).midY])
+                    }
+                )
                 .onTapGesture {
                     if position == userPosition + 1 {
                         if viewModel.stamina >= 10 {
-                            if treasure == 1 && userPosition < 4 {
-                                AuthManager.shared.addMoney(amount: 100)
+                            if let treasure = treasure, treasure != 0 {
+                                viewModel.coin = treasure
                                 viewModel.showCoinAlert = true
+                                onArrowTap?()
                             }
                             if let monster = monster, monster != 0 {
                                 let data = QuizStoryData(monsterName: "モンスター\(monster)", backgroundName: "ダンジョン背景1")
@@ -1250,10 +1323,7 @@ struct PlatformView: View {
                     .onTapGesture {
                         if viewModel.stamina >= 10 {
                             if position == userPosition + 1 {
-                                if treasure == 1 && userPosition < 4 {
-                                    viewModel.coin = 1
-                                    AuthManager.shared.addMoney(amount: 100)
-                                }
+                                viewModel.coin = treasure
                                 viewModel.showCoinAlert = true
                                 onArrowTap?()
                             }
@@ -1301,6 +1371,17 @@ struct PlatformView: View {
                     .frame(width: 150, height: 150)
                     .padding(.top,boss == 2 ? -185 : -165)
                     .padding(.leading ,boss == 2 ? 0 : 0)
+                    .onTapGesture {
+                        if position == userPosition + 1 {
+                            if viewModel.stamina >= 10 {
+                                let data = QuizStoryData(monsterName: "ボス\(boss)", backgroundName: "ダンジョン背景1")
+                                quizStoryData = data
+                                isPresentingQuizStory = true
+                            } else {
+                                viewModel.showStaminaAlert = true
+                            }
+                        }
+                    }
             } else if boss != 0 {
                 Image("")
                     .resizable()
@@ -1324,9 +1405,10 @@ struct PlatformView: View {
                     }
                     .onTapGesture {
                         if viewModel.stamina >= 10 {
-                            if treasure == 1 && userPosition < 4 {
-                                AuthManager.shared.addMoney(amount: 100)
+                            if let treasure = treasure, treasure != 0 {
+                                viewModel.coin = treasure
                                 viewModel.showCoinAlert = true
+                                onArrowTap?()
                             }
                             if let monster = monster, monster != 0 {
                                 let data = QuizStoryData(monsterName: "モンスター\(monster)", backgroundName: "ダンジョン背景1")
@@ -1347,8 +1429,8 @@ struct PlatformView: View {
                     .padding(padding1 ?? EdgeInsets())
             }
             
-//            Text("\(position)")
-//                .font(.system(size: 50))
+            Text("\(position)")
+                .font(.system(size: 50))
         }
         .fullScreenCover(item: $quizStoryData) { data in
             StoryListView(
