@@ -153,6 +153,53 @@ class AuthManager: ObservableObject {
         }
     }
     
+    func saveLastActiveTimeToFirebase(completion: @escaping (Bool) -> Void) {
+        guard let userId = currentUserId else {
+            completion(false)
+            return
+        }
+
+        let lastActiveRef = Database.database().reference()
+            .child("storys")
+            .child(userId)
+            .child("lastActiveTime")
+        
+        let currentTime = Date().timeIntervalSince1970 // Unixタイムスタンプ
+
+        lastActiveRef.setValue(currentTime) { error, _ in
+            if let error = error {
+                print("FirebaseへのlastActiveTimeの保存に失敗しました: \(error.localizedDescription)")
+                completion(false)
+            } else {
+                print("FirebaseにlastActiveTimeを保存しました。時刻: \(currentTime)")
+                completion(true)
+            }
+        }
+    }
+
+    // Firebaseから最後のアクティブ時刻を取得
+    func fetchLastActiveTimeFromFirebase(completion: @escaping (TimeInterval?) -> Void) {
+        guard let userId = currentUserId else {
+            completion(nil)
+            return
+        }
+
+        let lastActiveRef = Database.database().reference()
+            .child("storys")
+            .child(userId)
+            .child("lastActiveTime")
+
+        lastActiveRef.observeSingleEvent(of: .value) { snapshot in
+            if let lastActiveTimestamp = snapshot.value as? TimeInterval {
+                print("FirebaseからlastActiveTimeを取得しました。時刻: \(lastActiveTimestamp)")
+                completion(lastActiveTimestamp)
+            } else {
+                print("FirebaseからlastActiveTimeの取得に失敗しました。デフォルト値を使用します。")
+                completion(nil)
+            }
+        }
+    }
+    
     func anonymousSignIn(completion: @escaping () -> Void) {
         Auth.auth().signInAnonymously { result, error in
             if let error = error {

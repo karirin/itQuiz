@@ -45,7 +45,7 @@ struct TopView: View {
                                 .padding()
                         }
                         ZStack {
-                            ManagerTabView()
+                            StoryView()
                         }
                         .tabItem {
                             Image(systemName: "map")

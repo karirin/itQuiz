@@ -13,6 +13,7 @@ class Reward: NSObject, GADFullScreenContentDelegate, ObservableObject {
     @Published var rewardEarned: Bool = false // この行を追加
     var rewardedAd: GADRewardedAd?
     @ObservedObject var authManager = AuthManager.shared
+    @ObservedObject var viewModel: PositionViewModel = PositionViewModel.shared
 
     override init() {
         super.init()
@@ -34,6 +35,21 @@ class Reward: NSObject, GADFullScreenContentDelegate, ObservableObject {
             self.rewardedAd?.fullScreenContentDelegate = self
         }
     }
+    
+    func LoadStoryReward() {
+        GADRewardedAd.load(withAdUnitID: "ca-app-pub-4898800212808837/6563091309", request: GADRequest()) { (ad, error) in
+//        GADRewardedAd.load(withAdUnitID: "ca-app-pub-3940256099942544/1712485313", request: GADRequest()) { (ad, error) in //テスト
+            if let _ = error {
+                print("😭: 読み込みに失敗しました")
+                self.rewardLoaded = false
+                return
+            }
+            print("😍: 読み込みに成功しました LoadReward")
+            self.rewardLoaded = true
+            self.rewardedAd = ad
+            self.rewardedAd?.fullScreenContentDelegate = self
+        }
+    }
 
     // リワード広告の表示
     func ShowReward() {
@@ -42,6 +58,22 @@ class Reward: NSObject, GADFullScreenContentDelegate, ObservableObject {
                 ad.present(fromRootViewController: root, userDidEarnRewardHandler: {
                     print("😍: 報酬を獲得しました")
                     self.authManager.addMoney(amount: 300)
+                    self.LoadReward()
+                    self.rewardEarned = true
+                })
+            } else {
+                print("😭: 広告の準備ができていませんでした")
+                LoadReward()
+            }
+        }
+    }
+    
+    func ShowSutaminaReward() {
+        if let root = UIApplication.shared.windows.first?.rootViewController {
+            if let ad = rewardedAd {
+                ad.present(fromRootViewController: root, userDidEarnRewardHandler: { [self] in
+                    print("😍: 報酬を獲得しました")
+                    viewModel.recoverStamina(by: 30)
                     self.LoadReward()
                     self.rewardEarned = true
                 })

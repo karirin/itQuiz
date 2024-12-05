@@ -358,12 +358,12 @@ struct RankMatchQuizResultView: View {
             if level10flag {
                 ModalTittleView(showLevelUpModal: $level10flag, authManager: authManager, tittleNumber: .constant(10))
             }
-            if rankUpFlag {
-                RankUpModalView(showLevelUpModal: $rankUpFlag, authManager: authManager)
-            }
-            if rankDownFlag {
-                RankDownModalView(showLevelUpModal: $rankDownFlag, authManager: authManager)
-            }
+//            if rankUpFlag {
+//                RankUpModalView(showLevelUpModal: $rankUpFlag, authManager: authManager)
+//            }
+//            if rankDownFlag {
+//                RankDownModalView(showLevelUpModal: $rankDownFlag, authManager: authManager)
+//            }
             NavigationLink("", destination: ContentView().navigationBarBackButtonHidden(true), isActive: $isContentView)
         }
     }

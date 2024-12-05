@@ -8,6 +8,7 @@
 import SwiftUI
 import Firebase
 import Combine
+import UIKit
 
 struct QuizStoryData: Identifiable {
     let id = UUID()
@@ -17,41 +18,169 @@ struct QuizStoryData: Identifiable {
 
 // PositionViewModel の定義
 class PositionViewModel: ObservableObject {
+    // MARK: - Published Properties
     @Published var userPosition: Int = 1
     @Published var coin: Int = 1
+    @Published var monster: Int = 1
     @Published var stamina: Int = 100
+    @Published var monsterName: String = "モンスタ-1"
     @Published var showStaminaAlert: Bool = false
     @Published var showCoinAlert: Bool = false
+    @Published var showMonsterAlert: Bool = false
     @Published var isPositionFetched: Bool = false // フラグを追加
+    @Published var showMonsterQuizList = false
+    @Published var avatarName: String = ""
+    private let authManager = AuthManager.shared
     
+    // MARK: - Private Properties
     private var dbRef: DatabaseReference
     private var handle: DatabaseHandle?
     private var cancellables = Set<AnyCancellable>()
+    private var staminaRecoveryCancellable: AnyCancellable?
     
+    // MARK: - Constants
+    struct Constants {
+        static let maxStamina: Int = 100
+        static let staminaRecoveryInterval: TimeInterval = 60 // 60秒 = 1分
+        static let staminaRecoveryAmount: Int = 1
+    }
+    
+    // MARK: - Singleton Instance
     static let shared: PositionViewModel = {
         let instance = PositionViewModel()
         return instance
     }()
     
-    init() {
+    // MARK: - Initializer
+    private init() {
         self.dbRef = Database.database().reference()
         
-        // Observe changes in the authenticated user
-        AuthManager.shared.$user
-            .compactMap { $0?.uid } // Extract userId if user is logged in
-            .sink { [weak self] userId in
-                self?.fetchPosition(for: userId)
-                self?.fetchUserStamina(for: userId)
+        // アバターの監視
+        authManager.$avatars
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] avatars in
+                if let firstUsedAvatar = avatars.first(where: { $0.usedFlag == 1 }) {
+                    self?.avatarName = firstUsedAvatar.name
+                } else {
+                    self?.avatarName = "ネッキー" // デフォルト値
+                }
             }
             .store(in: &cancellables)
+        
+        // 認証されたユーザーの監視
+        authManager.$user
+            .compactMap { $0?.uid }
+            .sink { [weak self] userId in
+                self?.fetchPosition(for: userId ?? "")
+                self?.fetchUserStamina(for: userId ?? "")
+                self?.fetchAvatars(for: userId ?? "")
+            }
+            .store(in: &cancellables)
+        
+        // スタミナ回復タイマーの設定
+        staminaRecoveryCancellable = Timer.publish(every: Constants.staminaRecoveryInterval, on: .main, in: .common)
+            .autoconnect()
+            .sink { [weak self] _ in
+                self?.recoverStamina()
+            }
     }
     
+    // MARK: - Deinitializer
     deinit {
+        staminaRecoveryCancellable?.cancel()
         // Remove observer when the view model is deallocated
-        if let userId = AuthManager.shared.currentUserId, let handle = handle {
+        if let userId = authManager.currentUserId, let handle = handle {
             dbRef.child("storys").child(userId).child("position").removeObserver(withHandle: handle)
         }
     }
+    
+    // MARK: - Stamina Recovery
+    private func recoverStamina() {
+        guard stamina < Constants.maxStamina else { return }
+        
+        DispatchQueue.main.async {
+            self.stamina += Constants.staminaRecoveryAmount
+            // 最大スタミナを超えないようにする
+            if self.stamina > Constants.maxStamina {
+                self.stamina = Constants.maxStamina
+            }
+        }
+        
+        updateStaminaInFirebase()
+    }
+    
+    // スタミナ回復のためのメソッド
+    func recoverStaminaOnAppLaunch(completion: @escaping (Bool) -> Void) {
+        stopStaminaRecoveryTimer()
+        authManager.fetchLastActiveTimeFromFirebase { [weak self] lastActiveTimestamp in
+            guard let self = self else {
+                completion(false)
+                return
+            }
+
+            let currentTime = Date().timeIntervalSince1970
+
+            if let lastActive = lastActiveTimestamp {
+                let elapsedTime = currentTime - lastActive
+                let minutesPassed = Int(elapsedTime / Constants.staminaRecoveryInterval)
+
+                guard minutesPassed > 0 else {
+                    print("スタミナ回復の必要なし。経過時間: \(elapsedTime)秒")
+                    completion(true)
+                    self.startStaminaRecoveryTimer()
+                    return
+                }
+
+                let staminaToRecover = minutesPassed * Constants.staminaRecoveryAmount
+                let newStamina = min(self.stamina + staminaToRecover, Constants.maxStamina)
+                let actualRecovered = newStamina - self.stamina
+
+                if actualRecovered > 0 {
+                    DispatchQueue.main.async {
+                        self.stamina = newStamina
+                        self.updateStaminaInFirebase()
+                    }
+                    print("\(actualRecovered)スタミナを回復しました。")
+                } else {
+                    print("スタミナの回復が必要ありません。")
+                }
+            } else {
+                print("lastActiveTimeが存在しないため、スタミナ回復をスキップします。")
+            }
+
+            // 最後のアクティブ時刻を現在時刻に更新
+            self.authManager.saveLastActiveTimeToFirebase { success in
+                completion(success)
+                self.startStaminaRecoveryTimer()
+            }
+        }
+    }
+    
+    func recoverStamina(by amount: Int) {
+        guard amount > 0 else { return }
+        DispatchQueue.main.async {
+            self.stamina = min(self.stamina + amount, Constants.maxStamina)
+        }
+        updateStaminaInFirebase()
+    }
+    
+    // スタミナを更新するメソッド
+    func updateStaminaInFirebase() {
+        guard let userId = AuthManager.shared.currentUserId else { return }
+        let storyRef = dbRef.child("storys").child(userId)
+        let updates = ["stamina": stamina] as [String : Any]
+        
+        storyRef.updateChildValues(updates) { error, _ in
+            if let error = error {
+                print("スタミナの更新に失敗しました: \(error.localizedDescription)")
+                // 必要に応じてエラーハンドリングを追加
+            } else {
+                print("スタミナが\(self.stamina)に回復しました")
+            }
+        }
+    }
+    
+    // MARK: - Firebase Fetch Methods
     
     func fetchUserStamina(for userId: String) {
         let staminaRef = Database.database().reference().child("storys").child(userId).child("stamina")
@@ -98,7 +227,11 @@ class PositionViewModel: ObservableObject {
         }
     }
     
-    /// Increment the user's position
+    func fetchAvatars(for userId: String) {
+        authManager.fetchAvatars() {}
+    }
+    
+    /// ユーザーのポジションを増加させる
     func incrementPosition() {
         guard let userId = AuthManager.shared.currentUserId else {
             print("User is not logged in.")
@@ -149,7 +282,7 @@ class PositionViewModel: ObservableObject {
 
     /// スタミナを減少させる関数
     func decreaseStamina(by amount: Int = 10) {
-        guard let userId = AuthManager.shared.currentUserId else {
+        guard let userId = authManager.currentUserId else {
             print("ユーザーがログインしていません。")
             return
         }
@@ -193,6 +326,48 @@ class PositionViewModel: ObservableObject {
             }
         }
     }
+    
+    func saveLastActiveTimeToFirebase() {
+        guard let userId = authManager.currentUserId else { return }
+        let lastActiveRef = dbRef.child("storys").child(userId).child("lastActiveTime")
+        let currentTime = Date().timeIntervalSince1970 // Unixタイムスタンプとして保存
+        
+        lastActiveRef.setValue(currentTime) { error, _ in
+            if let error = error {
+                print("FirebaseへのlastActiveTimeの保存に失敗しました: \(error.localizedDescription)")
+            } else {
+                print("FirebaseにlastActiveTimeを保存しました")
+            }
+        }
+    }
+
+    // saveLastActiveTime 関数を拡張してFirebaseにも保存
+    func saveLastActiveTime(completion: @escaping (Bool) -> Void) {
+        authManager.saveLastActiveTimeToFirebase { success in
+            if success {
+                print("最後のアクティブ時刻を保存しました。")
+            } else {
+                print("最後のアクティブ時刻の保存に失敗しました。")
+            }
+            completion(success)
+        }
+    }
+    
+    func startStaminaRecoveryTimer() {
+        guard staminaRecoveryCancellable == nil else { return } // 既にタイマーが動作中の場合は無視
+        
+        staminaRecoveryCancellable = Timer.publish(every: Constants.staminaRecoveryInterval, on: .main, in: .common)
+            .autoconnect()
+            .sink { [weak self] _ in
+                self?.recoverStamina()
+            }
+    }
+    
+    /// スタミナ回復タイマーを停止する
+    func stopStaminaRecoveryTimer() {
+        staminaRecoveryCancellable?.cancel()
+        staminaRecoveryCancellable = nil
+    }
 }
 
 // Viewの中心に近いPlatformViewを特定するためのPreferenceKey
@@ -217,14 +392,17 @@ struct ScrollOffsetKey: PreferenceKey {
 }
 
 // TestView の定義
-struct TestView: View {
-    @StateObject var viewModel = PositionViewModel.shared // 共有インスタンスを使用
+struct StoryView: View {
+    @StateObject var viewModel = PositionViewModel.shared
+    private var audioManager = AudioManager.shared
     @Namespace private var animationNamespace
     @State private var initialScrollDone = false
+    @State private var isStorySutaminaModal = false
     @State private var isLoading = true
     @State private var position: Int = 1
     @State private var index: Int = 1
     @State private var currentVisiblePosition: Int = 1
+    @Environment(\.scenePhase) var scenePhase
 
     var body: some View {
         NavigationStack {
@@ -237,6 +415,10 @@ struct TestView: View {
                         .animation(.easeInOut(duration: 0.5), value: currentVisiblePosition)
 
                     VStack {
+//                        if userPreFlag != 1 {
+                        BannerStoryView()
+                            .frame(height: 60)
+//                        }
                         VStack {
                             // スタミナ表示
                             HStack{
@@ -280,8 +462,17 @@ struct TestView: View {
                         }
                         
                     }
+                    
+                    if viewModel.showStaminaAlert {
+                        StorySutaminaModalView(isPresented: $viewModel.showStaminaAlert)
+                    }
+                    
                     if viewModel.showCoinAlert {
                         StoryCoinModalView(coin: viewModel.coin, isPresented: $viewModel.showCoinAlert)
+                    }
+                    
+                    if viewModel.showMonsterAlert {
+                        StoryMonsterModalView(monster: $viewModel.monster, isPresented: $viewModel.showMonsterAlert, showQuizList: $viewModel.showMonsterQuizList, audioManager: audioManager)
                     }
                     
                     if isLoading {
@@ -293,18 +484,27 @@ struct TestView: View {
                     }
                 }
                 .onAppear{
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+//                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                         position = viewModel.userPosition
                         index = viewModel.userPosition
                         if let userId = AuthManager.shared.currentUserId {
                              viewModel.fetchUserStamina(for: userId)
                         }
+//                    }
+                    viewModel.recoverStaminaOnAppLaunch { success in
+                        if success {
+                            print("スタミナ回復に成功しました。")
+                        } else {
+                            print("スタミナ回復に失敗しました。")
+                        }
                     }
+                    
+                    // タイマーを開始
+                    viewModel.startStaminaRecoveryTimer()
                 }
                 // userPosition が取得されたときにスクロール
                 .onReceive(viewModel.$isPositionFetched) { fetched in
                     if fetched && !initialScrollDone {
-                        print("proxy:\(proxy)")
                         scrollToPosition(proxy: proxy)
                         initialScrollDone = true
                     }
@@ -334,12 +534,31 @@ struct TestView: View {
 //                }
             }
         }
-        .alert(isPresented: $viewModel.showStaminaAlert) {
-            Alert(
-                title: Text("スタミナ不足"),
-                message: Text("スタミナが不足しています。スタミナを回復するまで先に進むことができません。"),
-                dismissButton: .default(Text("OK"))
-            )
+        // アプリのライフサイクルの変更を監視
+        .onChange(of: scenePhase) { newPhase in
+            switch newPhase {
+            case .background:
+                // アプリがバックグラウンドに移行したとき
+                viewModel.saveLastActiveTime { success in
+                    if success {
+                        print("最後のアクティブ時刻を保存しました。")
+                    } else {
+                        print("最後のアクティブ時刻の保存に失敗しました。")
+                    }
+                }
+            case .active:
+                // アプリがアクティブになったとき
+                viewModel.recoverStaminaOnAppLaunch { success in
+                    if success {
+                        print("スタミナ回復に成功しました。")
+                    } else {
+                        print("スタミナ回復に失敗しました。")
+                    }
+                }
+                viewModel.startStaminaRecoveryTimer()
+            default:
+                break
+            }
         }
     }
     private func updateBackgroundImageBasedOnScroll(offset: CGFloat) {
@@ -366,19 +585,20 @@ struct TestView: View {
     }
     /// スクロール処理と isLoading の設定を行う関数
     private func scrollToPosition(proxy: ScrollViewProxy) {
-        print("scrollToPosition")
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            withAnimation { // アニメーションの明示的な時間設定
-                if viewModel.userPosition < 11 {
-                    proxy.scrollTo(15, anchor: .top)
-                } else if 11 <= viewModel.userPosition && viewModel.userPosition <= 12 {
-                    proxy.scrollTo(15, anchor: .bottom)
-                } else if 13 <= viewModel.userPosition && viewModel.userPosition <= 15 {
+            withAnimation {
+                if viewModel.userPosition < 7 {
+                    proxy.scrollTo(14, anchor: .top)
+                } else if 7 <= viewModel.userPosition && viewModel.userPosition <= 10 {
                     proxy.scrollTo(14, anchor: .bottom)
-                } else if 16 <= viewModel.userPosition && viewModel.userPosition <= 18 {
+                } else if 11 <= viewModel.userPosition && viewModel.userPosition <= 12 {
                     proxy.scrollTo(13, anchor: .bottom)
-                } else if 19 <= viewModel.userPosition && viewModel.userPosition <= 20 {
+                } else if 13 <= viewModel.userPosition && viewModel.userPosition <= 15 {
                     proxy.scrollTo(12, anchor: .bottom)
+                } else if 16 <= viewModel.userPosition && viewModel.userPosition <= 18 {
+                    proxy.scrollTo(11, anchor: .bottom)
+                } else if 19 <= viewModel.userPosition && viewModel.userPosition <= 20 {
+                    proxy.scrollTo(10, anchor: .bottom)
                 } else {
                     if index % 3 == 0  {
                         position = viewModel.userPosition
@@ -731,46 +951,46 @@ struct PlatformsContainer: View {
 //                    padding1: nil
 //                )
 //            ],
-            [
-                PlatformData(
-                    imageName: self.platformImageName,
-                    position: 55,
-                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
-                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
-                ),
-                PlatformData(
-                    imageName: self.platformImageName,
-                    position: 56,
-                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
-                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
-                ),
-                PlatformData(
-                    imageName: self.platformImageName,
-                    position: 57,
-                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
-                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
-                )
-            ],
-            [
-                PlatformData(
-                    imageName: self.platformImageName,
-                    position:54,
-                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
-                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
-                ),
-                PlatformData(
-                    imageName: self.platformImageName,
-                    position: 53,
-                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
-                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
-                ),
-                PlatformData(
-                    imageName: self.platformImageName,
-                    position: 52,
-                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
-                    padding1: nil
-                )
-            ],
+//            [
+//                PlatformData(
+//                    imageName: self.platformImageName,
+//                    position: 55,
+//                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
+//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
+//                ),
+//                PlatformData(
+//                    imageName: self.platformImageName,
+//                    position: 56,
+//                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
+//                ),
+//                PlatformData(
+//                    imageName: self.platformImageName,
+//                    position: 57,
+//                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
+//                )
+//            ],
+//            [
+//                PlatformData(
+//                    imageName: self.platformImageName,
+//                    position:54,
+//                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
+//                ),
+//                PlatformData(
+//                    imageName: self.platformImageName,
+//                    position: 53,
+//                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
+//                ),
+//                PlatformData(
+//                    imageName: self.platformImageName,
+//                    position: 52,
+//                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
+//                    padding1: nil
+//                )
+//            ],
             [
                 PlatformData(
                     imageName: self.platformImageName,
@@ -790,8 +1010,8 @@ struct PlatformsContainer: View {
                     imageName: self.platformImageName,
                     position: 51,
                     padding: EdgeInsets(top: 0, leading: -20, bottom: 60, trailing: 30),
-                    padding1: EdgeInsets(top: 0, leading: -20, bottom: 120, trailing: 30),
-                    boss: 2
+                    padding1: EdgeInsets(top: 0, leading: -10, bottom: 120, trailing: 30),
+                    boss: 16
                 )
 //                PlatformData(
 //                    imageName: self.platformImageName,
@@ -988,8 +1208,8 @@ struct PlatformsContainer: View {
                     imageName: self.platformImageName,
                     position: 27,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 60),
-                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0),
-                    boss: 1
+                    padding1: EdgeInsets(top: 0, leading: -50, bottom: 120, trailing: 0),
+                    boss: 15
                 )
             ],
             [
@@ -1238,9 +1458,10 @@ struct PlatformView: View {
     @State private var backgroundName: String = ""
     @State private var quizStoryData: QuizStoryData? = nil
     @State private var coin: Int = 1
+    private var audioManager = AudioManager.shared
     
     var imageName: String {
-        position >= 28 ? "足場2" : position == 27 ? "ボス足場1" : "足場1"
+        position >= 28 ? position == 51 ? "ボス足場2" : "足場2" : position == 27 ? "ボス足場1" : "足場1"
     }
     
     init(imageName: String, position: Int, padding: EdgeInsets = EdgeInsets(), padding1: EdgeInsets? = nil, paddingMonster: EdgeInsets? = nil, paddingTreasure: EdgeInsets? = nil, userPosition: Int, onArrowTap: (() -> Void)? = nil, namespace: Namespace.ID, treasure: Int? = 0, monster: Int? = 0, boss: Int? = 0, viewModel: PositionViewModel) {
@@ -1272,30 +1493,41 @@ struct PlatformView: View {
                             .preference(key: ViewOffsetKey.self, value: [position: geometry.frame(in: .global).midY])
                     }
                 )
-                .onTapGesture {
-                    if position == userPosition + 1 {
-                        if viewModel.stamina >= 10 {
-                            if let treasure = treasure, treasure != 0 {
-                                viewModel.coin = treasure
-                                viewModel.showCoinAlert = true
-                                onArrowTap?()
-                            }
-                            if let monster = monster, monster != 0 {
-                                let data = QuizStoryData(monsterName: "モンスター\(monster)", backgroundName: "ダンジョン背景1")
-                                quizStoryData = data
-                                isPresentingQuizStory = true
-                            } else {
-                                onArrowTap?()
-                            }
-                        } else {
-                            viewModel.showStaminaAlert = true
-                        }
-                    }
-                }
+//                .onTapGesture {
+//                    self.triggerHaptic()
+//                    if viewModel.stamina >= 10 {
+//                        if let treasure = treasure, treasure != 0 {
+//                            audioManager.playTittleSound()
+//                            viewModel.coin = treasure
+//                            viewModel.showCoinAlert = true
+//                            onArrowTap?()
+//                        }
+//                        if let boss = boss, boss != 0 {
+//                            audioManager.playSound()
+//                            let data = QuizStoryData(monsterName: "ボス\(boss)", backgroundName: "ダンジョン背景1")
+//                            viewModel.monsterName = "ボス\(boss)"
+//                            viewModel.monster = boss
+//                            viewModel.showMonsterAlert = true
+//                        }
+//                        if let monster = monster, monster != 0 {
+//                            audioManager.playSound()
+//                            let data = QuizStoryData(monsterName: "モンスター\(monster)", backgroundName: "ダンジョン背景1")
+////                                quizStoryData = data
+//                            viewModel.monsterName = "モンスター\(monster)"
+//                            viewModel.monster = monster
+//                            viewModel.showMonsterAlert = true
+//                        }
+//                        if let monster = monster, monster == 0, let boss = boss, boss == 0 {
+//                            onArrowTap?()
+//                        }
+//                    } else {
+//                        viewModel.showStaminaAlert = true
+//                    }
+//                }
             
             // アバター表示
             if position == userPosition {
-                Image("\(avatarName)")
+                Image("\(viewModel.avatarName)")
                     .resizable()
                     .frame(width: 80, height: 80)
                     .padding(.top, -45)
@@ -1323,6 +1555,8 @@ struct PlatformView: View {
                     .onTapGesture {
                         if viewModel.stamina >= 10 {
                             if position == userPosition + 1 {
+                                self.triggerHaptic()
+                                audioManager.playTittleSound()
                                 viewModel.coin = treasure
                                 viewModel.showCoinAlert = true
                                 onArrowTap?()
@@ -1347,10 +1581,14 @@ struct PlatformView: View {
                         .padding(paddingMonster ?? EdgeInsets())
                         .onTapGesture {
                             if position == userPosition + 1 {
+                                self.triggerHaptic()
+                                audioManager.playSound()
                                 if viewModel.stamina >= 10 {
                                     let data = QuizStoryData(monsterName: "モンスター\(monster)", backgroundName: "ダンジョン背景1")
                                     quizStoryData = data
-                                    isPresentingQuizStory = true
+                                    viewModel.monsterName = "モンスター\(monster)"
+                                    viewModel.monster = monster
+                                    viewModel.showMonsterAlert = true
                                 } else {
                                     viewModel.showStaminaAlert = true
                                 }
@@ -1369,10 +1607,12 @@ struct PlatformView: View {
                 Image("ボス\(boss)")
                     .resizable()
                     .frame(width: 150, height: 150)
-                    .padding(.top,boss == 2 ? -185 : -165)
-                    .padding(.leading ,boss == 2 ? 0 : 0)
+                    .padding(.top,boss == 16 ? -185 : -165)
+                    .padding(.leading ,boss == 16 ? 0 : 0)
                     .onTapGesture {
                         if position == userPosition + 1 {
+                            self.triggerHaptic()
+                            audioManager.playSound()
                             if viewModel.stamina >= 10 {
                                 let data = QuizStoryData(monsterName: "ボス\(boss)", backgroundName: "ダンジョン背景1")
                                 quizStoryData = data
@@ -1386,8 +1626,8 @@ struct PlatformView: View {
                 Image("")
                     .resizable()
                     .frame(width: 150, height: 150)
-                    .padding(.top,boss == 2 ? -185 : -165)
-                    .padding(.leading ,boss == 2 ? 0 : 0)
+                    .padding(.top,boss == 16 ? -185 : -165)
+                    .padding(.leading ,boss == 16 ? 0 : 0)
             }
             
             // 下矢印表示
@@ -1406,15 +1646,31 @@ struct PlatformView: View {
                     .onTapGesture {
                         if viewModel.stamina >= 10 {
                             if let treasure = treasure, treasure != 0 {
+                                audioManager.playTittleSound()
                                 viewModel.coin = treasure
                                 viewModel.showCoinAlert = true
                                 onArrowTap?()
                             }
+                            if let boss = boss, boss != 0 {
+                                audioManager.playSound()
+                                let data = QuizStoryData(monsterName: "ボス\(boss)", backgroundName: "ダンジョン背景1")
+                                viewModel.monsterName = "ボス\(boss)"
+                                viewModel.monster = boss
+                                viewModel.showMonsterAlert = true
+                            }
                             if let monster = monster, monster != 0 {
+                                audioManager.playSound()
                                 let data = QuizStoryData(monsterName: "モンスター\(monster)", backgroundName: "ダンジョン背景1")
-                                quizStoryData = data
-                                isPresentingQuizStory = true
-                            } else {
+//                                quizStoryData = data
+                                viewModel.monsterName = "モンスター\(monster)"
+                                viewModel.monster = monster
+                                viewModel.showMonsterAlert = true
+                            }
+                            if let monster = monster, monster == 0, let boss = boss, boss == 0 {
+                                if let treasure = treasure, treasure == 0 {
+                                    audioManager.playSound()
+                                }
+                                self.triggerHaptic()
                                 onArrowTap?()
                             }
                         } else {
@@ -1429,29 +1685,31 @@ struct PlatformView: View {
                     .padding(padding1 ?? EdgeInsets())
             }
             
-            Text("\(position)")
-                .font(.system(size: 50))
+//            Text("\(position)")
+//                .font(.system(size: 50))
         }
-        .fullScreenCover(item: $quizStoryData) { data in
-            StoryListView(
-                isPresenting: Binding(
-                    get: { self.quizStoryData != nil },
-                    set: { if !$0 { self.quizStoryData = nil } }
-                ),
-                monsterName: data.monsterName,
-                backgroundName: data.backgroundName,
-                viewModel: viewModel
-            )
-        }
-        .onAppear{
-            AuthManager.shared.fetchUsedAvatars { usedAvatars in
-                if let firstAvatar = usedAvatars.first {
-                    self.avatarName = firstAvatar.name
-                } else {
-                    self.avatarName = "" // デフォルト値を設定
-                }
+        .fullScreenCover(isPresented: $viewModel.showMonsterQuizList) {
+            if position < 28 {
+                StoryITListView(
+                    isPresenting: $viewModel.showMonsterQuizList,
+                    monsterName: viewModel.monsterName,
+                    backgroundName: "ダンジョン背景1",
+                    viewModel: viewModel
+                )
+            } else {
+                StoryInfoListView(
+                    isPresenting: $viewModel.showMonsterQuizList,
+                    monsterName: viewModel.monsterName,
+                    backgroundName: "ダンジョン背景1",
+                    viewModel: viewModel
+                )
             }
         }
+    }
+    func triggerHaptic() {
+        let generator = UIImpactFeedbackGenerator(style: .medium)
+        generator.prepare()
+        generator.impactOccurred()
     }
 }
 
@@ -1475,8 +1733,8 @@ extension EdgeInsets {
 }
 
 // プレビューの定義
-struct TestView_Previews: PreviewProvider {
+struct StoryViewView_Previews: PreviewProvider {
     static var previews: some View {
-        TestView()
+        StoryView()
     }
 }

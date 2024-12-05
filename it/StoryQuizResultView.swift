@@ -397,7 +397,7 @@ struct StoyrQuizResultView_Previews: PreviewProvider {
         let authManager = AuthManager() // 適切なダミーまたはモックオブジェクトで置き換えてください
 
         // プレビュー用にビューを初期化
-        StoryQuizResultView(results: dummyResults, authManager: authManager, isPresenting: $isPresenting, navigateToQuizResultView: $navigateToQuizResultView, playerExperience: 10, playerMoney: 10, elapsedTime: 0, quizLevel: .beginner, victoryFlag: .constant(true), viewModel: PositionViewModel())
+        StoryQuizResultView(results: dummyResults, authManager: authManager, isPresenting: $isPresenting, navigateToQuizResultView: $navigateToQuizResultView, playerExperience: 10, playerMoney: 10, elapsedTime: 0, quizLevel: .beginner, victoryFlag: .constant(true), viewModel: PositionViewModel.shared)
     }
 }
 
