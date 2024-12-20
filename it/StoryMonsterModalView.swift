@@ -21,6 +21,7 @@ struct StoryMonsterModalView: View {
     @State private var monsterHP: Int = 100
     @State private var monsterAttack: Int = 10
     @State private var quizTitle: String = ""
+    @State private var slideOut = false
     @ObservedObject var audioManager: AudioManager
 
     let monsters: [Int: Monster] = [
@@ -64,6 +65,7 @@ struct StoryMonsterModalView: View {
                 .edgesIgnoringSafeArea(.all)
                 .onTapGesture {
                     isPresented = false
+                    audioManager.playCancelSound()
                 }
                 ZStack{
                     VStack {
@@ -127,9 +129,9 @@ struct StoryMonsterModalView: View {
                         Button(action: {
                             isPresented = false
                             showQuizList = true
-                            audioManager.playSound()
+                            audioManager.playKetteiSound()
                         }) {
-                            Image("対戦する")
+                            Image("たたかう")
                                 .resizable()
                                 .scaledToFit()
                                 .frame(height:80)

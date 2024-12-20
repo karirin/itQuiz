@@ -831,8 +831,6 @@ struct StoryQuizView: View {
                 // QuizResultViewへの遷移フラグを設定
                 self.navigateToQuizResult = true
             }
-            print("playerExperience\(playerExperience)")
-            print("playerMoney:\(playerMoney)")
         }
         .alert(isPresented: $showAlert) {
               Alert(
@@ -924,6 +922,6 @@ struct StoryListView_Previews: PreviewProvider {
     static var previews: some View {
         @State var selectedUser = User(id: "1", userName: "SampleUser", level: 1, experience: 100, avatars: [], userMoney: 1000, userHp: 100, userAttack: 20, userFlag: 0, adminFlag: 0, rankMatchPoint: 100, rank: 1)
 
-        StoryITListView(isPresenting: .constant(false), monsterName: "ボス15", backgroundName: "ダンジョン背景1", viewModel: PositionViewModel.shared)
+        StoryITListView(isPresenting: .constant(false), monsterName: "モンスター2", backgroundName: "ダンジョン背景1", viewModel: PositionViewModel.shared)
     }
 }

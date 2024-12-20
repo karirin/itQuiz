@@ -71,6 +71,7 @@ class PositionViewModel: ObservableObject {
         authManager.$user
             .compactMap { $0?.uid }
             .sink { [weak self] userId in
+                print("userId   :\(userId)")
                 self?.fetchPosition(for: userId ?? "")
                 self?.fetchUserStamina(for: userId ?? "")
                 self?.fetchAvatars(for: userId ?? "")
@@ -193,7 +194,18 @@ class PositionViewModel: ObservableObject {
             } else {
                 // スタミナが存在しない場合は初期値を設定
                 self.stamina = 100
-                // self.saveInitialStamina()
+                self.saveInitialStamina(for: userId)
+            }
+        }
+    }
+    
+    private func saveInitialStamina(for userId: String) {
+        let staminaRef = dbRef.child("storys").child(userId).child("stamina")
+        staminaRef.setValue(self.stamina) { error, _ in
+            if let error = error {
+                print("初期スタミナの保存に失敗しました: \(error.localizedDescription)")
+            } else {
+                print("初期スタミナをFirebaseに保存しました: \(self.stamina)")
             }
         }
     }
@@ -222,7 +234,22 @@ class PositionViewModel: ObservableObject {
                     print("取得した position (Double): \(positionValue)")
                 }
             } else {
-                print("position の取得に失敗しました")
+                // position が存在しない場合は初期値を設定
+                self.userPosition = 1
+                self.isPositionFetched = true
+                self.saveInitialPosition(for: userId)
+                print("position が存在しないため、初期値を設定しました。")
+            }
+        }
+    }
+
+    private func saveInitialPosition(for userId: String) {
+        let positionRef = dbRef.child("storys").child(userId).child("position")
+        positionRef.setValue(self.userPosition) { error, _ in
+            if let error = error {
+                print("初期 position の保存に失敗しました: \(error.localizedDescription)")
+            } else {
+                print("初期 position をFirebaseに保存しました: \(self.userPosition)")
             }
         }
     }
@@ -381,6 +408,17 @@ struct ViewOffsetKey: PreferenceKey {
     }
 }
 
+struct DownArrowPositionKey: PreferenceKey {
+    typealias Value = CGPoint?
+    static var defaultValue: CGPoint? = nil
+
+    static func reduce(value: inout CGPoint?, nextValue: () -> CGPoint?) {
+        if let next = nextValue() {
+            value = next
+        }
+    }
+}
+
 struct ScrollOffsetKey: PreferenceKey {
     typealias Value = CGFloat
 
@@ -394,7 +432,8 @@ struct ScrollOffsetKey: PreferenceKey {
 // TestView の定義
 struct StoryView: View {
     @StateObject var viewModel = PositionViewModel.shared
-    private var audioManager = AudioManager.shared
+    @ObservedObject var audioManager = AudioManager()
+    @ObservedObject var authManager = AuthManager()
     @Namespace private var animationNamespace
     @State private var initialScrollDone = false
     @State private var isStorySutaminaModal = false
@@ -402,7 +441,15 @@ struct StoryView: View {
     @State private var position: Int = 1
     @State private var index: Int = 1
     @State private var currentVisiblePosition: Int = 1
+    @State private var isSoundOn: Bool = true
     @Environment(\.scenePhase) var scenePhase
+    @State private var userPreFlag: Int = 0
+    @State private var isStoryFlag: Bool = false
+    @State private var isTutorialStart: Bool = false
+    @State private var csFlag: Bool = false
+    @State private var downArrowPosition: CGPoint? = nil
+    @Binding var isReturnActive: Bool
+    @Binding var isPresented: Bool
 
     var body: some View {
         NavigationStack {
@@ -415,13 +462,44 @@ struct StoryView: View {
                         .animation(.easeInOut(duration: 0.5), value: currentVisiblePosition)
 
                     VStack {
-//                        if userPreFlag != 1 {
-                        BannerStoryView()
-                            .frame(height: 60)
-//                        }
+                        if userPreFlag != 1 {
+                            BannerStoryView()
+                                .frame(height: 60)
+                        }
                         VStack {
-                            // スタミナ表示
-                            HStack{
+                                HStack{
+                                    if isReturnActive {
+                                        Button(action: {
+                                            isPresented = false
+                                            audioManager.playCancelSound()
+                                        }) {
+                                            Image(systemName: "chevron.left")
+                                                .foregroundColor(Color("fontGray"))
+                                            Text("戻る")
+                                                .foregroundColor(Color("fontGray"))
+                                        }
+                                        .fontWeight(.bold)
+                                    }
+                                Spacer()
+                                Button(action: {
+                                    audioManager.toggleSound()
+                                    audioManager.playSound()
+                                    isSoundOn.toggle()
+                                }) {
+                                    if isSoundOn {
+//                                        Image(systemName: "speaker.wave.2")
+                                        Image("音声オン")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width:40)
+                                    } else {
+//                                        Image(systemName: "speaker.slash")
+                                        Image("音声オフ")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width:40)
+                                    }
+                                }
                                 HStack {
                                     Image("スタミナ")
                                         .resizable()
@@ -434,10 +512,9 @@ struct StoryView: View {
                                 .padding(10)
                                 .background(Color.black.opacity(0.5))
                                 .cornerRadius(10)
-                                Spacer()
                             }
+                            .padding(.horizontal, 50)
                         }
-                        .padding(.leading, 50)
                         
                         // スタミナゲージ
                         ProgressStoryView(progress: .constant((Float(viewModel.stamina) / 100)))
@@ -475,6 +552,60 @@ struct StoryView: View {
                         StoryMonsterModalView(monster: $viewModel.monster, isPresented: $viewModel.showMonsterAlert, showQuizList: $viewModel.showMonsterQuizList, audioManager: audioManager)
                     }
                     
+                    if isStoryFlag {
+                        TutorialStoryModalView(isPresented: $isStoryFlag, isTutorialStart: $isTutorialStart)
+                    }
+                    
+                    if csFlag {
+                        HelpStoryModalView(audioManager: audioManager, isPresented: $csFlag)
+                    }
+                    
+                    if isTutorialStart {
+                       if let position = downArrowPosition {
+                           Color.black.opacity(0.5)
+                               .overlay(
+                                Group {
+                                    Circle()
+                                        .frame(width: 100, height: 100)
+                                        .position(x: position.x, y: isSmallDevice() ? position.y : position.y + 30)
+                                        .blendMode(.destinationOut)
+                                }
+                           )
+                               .ignoresSafeArea()
+                               .compositingGroup()
+                               .background(.clear)
+                               .onTapGesture {
+                                   isTutorialStart = false
+                               }
+                               VStack {
+                                   Spacer()
+                                   Spacer()
+                                   Spacer()
+                                   VStack(alignment: .trailing, spacing: .zero) {
+                                       Text("「下矢印」をクリックすると進むことができます")
+                                           .font(.callout)
+                                           .padding(5)
+                                           .font(.system(size: 24.0))
+                                           .padding(.all, 16.0)
+                                           .background(Color("Color2"))
+                                           .overlay(
+                                            RoundedRectangle(cornerRadius: 20)
+                                                .stroke(Color.gray, lineWidth: 15)
+                                           )
+                                           .cornerRadius(20)
+                                           .padding(.horizontal, 16)
+                                           .padding(.bottom)
+                                           .foregroundColor(Color("fontGray"))
+                                           .shadow(radius: 10)
+                                   }
+                                   Spacer()
+                               }
+                               .onTapGesture {
+                                   isTutorialStart = false
+                               }
+                           }
+                       }
+                    
                     if isLoading {
                         VStack {
                             ActivityIndicator()
@@ -483,14 +614,37 @@ struct StoryView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
                 }
+                .coordinateSpace(name: "StoryViewCoordinateSpace") // 名前付き座標空間を設定
+                .onPreferenceChange(DownArrowPositionKey.self) { position in
+                    self.downArrowPosition = position
+                }
                 .onAppear{
-//                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        position = viewModel.userPosition
-                        index = viewModel.userPosition
-                        if let userId = AuthManager.shared.currentUserId {
-                             viewModel.fetchUserStamina(for: userId)
+                    let userDefaults = UserDefaults.standard
+                    if !userDefaults.bool(forKey: "hasLaunchedStoryOnappear") {
+                        isStoryFlag = true
+                        proxy.scrollTo(14, anchor: .top)
+                        isLoading = false
+                    }
+                    userDefaults.set(true, forKey: "hasLaunchedStoryOnappear")
+                    userDefaults.synchronize()
+                    authManager.fetchUserStoryCsFlag()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                        if authManager.userStoryCsFlag == 0 {
+                            executeProcessEveryfifTimes()
                         }
-//                    }
+                    }
+                    position = viewModel.userPosition
+                    index = viewModel.userPosition
+                    if let userId = AuthManager.shared.currentUserId {
+                         viewModel.fetchUserStamina(for: userId)
+                    }
+                    authManager.fetchPreFlag()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                        userPreFlag = authManager.userPreFlag
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
+                        isLoading = false
+                    }
                     viewModel.recoverStaminaOnAppLaunch { success in
                         if success {
                             print("スタミナ回復に成功しました。")
@@ -498,8 +652,6 @@ struct StoryView: View {
                             print("スタミナ回復に失敗しました。")
                         }
                     }
-                    
-                    // タイマーを開始
                     viewModel.startStaminaRecoveryTimer()
                 }
                 // userPosition が取得されたときにスクロール
@@ -561,6 +713,19 @@ struct StoryView: View {
             }
         }
     }
+    func executeProcessEveryfifTimes() {
+        // UserDefaultsからカウンターを取得
+        let count = UserDefaults.standard.integer(forKey: "launchStoryCSCount") + 1
+        
+        // カウンターを更新
+        UserDefaults.standard.set(count, forKey: "launchStoryCSCount")
+        
+        // 3回に1回の割合で処理を実行
+        if count % 10 == 0 {
+            csFlag = true
+        }
+    }
+    
     private func updateBackgroundImageBasedOnScroll(offset: CGFloat) {
         if offset < -300 {
             currentVisiblePosition = 21
@@ -1539,11 +1704,6 @@ struct PlatformView: View {
                         }
                     }
             } else {
-                Image("")
-                    .resizable()
-                    .frame(width: 80, height: 80)
-                    .padding(.top, -45)
-                    .padding(padding1 ?? EdgeInsets())
             }
             
             // 宝箱表示
@@ -1566,10 +1726,6 @@ struct PlatformView: View {
                         }
                     }
             } else {
-                Image("")
-                    .resizable()
-                    .frame(width: 80, height: 80)
-                    .padding(paddingTreasure ?? EdgeInsets())
             }
             
             // モンスター表示
@@ -1595,11 +1751,6 @@ struct PlatformView: View {
                             }
                         }
                 } else if monster != 0 {
-                    Image("")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 80)
-                        .padding(paddingMonster ?? EdgeInsets())
                 }
             
             // ボス表示
@@ -1623,11 +1774,6 @@ struct PlatformView: View {
                         }
                     }
             } else if boss != 0 {
-                Image("")
-                    .resizable()
-                    .frame(width: 150, height: 150)
-                    .padding(.top,boss == 16 ? -185 : -165)
-                    .padding(.leading ,boss == 16 ? 0 : 0)
             }
             
             // 下矢印表示
@@ -1635,9 +1781,18 @@ struct PlatformView: View {
                 Image("下矢印")
                     .resizable()
                     .frame(width: 50, height: 50)
-                    .padding(.top, -30)
                     .padding(padding1 ?? EdgeInsets())
                     .scaleEffect(isPulsing ? 1.4 : 1.0)
+                    .background(
+                        GeometryReader { geometry in
+                            Color.clear
+                                .preference(key: DownArrowPositionKey.self, value: CGPoint(
+                                    x: geometry.frame(in: .named("StoryViewCoordinateSpace")).midX,
+                                    y: geometry.frame(in: .named("StoryViewCoordinateSpace")).midY
+                                ))
+                        }
+                    )
+                    .padding(.top, -30)
                     .onAppear {
                         withAnimation(Animation.easeInOut(duration: 0.8).repeatForever(autoreverses: true)) {
                             isPulsing.toggle()
@@ -1678,8 +1833,8 @@ struct PlatformView: View {
                         }
                     }
             } else {
-                Image("")
-                    .resizable()
+                Rectangle()
+                    .fill(Color.clear)
                     .frame(width: 50, height: 50)
                     .padding(.top, -30)
                     .padding(padding1 ?? EdgeInsets())
@@ -1735,6 +1890,6 @@ extension EdgeInsets {
 // プレビューの定義
 struct StoryViewView_Previews: PreviewProvider {
     static var previews: some View {
-        StoryView()
+        StoryView(isReturnActive: .constant(true), isPresented: .constant(false))
     }
 }

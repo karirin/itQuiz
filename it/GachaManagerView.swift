@@ -38,60 +38,89 @@ struct GachaManagerView: View {
 
     var body: some View {
             VStack {
-                Spacer()
-                Image("ガチャ一覧")
-                    .resizable()
-                    .frame(height: 130)
-                Spacer()
-                    .frame(height:30)
                 ScrollView{
-                    HStack{
-                        Image("300コイン")
-                            .resizable()
-                            .frame(maxWidth:150,maxHeight:60)
-                        Spacer()
-                    }
-                    .padding(.leading)
                     Button(action: {
                         audioManager.playSound()
                         // 画面遷移のトリガーをオンにする
                         self.isPresentingQuizBeginner = true
                     }) {
-                        //                        Image("IT基礎知識の問題の初級")
-                        Image("ガチャ一覧ボタン")
+                        Image("レギュラーガチャ")
                             .resizable()
-                            .frame(height: 130)
+                            .scaledToFit()
+                            .cornerRadius(10)
+                            .shadow(radius: 5)
+                            .padding()
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding(.horizontal)
-                    .padding(.bottom)
-                    .shadow(radius: 10)
-                    
-                    
-                    HStack{
-                        Image("600コイン")
-                            .resizable()
-                            .frame(maxWidth:150,maxHeight:60)
-                        Spacer()
-                    }
-                    .padding(.leading)
                     Button(action: {
                         audioManager.playSound()
                         self.isPresentingQuizIntermediate = true
                     }) {
-                        //                    Image("IT基礎知識の問題の中級")
-                        Image("レアガチャ一覧ボタン")
+                        Image("幸福ガチャ")
                             .resizable()
-                            .frame(height: 130)
+                            .scaledToFit()
+                            .cornerRadius(10)
+                            .shadow(radius: 5)
+                            .padding()
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding(.horizontal)
-                    .padding(.bottom)
-                    .shadow(radius: 10)
+                    Button(action: {
+                        audioManager.playSound()
+                        self.isPresentingQuizAdvanced = true
+                    }) {
+                        Image("メカガチャ")
+                            .resizable()
+                            .scaledToFit()
+                            .cornerRadius(10)
+                            .shadow(radius: 5)
+                            .padding()
+                    }
+//                    HStack{
+//                        Image("300コイン")
+//                            .resizable()
+//                            .frame(maxWidth:150,maxHeight:60)
+//                        Spacer()
+//                    }
+//                    .padding(.leading)
+//                    Button(action: {
+//                        audioManager.playSound()
+//                        // 画面遷移のトリガーをオンにする
+//                        self.isPresentingQuizBeginner = true
+//                    }) {
+//                        //                        Image("IT基礎知識の問題の初級")
+//                        Image("ガチャ一覧ボタン")
+//                            .resizable()
+//                            .frame(height: 130)
+//                    }
+//                    .frame(maxWidth: .infinity)
+//                    .padding(.horizontal)
+//                    .padding(.bottom)
+//                    .shadow(radius: 10)
+//                    
+//                    
+//                    HStack{
+//                        Image("600コイン")
+//                            .resizable()
+//                            .frame(maxWidth:150,maxHeight:60)
+//                        Spacer()
+//                    }
+//                    .padding(.leading)
+//                    Button(action: {
+//                        audioManager.playSound()
+//                        self.isPresentingQuizIntermediate = true
+//                    }) {
+//                        //                    Image("IT基礎知識の問題の中級")
+//                        Image("レアガチャ一覧ボタン")
+//                            .resizable()
+//                            .frame(height: 130)
+//                    }
+//                    .frame(maxWidth: .infinity)
+//                    .padding(.horizontal)
+//                    .padding(.bottom)
+//                    .shadow(radius: 10)
                     
                     Spacer()
                     NavigationLink("", destination: GachaView().navigationBarBackButtonHidden(true), isActive: $isPresentingQuizBeginner) // 適切な遷移先に変更してください
                     NavigationLink("", destination: RareGachaView().navigationBarBackButtonHidden(true), isActive: $isPresentingQuizIntermediate) // 適切な遷移先に変更してください
+                    NavigationLink("", destination: MekaGachaView().navigationBarBackButtonHidden(true), isActive: $isPresentingQuizAdvanced) // 適切な遷移先に変更してください
                 }
             }
         .onTapGesture {

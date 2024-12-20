@@ -2091,7 +2091,7 @@ struct QuizView: View {
 
 struct QuizView_Previews: PreviewProvider {
     static var previews: some View {
-//        QuizIntermediateList(isPresenting: .constant(false))
-        QuizIncorrectAnswerListView(isPresenting: .constant(false))
+        QuizITBasicList(isPresenting: .constant(false))
+//        QuizIncorrectAnswerListView(isPresenting: .constant(false))
     }
 }

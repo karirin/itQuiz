@@ -50,16 +50,16 @@ struct StoryQuizResultView: View {
     @State private var rankUpFlag: Bool = false
     @State private var rankDownFlag: Bool = false
     @State private var userPreFlag: Int = 0
-//    @Int var elapsedTime = 1
+    @State private var preFlag: Bool = false
     @Binding var isPresenting: Bool
 
     @Binding var navigateToQuizResultView: Bool
 //    @Environment(\.rootPresentationMode) private var rootPresentationMode: Binding<RootPresentationMode>
     @State private var isHidden = false
-    private let interstitial = Interstitial()
+    private let interstitial = InterstitialStory()
 //    @StateObject var interstitial = Interstitial()
     @Environment(\.presentationMode) var presentationMode
-    private let adViewControllerRepresentable = AdViewControllerRepresentable()
+    private let adViewControllerRepresentable = AdViewControllerRepresentableStory()
     @Binding var victoryFlag : Bool
 //    @Binding private var victoryFlag: Bool
     // QuizResultView.swift
@@ -87,7 +87,7 @@ struct StoryQuizResultView: View {
                         HStack{
                             Spacer()
                             Button(action: {
-                                showSubFlag = true
+                                preFlag = true
                                 audioManager.playSound()
                             }) {
                                 Image("プレミアムプランボタン")
@@ -238,10 +238,12 @@ struct StoryQuizResultView: View {
                     authManager.fetchUserStory()
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                         userPreFlag = authManager.userPreFlag
+                        if userPreFlag != 1 {
+                            executeProcessEveryFortyTimes()
+                        }
                     }
-                    
-//                    interstitial.loadInterstitial()
-                        if !interstitial.interstitialAdLoaded {
+                    DispatchQueue.main.async {
+                        if !interstitial.interstitialAdLoaded && interstitial.wasAdDismissed == false {
                             interstitial.loadInterstitial(completion: { isLoaded in
                                 if isLoaded {
                                     self.interstitial.presentInterstitial(from: adViewControllerRepresentable.viewController)
@@ -250,7 +252,7 @@ struct StoryQuizResultView: View {
                         } else if !interstitial.wasAdDismissed {
                             interstitial.presentInterstitial(from: adViewControllerRepresentable.viewController)
                         }
-//                    interstitial.presentInterstitial(from: adViewControllerRepresentable.viewController)
+                    }
                     authManager.fetchUserExperienceAndLevel()
                       DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                           if authManager.level > 2 {
@@ -305,13 +307,14 @@ struct StoryQuizResultView: View {
                           }
                           }
                       }
-//                    print("onAppear !interstitial.interstitialAdLoaded:\(!interstitial.interstitialAdLoaded)")
-//                    print("onAppear !interstitial.wasAdDismissed:\(!interstitial.wasAdDismissed)")
                 }
 
                 if showMemoView {
                     MemoView(memo: $currentMemo, question: selectedQuestion)
                 }
+            }
+            .sheet(isPresented: $preFlag) {
+                PreView(audioManager: audioManager)
             }
             .background {
                 if userPreFlag != 1 {
@@ -322,7 +325,6 @@ struct StoryQuizResultView: View {
             .background(Color("Color2"))
             .navigationBarBackButtonHidden(true)
             .navigationBarItems(leading: Button(action: {
-                print("戻るボタン")
                 if victoryFlag {
                     viewModel.incrementPosition()
                 } else {
@@ -373,6 +375,19 @@ struct StoryQuizResultView: View {
                 LevelUpModalView(showLevelUpModal: $showLevelUpModal, authManager: authManager)
             }
             NavigationLink("", destination: ContentView().navigationBarBackButtonHidden(true), isActive: $isContentView)
+        }
+    }
+    
+    func executeProcessEveryFortyTimes() {
+        // UserDefaultsからカウンターを取得
+        let count = UserDefaults.standard.integer(forKey: "launchPreCount") + 1
+        
+        // カウンターを更新
+        UserDefaults.standard.set(count, forKey: "launchPreCount")
+        
+        // 3回に1回の割合で処理を実行
+        if count % 5 == 0 {
+            preFlag = true
         }
     }
     

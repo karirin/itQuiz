@@ -45,7 +45,7 @@ struct TopView: View {
                                 .padding()
                         }
                         ZStack {
-                            StoryView()
+                            StoryView(isReturnActive: .constant(false), isPresented: .constant(false))
                         }
                         .tabItem {
                             Image(systemName: "map")

@@ -27,18 +27,22 @@ enum Rarity: Int {
     case ultraRare = 10
     case RultraRare = 19
     case legendRare = 1
+    case mekaRare = 50
+    case mekaSuperRare = 31
+    case mekaUltraRare = 17
+    case mekaLegendRare = 2
     
     var displayString: String {
         switch self {
         case .normal:
             return "ノーマル"
-        case .rare, .Rrare:
+        case .rare, .Rrare, .mekaRare:
             return "レア"
-        case .superRare, .RsuperRare:
+        case .superRare, .RsuperRare, .mekaSuperRare:
             return "スーパーレア"
-        case .ultraRare, .RultraRare:
+        case .ultraRare, .RultraRare, .mekaUltraRare:
             return "ウルトラレア"
-        case .legendRare:
+        case .legendRare, .mekaLegendRare:
             return "レジェンドレア"
         }
     }
@@ -80,6 +84,21 @@ enum Rarity: Int {
                 Item(name: "七福神 福天丸", attack: 75,probability: 3, health: 380, rarity: .RultraRare),
                 Item(name: "七福神 金満徳", attack: 100,probability: 3, health: 500, rarity: .legendRare)
             ]
+        case .meka:
+            self.items = [
+                Item(name: "メカマウス", attack: 20,probability: 25, health: 210, rarity: .mekaRare),
+                Item(name: "メカドック", attack: 20,probability: 25, health: 215, rarity: .mekaRare),
+                Item(name: "メカベアー", attack: 20,probability: 25, health: 220, rarity: .mekaRare),
+                Item(name: "ロボン", attack: 25,probability: 25, health: 225, rarity: .mekaRare),
+                Item(name: "ロボノコ", attack: 30,probability: 25, health: 240, rarity: .mekaRare),
+                Item(name: "ロボカー", attack: 40,probability: 10, health: 250, rarity: .mekaRare),
+                Item(name: "バースト", attack: 47,probability: 5, health: 260, rarity: .mekaRare),
+                Item(name: "古代ロボ マーク", attack: 30,probability: 10, health: 600, rarity: .mekaSuperRare),
+                Item(name: "メカライオネル", attack: 70,probability: 10, health: 200, rarity: .mekaSuperRare),
+                Item(name: "ロボ長 バーグ", attack: 60,probability: 5, health: 400, rarity: .mekaUltraRare),
+                Item(name: "悪意ロボ ルーク", attack: 70,probability: 3, health: 450, rarity: .mekaUltraRare),
+                Item(name: "究極完全体バーグ", attack: 200,probability: 3, health: 400, rarity: .mekaLegendRare)
+            ]
         }
     }
 
@@ -101,6 +120,7 @@ enum Rarity: Int {
     enum GachaMode {
         case normal
         case rare
+        case meka
     }
     
 // itemsリストをシャッフルする関数
@@ -340,7 +360,9 @@ struct GachaView: View {
                     ScrollView{
                         Image("ガチャ")
                             .resizable()
-                            .frame(width: frameSize().width, height: frameSize().height)
+                            .scaledToFit()
+                            .cornerRadius(10)
+                            .padding()
                         Spacer()
                         HStack{
                             Spacer()

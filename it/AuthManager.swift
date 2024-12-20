@@ -55,6 +55,7 @@ class AuthManager: ObservableObject {
     @Published var money: Int = 0
     @Published var userFlag: Int = 0
     @Published var userCsFlag: Int = 0
+    @Published var userStoryCsFlag: Int = 0
     @Published var adminFlag: Int = 0
     @Published var avatars: [Avatar] = []
     @Published var rankUp: Bool = false
@@ -68,6 +69,7 @@ class AuthManager: ObservableObject {
     @Published var loginCount: Int = 0 // 追加: ログイン回数を保持
     @Published var loginBonus: Int = 0  // 追加: 現在のボーナス額を保持
     @Published var usedAvatars: [Avatar] = []
+    @Published var usersWithoutAvatars: [User] = []
     
     init() {
         user = Auth.auth().currentUser
@@ -454,6 +456,20 @@ class AuthManager: ObservableObject {
         }
     }
     
+    func updateUserStoryCsFlag(userId: String, userCsFlag: Int, completion: @escaping (Bool) -> Void) {
+        let userRef = Database.database().reference().child("users").child(userId)
+        let updates = ["userStoryCsFlag": userCsFlag]
+        print(updates)
+        userRef.updateChildValues(updates) { (error, _) in
+            if let error = error {
+                print("Error updating tutorialNum: \(error)")
+                completion(false)
+            } else {
+                completion(true)
+            }
+        }
+    }
+    
     func updatePreFlag(userId: String, userPreFlag: Int, completion: @escaping (Bool) -> Void) {
         let userRef = Database.database().reference().child("users").child(userId)
         let updates = ["userPreFlag": userPreFlag]
@@ -808,6 +824,19 @@ class AuthManager: ObservableObject {
 //                print("data:\(data)")
 //                self.experience = data["experience"] as? Int ?? 0
                 self.userCsFlag = data["userCsFlag"] as? Int ?? 0
+            }
+        }
+    }
+    
+    func fetchUserStoryCsFlag() {
+        guard let userId = user?.uid else { return }
+        
+        let userRef = Database.database().reference().child("users").child(userId)
+        userRef.observeSingleEvent(of: .value) { (snapshot) in
+            if let data = snapshot.value as? [String: Any] {
+//                print("data:\(data)")
+//                self.experience = data["experience"] as? Int ?? 0
+                self.userStoryCsFlag = data["userStoryCsFlag"] as? Int ?? 0
             }
         }
     }

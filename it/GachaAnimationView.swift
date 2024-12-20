@@ -57,6 +57,14 @@ struct GachaAnimationView: View {
             videoName = "RultraRare"
         case .legendRare:
             videoName = "legendRare"
+        case .mekaRare:
+            videoName = "mekaRare"
+        case .mekaSuperRare:
+            videoName = "mekaSuperRare"
+        case .mekaUltraRare:
+            videoName = "mekaUltraRare"
+        case .mekaLegendRare:
+            videoName = "mekaLegendRare"
         default:
             videoName = "normal"
         }

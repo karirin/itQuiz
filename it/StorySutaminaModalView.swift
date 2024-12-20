@@ -11,6 +11,7 @@ struct StorySutaminaModalView: View {
     @StateObject var reward = Reward()
     @State private var showAlert: Bool = false
     @Binding var isPresented: Bool
+    @ObservedObject var audioManager = AudioManager()
     
     var body: some View {
         ZStack{
@@ -20,6 +21,22 @@ struct StorySutaminaModalView: View {
                     isPresented = false
                 }
             VStack{
+                HStack{
+                    Spacer()
+                        .frame(width:270)
+                    Button(action: {
+                        isPresented = false
+                        audioManager.playCancelSound()
+                    }) {
+                        Image(systemName: "xmark.circle.fill")
+                            .resizable()
+                            .frame(width: 60, height: 60)
+                            .foregroundColor(.gray)
+                            .background(.white)
+                            .cornerRadius(50)
+                    }
+                }
+                .padding(.top, -50)
                 VStack{
                     Text("スタミナがありません")
                     Text("1分に1スタミナ回復します")
@@ -92,23 +109,6 @@ struct StorySutaminaModalView: View {
 //                    )
 //                }
             }
-            .overlay(
-                // 「×」ボタンを右上に配置
-                Button(action: {
-                    isPresented = false
-                }) {
-                    Image(systemName: "xmark.circle.fill")
-                        .resizable()
-                        .frame(width: 60, height: 60)
-                        .foregroundColor(.gray)
-                        .background(.white)
-                        .cornerRadius(50)
-                        .padding()
-                }
-                    .offset(x: 35, y: -70), // この値を調整してボタンを正しい位置に移動させます
-                alignment: .topTrailing // 枠の右上を基準に位置を調整します
-            )
-            .padding(.trailing)
         }
         .onAppear() {
             reward.LoadStoryReward()

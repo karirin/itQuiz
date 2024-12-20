@@ -267,7 +267,9 @@ struct RareGachaView: View {
                     ScrollView{
                         Image("レアガチャ")
                             .resizable()
-                            .frame(maxWidth:350,maxHeight:280)
+                            .scaledToFill()
+                            .cornerRadius(10)
+                            .padding()
                         Spacer()
                         HStack{
                             Spacer()
@@ -495,7 +497,7 @@ struct RareGachaView: View {
 //                    Text("戻る")
 //                        .foregroundColor(Color("fontGray"))
 //                })
-        .background(Color("RareGachaBackgroundColor"))
+        .background(Color("Color2"))
            .onChange(of: animationFinished) { finished in
                if finished {
                    self.showAnimation = false

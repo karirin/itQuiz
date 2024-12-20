@@ -15,6 +15,7 @@ struct Treasure: Codable {
 
 struct StoryCoinModalView: View {
     @ObservedObject var authManager = AuthManager()
+    @ObservedObject var audioManager = AudioManager()
     let coin: Int
     @Binding var isPresented: Bool
     @State var toggle = false
@@ -51,9 +52,26 @@ struct StoryCoinModalView: View {
                 .edgesIgnoringSafeArea(.all)
                 .onTapGesture {
                     isPresented = false
+                    audioManager.playCancelSound()
                 }
                 ZStack{
                     VStack {
+                        HStack{
+                            Spacer()
+                                .frame(width:270)
+                            Button(action: {
+                                isPresented = false
+                                audioManager.playCancelSound()
+                            }) {
+                                Image(systemName: "xmark.circle.fill")
+                                    .resizable()
+                                    .frame(width: 60, height: 60)
+                                    .foregroundColor(.gray)
+                                    .background(.white)
+                                    .cornerRadius(50)
+                            }
+                        }
+                        .padding(.bottom, -50)
                     Image("\(coinImage)")
 //                        Image("コイン1")
                         .resizable()
@@ -77,22 +95,6 @@ struct StoryCoinModalView: View {
             .foregroundColor(Color("fontGray"))
 //            .padding()
         .shadow(radius: 10)
-        .overlay(
-            // 「×」ボタンを右上に配置
-            Button(action: {
-                isPresented = false
-            }) {
-                Image(systemName: "xmark.circle.fill")
-                    .resizable()
-                    .frame(width: 60, height: 60)
-                    .foregroundColor(.gray)
-                    .background(.white)
-                    .cornerRadius(50)
-                    .padding()
-            }
-                .offset(x: 35, y: -70), // この値を調整してボタンを正しい位置に移動させます
-            alignment: .topTrailing // 枠の右上を基準に位置を調整します
-        )
         .padding(25)
                 }
         .onAppear {
@@ -106,7 +108,6 @@ struct StoryCoinModalView: View {
             coinTitle = treasure.coinTitle
             AuthManager.shared.addMoney(amount: treasure.reward)
         } else {
-            // 未定義のモンスターの場合のデフォルト値
                 print("未知の宝物")
         }
     }
