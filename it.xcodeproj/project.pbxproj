@@ -70,6 +70,9 @@
 		1867D3B42B8847E60021ED5D /* HelpModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1867D3B32B8847E60021ED5D /* HelpModalView.swift */; };
 		186C39AA2B70B576007F625E /* StoreKitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186C39A92B70B576007F625E /* StoreKitView.swift */; };
 		186C39AC2B71235B007F625E /* CoinModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186C39AB2B71235B007F625E /* CoinModalView.swift */; };
+		1875D9562D1851A400386509 /* StoryUserQuizView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1875D9552D1851A400386509 /* StoryUserQuizView.swift */; };
+		1875D9582D18595200386509 /* StoryUserQuizListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1875D9572D18595200386509 /* StoryUserQuizListView.swift */; };
+		1875D95A2D19953900386509 /* StoryUserModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1875D9592D19953900386509 /* StoryUserModalView.swift */; };
 		187E7C932C57BD110071621F /* QuizITStrategyIncorrectAnswerListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187E7C922C57BD110071621F /* QuizITStrategyIncorrectAnswerListView.swift */; };
 		187E7C952C57BD7C0071621F /* QuizESIncorrectAnswerListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187E7C942C57BD7C0071621F /* QuizESIncorrectAnswerListView.swift */; };
 		1896A1FF2BAD3B170072F12B /* ManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1896A1FE2BAD3B170072F12B /* ManagerView.swift */; };
@@ -105,6 +108,7 @@
 		18B371BA2CFDC2B60016AEEF /* StoryInfoListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18B371B92CFDC2B60016AEEF /* StoryInfoListView.swift */; };
 		18BD10B82B6B601500ABB28F /* sound.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18BD10B72B6B601500ABB28F /* sound.mp3 */; };
 		18C37B132D0DF9D600326A2E /* CheckUsersListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C37B122D0DF9D600326A2E /* CheckUsersListView.swift */; };
+		18DE99712D211AB2003E315A /* StoryAppliedListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18DE99702D211AB2003E315A /* StoryAppliedListView.swift */; };
 		18E818572B5EBDFC00595669 /* RewardTimesModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E818562B5EBDFC00595669 /* RewardTimesModal.swift */; };
 		18EA883E2B8C48AE00067FE7 /* SubModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18EA883D2B8C48AE00067FE7 /* SubModalView.swift */; };
 		18F95C462B51AB7200F8DBBB /* TittlesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18F95C452B51AB7200F8DBBB /* TittlesView.swift */; };
@@ -223,6 +227,9 @@
 		186C39A92B70B576007F625E /* StoreKitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreKitView.swift; sourceTree = "<group>"; };
 		186C39AB2B71235B007F625E /* CoinModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinModalView.swift; sourceTree = "<group>"; };
 		186C39AD2B71D2B3007F625E /* it.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = it.entitlements; sourceTree = "<group>"; };
+		1875D9552D1851A400386509 /* StoryUserQuizView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryUserQuizView.swift; sourceTree = "<group>"; };
+		1875D9572D18595200386509 /* StoryUserQuizListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryUserQuizListView.swift; sourceTree = "<group>"; };
+		1875D9592D19953900386509 /* StoryUserModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryUserModalView.swift; sourceTree = "<group>"; };
 		187E7C922C57BD110071621F /* QuizITStrategyIncorrectAnswerListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizITStrategyIncorrectAnswerListView.swift; sourceTree = "<group>"; };
 		187E7C942C57BD7C0071621F /* QuizESIncorrectAnswerListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizESIncorrectAnswerListView.swift; sourceTree = "<group>"; };
 		1896A1FE2BAD3B170072F12B /* ManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagerView.swift; sourceTree = "<group>"; };
@@ -258,6 +265,7 @@
 		18B371B92CFDC2B60016AEEF /* StoryInfoListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryInfoListView.swift; sourceTree = "<group>"; };
 		18BD10B72B6B601500ABB28F /* sound.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = sound.mp3; path = ../../../Downloads/sound.mp3; sourceTree = "<group>"; };
 		18C37B122D0DF9D600326A2E /* CheckUsersListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckUsersListView.swift; sourceTree = "<group>"; };
+		18DE99702D211AB2003E315A /* StoryAppliedListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryAppliedListView.swift; sourceTree = "<group>"; };
 		18E818562B5EBDFC00595669 /* RewardTimesModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardTimesModal.swift; sourceTree = "<group>"; };
 		18EA883D2B8C48AE00067FE7 /* SubModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubModalView.swift; sourceTree = "<group>"; };
 		18F95C452B51AB7200F8DBBB /* TittlesView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TittlesView.swift; path = ../../../Downloads/TittlesView.swift; sourceTree = "<group>"; };
@@ -388,7 +396,9 @@
 				189892492C51128200970794 /* QuizComputerSystemListView.swift */,
 				183211622B9CB7B60064F10A /* QuizITStrategyListView.swift */,
 				189F82C72BA550E100C0247A /* RankMatchQuizListView.swift */,
+				1875D9572D18595200386509 /* StoryUserQuizListView.swift */,
 				181B25632CE8A3B400F8419B /* StoryITListView.swift */,
+				18DE99702D211AB2003E315A /* StoryAppliedListView.swift */,
 				18B371B92CFDC2B60016AEEF /* StoryInfoListView.swift */,
 				18A8D0692C19C453004DB532 /* MugenQuizListView.swift */,
 				183211842BA0138E0064F10A /* QuizITBasicListView.swift */,
@@ -409,6 +419,7 @@
 				260E44242AB59A7900FBB487 /* QuizView.swift */,
 				18236D732BC26DFA009C6CEB /* QuizBossView.swift */,
 				189F82C52BA549AC00C0247A /* RankMatchQuizView.swift */,
+				1875D9552D1851A400386509 /* StoryUserQuizView.swift */,
 				181B25652CE8A43C00F8419B /* StoryQuizView.swift */,
 				181B25672CE987D900F8419B /* StoryQuizResultView.swift */,
 				18A8D06B2C1B044B004DB532 /* MugenQuizView.swift */,
@@ -433,6 +444,7 @@
 				260E44222AB5963A00FBB487 /* AuthManager.swift */,
 				181B25692CE99CE700F8419B /* StoryCoinModalView.swift */,
 				18B371B52CFAAC1D0016AEEF /* StoryMonsterModalView.swift */,
+				1875D9592D19953900386509 /* StoryUserModalView.swift */,
 				26A25D4F2AB9FB1A006B368F /* TitleListView.swift */,
 				2641992B2AC2572F002013B9 /* AvatarListView.swift */,
 				267283122AFA84C600549219 /* IllustratedView.swift */,
@@ -695,6 +707,7 @@
 				1832116F2B9CB8570064F10A /* QuizITManagementListView.swift in Sources */,
 				187E7C932C57BD110071621F /* QuizITStrategyIncorrectAnswerListView.swift in Sources */,
 				183211692B9CB8130064F10A /* QuizITTechnologyListView.swift in Sources */,
+				1875D9562D1851A400386509 /* StoryUserQuizView.swift in Sources */,
 				262F0FF62B1ADBC5004C0C47 /* SubscriptionView.swift in Sources */,
 				1832117B2B9DC0280064F10A /* PentagonManagerView.swift in Sources */,
 				264F19152AF2824700B6FB10 /* RankingView.swift in Sources */,
@@ -739,6 +752,7 @@
 				189892482C4FD84A00970794 /* ESManagerListView.swift in Sources */,
 				269A878A2AB86FC900F33C9E /* GachaView.swift in Sources */,
 				26A026DE2ABDD1EB00119F2B /* TopView.swift in Sources */,
+				1875D9582D18595200386509 /* StoryUserQuizListView.swift in Sources */,
 				183211712B9CB87D0064F10A /* QuizInfoManagementListView.swift in Sources */,
 				18E818572B5EBDFC00595669 /* RewardTimesModal.swift in Sources */,
 				183211852BA0138E0064F10A /* QuizITBasicListView.swift in Sources */,
@@ -748,6 +762,7 @@
 				183211752B9DB3880064F10A /* PentagonITShape.swift in Sources */,
 				26A25D502AB9FB1A006B368F /* TitleListView.swift in Sources */,
 				183211672B9CB7F00064F10A /* QuizAppliedStrategyListView.swift in Sources */,
+				18DE99712D211AB2003E315A /* StoryAppliedListView.swift in Sources */,
 				18236D7A2BC27A07009C6CEB /* BossManagerListView.swift in Sources */,
 				18A5A4B42B7C6918009EFAB6 /* Story.swift in Sources */,
 				18236D742BC26DFA009C6CEB /* QuizBossView.swift in Sources */,
@@ -764,6 +779,7 @@
 				183211632B9CB7B60064F10A /* QuizITStrategyListView.swift in Sources */,
 				182899CA2CC36733001BD535 /* SplashScreenView.swift in Sources */,
 				260E44252AB59A7900FBB487 /* QuizView.swift in Sources */,
+				1875D95A2D19953900386509 /* StoryUserModalView.swift in Sources */,
 				26AA130C2ACD74660035F5F4 /* ModalView.swift in Sources */,
 				189892582C526FFC00970794 /* QuizSystemKaihatuListView.swift in Sources */,
 				1832117D2B9DD20E0064F10A /* ManagerListTabView.swift in Sources */,

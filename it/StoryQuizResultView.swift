@@ -61,10 +61,11 @@ struct StoryQuizResultView: View {
     @Environment(\.presentationMode) var presentationMode
     private let adViewControllerRepresentable = AdViewControllerRepresentableStory()
     @Binding var victoryFlag : Bool
+    @Binding var isUserStoryFlag : Bool
 //    @Binding private var victoryFlag: Bool
     // QuizResultView.swift
     @ObservedObject var viewModel: PositionViewModel
-    init(results: [QuizResult], authManager: AuthManager, isPresenting: Binding<Bool>, navigateToQuizResultView: Binding<Bool>, playerExperience: Int, playerMoney: Int, elapsedTime: TimeInterval, quizLevel: QuizLevel, victoryFlag: Binding<Bool>, viewModel: PositionViewModel) {
+    init(results: [QuizResult], authManager: AuthManager, isPresenting: Binding<Bool>, navigateToQuizResultView: Binding<Bool>, playerExperience: Int, playerMoney: Int, elapsedTime: TimeInterval, quizLevel: QuizLevel, victoryFlag: Binding<Bool>, isUserStoryFlag: Binding<Bool>, viewModel: PositionViewModel) {
         _results = State(initialValue: results)
         self.authManager = authManager
         _isPresenting = isPresenting
@@ -75,6 +76,7 @@ struct StoryQuizResultView: View {
         self.elapsedTime = elapsedTime
         self.quizLevel = quizLevel
         _victoryFlag = victoryFlag
+        _isUserStoryFlag = isUserStoryFlag
         self.viewModel = viewModel
 //        print("self.elapsedTime init:\(self.elapsedTime)")
     }
@@ -308,7 +310,18 @@ struct StoryQuizResultView: View {
                           }
                       }
                 }
-
+                .onDisappear {
+                    print("onDisappear")
+                    if victoryFlag {
+                        if isUserStoryFlag {
+                            viewModel.incrementUserPosition()
+                        } else {
+                            viewModel.incrementPosition()
+                        }
+                    } else {
+                        viewModel.decreaseStamina(by: 10)
+                    }
+                }
                 if showMemoView {
                     MemoView(memo: $currentMemo, question: selectedQuestion)
                 }
@@ -325,11 +338,6 @@ struct StoryQuizResultView: View {
             .background(Color("Color2"))
             .navigationBarBackButtonHidden(true)
             .navigationBarItems(leading: Button(action: {
-                if victoryFlag {
-                    viewModel.incrementPosition()
-                } else {
-                    viewModel.decreaseStamina(by: 10)
-                }
                 isPresenting = false
                 audioManager.playCancelSound()
             }) {
@@ -374,7 +382,6 @@ struct StoryQuizResultView: View {
             if showLevelUpModal {
                 LevelUpModalView(showLevelUpModal: $showLevelUpModal, authManager: authManager)
             }
-            NavigationLink("", destination: ContentView().navigationBarBackButtonHidden(true), isActive: $isContentView)
         }
     }
     
@@ -412,7 +419,7 @@ struct StoyrQuizResultView_Previews: PreviewProvider {
         let authManager = AuthManager() // 適切なダミーまたはモックオブジェクトで置き換えてください
 
         // プレビュー用にビューを初期化
-        StoryQuizResultView(results: dummyResults, authManager: authManager, isPresenting: $isPresenting, navigateToQuizResultView: $navigateToQuizResultView, playerExperience: 10, playerMoney: 10, elapsedTime: 0, quizLevel: .beginner, victoryFlag: .constant(true), viewModel: PositionViewModel.shared)
+        StoryQuizResultView(results: dummyResults, authManager: authManager, isPresenting: $isPresenting, navigateToQuizResultView: $navigateToQuizResultView, playerExperience: 10, playerMoney: 10, elapsedTime: 0, quizLevel: .beginner, victoryFlag: .constant(true), isUserStoryFlag: .constant(false), viewModel: PositionViewModel.shared)
     }
 }
 

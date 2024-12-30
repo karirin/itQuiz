@@ -27,16 +27,21 @@ class PositionViewModel: ObservableObject {
     @Published var showStaminaAlert: Bool = false
     @Published var showCoinAlert: Bool = false
     @Published var showMonsterAlert: Bool = false
-    @Published var isPositionFetched: Bool = false // フラグを追加
+    @Published var showUserStoryAlert: Bool = false
+    @Published var showUserStoryQuiz: Bool = false
+    @Published var isPositionFetched: Bool = false
+    @Published var isStoryRankingModal: Bool = false
     @Published var showMonsterQuizList = false
     @Published var avatarName: String = ""
     private let authManager = AuthManager.shared
+    @Published var selectedUser: User? = nil
     
     // MARK: - Private Properties
     private var dbRef: DatabaseReference
     private var handle: DatabaseHandle?
     private var cancellables = Set<AnyCancellable>()
     private var staminaRecoveryCancellable: AnyCancellable?
+    @Published var storyUsers: [RankedUser] = []
     
     // MARK: - Constants
     struct Constants {
@@ -306,6 +311,54 @@ class PositionViewModel: ObservableObject {
             }
         }
     }
+    
+    func incrementUserPosition() {
+        guard let userId = AuthManager.shared.currentUserId else {
+            print("User is not logged in.")
+            return
+        }
+        
+        // スタミナが十分か確認
+        guard self.stamina >= 10 else {
+            showStaminaAlert = true
+            return
+        }
+        
+        let newPosition = userPosition + 1
+        let newStamina = self.stamina
+        
+        // ローカルの状態を即時に更新し、アニメーションをトリガー
+        DispatchQueue.main.async {
+            withAnimation(.easeInOut(duration: 0.5)) { // アニメーションの調整
+                self.userPosition = newPosition
+                self.stamina = newStamina
+            }
+        }
+        
+        let storyRef = dbRef.child("storys").child(userId)
+        
+        // 複数のフィールドを同時に更新するためのデータ構造
+        let updates = [
+            "position": newPosition,
+            "stamina": newStamina
+        ] as [String : Any]
+        
+        // Firebase に位置とスタミナを同時に更新
+        storyRef.updateChildValues(updates) { error, _ in
+            if let error = error {
+                print("position と stamina の更新に失敗しました: \(error.localizedDescription)")
+                // 必要に応じてローカルの状態を元に戻す処理を追加
+                DispatchQueue.main.async {
+                    withAnimation {
+                        self.userPosition = newPosition - 1
+                        self.stamina = newStamina
+                    }
+                }
+            } else {
+                print("position と stamina が更新されました: position=\(newPosition), stamina=\(newStamina)")
+            }
+        }
+    }
 
     /// スタミナを減少させる関数
     func decreaseStamina(by amount: Int = 10) {
@@ -395,6 +448,145 @@ class PositionViewModel: ObservableObject {
         staminaRecoveryCancellable?.cancel()
         staminaRecoveryCancellable = nil
     }
+
+    @Published var storys: [String: Story] = [:]
+    @Published var users = [User]()
+
+    struct Story: Codable {
+        let lastActiveTime: Double?
+        let position: Int
+        let stamina: Int
+    }
+
+    func fetchUsers(completion: @escaping (Bool) -> Void) {
+        let usersRef = Database.database().reference().child("users")
+        usersRef.observeSingleEvent(of: .value, with: { (snapshot) in
+            var users: [User] = []
+
+            guard let usersData = snapshot.value as? [String: [String: Any]] else {
+                print("Error: Could not parse users data")
+                return
+            }
+
+            for (userId, data) in usersData {
+                if let userName = data["userName"] as? String,
+                   let userMoney = data["userMoney"] as? Int,
+                   let userHp = data["userHp"] as? Int,
+                   let userAttack = data["userAttack"] as? Int,
+                   let level = data["level"] as? Int,
+                   let experience = data["experience"] as? Int {
+
+                    let rankMatchPoint = data["rankMatchPoint"] as? Int ?? 100
+                    let rank = data["rank"] as? Int ?? 1
+
+                    var filteredAvatars: [[String: Any]] = []
+                    if let avatarsData = data["avatars"] as? [String: [String: Any]] {
+                        for (_, avatarData) in avatarsData {
+                            if avatarData["usedFlag"] as? Int == 1 {
+                                filteredAvatars.append(avatarData)
+                            }
+                        }
+                    }
+
+                    let user = User(id: userId,
+                                    userName: userName,
+                                    level: level,
+                                    experience: experience,
+                                    avatars: filteredAvatars,
+                                    userMoney: userMoney,
+                                    userHp: userHp,
+                                    userAttack: userAttack,
+                                    userFlag: 1,
+                                    adminFlag: 0,
+                                    rankMatchPoint: rankMatchPoint,
+                                    rank: rank)
+                    users.append(user)
+                    
+                }
+            }
+
+            self.users = users.sorted { $0.level > $1.level }
+            completion(true)
+//            self.rankedUsers = users.sorted { $0.rankMatchPoint > $1.rankMatchPoint }
+
+            DispatchQueue.main.async {
+//                self.calculateLevelRankings()
+//                self.calculateRankRankings()
+            }
+//            self.fetchMonthlyAnswers()
+        }) { (error) in
+            print("Error getting users: \(error.localizedDescription)")
+        }
+    }
+
+    func fetchStorys() {
+        Database.database().reference().child("storys").observe(.value) { [weak self] snapshot in
+            var tempStorys: [String: Story] = [:]
+            for child in snapshot.children {
+                if let childSnapshot = child as? DataSnapshot,
+                   let value = childSnapshot.value as? [String: Any],
+                   let position = value["position"] as? Int,
+                   let stamina = value["stamina"] as? Int {
+                    let lastActiveTime = value["lastActiveTime"] as? Double
+
+                    let story = Story(lastActiveTime: lastActiveTime, position: position, stamina: stamina)
+                    tempStorys[childSnapshot.key] = story
+                }
+            }
+            DispatchQueue.main.async {
+                self?.storys = tempStorys
+                self?.updateRankedUsers() { success in
+                    if success {
+                        self!.storyUsers = self!.storyUsers.sorted { $0.position > $1.position }
+                        self!.assignRanks()
+                    }
+                }
+            }
+        }
+    }
+
+    private func assignRanks() {
+        var currentRank = 1
+        var previousPosition: Int? = nil
+        var sameRankCount = 0
+        for (index, user) in storyUsers.enumerated() {
+            if let prevPos = previousPosition {
+                if user.position == prevPos {
+                    storyUsers[index].rank = currentRank
+                    sameRankCount += 1
+                } else {
+                    currentRank += sameRankCount + 1
+                    storyUsers[index].rank = currentRank
+                    sameRankCount = 0
+                }
+            } else {
+                storyUsers[index].rank = currentRank
+            }
+            previousPosition = user.position
+        }
+    }
+
+    func updateRankedUsers(completion: @escaping (Bool) -> Void) {
+        let ranked = users.compactMap { user -> RankedUser? in
+            guard let story = storys[user.id] else { return nil }
+            return RankedUser(user: user, position: story.position)
+        }
+        .sorted { $1.position < $0.position } // positionが小さいほど上位
+
+        DispatchQueue.main.async {
+            self.storyUsers = ranked
+            self.updateCurrentUserRank()
+            completion(true)
+        }
+    }
+
+    func updateCurrentUserRank() {
+        // ここで現在のユーザーIDを取得します。例えば、Firebase Authenticationを使用している場合：
+        guard let currentUserID = Auth.auth().currentUser?.uid else { return }
+        if let index = storyUsers.firstIndex(where: { $0.user.id == currentUserID }) {
+//            currentUserLevelRank = index + 1
+        }
+    }
 }
 
 // Viewの中心に近いPlatformViewを特定するためのPreferenceKey
@@ -432,11 +624,13 @@ struct ScrollOffsetKey: PreferenceKey {
 // TestView の定義
 struct StoryView: View {
     @StateObject var viewModel = PositionViewModel.shared
+    @StateObject var rankingViewModel = RankingViewModel()
     @ObservedObject var audioManager = AudioManager()
     @ObservedObject var authManager = AuthManager()
     @Namespace private var animationNamespace
     @State private var initialScrollDone = false
     @State private var isStorySutaminaModal = false
+    @State private var isStoryRankingModal = false
     @State private var isLoading = true
     @State private var position: Int = 1
     @State private var index: Int = 1
@@ -466,7 +660,7 @@ struct StoryView: View {
                             BannerStoryView()
                                 .frame(height: 60)
                         }
-                        VStack {
+                        VStack(spacing:5) {
                                 HStack{
                                     if isReturnActive {
                                         Button(action: {
@@ -474,32 +668,51 @@ struct StoryView: View {
                                             audioManager.playCancelSound()
                                         }) {
                                             Image(systemName: "chevron.left")
-                                                .foregroundColor(Color("fontGray"))
                                             Text("戻る")
-                                                .foregroundColor(Color("fontGray"))
                                         }
                                         .fontWeight(.bold)
+                                        .foregroundColor(.white)
+                                        .padding(10)
+                                        .background(Color.black.opacity(0.5))
+                                        .cornerRadius(30)
                                     }
                                 Spacer()
-                                Button(action: {
-                                    audioManager.toggleSound()
-                                    audioManager.playSound()
-                                    isSoundOn.toggle()
-                                }) {
-                                    if isSoundOn {
-//                                        Image(systemName: "speaker.wave.2")
-                                        Image("音声オン")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(width:40)
-                                    } else {
-//                                        Image(systemName: "speaker.slash")
-                                        Image("音声オフ")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(width:40)
+                                    Button(action: {
+                                        audioManager.toggleSound()
+                                        audioManager.playSound()
+                                        isSoundOn.toggle()
+                                    }) {
+                                        if isSoundOn {
+//                                            HStack {
+                                                Image("音声オン")
+                                                    .resizable()
+                                                    .scaledToFit()
+                                                    .frame(width:40)
+//                                                Text("音声オン")
+//                                                    .font(.system(size: 12))
+//                                                    .fontWeight(.bold)
+//                                                    .foregroundColor(.white)
+//                                            }
+//    //                                        .padding(5)
+//                                            .padding(.trailing)
+//                                            .background(Color.black.opacity(0.5))
+//                                            .cornerRadius(30)
+                                        } else {
+//                                            HStack {
+                                                Image("音声オフ")
+                                                    .resizable()
+                                                    .scaledToFit()
+                                                    .frame(width:40)
+//                                                Text("音声オフ")
+//                                                    .fontWeight(.bold)
+//                                                    .foregroundColor(.white)
+//                                            }
+//                                            .padding(5)
+//                                            .padding(.trailing)
+//                                            .background(Color.black.opacity(0.5))
+//                                            .cornerRadius(30)
+                                        }
                                     }
-                                }
                                 HStack {
                                     Image("スタミナ")
                                         .resizable()
@@ -513,20 +726,33 @@ struct StoryView: View {
                                 .background(Color.black.opacity(0.5))
                                 .cornerRadius(10)
                             }
-                            .padding(.horizontal, 50)
+                            // スタミナゲージ
+                            ProgressStoryView(progress: .constant((Float(viewModel.stamina) / 100)))
+                                .progressViewStyle(LinearProgressViewStyle(tint: .green))
+                                .padding(.bottom, 10)
+                            HStack{
+                                Spacer()
+                                Button(action: {
+                                    audioManager.toggleSound()
+                                    audioManager.playSound()
+                                    isStoryRankingModal = true
+                                }) {
+                                    Image("ランキングストーリーボタン")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(height:45)
+                                }
+                                
+                            }
                         }
-                        
-                        // スタミナゲージ
-                        ProgressStoryView(progress: .constant((Float(viewModel.stamina) / 100)))
-                            .progressViewStyle(LinearProgressViewStyle(tint: .green))
-                            .padding(.bottom, 10)
-                        
+                        .padding(.horizontal, 50)
                         // スクロールビュー
                         ScrollView {
                             VStack {
                                 PlatformsContainer(viewModel: viewModel, namespace: animationNamespace)
                             }
-                            .padding(.top, 100)
+                            
+                            NavigationLink("", destination: StoryRankingView(viewModel: rankingViewModel, isReturnFlag: .constant(true)).navigationBarBackButtonHidden(true), isActive: $isStoryRankingModal)
                         }
                         .background(
                             GeometryReader { geometry in
@@ -549,7 +775,11 @@ struct StoryView: View {
                     }
                     
                     if viewModel.showMonsterAlert {
-                        StoryMonsterModalView(monster: $viewModel.monster, isPresented: $viewModel.showMonsterAlert, showQuizList: $viewModel.showMonsterQuizList, audioManager: audioManager)
+                        StoryMonsterModalView(monster: $viewModel.monster, isPresented: $viewModel.showMonsterAlert, showQuizList: $viewModel.showMonsterQuizList, audioManager: audioManager, viewModel: viewModel)
+                    }
+                    
+                    if viewModel.showUserStoryAlert {
+                        StoryUserModalView(viewModel: viewModel, isPresented: $viewModel.showUserStoryAlert, showQuizList: $viewModel.showUserStoryQuiz, audioManager: audioManager, user: viewModel.selectedUser!)
                     }
                     
                     if isStoryFlag {
@@ -653,6 +883,11 @@ struct StoryView: View {
                         }
                     }
                     viewModel.startStaminaRecoveryTimer()
+                    viewModel.fetchUsers() { success in
+                        if success {
+                            viewModel.fetchStorys()
+                        }
+                    }
                 }
                 // userPosition が取得されたときにスクロール
                 .onReceive(viewModel.$isPositionFetched) { fetched in
@@ -670,20 +905,20 @@ struct StoryView: View {
                         scrollToPosition(proxy: proxy)
                     }
                 }
-//                .onPreferenceChange(ViewOffsetKey.self) { offsets in
-//                    // 現在のスクリーン中央のY座標
-//                    let screenHeight = UIScreen.main.bounds.height
-//                    let centerY = screenHeight / 2
-//
-//                    // 各PlatformViewのmidYとスクリーン中央との距離を計算
-//                    let closest = offsets.min { abs($0.value - centerY) < abs($1.value - centerY) }
-//
-//                    if let closestPosition = closest?.key {
-//                        if currentVisiblePosition != closestPosition {
-//                            currentVisiblePosition = closestPosition
-//                        }
-//                    }
-//                }
+                .onPreferenceChange(ViewOffsetKey.self) { offsets in
+                    // 現在のスクリーン中央のY座標
+                    let screenHeight = UIScreen.main.bounds.height
+                    let centerY = screenHeight / 2
+
+                    // 各PlatformViewのmidYとスクリーン中央との距離を計算
+                    let closest = offsets.min { abs($0.value - centerY) < abs($1.value - centerY) }
+
+                    if let closestPosition = closest?.key {
+                        if currentVisiblePosition != closestPosition {
+                            currentVisiblePosition = closestPosition
+                        }
+                    }
+                }
             }
         }
         // アプリのライフサイクルの変更を監視
@@ -736,50 +971,94 @@ struct StoryView: View {
         }
     }
     
-    private func backgroundImageName(for position: Int) -> String {
+    func backgroundImageName(for position: Int) -> String {
         switch position {
-        case 1...27:
-            return "背景1"
-        case 28...51:
-            return "背景2"
-        case 52...60:
-            return "背景3"
+        case 1...58:
+            return "背景1ダンジョン"
+        case 59...108:
+            return "背景2ダンジョン"
+        case 109...150:
+            return "背景3ダンジョン"
         default:
-            return "背景1" // デフォルトの背景
+            return "背景1ダンジョン"
         }
     }
-    /// スクロール処理と isLoading の設定を行う関数
+    
+    struct PositionMapping {
+        let range: ClosedRange<Int>
+        let target: Int
+    }
+
+    let positionMappings: [PositionMapping] = [
+        PositionMapping(range: 1...3, target: 51),
+        PositionMapping(range: 4...6, target: 50),
+        PositionMapping(range: 7...9, target: 49),
+        PositionMapping(range: 10...12, target: 48),
+        PositionMapping(range: 13...15, target: 47),
+        PositionMapping(range: 16...18, target: 46),
+        PositionMapping(range: 19...21, target: 45),
+        PositionMapping(range: 22...24, target: 44),
+        PositionMapping(range: 25...27, target: 43),
+        PositionMapping(range: 28...30, target: 42),
+        PositionMapping(range: 31...33, target: 41),
+        PositionMapping(range: 34...36, target: 40),
+        PositionMapping(range: 37...39, target: 39),
+        PositionMapping(range: 40...42, target: 38),
+        PositionMapping(range: 43...45, target: 37),
+        PositionMapping(range: 46...48, target: 36),
+        PositionMapping(range: 49...51, target: 35),
+        PositionMapping(range: 52...52, target: 34),
+        PositionMapping(range: 53...55, target: 33),
+        PositionMapping(range: 56...58, target: 32),
+        PositionMapping(range: 59...61, target: 31),
+        PositionMapping(range: 62...64, target: 30),
+        PositionMapping(range: 65...67, target: 29),
+        PositionMapping(range: 68...70, target: 28),
+        PositionMapping(range: 71...73, target: 27),
+        PositionMapping(range: 74...76, target: 26),
+        PositionMapping(range: 77...79, target: 25),
+        PositionMapping(range: 80...82, target: 24),
+        PositionMapping(range: 83...85, target: 23),
+        PositionMapping(range: 86...88, target: 22),
+        PositionMapping(range: 89...91, target: 21),
+        PositionMapping(range: 92...94, target: 20),
+        PositionMapping(range: 95...97, target: 19),
+        PositionMapping(range: 98...100, target: 18),
+        PositionMapping(range: 101...101, target: 17),
+        PositionMapping(range: 102...104, target: 16),
+        PositionMapping(range: 105...107, target: 15),
+        PositionMapping(range: 108...110, target: 14),
+        PositionMapping(range: 111...113, target: 13),
+        PositionMapping(range: 114...116, target: 12),
+        PositionMapping(range: 117...119, target: 11),
+        PositionMapping(range: 120...122, target: 10),
+        PositionMapping(range: 123...125, target: 9),
+        PositionMapping(range: 126...128, target: 8),
+        PositionMapping(range: 129...131, target: 7),
+        PositionMapping(range: 132...134, target: 6),
+        PositionMapping(range: 135...137, target: 5),
+        PositionMapping(range: 138...140, target: 4),
+        PositionMapping(range: 141...143, target: 3),
+        PositionMapping(range: 144...146, target: 2),
+        PositionMapping(range: 147...150, target: 1)
+    ]
+    
     private func scrollToPosition(proxy: ScrollViewProxy) {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             withAnimation {
-                if viewModel.userPosition < 7 {
-                    proxy.scrollTo(14, anchor: .top)
-                } else if 7 <= viewModel.userPosition && viewModel.userPosition <= 10 {
-                    proxy.scrollTo(14, anchor: .bottom)
-                } else if 11 <= viewModel.userPosition && viewModel.userPosition <= 12 {
-                    proxy.scrollTo(13, anchor: .bottom)
-                } else if 13 <= viewModel.userPosition && viewModel.userPosition <= 15 {
-                    proxy.scrollTo(12, anchor: .bottom)
-                } else if 16 <= viewModel.userPosition && viewModel.userPosition <= 18 {
-                    proxy.scrollTo(11, anchor: .bottom)
-                } else if 19 <= viewModel.userPosition && viewModel.userPosition <= 20 {
-                    proxy.scrollTo(10, anchor: .bottom)
+                let userPos = viewModel.userPosition
+                print("userPos      :\(userPos)")
+                if let mapping = positionMappings.first(where: { $0.range.contains(userPos) }) {
+                    print("Scroll to position: \(mapping.target)")
+                    proxy.scrollTo(mapping.target, anchor: .bottom)
                 } else {
-                    if index % 3 == 0  {
-                        position = viewModel.userPosition
-                        proxy.scrollTo(isSmallDevice() ? viewModel.userPosition : viewModel.userPosition, anchor: .bottom)
-                    } else {
-                        if viewModel.userPosition == 21 {
-                            position = viewModel.userPosition
-                            proxy.scrollTo(isSmallDevice() ? viewModel.userPosition : viewModel.userPosition, anchor: .bottom)
-                        } else {
-                            proxy.scrollTo(isSmallDevice() ? position : position, anchor: .bottom)
-                        }
-                    }
-                    index += 1
+                    // デフォルトのスクロール先を設定
+                    let defaultTarget = 33
+                    print("Default scroll to position: \(defaultTarget)")
+                    proxy.scrollTo(defaultTarget, anchor: .bottom)
                 }
             }
-//            // アニメーション完了後に isLoading を true に設定
+            // アニメーション完了後に isLoading を false に設定
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { // アニメーション時間と合わせる
                 isLoading = false
             }
@@ -789,7 +1068,7 @@ struct StoryView: View {
 
 
 struct PlatformData: Identifiable {
-    let id = UUID()
+    var id: Int { position }
     let imageName: String
     let position: Int
     let padding: EdgeInsets?
@@ -836,332 +1115,759 @@ struct PlatformsContainer: View {
         self.namespace = namespace
         self.platformImageName = "足場1"
         self.platformDatas = [
-//            [
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 97,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
-//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
-//                ),
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 98,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
-//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
-//                ),
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 99,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
-//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
-//                )
-//            ],
-//            [
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 96,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
-//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
-//                ),
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 95,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
-//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
-//                ),
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 94,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
-//                    padding1: nil
-//                )
-//            ],
-//            [
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 91,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
-//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
-//                ),
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 92,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
-//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
-//                ),
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 93,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
-//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
-//                )
-//            ],
-//            [
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 90,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
-//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
-//                ),
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 89,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
-//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
-//                ),
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 88,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
-//                    padding1: nil
-//                )
-//            ],
-//            [
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 85,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
-//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
-//                ),
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 86,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
-//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
-//                ),
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 87,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
-//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
-//                )
-//            ],
-//            [
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 84,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
-//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
-//                ),
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 83,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
-//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
-//                ),
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 82,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
-//                    padding1: nil
-//                )
-//            ],
-//            [
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 79,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
-//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
-//                ),
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 80,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
-//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
-//                ),
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 81,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
-//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
-//                )
-//            ],
-//            [
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 78,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
-//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
-//                ),
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 77,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
-//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
-//                ),
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 76,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
-//                    padding1: nil
-//                )
-//            ],
-//            [
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 73,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
-//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
-//                ),
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 74,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
-//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
-//                ),
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 75,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
-//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
-//                )
-//            ],
-//            [
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 72,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
-//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
-//                ),
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 71,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
-//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
-//                ),
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 70,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
-//                    padding1: nil
-//                )
-//            ],
-//            [
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 67,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
-//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
-//                ),
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 68,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
-//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
-//                ),
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 69,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
-//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
-//                )
-//            ],
-//            [
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 66,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
-//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
-//                ),
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 65,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
-//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
-//                ),
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 64,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
-//                    padding1: nil
-//                )
-//            ],
-//            [
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 61,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
-//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
-//                ),
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 62,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
-//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
-//                ),
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 63,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
-//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
-//                )
-//            ],
-//            [
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position:60,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
-//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
-//                ),
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 59,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
-//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
-//                ),
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 58,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
-//                    padding1: nil
-//                )
-//            ],
-//            [
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 55,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
-//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
-//                ),
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 56,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
-//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
-//                ),
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 57,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
-//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
-//                )
-//            ],
-//            [
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position:54,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
-//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
-//                ),
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 53,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
-//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
-//                ),
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 52,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
-//                    padding1: nil
-//                )
-//            ],
+            [
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 150,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    boss: 35
+                )
+            ],
+            [
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 147,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 148,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 149,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
+                )
+            ],
+            [
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 146,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0),
+                    paddingTreasure: EdgeInsets(top: -120, leading: 0, bottom: 0, trailing: 0),
+                    treasure: 26
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 145,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 144,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
+                    padding1: nil
+                )
+            ],
+            [
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 141,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 142,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 143,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0),
+                    paddingMonster: EdgeInsets(top: -120, leading: 0, bottom: 0, trailing: 0),
+                    monster: 49
+                )
+            ],
+            [
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 140,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0),
+                    paddingMonster: EdgeInsets(top: -120, leading: 0, bottom: 0, trailing: 0),
+                    monster: 48
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 139,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 138,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
+                    padding1: nil,
+                    treasure: 25
+                )
+            ],
+            [
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 135,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 136,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 137,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0),
+                    paddingMonster: EdgeInsets(top: -120, leading: 0, bottom: 0, trailing: 0),
+                    monster: 47
+                )
+            ],
+            [
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 134,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0),
+                    paddingMonster: EdgeInsets(top: -120, leading: 0, bottom: 0, trailing: 0),
+                    monster: 46
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 133,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 132,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
+                    padding1: nil
+                )
+            ],
+            [
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 129,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    treasure: 24
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 130,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 131,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0),
+                    paddingMonster: EdgeInsets(top: -120, leading: 0, bottom: 0, trailing: 0),
+                    monster: 45
+                )
+            ],
+            [
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 128,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0),
+                    paddingMonster: EdgeInsets(top: -120, leading: 0, bottom: 0, trailing: 0),
+                    monster: 44
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 127,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 126,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
+                    padding1: nil,
+                    paddingMonster: EdgeInsets(top: -60, leading: 0, bottom: 0, trailing: 0),
+                    monster: 43
+                )
+            ],
+            [
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 123,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 124,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    paddingTreasure: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    treasure: 23
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 125,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
+                )
+            ],
+            [
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 122,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0),
+                    paddingMonster: EdgeInsets(top: -150, leading: 0, bottom: 0, trailing: 0),
+                    monster: 42
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 121,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 120,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
+                    padding1: nil,
+                    paddingMonster: EdgeInsets(top: -60, leading: 0, bottom: 0, trailing: 0),
+                    monster: 41
+                )
+            ],
+            [
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 117,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    paddingMonster: EdgeInsets(top: -60, leading: 0, bottom: 0, trailing: 0),
+                    monster: 40
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 118,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 119,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
+                )
+            ],
+            [
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 116,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 115,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    paddingTreasure: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    treasure: 22
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 114,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
+                    padding1: nil
+                )
+            ],
+            [
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 111,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    paddingMonster: EdgeInsets(top: 0, leading: 0, bottom: 30, trailing: 0),
+                    monster: 39
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 112,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 113,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0),
+                    paddingMonster: EdgeInsets(top: 0, leading: 0, bottom: 150, trailing: 0),
+                    monster: 38
+                )
+            ],
+            [
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 110,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 109,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    paddingMonster: EdgeInsets(top: -60, leading: 0, bottom: 0, trailing: 0),
+                    monster: 37
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 108,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
+                    padding1: nil,
+                    treasure: 21
+                )
+            ],
+            [
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 105,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    paddingMonster: EdgeInsets(top: 0, leading: 0, bottom: 30, trailing: 0),
+                    monster: 35
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 106,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 107,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0),
+                    paddingMonster: EdgeInsets(top: 0, leading: 0, bottom: 150, trailing: 0),
+                    monster: 36
+                )
+            ],
+            [
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position:104,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 103,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    paddingTreasure: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    treasure: 20
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 102,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
+                    padding1: nil
+                )
+            ],
+            [
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 101,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    boss: 16
+                )
+            ],
+            [
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 98,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 99,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 100,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
+                )
+            ],
+            [
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 97,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0),
+                    paddingTreasure: EdgeInsets(top: -120, leading: 0, bottom: 0, trailing: 0),
+                    treasure: 19
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 96,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 95,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
+                    padding1: nil
+                )
+            ],
+            [
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 92,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 93,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 94,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0),
+                    paddingMonster: EdgeInsets(top: -120, leading: 0, bottom: 0, trailing: 0),
+                    monster: 34
+                )
+            ],
+            [
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 91,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0),
+                    paddingMonster: EdgeInsets(top: -120, leading: 0, bottom: 0, trailing: 0),
+                    monster: 33
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 90,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 89,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
+                    padding1: nil,
+                    treasure: 18
+                )
+            ],
+            [
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 86,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 87,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 88,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0),
+                    paddingMonster: EdgeInsets(top: -120, leading: 0, bottom: 0, trailing: 0),
+                    monster: 30
+                )
+            ],
+            [
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 85,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0),
+                    paddingMonster: EdgeInsets(top: -120, leading: 0, bottom: 0, trailing: 0),
+                    monster: 31
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 84,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 83,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
+                    padding1: nil
+                )
+            ],
+            [
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 80,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    treasure: 17
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 81,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 82,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0),
+                    paddingMonster: EdgeInsets(top: -120, leading: 0, bottom: 0, trailing: 0),
+                    monster: 29
+                )
+            ],
+            [
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 79,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0),
+                    paddingMonster: EdgeInsets(top: -120, leading: 0, bottom: 0, trailing: 0),
+                    monster: 25
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 78,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 77,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
+                    padding1: nil,
+                    paddingMonster: EdgeInsets(top: -60, leading: 0, bottom: 0, trailing: 0),
+                    monster: 24
+                )
+            ],
+            [
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 74,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 75,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    paddingTreasure: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    treasure: 16
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 76,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
+                )
+            ],
+            [
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 73,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0),
+                    paddingMonster: EdgeInsets(top: -150, leading: 0, bottom: 0, trailing: 0),
+                    monster: 26
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 72,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 71,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
+                    padding1: nil,
+                    monster: 23
+                )
+            ],
+            [
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 68,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    monster: 22
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 69,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 70,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
+                )
+            ],
+            [
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 67,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 66,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    paddingTreasure: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    treasure: 15
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 65,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
+                    padding1: nil
+                )
+            ],
+            [
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 62,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    paddingMonster: EdgeInsets(top: 0, leading: 0, bottom: 30, trailing: 0),
+                    monster: 20
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 63,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 64,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0),
+                    paddingMonster: EdgeInsets(top: 0, leading: 0, bottom: 150, trailing: 0),
+                    monster: 21
+                )
+            ],
+            [
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position:61,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 60,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    paddingMonster: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    monster: 19
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 59,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
+                    padding1: nil,
+                    treasure: 14
+                )
+            ],
+            [
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 56,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    paddingMonster: EdgeInsets(top: 0, leading: 0, bottom: 30, trailing: 0),
+                    monster: 17
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 57,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 58,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0),
+                    paddingMonster: EdgeInsets(top: 0, leading: 0, bottom: 150, trailing: 0),
+                    monster: 18
+                )
+            ],
+            [
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position:55,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0)
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 54,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    paddingTreasure: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
+                    treasure: 13
+                ),
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 53,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
+                    padding1: nil
+                )
+            ],
+            [
+                PlatformData(
+                    imageName: self.platformImageName,
+                    position: 52,
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
+                    boss: 15
+                )
+            ],
             [
                 PlatformData(
                     imageName: self.platformImageName,
                     position: 49,
-                    padding: EdgeInsets(top: 0, leading: 40, bottom: -60, trailing: -30),
-                    padding1: EdgeInsets(top: 0, leading: 60, bottom: 0, trailing: 0),
+                    padding: EdgeInsets(top: 0, leading: 30, bottom: -60, trailing: 0),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
                     paddingTreasure: EdgeInsets(top: 0, leading: 60, bottom: 0, trailing: 0),
                     treasure: 12
                 ),
@@ -1174,29 +1880,9 @@ struct PlatformsContainer: View {
                 PlatformData(
                     imageName: self.platformImageName,
                     position: 51,
-                    padding: EdgeInsets(top: 0, leading: -20, bottom: 60, trailing: 30),
-                    padding1: EdgeInsets(top: 0, leading: -10, bottom: 120, trailing: 30),
-                    boss: 16
+                    padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 30),
+                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 30)
                 )
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 49,
-//                    padding: EdgeInsets(top: 0, leading: 45, bottom: -60, trailing: 0),
-//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
-//                ),
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 50,
-//                    padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
-//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0)
-//                ),
-//                PlatformData(
-//                    imageName: self.platformImageName,
-//                    position: 51,
-//                    padding: EdgeInsets(top: 0, leading: -45, bottom: 60, trailing: 0),
-//                    padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0),
-//                    boss: 2
-//                )
             ],
             [
                 PlatformData(
@@ -1373,8 +2059,7 @@ struct PlatformsContainer: View {
                     imageName: self.platformImageName,
                     position: 27,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 60),
-                    padding1: EdgeInsets(top: 0, leading: -50, bottom: 120, trailing: 0),
-                    boss: 15
+                    padding1: EdgeInsets(top: 0, leading: -50, bottom: 120, trailing: 0)
                 )
             ],
             [
@@ -1589,7 +2274,6 @@ struct PlatformsContainer: View {
                                     boss: platformData.boss ?? 0,
                                     viewModel: viewModel
                                 )
-                                .id(platformData.position)
                             }
                         }
                     }
@@ -1620,14 +2304,55 @@ struct PlatformView: View {
     @State private var isPresentingQuizStory = false
     @ObservedObject var viewModel: PositionViewModel
     @State private var monsterName: String = ""
-    @State private var backgroundName: String = ""
     @State private var quizStoryData: QuizStoryData? = nil
     @State private var coin: Int = 1
     private var audioManager = AudioManager.shared
+    @State private var isPresentingStoryUserQuiz = false
+    var otherUser: RankedUser? {
+        viewModel.storyUsers.first(where: { $0.position == position && $0.user.id != AuthManager.shared.currentUserId &&  $0.position != 2 })
+    }
     
     var imageName: String {
-        position >= 28 ? position == 51 ? "ボス足場2" : "足場2" : position == 27 ? "ボス足場1" : "足場1"
+        if position > 101 {
+            if position == 150 {
+                return "ボス足場3"
+            } else {
+                return "足場3"
+            }
+        } else if position >= 53 {
+            if position == 101 {
+                return "ボス足場2"
+            } else {
+                return "足場2"
+            }
+        } else {
+            if position == 52 {
+                return "ボス足場1"
+            } else {
+                return "足場1"
+            }
+        }
     }
+    
+    var backgroundName: String {
+        get {
+            switch viewModel.userPosition {
+            case 1...51:
+                return "ダンジョン背景1"
+            case 52...100:
+                return "ダンジョン背景2"
+            case 101...150:
+                return "ダンジョン背景3"
+            default:
+                return "ダンジョン背景1" // デフォルトの背景
+            }
+        }
+        set {
+            // 必要に応じてsetterを実装。今回は動的置き換えのため空でも可。
+            // 例: 何もしない場合
+        }
+    }
+
     
     init(imageName: String, position: Int, padding: EdgeInsets = EdgeInsets(), padding1: EdgeInsets? = nil, paddingMonster: EdgeInsets? = nil, paddingTreasure: EdgeInsets? = nil, userPosition: Int, onArrowTap: (() -> Void)? = nil, namespace: Namespace.ID, treasure: Int? = 0, monster: Int? = 0, boss: Int? = 0, viewModel: PositionViewModel) {
 //        self.imageName = imageName
@@ -1650,7 +2375,8 @@ struct PlatformView: View {
             // プラットフォーム画像
             Image(imageName)
                 .resizable()
-                .frame(width: 80, height: 80)
+                .scaledToFit()
+                .frame(width: position == 52 ? 400 : position == 101 ? 400 :  position == 150 ? 400 : 80)
                 .padding(padding)
                 .background(
                     GeometryReader { geometry in
@@ -1658,43 +2384,66 @@ struct PlatformView: View {
                             .preference(key: ViewOffsetKey.self, value: [position: geometry.frame(in: .global).midY])
                     }
                 )
-//                .onTapGesture {
-//                    self.triggerHaptic()
-//                    if viewModel.stamina >= 10 {
-//                        if let treasure = treasure, treasure != 0 {
-//                            audioManager.playTittleSound()
-//                            viewModel.coin = treasure
-//                            viewModel.showCoinAlert = true
-//                            onArrowTap?()
-//                        }
-//                        if let boss = boss, boss != 0 {
-//                            audioManager.playSound()
-//                            let data = QuizStoryData(monsterName: "ボス\(boss)", backgroundName: "ダンジョン背景1")
-//                            viewModel.monsterName = "ボス\(boss)"
-//                            viewModel.monster = boss
-//                            viewModel.showMonsterAlert = true
-//                        }
-//                        if let monster = monster, monster != 0 {
-//                            audioManager.playSound()
-//                            let data = QuizStoryData(monsterName: "モンスター\(monster)", backgroundName: "ダンジョン背景1")
-////                                quizStoryData = data
-//                            viewModel.monsterName = "モンスター\(monster)"
-//                            viewModel.monster = monster
-//                            viewModel.showMonsterAlert = true
-//                        }
-//                        if let monster = monster, monster == 0, let boss = boss, boss == 0 {
-//                            onArrowTap?()
-//                        }
-//                    } else {
-//                        viewModel.showStaminaAlert = true
-//                    }
-//                }
+            
+            
+            if let otherUser = otherUser {
+                if let treasure = treasure, treasure == 0 {
+                    if let boss = boss, boss == 0 {
+                        if let monster = monster, monster == 0 {
+                            if position != userPosition {
+                                if position != 1 {
+                                        ForEach(otherUser.user.avatars.indices, id: \.self) { index in
+                                            let avatarData = otherUser.user.avatars[index]
+                                            if let name = avatarData["name"] as? String,
+                                               let usedFlag = avatarData["usedFlag"] as? Int,
+                                               usedFlag == 1 {
+                                                VStack(spacing: -20){
+                                                    HStack() {
+                                                        Text("\(otherUser.user.userName)")
+                                                            .font(.system(size: fontSize(for: otherUser.user.userName, isIPad: true)))
+                                                            .padding(5)
+                                                            .foregroundColor(.white)
+                                                            .fontWeight(.bold)
+                                                            .background(Color.black.opacity(0.5))
+                                                            .cornerRadius(10)
+                                                    }
+                                                    .zIndex(1)
+                                                    HStack(spacing: 10) {
+                                                        Image(name)
+                                                            .resizable()
+                                                            .scaledToFit()
+                                                            .frame(width: 80)
+                                                            .padding(padding1 ?? EdgeInsets())
+                                                    }
+                                                }
+                                                .padding(.top, -60)
+                                                .onTapGesture {
+                                                    if position == userPosition + 1 {
+                                                        self.triggerHaptic()
+                                                        audioManager.playSound()
+                                                        if viewModel.stamina >= 10 {
+                                                            viewModel.selectedUser = otherUser.user
+                                                            viewModel.showUserStoryAlert = true
+                                                        } else {
+                                                            viewModel.showStaminaAlert = true
+                                                        }
+                                                    }
+                                                }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             
             // アバター表示
             if position == userPosition {
                 Image("\(viewModel.avatarName)")
                     .resizable()
-                    .frame(width: 80, height: 80)
+                    .scaledToFit()
+                    .frame(width: 80)
                     .padding(.top, -45)
                     .padding(padding1 ?? EdgeInsets())
                     .offset(y: isMovingUp ? -3 : 3)
@@ -1740,7 +2489,7 @@ struct PlatformView: View {
                                 self.triggerHaptic()
                                 audioManager.playSound()
                                 if viewModel.stamina >= 10 {
-                                    let data = QuizStoryData(monsterName: "モンスター\(monster)", backgroundName: "ダンジョン背景1")
+                                    let data = QuizStoryData(monsterName: "モンスター\(monster)", backgroundName: backgroundName)
                                     quizStoryData = data
                                     viewModel.monsterName = "モンスター\(monster)"
                                     viewModel.monster = monster
@@ -1757,15 +2506,16 @@ struct PlatformView: View {
             if let boss = boss, boss != 0 && userPosition < position {
                 Image("ボス\(boss)")
                     .resizable()
-                    .frame(width: 150, height: 150)
-                    .padding(.top,boss == 16 ? -185 : -165)
-                    .padding(.leading ,boss == 16 ? 0 : 0)
+                    .scaledToFit()
+                    .shadow(radius: 10)
+                    .frame(width: boss == 15 ? 250 : boss == 16 ? 200 : 250)
+                    .padding(.top,boss == 16 ? -100 : boss == 35 ? -20 : -20)
                     .onTapGesture {
                         if position == userPosition + 1 {
                             self.triggerHaptic()
                             audioManager.playSound()
                             if viewModel.stamina >= 10 {
-                                let data = QuizStoryData(monsterName: "ボス\(boss)", backgroundName: "ダンジョン背景1")
+                                let data = QuizStoryData(monsterName: "ボス\(boss)", backgroundName: backgroundName)
                                 quizStoryData = data
                                 isPresentingQuizStory = true
                             } else {
@@ -1774,6 +2524,11 @@ struct PlatformView: View {
                         }
                     }
             } else if boss != 0 {
+                Rectangle()
+                    .fill(Color.clear)
+                    .frame(width: 150, height: 150)
+                    .padding(.top,boss == 16 ? -185 : -165)
+                    .padding(.leading ,boss == 16 ? 0 : 0)
             }
             
             // 下矢印表示
@@ -1808,25 +2563,35 @@ struct PlatformView: View {
                             }
                             if let boss = boss, boss != 0 {
                                 audioManager.playSound()
-                                let data = QuizStoryData(monsterName: "ボス\(boss)", backgroundName: "ダンジョン背景1")
+                                let data = QuizStoryData(monsterName: "ボス\(boss)", backgroundName: backgroundName)
                                 viewModel.monsterName = "ボス\(boss)"
                                 viewModel.monster = boss
                                 viewModel.showMonsterAlert = true
                             }
                             if let monster = monster, monster != 0 {
                                 audioManager.playSound()
-                                let data = QuizStoryData(monsterName: "モンスター\(monster)", backgroundName: "ダンジョン背景1")
-//                                quizStoryData = data
+                                let data = QuizStoryData(monsterName: "モンスター\(monster)", backgroundName: backgroundName)
                                 viewModel.monsterName = "モンスター\(monster)"
                                 viewModel.monster = monster
                                 viewModel.showMonsterAlert = true
                             }
-                            if let monster = monster, monster == 0, let boss = boss, boss == 0 {
+                            if let otherUser = otherUser {
                                 if let treasure = treasure, treasure == 0 {
-                                    audioManager.playSound()
+                                    if let boss = boss, boss == 0 {
+                                        if let monster = monster, monster == 0 {
+                                            viewModel.showUserStoryAlert = true
+                                            viewModel.selectedUser = otherUser.user
+                                        }
+                                    }
                                 }
-                                self.triggerHaptic()
-                                onArrowTap?()
+                            } else {
+                                if let monster = monster, monster == 0, let boss = boss, boss == 0 {
+                                    if let treasure = treasure, treasure == 0 {
+                                        audioManager.playSound()
+                                    }
+                                    self.triggerHaptic()
+                                    onArrowTap?()
+                                }
                             }
                         } else {
                             viewModel.showStaminaAlert = true
@@ -1843,15 +2608,49 @@ struct PlatformView: View {
 //            Text("\(position)")
 //                .font(.system(size: 50))
         }
+        .fullScreenCover(isPresented: $viewModel.showUserStoryQuiz) {
+            VStack {
+                if let user = viewModel.selectedUser {
+                    StoryUserQuizListView(isPresenting: $viewModel.showUserStoryQuiz, viewModel: viewModel, user: user, backgroundName: backgroundName)
+                }
+            }
+        }
+//    case 1...51:
+//        return "ダンジョン背景1"
+//    case 52...100:
+//        return "ダンジョン背景2"
+//    case 101...150:
         .fullScreenCover(isPresented: $viewModel.showMonsterQuizList) {
-            if position < 28 {
+            switch viewModel.userPosition {
+            case 1...51:
                 StoryITListView(
                     isPresenting: $viewModel.showMonsterQuizList,
                     monsterName: viewModel.monsterName,
                     backgroundName: "ダンジョン背景1",
                     viewModel: viewModel
                 )
-            } else {
+                .onAppear{
+                    print("StoryITListView")
+                }
+            case 52...100:
+                StoryInfoListView(
+                    isPresenting: $viewModel.showMonsterQuizList,
+                    monsterName: viewModel.monsterName,
+                    backgroundName: "ダンジョン背景2",
+                    viewModel: viewModel
+                )
+                .onAppear{
+                    print("StoryInfoListView")
+                }
+            case 101...150:
+                StoryAppliedListView(
+                    isPresenting: $viewModel.showMonsterQuizList,
+                    monsterName: viewModel.monsterName,
+                    backgroundName: "ダンジョン背景3",
+                    viewModel: viewModel
+                )
+            default:
+                // デフォルトのビュー、またはエラーハンドリング
                 StoryInfoListView(
                     isPresenting: $viewModel.showMonsterQuizList,
                     monsterName: viewModel.monsterName,
@@ -1859,8 +2658,46 @@ struct PlatformView: View {
                     viewModel: viewModel
                 )
             }
+//            if position < 28 {
+//                StoryITListView(
+//                    isPresenting: $viewModel.showMonsterQuizList,
+//                    monsterName: viewModel.monsterName,
+//                    backgroundName: backgroundName,
+//                    viewModel: viewModel
+//                )
+//            } else {
+//                StoryInfoListView(
+//                    isPresenting: $viewModel.showMonsterQuizList,
+//                    monsterName: viewModel.monsterName,
+//                    backgroundName: backgroundName,
+//                    viewModel: viewModel
+//                )
+//            }
         }
     }
+    
+    func fontSize(for text: String, isIPad: Bool) -> CGFloat {
+        let baseFontSize: CGFloat = isIPad ? 16 : 16 // iPad用のベースフォントサイズを大きくする
+
+        let englishAlphabet = CharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+        let textCharacterSet = CharacterSet(charactersIn: text)
+//print(text)
+//        print(baseFontSize)
+        if englishAlphabet.isSuperset(of: textCharacterSet) {
+            return baseFontSize
+        } else {
+            if text.count >= 8 {
+                return baseFontSize - 8
+            }  else if text.count >= 6 {
+                return baseFontSize - 4
+            } else if text.count >= 4 {
+                return baseFontSize - 2
+            } else {
+                return baseFontSize
+            }
+        }
+    }
+    
     func triggerHaptic() {
         let generator = UIImpactFeedbackGenerator(style: .medium)
         generator.prepare()

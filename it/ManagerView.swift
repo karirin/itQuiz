@@ -37,23 +37,23 @@ struct ManagerView: View {
                 }
                 .padding(.leading)
                 .background(.white)
-                TopTabView(list: list, selectedTab: $selectedTab)
-                    .padding(.top,-13)
-                TabView(selection: $selectedTab,
-                                    content: {
+//                TopTabView(list: list, selectedTab: $selectedTab)
+//                    .padding(.top,-13)
+//                TabView(selection: $selectedTab,
+//                                    content: {
 //                    QuizManagerView(isPresenting: .constant(false))
 //                                    .tag(0)
                     ManagerListView(isPresenting: .constant(false))
-                                    .tag(0)
-                    RankMatchListView(authManager: authManager)
+//                                    .tag(0)
+//                    RankMatchListView(authManager: authManager)
 //                    TopView()
 //                    StoryView()
-                        .tag(1)
-                    BossManagerListView(isPresenting: .constant(false))
-                        .padding(.top)
-                                    .tag(2)
-                })
-                            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+//                        .tag(1)
+//                    BossManagerListView(isPresenting: .constant(false))
+//                        .padding(.top)
+//                                    .tag(2)
+//                })
+//                            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
 //                LevelRankingView(viewModel: viewModel)
             }
             .onAppear{

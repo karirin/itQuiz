@@ -23,6 +23,7 @@ struct StoryMonsterModalView: View {
     @State private var quizTitle: String = ""
     @State private var slideOut = false
     @ObservedObject var audioManager: AudioManager
+    @ObservedObject var viewModel: PositionViewModel
 
     let monsters: [Int: Monster] = [
         1: Monster(name: "モンスター1", playerExperience: 30, playerMoney: 30, monsterHP: 160, monsterUnderHP: 160, monsterAttack: 30),
@@ -39,8 +40,8 @@ struct StoryMonsterModalView: View {
         12: Monster(name: "モンスター12", playerExperience: 55, playerMoney: 55, monsterHP: 190, monsterUnderHP: 190, monsterAttack: 35),
         13: Monster(name: "モンスター13", playerExperience: 60, playerMoney: 60, monsterHP: 200, monsterUnderHP: 200, monsterAttack: 38),
         14: Monster(name: "モンスター14", playerExperience: 65, playerMoney: 65, monsterHP: 210, monsterUnderHP: 210, monsterAttack: 40),
-        15: Monster(name: "ボス15", playerExperience: 120, playerMoney: 150, monsterHP: 300, monsterUnderHP: 300, monsterAttack: 65),
-        16: Monster(name: "ボス16", playerExperience: 200, playerMoney: 300, monsterHP: 500, monsterUnderHP: 500, monsterAttack: 200),
+        15: Monster(name: "ボス15", playerExperience: 150, playerMoney: 150, monsterHP: 1000, monsterUnderHP: 1000, monsterAttack: 100),
+        16: Monster(name: "ボス16", playerExperience: 300, playerMoney: 300, monsterHP: 3000, monsterUnderHP: 3000, monsterAttack: 300),
         17: Monster(name: "モンスター17", playerExperience: 80, playerMoney: 80, monsterHP: 240, monsterUnderHP: 240, monsterAttack: 48),
         18: Monster(name: "モンスター18", playerExperience: 85, playerMoney: 85, monsterHP: 250, monsterUnderHP: 250, monsterAttack: 50),
         19: Monster(name: "モンスター19", playerExperience: 90, playerMoney: 90, monsterHP: 260, monsterUnderHP: 260, monsterAttack: 52),
@@ -56,7 +57,29 @@ struct StoryMonsterModalView: View {
         29: Monster(name: "モンスター29", playerExperience: 140, playerMoney: 140, monsterHP: 360, monsterUnderHP: 360, monsterAttack: 78),
         30: Monster(name: "モンスター30", playerExperience: 145, playerMoney: 145, monsterHP: 370, monsterUnderHP: 370, monsterAttack: 80),
         31: Monster(name: "モンスター31", playerExperience: 150, playerMoney: 150, monsterHP: 380, monsterUnderHP: 380, monsterAttack: 82),
-        32: Monster(name: "モンスター32", playerExperience: 155, playerMoney: 155, monsterHP: 390, monsterUnderHP: 390, monsterAttack: 85)
+        32: Monster(name: "モンスター32", playerExperience: 155, playerMoney: 155, monsterHP: 390, monsterUnderHP: 390, monsterAttack: 85),
+        33: Monster(name: "モンスター33", playerExperience: 160, playerMoney: 160, monsterHP: 400, monsterUnderHP: 400, monsterAttack: 88),
+        34: Monster(name: "モンスター34", playerExperience: 170, playerMoney: 165, monsterHP: 420, monsterUnderHP: 420, monsterAttack: 92),
+        35: Monster(name: "ボス35", playerExperience: 1000, playerMoney: 1000, monsterHP: 5000, monsterUnderHP: 5000, monsterAttack: 500),
+        36: Monster(name: "モンスター36", playerExperience: 190, playerMoney: 185, monsterHP: 460, monsterUnderHP: 460, monsterAttack: 100),
+        37: Monster(name: "モンスター37", playerExperience: 200, playerMoney: 190, monsterHP: 480, monsterUnderHP: 480, monsterAttack: 105),
+        38: Monster(name: "モンスター38", playerExperience: 200, playerMoney: 200, monsterHP: 500, monsterUnderHP: 500, monsterAttack: 110),
+        39: Monster(name: "モンスター39", playerExperience: 210, playerMoney: 210, monsterHP: 510, monsterUnderHP: 510, monsterAttack: 120),
+        40: Monster(name: "モンスター40", playerExperience: 220, playerMoney: 220, monsterHP: 520, monsterUnderHP: 520, monsterAttack: 130),
+        41: Monster(name: "モンスター41", playerExperience: 230, playerMoney: 230, monsterHP: 530, monsterUnderHP: 530, monsterAttack: 150),
+        42: Monster(name: "モンスター42", playerExperience: 240, playerMoney: 240, monsterHP: 550, monsterUnderHP: 550, monsterAttack: 170),
+        43: Monster(name: "モンスター43", playerExperience: 250, playerMoney: 250, monsterHP: 570, monsterUnderHP: 570, monsterAttack: 190),
+        44: Monster(name: "モンスター44", playerExperience: 260, playerMoney: 270, monsterHP: 600, monsterUnderHP: 600, monsterAttack: 210),
+        
+        45: Monster(name: "モンスター45", playerExperience: 280, playerMoney: 280, monsterHP: 630, monsterUnderHP: 630, monsterAttack: 230),
+        46: Monster(name: "モンスター46", playerExperience: 310, playerMoney: 310, monsterHP: 660, monsterUnderHP: 660, monsterAttack: 250),
+        47: Monster(name: "モンスター47", playerExperience: 340, playerMoney: 340, monsterHP: 690, monsterUnderHP: 690, monsterAttack: 270),
+        48: Monster(name: "モンスター48", playerExperience: 370, playerMoney: 370, monsterHP: 720, monsterUnderHP: 720, monsterAttack: 290),
+        49: Monster(name: "モンスター49", playerExperience: 400, playerMoney: 400, monsterHP: 750, monsterUnderHP: 550, monsterAttack: 310),
+        50: Monster(name: "モンスター50", playerExperience: 430, playerMoney: 430, monsterHP: 800, monsterUnderHP: 800, monsterAttack: 350),
+        51: Monster(name: "モンスター51", playerExperience: 460, playerMoney: 460, monsterHP: 850, monsterUnderHP: 850, monsterAttack: 400),
+        
+        52: Monster(name: "モンスター52", playerExperience: 500, playerMoney: 500, monsterHP: 900, monsterUnderHP: 900, monsterAttack: 500),
     ]
 
     var body: some View {
@@ -97,7 +120,7 @@ struct StoryMonsterModalView: View {
                         }
                     HStack{
                         HStack{
-                            Image("攻撃マーク")
+                            Image("HPマーク")
                                 .resizable()
                                 .scaledToFit()
                                 .frame(height:30)
@@ -110,7 +133,7 @@ struct StoryMonsterModalView: View {
                         Spacer()
                             .frame(width:30)
                         HStack{
-                            Image("HPマーク")
+                            Image("攻撃マーク")
                                 .resizable()
                                 .scaledToFit()
                                 .frame(height:30)
@@ -142,91 +165,21 @@ struct StoryMonsterModalView: View {
             
             .foregroundColor(Color("fontGray"))
         .shadow(radius: 10)
-//        .overlay(
-//            ZStack {
-//                Spacer()
-//                HStack {
-//                    Spacer()
-//                    VStack{
-//                        Spacer()
-//                        HStack {
-//                            Button(action: {
-//                                reward.ExAndMoReward()
-//                            }, label: {
-//                                if reward.rewardLoaded{
-//                                    Image("倍ボタン")
-//                                        .resizable()
-//                                        .frame(width: 110, height: 110)
-//                                }else{
-//                                    Image("倍ボタン白黒")
-//                                        .resizable()
-//                                        .frame(width: 110, height: 110)
-//                                }
-//                            })
-//                                .shadow(radius: 5)
-//                                .disabled(!reward.rewardLoaded)
-//                                .onChange(of: reward.rewardEarned) { rewardEarned in
-//                                    showAlert = rewardEarned
-//                                    print("onchange reward.rewardEarned:\(showAlert)")
-//                                }
-//                                .alert(isPresented: $showAlert) {
-//                                    Alert(
-//                                        title: Text("報酬獲得！"),
-//                                        message: Text("1時間だけ獲得した経験値とコインが2倍"),
-//                                        dismissButton: .default(Text("OK"), action: {
-//                                            showAlert = false
-//                                            reward.rewardEarned = false
-//                                        })
-//                                    )
-//                                }
-//                                .background(GeometryReader { geometry in
-//                                    Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
-//                                })
-//                                .padding(.bottom)
-//                            
-//                                Spacer()
-//                        }
-//                    }
-//                }
-//            }
-//        )
-//        .overlay(
-//            ZStack {
-//                HStack {
-//                    Spacer()
-//                    VStack{
-//                        HStack {
-//                            // 「×」ボタンを右上に配置
-//                            Button(action: {
-//                                isPresented = false
-//                                audioManager.playCancelSound()
-//                            }) {
-//                                Image(systemName: "xmark.circle.fill")
-//                                    .resizable()
-//                                    .frame(width: 60, height: 60)
-//                                    .foregroundColor(.gray)
-//                                    .background(.white)
-//                                    .cornerRadius(50)
-//                                    .padding()
-//                            }
-//                        }
-//                        Spacer()
-//                    }
-//                }
-//            }
-//        )
         .padding(25)
         }
         .onAppear {
             // ビューが表示された際にパラメータを設定
             print("monster  :\(monster)")
             setMonsterParameters(monster: monster)
-            if monster < 8 {
+            switch viewModel.userPosition {
+                case 1...52:
+                    quizTitle = "ITパスポート"
+                case 53...101:
+                    quizTitle = "基本情報技術者試験"
+                case 102...150:
+                    quizTitle = "応用情報技術者試験"
+            default:
                 quizTitle = "ITパスポート"
-            } else if monster == 15 {
-                quizTitle = "ITパスポート"
-            } else {
-                quizTitle = "基本情報技術者試験"
             }
         }
             }
@@ -247,5 +200,5 @@ struct StoryMonsterModalView: View {
 }
 
 #Preview {
-    StoryMonsterModalView(monster: .constant(1), isPresented: .constant(true), showQuizList: .constant(false), audioManager: AudioManager())
+    StoryMonsterModalView(monster: .constant(1), isPresented: .constant(true), showQuizList: .constant(false), audioManager: AudioManager(), viewModel: PositionViewModel.shared)
 }

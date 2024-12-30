@@ -9,46 +9,6 @@ import SwiftUI
 import AVFoundation
 import Firebase
 
-//struct IncorrectAnswer {
-//var userId: String
-//var quizQuestion: String
-//var choices: [String]
-//var correctAnswerIndex: Int
-//var explanation: String
-//}
-//
-//struct ViewPositionKey1: PreferenceKey {
-//static var defaultValue: [CGRect] = []
-//static func reduce(value: inout [CGRect], nextValue: () -> [CGRect]) {
-//    value.append(contentsOf: nextValue())
-//}
-//}
-//
-//struct ViewPositionKey2: PreferenceKey {
-//static var defaultValue: [CGRect] = []
-//static func reduce(value: inout [CGRect], nextValue: () -> [CGRect]) {
-//    value.append(contentsOf: nextValue())
-//}
-//}
-//
-//struct ViewPositionKey3: PreferenceKey {
-//static var defaultValue: [CGRect] = []
-//static func reduce(value: inout [CGRect], nextValue: () -> [CGRect]) {
-//    value.append(contentsOf: nextValue())
-//}
-//}
-//
-//struct TimerArc: Shape {
-//    var startAngle: Angle
-//    var endAngle: Angle
-//
-//    func path(in rect: CGRect) -> Path {
-//        var path = Path()
-//        path.addArc(center: CGPoint(x: rect.midX, y: rect.midY), radius: rect.width / 2, startAngle: startAngle, endAngle: endAngle, clockwise: false)
-//        return path
-//    }
-//}
-
 struct Monster: Codable {
     let name: String
     let playerExperience: Int
@@ -74,8 +34,10 @@ let monsters: [String: Monster] = [
     "モンスター12": Monster(name: "モンスター12", playerExperience: 55, playerMoney: 55, monsterHP: 190, monsterUnderHP: 190, monsterAttack: 35),
     "モンスター13": Monster(name: "モンスター13", playerExperience: 60, playerMoney: 60, monsterHP: 200, monsterUnderHP: 200, monsterAttack: 38),
     "モンスター14": Monster(name: "モンスター14", playerExperience: 65, playerMoney: 65, monsterHP: 210, monsterUnderHP: 210, monsterAttack: 40),
-    "ボス15": Monster(name: "ボス15", playerExperience: 120, playerMoney: 150, monsterHP: 300, monsterUnderHP: 300, monsterAttack: 65),
-    "ボス16": Monster(name: "ボス16", playerExperience: 200, playerMoney: 300, monsterHP: 500, monsterUnderHP: 500, monsterAttack: 200),
+//    "ボス15": Monster(name: "ボス15", playerExperience: 120, playerMoney: 150, monsterHP: 300, monsterUnderHP: 300, monsterAttack: 65),
+//    "ボス16": Monster(name: "ボス16", playerExperience: 200, playerMoney: 300, monsterHP: 500, monsterUnderHP: 500, monsterAttack: 200),
+    "ボス15": Monster(name: "ボス15", playerExperience: 150, playerMoney: 150, monsterHP: 1000, monsterUnderHP: 1000, monsterAttack: 100),
+    "ボス16": Monster(name: "ボス16", playerExperience: 300, playerMoney: 300, monsterHP: 3000, monsterUnderHP: 3000, monsterAttack: 300),
     "モンスター17": Monster(name: "モンスター17", playerExperience: 80, playerMoney: 80, monsterHP: 240, monsterUnderHP: 240, monsterAttack: 48),
     "モンスター18": Monster(name: "モンスター18", playerExperience: 85, playerMoney: 85, monsterHP: 250, monsterUnderHP: 250, monsterAttack: 50),
     "モンスター19": Monster(name: "モンスター19", playerExperience: 90, playerMoney: 90, monsterHP: 260, monsterUnderHP: 260, monsterAttack: 52),
@@ -91,7 +53,29 @@ let monsters: [String: Monster] = [
     "モンスター29": Monster(name: "モンスター29", playerExperience: 140, playerMoney: 140, monsterHP: 360, monsterUnderHP: 360, monsterAttack: 78),
     "モンスター30": Monster(name: "モンスター30", playerExperience: 145, playerMoney: 145, monsterHP: 370, monsterUnderHP: 370, monsterAttack: 80),
     "モンスター31": Monster(name: "モンスター31", playerExperience: 150, playerMoney: 150, monsterHP: 380, monsterUnderHP: 380, monsterAttack: 82),
-    "モンスター32": Monster(name: "モンスター32", playerExperience: 155, playerMoney: 155, monsterHP: 390, monsterUnderHP: 390, monsterAttack: 85)
+    "モンスター32": Monster(name: "モンスター32", playerExperience: 155, playerMoney: 155, monsterHP: 390, monsterUnderHP: 390, monsterAttack: 85),
+    "モンスター33": Monster(name: "モンスター33", playerExperience: 160, playerMoney: 160, monsterHP: 400, monsterUnderHP: 400, monsterAttack: 88),
+    "モンスター34": Monster(name: "モンスター34", playerExperience: 170, playerMoney: 165, monsterHP: 420, monsterUnderHP: 420, monsterAttack: 92),
+    "ボス35": Monster(name: "ボス35", playerExperience: 1000, playerMoney: 1000, monsterHP: 5000, monsterUnderHP: 5000, monsterAttack: 500),
+    "モンスター36": Monster(name: "モンスター36", playerExperience: 190, playerMoney: 185, monsterHP: 460, monsterUnderHP: 460, monsterAttack: 100),
+    "モンスター37": Monster(name: "モンスター37", playerExperience: 200, playerMoney: 190, monsterHP: 480, monsterUnderHP: 480, monsterAttack: 105),
+    "モンスター38": Monster(name: "モンスター38", playerExperience: 200, playerMoney: 200, monsterHP: 500, monsterUnderHP: 500, monsterAttack: 110),
+    "モンスター39": Monster(name: "モンスター39", playerExperience: 210, playerMoney: 210, monsterHP: 510, monsterUnderHP: 510, monsterAttack: 120),
+    "モンスター40": Monster(name: "モンスター40", playerExperience: 220, playerMoney: 220, monsterHP: 520, monsterUnderHP: 520, monsterAttack: 130),
+    "モンスター41": Monster(name: "モンスター41", playerExperience: 230, playerMoney: 230, monsterHP: 530, monsterUnderHP: 530, monsterAttack: 150),
+    "モンスター42": Monster(name: "モンスター42", playerExperience: 240, playerMoney: 240, monsterHP: 550, monsterUnderHP: 550, monsterAttack: 170),
+    "モンスター43": Monster(name: "モンスター43", playerExperience: 250, playerMoney: 250, monsterHP: 570, monsterUnderHP: 570, monsterAttack: 190),
+    "モンスター44": Monster(name: "モンスター44", playerExperience: 260, playerMoney: 270, monsterHP: 600, monsterUnderHP: 600, monsterAttack: 210),
+    
+    "モンスター45": Monster(name: "モンスター45", playerExperience: 280, playerMoney: 280, monsterHP: 630, monsterUnderHP: 630, monsterAttack: 230),
+    "モンスター46": Monster(name: "モンスター46", playerExperience: 310, playerMoney: 310, monsterHP: 660, monsterUnderHP: 660, monsterAttack: 250),
+    "モンスター47": Monster(name: "モンスター47", playerExperience: 340, playerMoney: 340, monsterHP: 690, monsterUnderHP: 690, monsterAttack: 270),
+    "モンスター48": Monster(name: "モンスター48", playerExperience: 370, playerMoney: 370, monsterHP: 720, monsterUnderHP: 720, monsterAttack: 290),
+    "モンスター49": Monster(name: "モンスター49", playerExperience: 400, playerMoney: 400, monsterHP: 750, monsterUnderHP: 550, monsterAttack: 310),
+    "モンスター50": Monster(name: "モンスター50", playerExperience: 430, playerMoney: 430, monsterHP: 800, monsterUnderHP: 800, monsterAttack: 350),
+    "モンスター51": Monster(name: "モンスター51", playerExperience: 460, playerMoney: 460, monsterHP: 850, monsterUnderHP: 850, monsterAttack: 400),
+    
+    "モンスター52": Monster(name: "モンスター52", playerExperience: 500, playerMoney: 500, monsterHP: 900, monsterUnderHP: 900, monsterAttack: 500),
 ]
 
 struct StoryQuizView: View {
@@ -266,6 +250,7 @@ struct StoryQuizView: View {
             RateManager.shared.updateQuizData(userId: authManager.currentUserId!, quizType: quizLevel, newCorrectAnswers: correctAnswerCount, newTotalAnswers: answerCount)
             RateManager.shared.updateAnswerData(userId: authManager.currentUserId!, quizType: quizLevel,  newTotalAnswers: answerCount)
             navigateToQuizResultView = true //ここで結果画面への遷移フラグをtrueに
+            print("moveToNextQuiz")
         } else if playerHP <= 0 {
             showCompletionMessage = true
             timer?.invalidate()
@@ -705,7 +690,10 @@ struct StoryQuizView: View {
                            .bold()
                    }
                }
-            NavigationLink("", destination: StoryQuizResultView(results: quizResults, authManager: authManager, isPresenting: $isPresenting, navigateToQuizResultView: $navigateToQuizResultView, playerExperience: playerExperience, playerMoney: playerMoney, elapsedTime: 0, quizLevel: quizLevel,victoryFlag:$victoryFlag, viewModel: viewModel).navigationBarBackButtonHidden(true), isActive: $navigateToQuizResultView)
+            NavigationLink("", destination: StoryQuizResultView(results: quizResults, authManager: authManager, isPresenting: $isPresenting, navigateToQuizResultView: $navigateToQuizResultView, playerExperience: playerExperience, playerMoney: playerMoney, elapsedTime: 0, quizLevel: quizLevel,victoryFlag:$victoryFlag, isUserStoryFlag: .constant(false), viewModel: viewModel).navigationBarBackButtonHidden(true), isActive: $navigateToQuizResultView)
+                .onAppear{
+                    print("isPresenting     :\(isPresenting)")
+                }
     }
         .onTapGesture {
 //                audioManager.playSound()
@@ -734,6 +722,7 @@ struct StoryQuizView: View {
             navigateToQuizResultView = true
         }
         .onAppear {
+            print("backgroundName quiz      :\(backgroundName)")
             if let monster = monsters[monsterName] {
                 playerExperience = monster.playerExperience
                 playerMoney = monster.playerMoney
