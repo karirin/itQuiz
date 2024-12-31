@@ -485,28 +485,12 @@ struct StoryUserQuizView: View {
                         }
                     }
                     if quizLevel != .incorrectAnswer && quizLevel != .incorrectITAnswer && quizLevel != .incorrectInfoAnswer && quizLevel != .incorrectAppliedAnswer {
-                        
-                        VStack{
-                            HStack{
-                                ProgressBar3(value: Double(monsterHP), maxValue: Double(monsterUnderHP), color: Color("hpMonsterColor"))
-                                    .frame(height: 20)
-                                Text("\(monsterHP)/\(monsterUnderHP)")
-                                    .padding(.horizontal,10)
-                                    .padding(.vertical, 3)
-                                    .foregroundColor(Color(.white))
-                                    .background(Color.black.opacity(0.5))
-                                    .cornerRadius(30)
-                            }
-                            .padding(.horizontal)
-                            ZStack{
-                                // 味方キャラのHP
+                        ZStack{
+                            VStack{
                                 HStack{
-                                    Image(avator.isEmpty ? "defaultIcon" : (avator.first?["name"] as? String) ?? "")
-                                        .resizable()
-                                        .frame(width: 30,height:30)
-                                    ProgressBar3(value: Double(playerHP), maxValue: Double(self.userMaxHp), color: Color("hpUserColor"))
+                                    ProgressBar3(value: Double(monsterHP), maxValue: Double(monsterUnderHP), color: Color("hpMonsterColor"))
                                         .frame(height: 20)
-                                    Text("\(playerHP)/\(self.userMaxHp)")
+                                    Text("\(monsterHP)/\(monsterUnderHP)")
                                         .padding(.horizontal,10)
                                         .padding(.vertical, 3)
                                         .foregroundColor(Color(.white))
@@ -514,16 +498,31 @@ struct StoryUserQuizView: View {
                                         .cornerRadius(30)
                                 }
                                 .padding(.horizontal)
-                                // 味方がダメージをくらう
-                                if let selected = selectedAnswerIndex, selected != currentQuiz.correctAnswerIndex {
-                                    if showAttackImage{
-                                        //                                    Image("\(quizLevel)MonsterAttack\(monsterType)")
-                                        Image("beginnerMonsterAttack\(monsterType)")
+                                    HStack{
+                                        Image(avator.isEmpty ? "defaultIcon" : (avator.first?["name"] as? String) ?? "")
                                             .resizable()
-                                            .scaledToFit()
-                                            .frame(height:90)
-                                            .padding(.bottom, -30)
+                                            .frame(width: 30,height:30)
+                                        ProgressBar3(value: Double(playerHP), maxValue: Double(self.userMaxHp), color: Color("hpUserColor"))
+                                            .frame(height: 20)
+                                        Text("\(playerHP)/\(self.userMaxHp)")
+                                            .padding(.horizontal,10)
+                                            .padding(.vertical, 3)
+                                            .foregroundColor(Color(.white))
+                                            .background(Color.black.opacity(0.5))
+                                            .cornerRadius(30)
                                     }
+                                    .padding(.horizontal)
+                                }
+                            
+                            // 味方がダメージをくらう
+                            if let selected = selectedAnswerIndex, selected != currentQuiz.correctAnswerIndex {
+                                if showAttackImage{
+                                    //                                    Image("\(quizLevel)MonsterAttack\(monsterType)")
+                                    Image("beginnerMonsterAttack\(monsterType)")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(height:90)
+                                        .padding(.bottom, -30)
                                 }
                             }
                         }

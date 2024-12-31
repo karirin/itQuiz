@@ -555,6 +555,7 @@ struct StoryQuizView: View {
                                 .frame(height:80)
                           }
                     }
+                    
                     if quizLevel != .incorrectAnswer && quizLevel != .incorrectITAnswer && quizLevel != .incorrectInfoAnswer && quizLevel != .incorrectAppliedAnswer {
                         
                         ZStack{

@@ -491,6 +491,9 @@ struct QuizView: View {
     var body: some View {
         NavigationView{
             ZStack{
+                Image("\(monsterBackground)")
+                     .resizable()
+                     .edgesIgnoringSafeArea(.all)
                 VStack {
                     HStack{
                         Button(action: {
@@ -526,7 +529,11 @@ struct QuizView: View {
                                     .padding(.horizontal)
                                     .foregroundColor(Color("fontGray"))
                                 
-                            }.background(GeometryReader { geometry in
+                            }
+                            .frame(maxWidth: .infinity)
+                            .background(Color("Color2"))
+                            .padding(.vertical, 5)
+                            .background(GeometryReader { geometry in
                                 Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
                             })//
                             
@@ -548,49 +555,46 @@ struct QuizView: View {
                             }
                         }
                         ZStack{
-                            Image("\(monsterBackground)")
-                                .resizable()
-                                .frame(height:100)
-                                .opacity(1)
-                            VStack() {
-                                //                            Spacer()
-                                ZStack{
-                                    ZStack{
                                         Image("\(quizLevel)Monster\(monsterType)")
                                             .resizable()
-                                            .frame(width:80,height:80)
+                                            .scaledToFit()
+                                            .frame(width: isSmallDevice() ? 100 : 160)
+                            
+                        
+                        // 問題に正解して敵キャラにダメージ
+                        if let selected = selectedAnswerIndex {
+                            if selected == currentQuiz.correctAnswerIndex {
+                                if showAttackImage {
+                                    Image("attack1")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(height:isSmallDevice() ? 80 : 130)
+                                }
+                            }
+                        }
                                         // 敵キャラを倒した
                                         if showMonsterDownImage && monsterHP <= 0 {
                                             Image("倒す")
                                                 .resizable()
-                                                .frame(width:100,height:100)
+                                                .scaledToFit()
+                                                .frame(height:80)
                                         }
-                                    }
-                                    
-                                    // 問題に正解して敵キャラにダメージ
-                                    if let selected = selectedAnswerIndex {
-                                        if selected == currentQuiz.correctAnswerIndex {
-                                            if showAttackImage {
-                                                Image("attack1")
-                                                    .resizable()
-                                                    .frame(width:80,height:80)
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                                
                         }
                         if quizLevel != .incorrectAnswer && quizLevel != .incorrectITAnswer && quizLevel != .incorrectInfoAnswer && quizLevel != .incorrectAppliedAnswer && quizLevel != .incorrectESAnswer && quizLevel != .incorrectITStrategyAnswer {
-                            
-                            VStack{
-                                HStack{
-                                    ProgressBar3(value: Double(monsterHP), maxValue: Double(monsterUnderHP), color: Color("hpMonsterColor"))
-                                        .frame(height: 20)
-                                    Text("\(monsterHP)/\(monsterUnderHP)")
-                                        .foregroundColor(Color("fontGray"))
-                                }
-                                .padding(.horizontal)
-                                ZStack{
+                            ZStack{
+                                VStack{
+                                    HStack{
+                                        ProgressBar3(value: Double(monsterHP), maxValue: Double(monsterUnderHP), color: Color("hpMonsterColor"))
+                                            .frame(height: 20)
+                                        Text("\(monsterHP)/\(monsterUnderHP)")
+                                            .padding(.horizontal,10)
+                                            .padding(.vertical, 3)
+                                            .foregroundColor(Color(.white))
+                                            .background(Color.black.opacity(0.5))
+                                            .cornerRadius(30)
+                                    }
+                                    .padding(.horizontal)
                                     // 味方キャラのHP
                                     HStack{
                                         Image(avator.isEmpty ? "defaultIcon" : (avator.first?["name"] as? String) ?? "")
@@ -599,17 +603,24 @@ struct QuizView: View {
                                         ProgressBar3(value: Double(playerHP), maxValue: Double(self.userMaxHp), color: Color("hpUserColor"))
                                             .frame(height: 20)
                                         Text("\(playerHP)/\(self.userMaxHp)")
-                                            .foregroundColor(Color("fontGray"))
+                                            .padding(.horizontal,10)
+                                            .padding(.vertical, 3)
+                                            .foregroundColor(Color(.white))
+                                            .background(Color.black.opacity(0.5))
+                                            .cornerRadius(30)
                                     }
                                     .padding(.horizontal)
+                                }
                                     // 味方がダメージをくらう
                                     if let selected = selectedAnswerIndex, selected != currentQuiz.correctAnswerIndex {
                                         if showAttackImage{
                                             //                                    Image("\(quizLevel)MonsterAttack\(monsterType)")
                                             Image("beginnerMonsterAttack\(monsterType)")
                                                 .resizable()
-                                                .frame(width:30,height:30)
-                                        }
+                                                .scaledToFit()
+                                                .frame(height:90)
+         
+                                                .padding(.bottom, -30)
                                     }
                                 }
                             }
@@ -665,7 +676,7 @@ struct QuizView: View {
                     .sheet(isPresented: $showModal) {
                         ExperienceModalView(showModal: $showModal, addedExperience: 10, addedMoney: 10, authManager: authManager)
                     }
-                }.background(showIncorrectBackground ? Color("superLightRed") : Color("Color2"))
+                }.background(showIncorrectBackground ? Color(.red).opacity(0.1) : Color(.white).opacity(0))
                     .onPreferenceChange(ViewPositionKey.self) { positions in
                         self.buttonRect = positions.first ?? .zero
                     }
@@ -1001,6 +1012,7 @@ struct QuizView: View {
                     }
                 }
             }
+            .fontWeight(.bold)
             .onTapGesture {
                 //                audioManager.playSound()
                 if showCountdown == false {
