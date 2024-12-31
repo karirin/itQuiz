@@ -311,7 +311,6 @@ struct StoryQuizResultView: View {
                       }
                 }
                 .onDisappear {
-                    print("onDisappear")
                     if victoryFlag {
                         if isUserStoryFlag {
                             viewModel.incrementUserPosition()

@@ -497,9 +497,10 @@ struct QuizView: View {
                             showHomeModal.toggle()
                             audioManager.playSound()
                         }) {
-                            Image(systemName: "gearshape.fill")
+                            Image("設定")
                                 .resizable()
-                                .frame(width: 40, height: 40)
+                                .scaledToFit()
+                                .frame(height: 50)
                         }
                         .padding(.leading)
                         .foregroundColor(.gray)

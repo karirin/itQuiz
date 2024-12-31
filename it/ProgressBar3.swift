@@ -21,7 +21,11 @@ struct ProgressBar3: View {
                 Rectangle()
                     .frame(width: geometry.size.width * CGFloat(value / maxValue))
                     .foregroundColor(color)
-            }
+            }            
+            .overlay(
+                RoundedRectangle(cornerRadius: 8.0)
+                    .stroke(Color.black, lineWidth: 1) // 枠線の色と幅を指定
+            )
         }
         .cornerRadius(8.0)
     }

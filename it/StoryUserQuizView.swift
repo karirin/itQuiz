@@ -182,7 +182,8 @@ struct StoryUserQuizView: View {
             playerExperience = 5
             playerMoney = 5
             navigateToQuizResultView = true  //ここで結果画面への遷移フラグをtrueに
-            
+            RateManager.shared.updateQuizData(userId: authManager.currentUserId!, quizType: quizLevel, newCorrectAnswers: correctAnswerCount, newTotalAnswers: answerCount)
+            RateManager.shared.updateAnswerData(userId: authManager.currentUserId!, quizType: quizLevel, newTotalAnswers: answerCount)
         } else if self.remainingSeconds == 0 {
             currentQuizIndex += 1
            selectedAnswerIndex = nil
@@ -390,25 +391,23 @@ struct StoryUserQuizView: View {
     var body: some View {
         NavigationView{
         ZStack{
+            Image("\(backgroundName)")
+                 .resizable()
+                 .edgesIgnoringSafeArea(.all)
             VStack {
                 HStack{
                     Button(action: {
                         showHomeModal.toggle()
                         audioManager.playSound()
                     }) {
-                        Image(systemName: "gearshape.fill")
+                        Image("設定")
                             .resizable()
-                            .frame(width: 40, height: 40)
+                            .scaledToFit()
+                            .frame(height: 50)
                     }
                     .padding(.leading)
                     .foregroundColor(.gray)
                     Spacer()
-                    if let selected = selectedAnswerIndex, selected != currentQuiz.correctAnswerIndex {
-                        Text("正解")
-                            .foregroundColor(Color("fontGray"))
-                        Text("\(currentQuiz.choices[currentQuiz.correctAnswerIndex])")
-                            .foregroundColor(Color("fontGray"))
-                    }
                     Spacer()
                     // 正解の場合の赤い円
                     if let selected = selectedAnswerIndex, selected == currentQuiz.correctAnswerIndex {
@@ -419,7 +418,6 @@ struct StoryUserQuizView: View {
                         })
                 }
                 .padding(.trailing)
-//                    .padding(.top,40)
                 Spacer()
                 VStack{
                     ZStack {
@@ -430,7 +428,11 @@ struct StoryUserQuizView: View {
                                 .padding(.horizontal)
                                 .foregroundColor(Color("fontGray"))
                             
-                        }.background(GeometryReader { geometry in
+                        }
+                        .frame(maxWidth: .infinity)
+                        .background(Color("Color2"))
+                        .padding(.vertical, 5)
+                        .background(GeometryReader { geometry in
                             Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
                         })//
                         
@@ -452,21 +454,19 @@ struct StoryUserQuizView: View {
                         }
                     }
                     ZStack{
-                        Image("\(backgroundName)")
-                            .resizable()
-                            .frame(height:100)
-                            .opacity(1)
                         VStack() {
                             ZStack{
                                 ZStack{
                                     Image("\(user.avatars.first?["name"] as? String ?? "")")
                                         .resizable()
-                                        .frame(width:80,height:80)
+                                        .scaledToFill()
+                                        .frame(width: isSmallDevice() ? 100 : 160)
                                     // 敵キャラを倒した
                                     if showMonsterDownImage && monsterHP <= 0 {
                                         Image("倒す")
                                             .resizable()
-                                            .frame(width:100,height:100)
+                                            .scaledToFit()
+                                            .frame(height:80)
                                     }
                                 }
                                 
@@ -476,7 +476,8 @@ struct StoryUserQuizView: View {
                                         if showAttackImage {
                                             Image("attack1")
                                                 .resizable()
-                                                .frame(width:80,height:80)
+                                                .scaledToFit()
+                                                .frame(height:isSmallDevice() ? 80 : 130)
                                         }
                                     }
                                 }
@@ -490,7 +491,11 @@ struct StoryUserQuizView: View {
                                 ProgressBar3(value: Double(monsterHP), maxValue: Double(monsterUnderHP), color: Color("hpMonsterColor"))
                                     .frame(height: 20)
                                 Text("\(monsterHP)/\(monsterUnderHP)")
-                                    .foregroundColor(Color("fontGray"))
+                                    .padding(.horizontal,10)
+                                    .padding(.vertical, 3)
+                                    .foregroundColor(Color(.white))
+                                    .background(Color.black.opacity(0.5))
+                                    .cornerRadius(30)
                             }
                             .padding(.horizontal)
                             ZStack{
@@ -502,7 +507,11 @@ struct StoryUserQuizView: View {
                                     ProgressBar3(value: Double(playerHP), maxValue: Double(self.userMaxHp), color: Color("hpUserColor"))
                                         .frame(height: 20)
                                     Text("\(playerHP)/\(self.userMaxHp)")
-                                        .foregroundColor(Color("fontGray"))
+                                        .padding(.horizontal,10)
+                                        .padding(.vertical, 3)
+                                        .foregroundColor(Color(.white))
+                                        .background(Color.black.opacity(0.5))
+                                        .cornerRadius(30)
                                 }
                                 .padding(.horizontal)
                                 // 味方がダメージをくらう
@@ -511,7 +520,9 @@ struct StoryUserQuizView: View {
                                         //                                    Image("\(quizLevel)MonsterAttack\(monsterType)")
                                         Image("beginnerMonsterAttack\(monsterType)")
                                             .resizable()
-                                            .frame(width:30,height:30)
+                                            .scaledToFit()
+                                            .frame(height:90)
+                                            .padding(.bottom, -30)
                                     }
                                 }
                             }
@@ -543,7 +554,6 @@ struct StoryUserQuizView: View {
         .onAppear{
             
             showTutorial = true
-//                print("AnswerSelectionView currentQuiz.choices:\(currentQuiz.choices)")
         }
                         .frame(maxWidth: .infinity)
                         .shadow(radius: 1)
@@ -572,7 +582,8 @@ struct StoryUserQuizView: View {
                     .sheet(isPresented: $showModal) {
                         ExperienceModalView(showModal: $showModal, addedExperience: 10, addedMoney: 10, authManager: authManager)
                     }
-            }.background(showIncorrectBackground ? Color("superLightRed") : Color("Color2"))
+            }
+//            .background(showIncorrectBackground ? Color("superLightRed") : Color("Color2"))
             .onPreferenceChange(ViewPositionKey.self) { positions in
                 self.buttonRect = positions.first ?? .zero
             }
@@ -630,7 +641,7 @@ struct StoryUserQuizView: View {
                    }
                }
     }
-        
+        .fontWeight(.bold)
         .onTapGesture {
 //                audioManager.playSound()
             if showCountdown == false {
@@ -839,7 +850,18 @@ struct StoryUserQuizView: View {
 
 }
 }
-
-#Preview {
-    StoryView(isReturnActive: .constant(false), isPresented: .constant(false))
+struct StoryUserQuizView_Previews: PreviewProvider {
+    static var previews: some View {
+        @State var selectedUser = User(id: "1", userName: "SampleUser", level: 1, experience: 100, avatars: [
+            [
+                "name": "ネッキー",
+                "attack": 10,
+                "health": 20,
+                "usedFlag": 1,
+                "count": 1
+            ]
+        ], userMoney: 1000, userHp: 100, userAttack: 20, userFlag: 0, adminFlag: 0, rankMatchPoint: 100, rank: 1)
+        
+        StoryUserQuizListView(isPresenting: .constant(false), viewModel: PositionViewModel.shared, user: selectedUser, backgroundName: "ダンジョン背景1")
+    }
 }

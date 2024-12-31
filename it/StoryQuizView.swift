@@ -466,15 +466,20 @@ struct StoryQuizView: View {
     var body: some View {
         NavigationView{
         ZStack{
+            
+            Image("\(backgroundName)")
+                 .resizable()
+                 .edgesIgnoringSafeArea(.all)
             VStack {
                 HStack{
                     Button(action: {
                         showHomeModal.toggle()
                         audioManager.playSound()
                     }) {
-                        Image(systemName: "gearshape.fill")
+                        Image("設定")
                             .resizable()
-                            .frame(width: 40, height: 40)
+                            .scaledToFit()
+                            .frame(height: 50)
                     }
                     .padding(.leading)
                     .foregroundColor(.gray)
@@ -500,7 +505,11 @@ struct StoryQuizView: View {
                                 .padding(.horizontal)
                                 .foregroundColor(Color("fontGray"))
                             
-                        }.background(GeometryReader { geometry in
+                        }
+                        .frame(maxWidth: .infinity)
+                        .background(Color("Color2"))
+                        .padding(.vertical, 5)
+                        .background(GeometryReader { geometry in
                             Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
                         })//
                         
@@ -522,52 +531,45 @@ struct StoryQuizView: View {
                         }
                     }
                     ZStack{
-                        Image("\(backgroundName)")
-                            .resizable()
-                            .frame(height:100)
-                            .opacity(1)
-                        VStack() {
-                            //                            Spacer()
-                            ZStack{
-                                ZStack{
-//                                    Image("\(quizLevel)Monster\(monsterType)")
-                                    Image("\(monsterName)")
-                                        .resizable()
-                                        .scaledToFit()
-//                                        .frame(width:80,height:80)
-                                        .frame(width: monsterName == "ボス1" ? 100 : 80)
-                                    // 敵キャラを倒した
-                                    if showMonsterDownImage && monsterHP <= 0 {
-                                        Image("倒す")
+                                Image("\(monsterName)")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: isSmallDevice() ? 100 : 160)
+                            
+                            // 問題に正解して敵キャラにダメージ
+                            if let selected = selectedAnswerIndex {
+                                if selected == currentQuiz.correctAnswerIndex {
+                                    if showAttackImage {
+                                        Image("attack1")
                                             .resizable()
-                                            .frame(width:100,height:100)
-                                    }
-                                }
-                                
-                                // 問題に正解して敵キャラにダメージ
-                                if let selected = selectedAnswerIndex {
-                                    if selected == currentQuiz.correctAnswerIndex {
-                                        if showAttackImage {
-                                            Image("attack1")
-                                                .resizable()
-                                                .frame(width:80,height:80)
-                                        }
+                                            .scaledToFit()
+                                            .frame(height:isSmallDevice() ? 80 : 130)
                                     }
                                 }
                             }
-                        }
+                        
+                          if showMonsterDownImage && monsterHP <= 0 {
+                            Image("倒す")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(height:80)
+                          }
                     }
                     if quizLevel != .incorrectAnswer && quizLevel != .incorrectITAnswer && quizLevel != .incorrectInfoAnswer && quizLevel != .incorrectAppliedAnswer {
                         
-                        VStack{
-                            HStack{
-                                ProgressBar3(value: Double(monsterHP), maxValue: Double(monsterUnderHP), color: Color("hpMonsterColor"))
-                                    .frame(height: 20)
-                                Text("\(monsterHP)/\(monsterUnderHP)")
-                                    .foregroundColor(Color("fontGray"))
-                            }
-                            .padding(.horizontal)
-                            ZStack{
+                        ZStack{
+                            VStack{
+                                HStack{
+                                    ProgressBar3(value: Double(monsterHP), maxValue: Double(monsterUnderHP), color: Color("hpMonsterColor"))
+                                        .frame(height: 20)
+                                    Text("\(monsterHP)/\(monsterUnderHP)")
+                                        .padding(.horizontal,10)
+                                        .padding(.vertical, 3)
+                                        .foregroundColor(Color(.white))
+                                        .background(Color.black.opacity(0.5))
+                                        .cornerRadius(30)
+                                }
+                                .padding(.horizontal)
                                 // 味方キャラのHP
                                 HStack{
                                     Image(avator.isEmpty ? "defaultIcon" : (avator.first?["name"] as? String) ?? "")
@@ -576,17 +578,22 @@ struct StoryQuizView: View {
                                     ProgressBar3(value: Double(playerHP), maxValue: Double(self.userMaxHp), color: Color("hpUserColor"))
                                         .frame(height: 20)
                                     Text("\(playerHP)/\(self.userMaxHp)")
-                                        .foregroundColor(Color("fontGray"))
+                                        .padding(.horizontal,10)
+                                        .padding(.vertical, 3)
+                                        .foregroundColor(Color(.white))
+                                        .background(Color.black.opacity(0.5))
+                                        .cornerRadius(30)
                                 }
                                 .padding(.horizontal)
-                                // 味方がダメージをくらう
-                                if let selected = selectedAnswerIndex, selected != currentQuiz.correctAnswerIndex {
-                                    if showAttackImage{
-                                        //                                    Image("\(quizLevel)MonsterAttack\(monsterType)")
-                                        Image("beginnerMonsterAttack\(monsterType)")
-                                            .resizable()
-                                            .frame(width:30,height:30)
-                                    }
+                            }
+                            
+                            if let selected = selectedAnswerIndex, selected != currentQuiz.correctAnswerIndex {
+                                if showAttackImage{
+                                    Image("beginnerMonsterAttack\(monsterType)")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(height:90)
+                                        .padding(.bottom, -30)
                                 }
                             }
                         }
@@ -633,7 +640,8 @@ struct StoryQuizView: View {
                     .sheet(isPresented: $showModal) {
                         ExperienceModalView(showModal: $showModal, addedExperience: 10, addedMoney: 10, authManager: authManager)
                     }
-            }.background(showIncorrectBackground ? Color("superLightRed") : Color("Color2"))
+            }
+            .background(showIncorrectBackground ? Color(.red).opacity(0.1) : Color(.white).opacity(0))
             .onPreferenceChange(ViewPositionKey.self) { positions in
                 self.buttonRect = positions.first ?? .zero
             }
@@ -695,6 +703,7 @@ struct StoryQuizView: View {
                     print("isPresenting     :\(isPresenting)")
                 }
     }
+        .fontWeight(.bold)
         .onTapGesture {
 //                audioManager.playSound()
             if showCountdown == false {
@@ -844,48 +853,45 @@ struct StoryQuizView: View {
         .onChange(of: showCompletionMessage) { newValue in
             // 味方のHPが０以下のとき
             if newValue && playerHP <= 0 {
-//                victoryFlag = false
-//                authManager.addRankMatchPoints(for: user.id, points: 10, onSuccess: {
-//                    print("@@@@@@@@@@@@@@@@@@@@@@@1")
-//                }, onFailure: { error in
-//                })
-//                authManager.subtractRankMatchPoints(for: authManager.currentUserId!, points: 10, onSuccess: {
-//                    print("@@@@@@@@@@@@@@@@@@@@@@@2")
-//                    }, onFailure: { error in
-//                    })
-//                DispatchQueue.global(qos: .background).async {
-//                    authManager.addExperience(points: 5, onSuccess: {
-//                        // 成功した時の処理をここに書きます
-//                    }, onFailure: { error in
-//                        // 失敗した時の処理をここに書きます。`error`は失敗の原因を示す情報が含まれている可能性があります。
-//                    })
-//                    authManager.addMoney(amount: 5)
-//
-//                    DispatchQueue.main.async {
-//                    }
-//                }
+                victoryFlag = false
+                authManager.addRankMatchPoints(for: authManager.currentUserId!, points: 10, onSuccess: {
+                    print("@@@@@@@@@@@@@@@@@@@@@@@1")
+                }, onFailure: { error in
+                })
+                authManager.subtractRankMatchPoints(for: authManager.currentUserId!, points: 10, onSuccess: {
+                    print("@@@@@@@@@@@@@@@@@@@@@@@2")
+                    }, onFailure: { error in
+                    })
+                DispatchQueue.global(qos: .background).async {
+                    authManager.addExperience(points: 5, onSuccess: {
+                        // 成功した時の処理をここに書きます
+                    }, onFailure: { error in
+                        // 失敗した時の処理をここに書きます。`error`は失敗の原因を示す情報が含まれている可能性があります。
+                    })
+                    authManager.addMoney(amount: 5)
+
+                    DispatchQueue.main.async {
+                    }
+                }
             } else {
                 victoryFlag = true
                 DispatchQueue.global(qos: .background).async {
-//                    print("userId:\(user.id)")
-//                    authManager.addRankMatchPoints(for: authManager.currentUserId!, points: 10, onSuccess: {
-//                        print("@@@@@@@@@@@@@@@@@@@@@@@3")
-//                    }, onFailure: { error in
-//                       
-//                    })
-//                authManager.subtractRankMatchPoints(for: user.id, points: 10, onSuccess: {
-//                    print("@@@@@@@@@@@@@@@@@@@@@@@4")
-//                    }, onFailure: { error in
-//                    })
-//                    authManager.addExperience(points: playerExperience * authManager.rewardFlag, onSuccess: {
-////                            print("addExperience \(authManager.rewardFlag)")
-//                    }, onFailure: { error in
-//                        // 失敗した時の処理をここに書きます。`error`は失敗の原因を示す情報が含まれている可能性があります。
-//                    })
-//                    authManager.addMoney(amount: playerMoney * authManager.rewardFlag)
-//                    DispatchQueue.main.async {
-//                        // ここでUIの更新を行います。
-//                    }
+                    authManager.addRankMatchPoints(for: authManager.currentUserId!, points: 10, onSuccess: {
+                    }, onFailure: { error in
+                       
+                    })
+                authManager.subtractRankMatchPoints(for: authManager.currentUserId!, points: 10, onSuccess: {
+                    }, onFailure: { error in
+                    })
+                    authManager.addExperience(points: playerExperience * authManager.rewardFlag, onSuccess: {
+//                            print("addExperience \(authManager.rewardFlag)")
+                    }, onFailure: { error in
+                        // 失敗した時の処理をここに書きます。`error`は失敗の原因を示す情報が含まれている可能性があります。
+                    })
+                    authManager.addMoney(amount: playerMoney * authManager.rewardFlag)
+                    DispatchQueue.main.async {
+                        // ここでUIの更新を行います。
+                    }
                 }
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
@@ -909,8 +915,16 @@ struct StoryQuizView: View {
 //}
 struct StoryListView_Previews: PreviewProvider {
     static var previews: some View {
-        @State var selectedUser = User(id: "1", userName: "SampleUser", level: 1, experience: 100, avatars: [], userMoney: 1000, userHp: 100, userAttack: 20, userFlag: 0, adminFlag: 0, rankMatchPoint: 100, rank: 1)
+        @State var selectedUser = User(id: "1", userName: "SampleUser", level: 1, experience: 100, avatars: [
+            [
+                "name": "ネッキー",
+                "attack": 10,
+                "health": 20,
+                "usedFlag": 1,
+                "count": 1
+            ]
+        ], userMoney: 1000, userHp: 100, userAttack: 20, userFlag: 0, adminFlag: 0, rankMatchPoint: 100, rank: 1)
 
-        StoryITListView(isPresenting: .constant(false), monsterName: "モンスター2", backgroundName: "ダンジョン背景1", viewModel: PositionViewModel.shared)
+        StoryITListView(isPresenting: .constant(false), monsterName: "モンスター1", backgroundName: "ダンジョン背景1", viewModel: PositionViewModel.shared)
     }
 }

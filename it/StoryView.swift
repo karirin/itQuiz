@@ -975,9 +975,9 @@ struct StoryView: View {
         switch position {
         case 1...58:
             return "背景1ダンジョン"
-        case 59...108:
+        case 59...103:
             return "背景2ダンジョン"
-        case 109...150:
+        case 104...150:
             return "背景3ダンジョン"
         default:
             return "背景1ダンジョン"
@@ -1151,7 +1151,7 @@ struct PlatformsContainer: View {
                     padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
                     padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0),
                     paddingTreasure: EdgeInsets(top: -120, leading: 0, bottom: 0, trailing: 0),
-                    treasure: 26
+                    treasure: 30
                 ),
                 PlatformData(
                     imageName: self.platformImageName,
@@ -1330,8 +1330,7 @@ struct PlatformsContainer: View {
                     position: 122,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: 60, trailing: 0),
                     padding1: EdgeInsets(top: 0, leading: 0, bottom: 120, trailing: 0),
-                    paddingMonster: EdgeInsets(top: -150, leading: 0, bottom: 0, trailing: 0),
-                    monster: 42
+                    paddingMonster: EdgeInsets(top: -150, leading: 0, bottom: 0, trailing: 0)
                 ),
                 PlatformData(
                     imageName: self.platformImageName,
@@ -1445,8 +1444,7 @@ struct PlatformsContainer: View {
                     position: 105,
                     padding: EdgeInsets(top: 0, leading: 0, bottom: -60, trailing: 0),
                     padding1: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0),
-                    paddingMonster: EdgeInsets(top: 0, leading: 0, bottom: 30, trailing: 0),
-                    monster: 35
+                    paddingMonster: EdgeInsets(top: 0, leading: 0, bottom: 30, trailing: 0)
                 ),
                 PlatformData(
                     imageName: self.platformImageName,
@@ -2468,6 +2466,7 @@ struct PlatformView: View {
                                 audioManager.playTittleSound()
                                 viewModel.coin = treasure
                                 viewModel.showCoinAlert = true
+                                print("viewModel.coin   :\(viewModel.coin)")
                                 onArrowTap?()
                             }
                         } else {

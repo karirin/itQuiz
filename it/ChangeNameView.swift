@@ -11,8 +11,8 @@ import Firebase
 struct ChangeNameView: View {
     @Binding var isPresented: Bool
     @Binding var tutorialNum: Int
-//    @Binding var userName: String
-    @State private var userName: String = "test"
+//    @Binding var userName: Stringz
+    @State private var userName: String = ""
     @State private var showAlert = false
     @ObservedObject var authManager: AuthManager
     @Environment(\.presentationMode) var presentationMode

@@ -40,10 +40,21 @@ struct StoryCoinModalView: View {
         13: Treasure(coinImage: "コイン7", coinTitle: "800コインゲット！！", reward: 800),
         14: Treasure(coinImage: "コイン6", coinTitle: "600コインゲット！！", reward: 600),
         15: Treasure(coinImage: "コイン6", coinTitle: "600コインゲット！！", reward: 600),
-        16: Treasure(coinImage: "コイン7", coinTitle: "800コインゲット！！", reward: 800),
-        17: Treasure(coinImage: "コイン6", coinTitle: "600コインゲット！！", reward: 600),
-        18: Treasure(coinImage: "コイン7", coinTitle: "800コインゲット！！", reward: 800),
-        19: Treasure(coinImage: "コイン8", coinTitle: "800コインゲット！！", reward: 800),
+        16: Treasure(coinImage: "宝箱16", coinTitle: "1000コインゲット！！", reward: 1000),
+        17: Treasure(coinImage: "宝箱17", coinTitle: "1000コインゲット！！", reward: 1000),
+        18: Treasure(coinImage: "宝箱18", coinTitle: "1000コインゲット！！", reward: 1000),
+        19: Treasure(coinImage: "宝箱19", coinTitle: "1000コインゲット！！", reward: 1000),
+        20: Treasure(coinImage: "宝箱20", coinTitle: "1000コインゲット！！", reward: 1000),
+        21: Treasure(coinImage: "宝箱21", coinTitle: "1000コインゲット！！", reward: 1000),
+        22: Treasure(coinImage: "宝箱22", coinTitle: "1000コインゲット！！", reward: 1000),
+        23: Treasure(coinImage: "宝箱23", coinTitle: "1200コインゲット！！", reward: 1200),
+        24: Treasure(coinImage: "宝箱24", coinTitle: "1200コインゲット！！", reward: 1200),
+        25: Treasure(coinImage: "宝箱25", coinTitle: "1200コインゲット！！", reward: 1200),
+        26: Treasure(coinImage: "宝箱26", coinTitle: "1200コインゲット！！", reward: 1200),
+        27: Treasure(coinImage: "宝箱27", coinTitle: "1200コインゲット！！", reward: 1200),
+        28: Treasure(coinImage: "宝箱28", coinTitle: "1200コインゲット！！", reward: 1200),
+        29: Treasure(coinImage: "宝箱29", coinTitle: "1500コインゲット！！", reward: 1500),
+        30: Treasure(coinImage: "宝箱30", coinTitle: "2000コインゲット！！", reward: 2000),
     ]
     
     var body: some View {
@@ -114,5 +125,5 @@ struct StoryCoinModalView: View {
         }
 
 #Preview {
-    StoryCoinModalView(coin: 1, isPresented: .constant(true))
+    StoryCoinModalView(coin: 23, isPresented: .constant(true))
 }
