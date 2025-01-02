@@ -2438,170 +2438,35 @@ struct PlatformView: View {
             
             // アバター表示
             if position == userPosition {
-                Image("\(viewModel.avatarName)")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 80)
-                    .padding(.top, -45)
-                    .padding(padding1 ?? EdgeInsets())
-                    .offset(y: isMovingUp ? -3 : 3)
-                    .onAppear {
-                        withAnimation(Animation.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
-                            isMovingUp.toggle()
-                        }
-                    }
-            } else {
+                AvatarView(avatarName: viewModel.avatarName, padding1: padding1)
             }
             
             // 宝箱表示
             if let treasure = treasure, treasure != 0 && userPosition < position {
-                Image("宝箱\(treasure)")
-                    .resizable()
-                    .frame(width: 80, height: 80)
-                    .padding(paddingTreasure ?? EdgeInsets())
-                    .onTapGesture {
-                        if viewModel.stamina >= 10 {
-                            if position == userPosition + 1 {
-                                self.triggerHaptic()
-                                audioManager.playTittleSound()
-                                viewModel.coin = treasure
-                                viewModel.showCoinAlert = true
-                                print("viewModel.coin   :\(viewModel.coin)")
-                                onArrowTap?()
-                            }
-                        } else {
-                            viewModel.showStaminaAlert = true
-                        }
-                    }
-            } else {
+                TreasureView(treasure: treasure, paddingTreasure: paddingTreasure) {
+                    handleTreasureTap(treasure: treasure)
+                }
             }
             
             // モンスター表示
             if let monster = monster, monster != 0 && userPosition < position {
-                    Image("モンスター\(monster)")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 80)
-                        .padding(paddingMonster ?? EdgeInsets())
-                        .onTapGesture {
-                            if position == userPosition + 1 {
-                                self.triggerHaptic()
-                                audioManager.playSound()
-                                if viewModel.stamina >= 10 {
-                                    let data = QuizStoryData(monsterName: "モンスター\(monster)", backgroundName: backgroundName)
-                                    quizStoryData = data
-                                    viewModel.monsterName = "モンスター\(monster)"
-                                    viewModel.monster = monster
-                                    viewModel.showMonsterAlert = true
-                                } else {
-                                    viewModel.showStaminaAlert = true
-                                }
-                            }
-                        }
-                } else if monster != 0 {
+                MonsterView(monster: monster, paddingMonster: paddingMonster, backgroundName: backgroundName) {
+                    handleMonsterTap(monster: monster)
+                }
                 }
             
             // ボス表示
             if let boss = boss, boss != 0 && userPosition < position {
-                Image("ボス\(boss)")
-                    .resizable()
-                    .scaledToFit()
-                    .shadow(radius: 10)
-                    .frame(width: boss == 15 ? 250 : boss == 16 ? 200 : 250)
-                    .padding(.top,boss == 16 ? -100 : boss == 35 ? -20 : -20)
-                    .onTapGesture {
-                        if position == userPosition + 1 {
-                            self.triggerHaptic()
-                            audioManager.playSound()
-                            if viewModel.stamina >= 10 {
-                                let data = QuizStoryData(monsterName: "ボス\(boss)", backgroundName: backgroundName)
-                                quizStoryData = data
-                                isPresentingQuizStory = true
-                            } else {
-                                viewModel.showStaminaAlert = true
-                            }
-                        }
-                    }
-            } else if boss != 0 {
-                Rectangle()
-                    .fill(Color.clear)
-                    .frame(width: 150, height: 150)
-                    .padding(.top,boss == 16 ? -185 : -165)
-                    .padding(.leading ,boss == 16 ? 0 : 0)
+                BossView(boss: boss, paddingTop: paddingTop(for: boss)) {
+                    handleBossTap(boss: boss)
+                }
             }
             
             // 下矢印表示
             if position == userPosition + 1 {
-                Image("下矢印")
-                    .resizable()
-                    .frame(width: 50, height: 50)
-                    .padding(padding1 ?? EdgeInsets())
-                    .scaleEffect(isPulsing ? 1.4 : 1.0)
-                    .background(
-                        GeometryReader { geometry in
-                            Color.clear
-                                .preference(key: DownArrowPositionKey.self, value: CGPoint(
-                                    x: geometry.frame(in: .named("StoryViewCoordinateSpace")).midX,
-                                    y: geometry.frame(in: .named("StoryViewCoordinateSpace")).midY
-                                ))
-                        }
-                    )
-                    .padding(.top, -30)
-                    .onAppear {
-                        withAnimation(Animation.easeInOut(duration: 0.8).repeatForever(autoreverses: true)) {
-                            isPulsing.toggle()
-                        }
-                    }
-                    .onTapGesture {
-                        if viewModel.stamina >= 10 {
-                            if let treasure = treasure, treasure != 0 {
-                                audioManager.playTittleSound()
-                                viewModel.coin = treasure
-                                viewModel.showCoinAlert = true
-                                onArrowTap?()
-                            }
-                            if let boss = boss, boss != 0 {
-                                audioManager.playSound()
-                                let data = QuizStoryData(monsterName: "ボス\(boss)", backgroundName: backgroundName)
-                                viewModel.monsterName = "ボス\(boss)"
-                                viewModel.monster = boss
-                                viewModel.showMonsterAlert = true
-                            }
-                            if let monster = monster, monster != 0 {
-                                audioManager.playSound()
-                                let data = QuizStoryData(monsterName: "モンスター\(monster)", backgroundName: backgroundName)
-                                viewModel.monsterName = "モンスター\(monster)"
-                                viewModel.monster = monster
-                                viewModel.showMonsterAlert = true
-                            }
-                            if let otherUser = otherUser {
-                                if let treasure = treasure, treasure == 0 {
-                                    if let boss = boss, boss == 0 {
-                                        if let monster = monster, monster == 0 {
-                                            viewModel.showUserStoryAlert = true
-                                            viewModel.selectedUser = otherUser.user
-                                        }
-                                    }
-                                }
-                            } else {
-                                if let monster = monster, monster == 0, let boss = boss, boss == 0 {
-                                    if let treasure = treasure, treasure == 0 {
-                                        audioManager.playSound()
-                                    }
-                                    self.triggerHaptic()
-                                    onArrowTap?()
-                                }
-                            }
-                        } else {
-                            viewModel.showStaminaAlert = true
-                        }
-                    }
-            } else {
-                Rectangle()
-                    .fill(Color.clear)
-                    .frame(width: 50, height: 50)
-                    .padding(.top, -30)
-                    .padding(padding1 ?? EdgeInsets())
+                DownArrowView(isPulsing: $isPulsing, padding1: padding1) {
+                    handleDownArrowTap()
+                }
             }
             
 //            Text("\(position)")
@@ -2614,11 +2479,6 @@ struct PlatformView: View {
                 }
             }
         }
-//    case 1...51:
-//        return "ダンジョン背景1"
-//    case 52...100:
-//        return "ダンジョン背景2"
-//    case 101...150:
         .fullScreenCover(isPresented: $viewModel.showMonsterQuizList) {
             switch viewModel.userPosition {
             case 1...51:
@@ -2657,21 +2517,19 @@ struct PlatformView: View {
                     viewModel: viewModel
                 )
             }
-//            if position < 28 {
-//                StoryITListView(
-//                    isPresenting: $viewModel.showMonsterQuizList,
-//                    monsterName: viewModel.monsterName,
-//                    backgroundName: backgroundName,
-//                    viewModel: viewModel
-//                )
-//            } else {
-//                StoryInfoListView(
-//                    isPresenting: $viewModel.showMonsterQuizList,
-//                    monsterName: viewModel.monsterName,
-//                    backgroundName: backgroundName,
-//                    viewModel: viewModel
-//                )
-//            }
+        }
+    }
+    
+    func paddingTop(for boss: Int) -> CGFloat {
+        switch boss {
+        case 15:
+            return -100
+        case 16:
+            return -100
+        case 35:
+            return -20
+        default:
+            return -20
         }
     }
     
@@ -2697,12 +2555,204 @@ struct PlatformView: View {
         }
     }
     
+    // モンスタータップ時の処理
+    func handleMonsterTap(monster: Int) {
+        if viewModel.stamina >= 10 {
+            if position == userPosition + 1 {
+                let data = QuizStoryData(monsterName: "モンスター\(monster)", backgroundName: backgroundName)
+                viewModel.monsterName = "モンスター\(monster)"
+                viewModel.monster = monster
+                viewModel.showMonsterAlert = true
+            }
+        } else {
+            viewModel.showStaminaAlert = true
+        }
+    }
+    
+    // ボスタップ時の処理
+    func handleBossTap(boss: Int) {
+        if viewModel.stamina >= 10 {
+            if position == userPosition + 1 {
+                let data = QuizStoryData(monsterName: "ボス\(boss)", backgroundName: backgroundName)
+                viewModel.monsterName = "ボス\(boss)"
+                viewModel.monster = boss
+                viewModel.showMonsterAlert = true
+            }
+        } else {
+            viewModel.showStaminaAlert = true
+        }
+    }
+    
+    // 下矢印タップ時の処理
+    func handleDownArrowTap() {
+        if viewModel.stamina >= 10 {
+            if let treasure = treasure, treasure != 0 {
+                audioManager.playTittleSound()
+                viewModel.coin = treasure
+                viewModel.showCoinAlert = true
+                onArrowTap?()
+            }
+            if let boss = boss, boss != 0 {
+                audioManager.playSound()
+                let data = QuizStoryData(monsterName: "ボス\(boss)", backgroundName: backgroundName)
+                viewModel.monsterName = "ボス\(boss)"
+                viewModel.monster = boss
+                viewModel.showMonsterAlert = true
+            }
+            if let monster = monster, monster != 0 {
+                audioManager.playSound()
+                let data = QuizStoryData(monsterName: "モンスター\(monster)", backgroundName: backgroundName)
+                viewModel.monsterName = "モンスター\(monster)"
+                viewModel.monster = monster
+                viewModel.showMonsterAlert = true
+            }
+            print("monster      :\(monster)")
+            if let otherUser = otherUser, treasure == 0, boss == 0, monster == 0 {
+                viewModel.showUserStoryAlert = true
+                viewModel.selectedUser = otherUser.user
+            } else {
+                print("handleDownArrowTap()")
+                if let monster = monster, monster == 0, let boss = boss, boss == 0 {
+                    audioManager.playSound()
+                    triggerHaptic()
+                    onArrowTap?()
+                }
+            }
+        } else {
+            viewModel.showStaminaAlert = true
+        }
+    }
+    
+    func handleTreasureTap(treasure: Int) {
+        if viewModel.stamina >= 10 {
+            if position == userPosition + 1 {
+                audioManager.playTittleSound()
+                viewModel.coin = treasure
+                viewModel.showCoinAlert = true
+                onArrowTap?()
+            }
+        } else {
+            viewModel.showStaminaAlert = true
+        }
+    }
+    
     func triggerHaptic() {
         let generator = UIImpactFeedbackGenerator(style: .medium)
         generator.prepare()
         generator.impactOccurred()
     }
 }
+
+struct DownArrowView: View {
+    @Binding var isPulsing: Bool
+    let padding1: EdgeInsets?
+    let onTap: () -> Void
+    
+    var body: some View {
+        Image("下矢印")
+            .resizable()
+            .frame(width: 50, height: 50)
+            .padding(padding1 ?? EdgeInsets())
+            .scaleEffect(isPulsing ? 1.4 : 1.0)
+            .background(
+                GeometryReader { geometry in
+                    Color.clear
+                        .preference(key: DownArrowPositionKey.self, value: CGPoint(
+                            x: geometry.frame(in: .named("StoryViewCoordinateSpace")).midX,
+                            y: geometry.frame(in: .named("StoryViewCoordinateSpace")).midY
+                        ))
+                }
+            )
+            .padding(.top, -30)
+            .onAppear {
+                withAnimation(Animation.easeInOut(duration: 0.8).repeatForever(autoreverses: true)) {
+                    isPulsing.toggle()
+                }
+            }
+            .onTapGesture {
+                onTap()
+            }
+    }
+}
+
+
+struct BossView: View {
+    let boss: Int
+    let paddingTop: CGFloat
+    let onTap: () -> Void
+    
+    var body: some View {
+        Image("ボス\(boss)")
+            .resizable()
+            .scaledToFit()
+            .shadow(radius: 10)
+            .frame(width: boss == 15 ? 250 : boss == 16 ? 200 : 250)
+            .padding(.top, paddingTop)
+            .onTapGesture {
+                onTap()
+            }
+    }
+}
+
+
+struct MonsterView: View {
+    let monster: Int
+    let paddingMonster: EdgeInsets?
+    let backgroundName: String
+    let onTap: () -> Void
+    
+    var body: some View {
+        Image("モンスター\(monster)")
+            .resizable()
+            .scaledToFit()
+            .frame(width: 80)
+            .padding(paddingMonster ?? EdgeInsets())
+            .onTapGesture {
+                onTap()
+            }
+    }
+}
+
+
+struct TreasureView: View {
+    let treasure: Int
+    let paddingTreasure: EdgeInsets?
+    let onTap: () -> Void
+    
+    var body: some View {
+        Image("宝箱\(treasure)")
+            .resizable()
+            .frame(width: 80, height: 80)
+            .padding(paddingTreasure ?? EdgeInsets())
+            .onTapGesture {
+                onTap()
+            }
+    }
+}
+
+
+struct AvatarView: View {
+    let avatarName: String
+    let padding1: EdgeInsets?
+    
+    @State private var isMovingUp = false
+    
+    var body: some View {
+        Image("\(avatarName)")
+            .resizable()
+            .scaledToFit()
+            .frame(width: 80)
+            .padding(.top, -45)
+            .padding(padding1 ?? EdgeInsets())
+            .offset(y: isMovingUp ? -3 : 3)
+            .onAppear {
+                withAnimation(Animation.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
+                    isMovingUp.toggle()
+                }
+            }
+    }
+}
+
 
 // EdgeInsets の拡張
 extension EdgeInsets {

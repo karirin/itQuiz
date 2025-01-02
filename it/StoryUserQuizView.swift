@@ -460,6 +460,7 @@ struct StoryUserQuizView: View {
                                     Image("\(user.avatars.first?["name"] as? String ?? "")")
                                         .resizable()
                                         .scaledToFill()
+                                        .shadow(radius: 10)
                                         .frame(width: isSmallDevice() ? 100 : 160)
                                     // 敵キャラを倒した
                                     if showMonsterDownImage && monsterHP <= 0 {
@@ -501,7 +502,8 @@ struct StoryUserQuizView: View {
                                     HStack{
                                         Image(avator.isEmpty ? "defaultIcon" : (avator.first?["name"] as? String) ?? "")
                                             .resizable()
-                                            .frame(width: 30,height:30)
+                                            .scaledToFit()
+                                            .frame(height:30)
                                         ProgressBar3(value: Double(playerHP), maxValue: Double(self.userMaxHp), color: Color("hpUserColor"))
                                             .frame(height: 20)
                                         Text("\(playerHP)/\(self.userMaxHp)")

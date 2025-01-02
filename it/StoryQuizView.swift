@@ -534,6 +534,7 @@ struct StoryQuizView: View {
                                 Image("\(monsterName)")
                                     .resizable()
                                     .scaledToFit()
+                                    .shadow(radius: 10)
                                     .frame(width: isSmallDevice() ? 100 : 160)
                             
                             // 問題に正解して敵キャラにダメージ

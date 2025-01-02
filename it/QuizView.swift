@@ -558,6 +558,7 @@ struct QuizView: View {
                                         Image("\(quizLevel)Monster\(monsterType)")
                                             .resizable()
                                             .scaledToFit()
+                                            .shadow(radius: 10)
                                             .frame(width: isSmallDevice() ? 100 : 160)
                             
                         
