@@ -76,10 +76,10 @@ class PositionViewModel: ObservableObject {
         authManager.$user
             .compactMap { $0?.uid }
             .sink { [weak self] userId in
-                print("userId   :\(userId)")
-                self?.fetchPosition(for: userId ?? "")
-                self?.fetchUserStamina(for: userId ?? "")
-                self?.fetchAvatars(for: userId ?? "")
+                guard let self = self else { return }
+                self.fetchPosition(for: userId)
+                self.fetchUserStamina(for: userId)
+                self.fetchAvatars(for: userId)
             }
             .store(in: &cancellables)
         
@@ -449,8 +449,8 @@ class PositionViewModel: ObservableObject {
         staminaRecoveryCancellable = nil
     }
 
-    @Published var storys: [String: Story] = [:]
-    @Published var users = [User]()
+    private var storys: [String: Story] = [:]
+    private var users: [User] = []
 
     struct Story: Codable {
         let lastActiveTime: Double?
@@ -520,7 +520,7 @@ class PositionViewModel: ObservableObject {
     }
 
     func fetchStorys() {
-        Database.database().reference().child("storys").observe(.value) { [weak self] snapshot in
+        Database.database().reference().child("storys").observeSingleEvent(of: .value) { [weak self] snapshot in
             var tempStorys: [String: Story] = [:]
             for child in snapshot.children {
                 if let childSnapshot = child as? DataSnapshot,
