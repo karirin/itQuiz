@@ -220,7 +220,7 @@ struct QuizView: View {
     
     // 次の問題へ移る処理
     func moveToNextQuiz() {
-        if monsterType == 3 && monsterHP <= 0 {
+        if monsterType == 2 && monsterHP <= 0 {
             // 最後のモンスターが倒された場合、結果画面へ遷移
             showCompletionMessage = true
             timer?.invalidate()
@@ -726,8 +726,8 @@ struct QuizView: View {
                         Color.black.opacity(0.5)
                         // スポットライトの領域をカットアウ
                             .overlay(
-                                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                                    .frame(width: buttonRect.width, height: buttonRect.height+20)
+                                RoundedRectangle(cornerRadius: 0, style: .continuous)
+                                    .frame(width: buttonRect.width, height: buttonRect.height)
                                     .position(x: buttonRect.midX, y: buttonRect.midY)
                                     .blendMode(.destinationOut)
                             )
@@ -739,10 +739,6 @@ struct QuizView: View {
                         Spacer()
                             .frame(height: buttonRect.minY - bubbleHeight)
                         VStack(alignment: .trailing, spacing: .zero) {
-                            //                            Image("上矢印")
-                            //                                .resizable()
-                            //                                .frame(width: 20, height: 20)
-                            //                                .padding(.trailing, 206.0)
                             Text("問題が出題されます。")
                                 .font(.callout)
                                 .padding(5)
@@ -810,7 +806,7 @@ struct QuizView: View {
                     }
                     VStack {
                         Spacer()
-                            .frame(height: buttonRect.minY - bubbleHeight - 50)
+                            .frame(height: isSmallDevice() ? buttonRect.minY - bubbleHeight - 30 : buttonRect.minY - bubbleHeight + 30)
                         VStack(alignment: .trailing, spacing: .zero) {
                             Text("選択肢の中から正解と思うものをクリックしてください。")
                                 .font(.callout)
@@ -878,9 +874,9 @@ struct QuizView: View {
                     }
                     VStack {
                         Spacer()
-                            .frame(height: buttonRect.minY + 250)
+                            .frame(height: isSmallDevice() ? buttonRect.minY + 20 : buttonRect.minY + 80)
                         VStack(alignment: .trailing, spacing: .zero) {
-                            Text("正解すると相手モンスターにダメージ、不正解だと自分がダメージを受けます。\n相手のHPが０になれば次の相手に、自分のHPが０になればゲームオーバーです。")
+                            Text("正解すると相手モンスターにダメージ\n不正解だと自分がダメージを受けます\n相手のHPが０になれば次の相手に\n自分のHPが０になればゲームオーバーです")
                                 .font(.callout)
                                 .padding(5)
                                 .font(.system(size: 24.0))
@@ -891,7 +887,6 @@ struct QuizView: View {
                                         .stroke(Color.gray, lineWidth: 15)
                                 )
                                 .cornerRadius(20)
-                                .padding(.horizontal, 16)
                                 .foregroundColor(Color("fontGray"))
                                 .shadow(radius: 10)
                             //                        Image("下矢印")

@@ -23,6 +23,7 @@ struct StoryMonsterModalView: View {
     @State private var quizTitle: String = ""
     @State private var slideOut = false
     @ObservedObject var audioManager: AudioManager
+//    @ObservedObject var userPositionViewModel: UserPositionViewModel
     @ObservedObject var viewModel: PositionViewModel
 
     let monsters: [Int: Monster] = [

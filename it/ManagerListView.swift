@@ -247,7 +247,7 @@ struct ManagerListView: View {
                             .overlay(
                                 RoundedRectangle(cornerRadius: 20, style: .continuous)
                                     .frame(width: buttonRect.width - 20, height: buttonRect.height)
-                                    .position(x: buttonRect.midX, y: isSmallDevice() ? buttonRect.midY-120 : buttonRect.midY-155)
+                                    .position(x: buttonRect.midX, y: isSmallDevice() ? buttonRect.midY-80 : buttonRect.midY-115)
                                     .blendMode(.destinationOut)
                             )
                             .ignoresSafeArea()
@@ -256,7 +256,7 @@ struct ManagerListView: View {
                     }
                     VStack {
                         Spacer()
-                            .frame(height:isSmallDevice() ? buttonRect.minY + bubbleHeight-50 : buttonRect.minY + bubbleHeight-90)
+                            .frame(height:isSmallDevice() ? buttonRect.minY + bubbleHeight-20 : buttonRect.minY + bubbleHeight-50)
                         VStack(alignment: .trailing, spacing: .zero) {
 //                            Image("上矢印")
 //                                .resizable()
@@ -383,6 +383,6 @@ struct ManagerListView: View {
     }
 
 #Preview {
-    ManagerListView(isPresenting: .constant(false))
-//    TopView()
+//    ManagerListView(isPresenting: .constant(false))
+    TopView()
 }

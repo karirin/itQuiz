@@ -36,7 +36,6 @@ struct ManagerView: View {
                     Spacer()
                 }
                 .padding(.leading)
-                .background(.white)
 //                TopTabView(list: list, selectedTab: $selectedTab)
 //                    .padding(.top,-13)
 //                TabView(selection: $selectedTab,
@@ -56,10 +55,10 @@ struct ManagerView: View {
 //                            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
 //                LevelRankingView(viewModel: viewModel)
             }
+            .background(Color("Color2"))
             .onAppear{
                 reward.LoadReward()
             }
-            .background(Color("Color2"))
     }
 }
 

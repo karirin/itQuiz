@@ -112,7 +112,6 @@ struct itApp: App {
     
     var body: some Scene {
         WindowGroup {
-//            TopView(authManager: authManager)
             RootView(authManager: authManager)
                 .onAppear{
                     if let userId = authManager.currentUserId {
@@ -126,7 +125,6 @@ struct itApp: App {
                         authManager.anonymousSignIn(){}
                     }
                 }
-//            TestView()
         }
     }
 }
