@@ -18,6 +18,143 @@
             endingLineNumber = "72"
             landmarkName = "AuthManager"
             landmarkType = "3">
+            <Locations>
+               <Location
+                  uuid = "8908A95F-46C2-4759-9040-2EB23A87813B - d0c18cc0646cf66b"
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "property wrapper backing initializer of it.AuthManager.usersWithoutAvatars : Swift.Array&lt;it.User&gt;"
+                  moduleName = "it"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/apple/Desktop/itQuiz/it/AuthManager.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "0"
+                  endingLineNumber = "0"
+                  offsetFromSymbolStart = "24">
+               </Location>
+               <Location
+                  uuid = "8908A95F-46C2-4759-9040-2EB23A87813B - 4c5473e45c4dbad7"
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "it.AuthManager.usersWithoutAvatars.getter : Swift.Array&lt;it.User&gt;"
+                  moduleName = "it"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/apple/Desktop/itQuiz/it/AuthManager.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "0"
+                  endingLineNumber = "0"
+                  offsetFromSymbolStart = "28">
+               </Location>
+               <Location
+                  uuid = "8908A95F-46C2-4759-9040-2EB23A87813B - 6b82f3f31fd821b7"
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "it.AuthManager.usersWithoutAvatars.setter : Swift.Array&lt;it.User&gt;"
+                  moduleName = "it"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/apple/Desktop/itQuiz/it/AuthManager.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "72"
+                  endingLineNumber = "72"
+                  offsetFromSymbolStart = "0">
+               </Location>
+               <Location
+                  uuid = "8908A95F-46C2-4759-9040-2EB23A87813B - fd7195b44d07f999"
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "it.AuthManager.usersWithoutAvatars.modify : Swift.Array&lt;it.User&gt;"
+                  moduleName = "it"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/apple/Desktop/itQuiz/it/AuthManager.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "72"
+                  endingLineNumber = "72"
+                  offsetFromSymbolStart = "0">
+               </Location>
+               <Location
+                  uuid = "8908A95F-46C2-4759-9040-2EB23A87813B - 527a53b93f7a57f0"
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "it.AuthManager.usersWithoutAvatars.modify : Swift.Array&lt;it.User&gt; with unmangled suffix &quot;.resume.0&quot;"
+                  moduleName = "it"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/apple/Desktop/itQuiz/%3Ccompiler-generated%3E"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "0"
+                  endingLineNumber = "0"
+                  offsetFromSymbolStart = "20">
+               </Location>
+               <Location
+                  uuid = "8908A95F-46C2-4759-9040-2EB23A87813B - f30dafc286229773"
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "it.AuthManager.$usersWithoutAvatars.getter : Combine.Published&lt;Swift.Array&lt;it.User&gt;&gt;.Publisher"
+                  moduleName = "it"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/apple/Desktop/itQuiz/it/AuthManager.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "72"
+                  endingLineNumber = "72"
+                  offsetFromSymbolStart = "0">
+               </Location>
+               <Location
+                  uuid = "8908A95F-46C2-4759-9040-2EB23A87813B - ec9207589bec9ab4"
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "it.AuthManager.$usersWithoutAvatars.setter : Combine.Published&lt;Swift.Array&lt;it.User&gt;&gt;.Publisher"
+                  moduleName = "it"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/apple/Desktop/itQuiz/%3Ccompiler-generated%3E"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "0"
+                  endingLineNumber = "0"
+                  offsetFromSymbolStart = "36">
+               </Location>
+               <Location
+                  uuid = "8908A95F-46C2-4759-9040-2EB23A87813B - d26981c35bf8e3a5"
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "it.AuthManager.$usersWithoutAvatars.modify : Combine.Published&lt;Swift.Array&lt;it.User&gt;&gt;.Publisher"
+                  moduleName = "it"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/apple/Desktop/itQuiz/%3Ccompiler-generated%3E"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "0"
+                  endingLineNumber = "0"
+                  offsetFromSymbolStart = "64">
+               </Location>
+               <Location
+                  uuid = "8908A95F-46C2-4759-9040-2EB23A87813B - 4af76238b229e28c"
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "it.AuthManager.$usersWithoutAvatars.modify : Combine.Published&lt;Swift.Array&lt;it.User&gt;&gt;.Publisher with unmangled suffix &quot;.resume.0&quot;"
+                  moduleName = "it"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/apple/Desktop/itQuiz/%3Ccompiler-generated%3E"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "0"
+                  endingLineNumber = "0"
+                  offsetFromSymbolStart = "24">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy

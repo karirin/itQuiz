@@ -10,6 +10,7 @@ import Firebase
 
 struct ChangeNameView: View {
     @Binding var isPresented: Bool
+    @Binding var isReturnBtn: Bool
     @Binding var tutorialNum: Int
 //    @Binding var userName: Stringz
     @State private var userName: String = ""
@@ -21,16 +22,11 @@ struct ChangeNameView: View {
         ZStack{
             Color.black.opacity(0.4)
                 .edgesIgnoringSafeArea(.all)
-//                .onTapGesture {
-//                    if !userName.isEmpty {
-//                        showAlert = true
-//                        isPresented = false
-//                        authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 1) { success in
-//                            tutorialNum = 1
-//                            // データベースのアップデートが成功したかどうかをハンドリング
-//                        }
-//                    }
-//                }
+                .onTapGesture {
+                    if isReturnBtn {
+                        isPresented = false
+                    }
+                }
             VStack{
                 HStack{
                     Spacer()
@@ -100,8 +96,12 @@ struct ChangeNameView: View {
                 title: Text(""),
                 message: Text("名前が登録されました"),
                 dismissButton: .default(Text("OK")) {
-                    authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 1) { success in
-                        tutorialNum = 1
+                    if !isReturnBtn {
+                        authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 1) { success in
+                            tutorialNum = 1
+                            isPresented = false
+                        }
+                    } else {
                         isPresented = false
                     }
                 }
@@ -109,6 +109,24 @@ struct ChangeNameView: View {
         }
             
         }
+        .overlay(
+                // 「×」ボタンを右上に配置
+                Button(action: {
+                    if isReturnBtn {
+                        isPresented = false
+                    }
+                }) {
+                    Image(systemName: "xmark.circle.fill")
+                        .resizable()
+                        .frame(width: 50, height: 50)
+                        .foregroundColor(.black)
+                        .background(.white)
+                        .cornerRadius(50)
+                        .padding()
+                        .opacity(isReturnBtn ? 1 : 0)
+                }
+                .offset(x: 160, y: -120)
+        )
     }
 
     func saveName() {
@@ -129,6 +147,6 @@ struct ChangeNameView_Previews: PreviewProvider {
     static var previews: some View {
         @ObservedObject var authManager = AuthManager.shared
 //        ChangeNameView(isPresented: .constant(false), tutorialNum: .constant(1), userName: .constant("name"))
-        ChangeNameView(isPresented: .constant(false), tutorialNum: .constant(1), authManager: authManager)
+        ChangeNameView(isPresented: .constant(false), isReturnBtn: .constant(false), tutorialNum: .constant(1), authManager: authManager)
     }
 }

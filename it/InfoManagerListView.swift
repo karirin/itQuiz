@@ -417,9 +417,9 @@ struct InfoManagerListView: View {
                 }
             }
         
-        .sheet(isPresented: $preFlag) {
-            PreView(audioManager: audioManager)
-        }
+            .fullScreenCover(isPresented: $preFlag) {
+                PreView(audioManager: audioManager)
+            }
                 .navigationBarBackButtonHidden(true)
                 .navigationBarItems(leading: Button(action: {
                     self.presentationMode.wrappedValue.dismiss()

@@ -56,10 +56,10 @@ struct StoryQuizResultView: View {
     @Binding var navigateToQuizResultView: Bool
 //    @Environment(\.rootPresentationMode) private var rootPresentationMode: Binding<RootPresentationMode>
     @State private var isHidden = false
-    private let interstitial = InterstitialStory()
+    private let interstitial = Interstitial()
 //    @StateObject var interstitial = Interstitial()
     @Environment(\.presentationMode) var presentationMode
-    private let adViewControllerRepresentable = AdViewControllerRepresentableStory()
+    private let adViewControllerRepresentable = AdViewControllerRepresentable()
     @Binding var victoryFlag : Bool
     @Binding var isUserStoryFlag : Bool
 //    @Binding private var victoryFlag: Bool
@@ -325,7 +325,7 @@ struct StoryQuizResultView: View {
                     MemoView(memo: $currentMemo, question: selectedQuestion)
                 }
             }
-            .sheet(isPresented: $preFlag) {
+            .fullScreenCover(isPresented: $preFlag) {
                 PreView(audioManager: audioManager)
             }
             .background {
@@ -345,12 +345,8 @@ struct StoryQuizResultView: View {
                 Text("戻る")
                     .foregroundColor(Color("fontGray1"))
             })
-            .toolbar {
-                    ToolbarItem(placement: .principal) {
-                        Text("クイズ結果")
-                            .font(.system(size: 20)) // ここでフォントサイズを指定
-                    }
-                }
+            .navigationTitle("結果画面")
+            .navigationBarTitleDisplayMode(.inline)
             if showModal {
                 ExperienceModalView(showModal: $showModal, addedExperience: playerExperience, addedMoney: playerMoney, authManager: authManager)
             }
@@ -392,7 +388,7 @@ struct StoryQuizResultView: View {
         UserDefaults.standard.set(count, forKey: "launchPreCount")
         
         // 3回に1回の割合で処理を実行
-        if count % 5 == 0 {
+        if count % 3 == 0 {
             preFlag = true
         }
     }

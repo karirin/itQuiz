@@ -190,7 +190,7 @@ class PositionViewModel: ObservableObject {
     
     func fetchUserStamina(for userId: String) {
         let staminaRef = Database.database().reference().child("storys").child(userId).child("stamina")
-        
+        print("userId:\(userId)")
         staminaRef.observeSingleEvent(of: .value) { snapshot in
             if let staminaValue = snapshot.value as? Int {
                 DispatchQueue.main.async {

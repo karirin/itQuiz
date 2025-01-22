@@ -304,25 +304,27 @@ struct RankMatchQuizView: View {
                 correctAnswerIndex: currentQuiz.correctAnswerIndex, explanation: currentQuiz.explanation
                 )
                 // incorrectAnswer以外のクイズなら不正解の問題をincorrectAnswerテーブルに保存する
-                if quizLevel != .incorrectAnswer && quizLevel != .incorrectITAnswer && quizLevel != .incorrectInfoAnswer && quizLevel != .incorrectAppliedAnswer {
-                    switch quizLevel {
-                    case .itBasic,.itStrategy,.itTechnology,.itManagement:
-                        saveIncorrectITAnswer(incorrectAnswer)
-                        break
-                    case .itBasic,.itStrategy,.itTechnology,.itManagement:
-                        saveIncorrectITAnswer(incorrectAnswer)
-                        break
-                        
-                    case .infoBasic,.infoStrategy,.infoTechnology,.infoManagement:
-                        saveIncorrectInfoAnswer(incorrectAnswer)
-                        break
-                        
-                    case .appliedBasic,.appliedStrategy,.appliedTechnology,.appliedManagement:
-                        saveIncorrectAppliedAnswer(incorrectAnswer)
-                        break
-                    default:
-                        saveIncorrectAnswer(incorrectAnswer)
-                        break
+                if userPreFlag == 1 {
+                    if quizLevel != .incorrectAnswer && quizLevel != .incorrectITAnswer && quizLevel != .incorrectInfoAnswer && quizLevel != .incorrectAppliedAnswer {
+                        switch quizLevel {
+                        case .itBasic,.itStrategy,.itTechnology,.itManagement:
+                            saveIncorrectITAnswer(incorrectAnswer)
+                            break
+                        case .itBasic,.itStrategy,.itTechnology,.itManagement:
+                            saveIncorrectITAnswer(incorrectAnswer)
+                            break
+                            
+                        case .infoBasic,.infoStrategy,.infoTechnology,.infoManagement:
+                            saveIncorrectInfoAnswer(incorrectAnswer)
+                            break
+                            
+                        case .appliedBasic,.appliedStrategy,.appliedTechnology,.appliedManagement:
+                            saveIncorrectAppliedAnswer(incorrectAnswer)
+                            break
+                        default:
+                            saveIncorrectAnswer(incorrectAnswer)
+                            break
+                        }
                     }
                 }
                 answerCount += 1

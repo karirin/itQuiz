@@ -92,9 +92,9 @@ struct GraphManagerView: View {
                 }
             }
         }
-            .sheet(isPresented: $preFlag) {
-                PreView(audioManager: audioManager)
-            }
+        .fullScreenCover(isPresented: $preFlag) {
+            PreView(audioManager: audioManager)
+        }
         .frame(maxWidth:.infinity,maxHeight: .infinity)
         .background(Color("Color2"))
         .onAppear {

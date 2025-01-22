@@ -1006,13 +1006,8 @@ struct RankingView: View {
             Text("戻る")
                 .foregroundColor(Color("fontGray"))
         })
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                Text("ランキング")
-                    .font(.system(size: 20))
-                    .foregroundColor(Color("fontGray"))
-            }
-        }
+        .navigationTitle("ランキング")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 

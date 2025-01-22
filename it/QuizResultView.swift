@@ -198,7 +198,7 @@ struct QuizResultView: View {
                         .foregroundColor(Color("fontGray1"))
                     }
                 }
-                .sheet(isPresented: $preFlag) {
+                .fullScreenCover(isPresented: $preFlag) {
                     PreView(audioManager: audioManager)
                 }
                 .onChange(of: authManager.didLevelUp) { newValue in
@@ -332,12 +332,8 @@ struct QuizResultView: View {
                 Text("戻る")
                     .foregroundColor(Color("fontGray1"))
             })
-            .toolbar {
-                    ToolbarItem(placement: .principal) {
-                        Text("クイズ結果")
-                            .font(.system(size: 20)) // ここでフォントサイズを指定
-                    }
-                }
+            .navigationTitle("結果画面")
+            .navigationBarTitleDisplayMode(.inline)
             if showModal {
                 ExperienceModalView(showModal: $showModal, addedExperience: playerExperience, addedMoney: playerMoney, authManager: authManager)
             }
@@ -391,7 +387,7 @@ struct QuizResultView: View {
         UserDefaults.standard.set(count, forKey: "launchPreCount")
         
         // 3回に1回の割合で処理を実行
-        if count % 5 == 0 {
+        if count % 3 == 0 {
             preFlag = true
         }
     }

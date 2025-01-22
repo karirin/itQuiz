@@ -166,12 +166,8 @@ struct GachaManagerView: View {
             Text("戻る")
                 .foregroundColor(Color("fontGray"))
         })
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                Text("ガチャ一覧")
-                    .font(.system(size: 20)) // ここでフォントサイズを指定
-            }
-        }
+        .navigationTitle("ガチャ一覧")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
