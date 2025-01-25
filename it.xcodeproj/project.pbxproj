@@ -7,6 +7,21 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1801FFAD2D4480D1007625A2 /* TittlesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1801FFAC2D4480D1007625A2 /* TittlesView.swift */; };
+		1801FFAF2D4480FE007625A2 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1801FFAE2D4480FE007625A2 /* ContentView.swift */; };
+		1801FFD52D4482F6007625A2 /* レベルアップ.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1801FFC82D4482F5007625A2 /* レベルアップ.mp3 */; };
+		1801FFD62D4482F6007625A2 /* 倒れる.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1801FFC92D4482F5007625A2 /* 倒れる.mp3 */; };
+		1801FFD72D4482F6007625A2 /* キャンセル.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1801FFCA2D4482F5007625A2 /* キャンセル.mp3 */; };
+		1801FFD82D4482F6007625A2 /* ゲームクリア.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1801FFCB2D4482F5007625A2 /* ゲームクリア.mp3 */; };
+		1801FFD92D4482F6007625A2 /* 正解.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1801FFCC2D4482F5007625A2 /* 正解.mp3 */; };
+		1801FFDA2D4482F6007625A2 /* 敵攻撃.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1801FFCD2D4482F5007625A2 /* 敵攻撃.mp3 */; };
+		1801FFDB2D4482F6007625A2 /* カウントダウン.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1801FFCE2D4482F5007625A2 /* カウントダウン.mp3 */; };
+		1801FFDC2D4482F6007625A2 /* ゲームオーバー.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1801FFCF2D4482F5007625A2 /* ゲームオーバー.mp3 */; };
+		1801FFDD2D4482F6007625A2 /* 不正解.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1801FFD02D4482F5007625A2 /* 不正解.mp3 */; };
+		1801FFDE2D4482F6007625A2 /* 称号.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1801FFD12D4482F5007625A2 /* 称号.mp3 */; };
+		1801FFDF2D4482F6007625A2 /* 味方攻撃.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1801FFD22D4482F5007625A2 /* 味方攻撃.mp3 */; };
+		1801FFE02D4482F6007625A2 /* ホームに戻る.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1801FFD32D4482F5007625A2 /* ホームに戻る.mp3 */; };
+		1801FFE12D4482F6007625A2 /* おとも切り替え.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1801FFD42D4482F6007625A2 /* おとも切り替え.mp3 */; };
 		180A9FBB2CD640ED00B35C83 /* ChangeNameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180A9FBA2CD640ED00B35C83 /* ChangeNameView.swift */; };
 		180A9FBD2CD66C5A00B35C83 /* TutorialModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180A9FBC2CD66C5A00B35C83 /* TutorialModalView.swift */; };
 		180A9FC72CDF5CCA00B35C83 /* StampAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180A9FC62CDF5CCA00B35C83 /* StampAnimationView.swift */; };
@@ -16,23 +31,9 @@
 		181B25662CE8A43C00F8419B /* StoryQuizView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181B25652CE8A43C00F8419B /* StoryQuizView.swift */; };
 		181B25682CE987D900F8419B /* StoryQuizResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181B25672CE987D900F8419B /* StoryQuizResultView.swift */; };
 		181B256A2CE99CE700F8419B /* StoryCoinModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181B25692CE99CE700F8419B /* StoryCoinModalView.swift */; };
-		1820AE172B518D8D00BBA679 /* 正解.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1820AE092B518D8C00BBA679 /* 正解.mp3 */; };
-		1820AE182B518D8D00BBA679 /* カウントダウン.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1820AE0A2B518D8C00BBA679 /* カウントダウン.mp3 */; };
-		1820AE192B518D8D00BBA679 /* 倒れる.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1820AE0B2B518D8C00BBA679 /* 倒れる.mp3 */; };
-		1820AE1B2B518D8D00BBA679 /* おとも切り替え.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1820AE0D2B518D8C00BBA679 /* おとも切り替え.mp3 */; };
-		1820AE1D2B518D8D00BBA679 /* キャンセル.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1820AE0F2B518D8D00BBA679 /* キャンセル.mp3 */; };
-		1820AE1E2B518D8D00BBA679 /* soundKettei.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1820AE102B518D8D00BBA679 /* soundKettei.mp3 */; };
-		1820AE1F2B518D8D00BBA679 /* 不正解.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1820AE112B518D8D00BBA679 /* 不正解.mp3 */; };
-		1820AE202B518D8D00BBA679 /* 味方攻撃.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1820AE122B518D8D00BBA679 /* 味方攻撃.mp3 */; };
-		1820AE212B518D8D00BBA679 /* 敵攻撃.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1820AE132B518D8D00BBA679 /* 敵攻撃.mp3 */; };
-		1820AE222B518D8D00BBA679 /* ホームに戻る.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1820AE142B518D8D00BBA679 /* ホームに戻る.mp3 */; };
-		1820AE232B518D8D00BBA679 /* レベルアップ.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1820AE152B518D8D00BBA679 /* レベルアップ.mp3 */; };
 		18236D642BC195F3009C6CEB /* TermsOfServiceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18236D632BC195F3009C6CEB /* TermsOfServiceView.swift */; };
 		18236D662BC19613009C6CEB /* PrivacyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18236D652BC19613009C6CEB /* PrivacyView.swift */; };
 		18236D682BC1964A009C6CEB /* TimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18236D672BC1964A009C6CEB /* TimerView.swift */; };
-		18236D6B2BC1967E009C6CEB /* ゲームオーバー.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18236D692BC1967E009C6CEB /* ゲームオーバー.mp3 */; };
-		18236D6C2BC1967E009C6CEB /* ゲームクリア.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18236D6A2BC1967E009C6CEB /* ゲームクリア.mp3 */; };
-		18236D6E2BC1968B009C6CEB /* 称号.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18236D6D2BC1968B009C6CEB /* 称号.mp3 */; };
 		18236D722BC26BC8009C6CEB /* QuizGoburinListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18236D712BC26BC8009C6CEB /* QuizGoburinListView.swift */; };
 		18236D742BC26DFA009C6CEB /* QuizBossView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18236D732BC26DFA009C6CEB /* QuizBossView.swift */; };
 		18236D762BC27810009C6CEB /* QuizKaijyuListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18236D752BC27810009C6CEB /* QuizKaijyuListView.swift */; };
@@ -106,13 +107,10 @@
 		18B371B62CFAAC1D0016AEEF /* StoryMonsterModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18B371B52CFAAC1D0016AEEF /* StoryMonsterModalView.swift */; };
 		18B371B82CFC5B140016AEEF /* StorySutaminaModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18B371B72CFC5B140016AEEF /* StorySutaminaModalView.swift */; };
 		18B371BA2CFDC2B60016AEEF /* StoryInfoListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18B371B92CFDC2B60016AEEF /* StoryInfoListView.swift */; };
-		18BD10B82B6B601500ABB28F /* sound.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18BD10B72B6B601500ABB28F /* sound.mp3 */; };
 		18C37B132D0DF9D600326A2E /* CheckUsersListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C37B122D0DF9D600326A2E /* CheckUsersListView.swift */; };
 		18DE99712D211AB2003E315A /* StoryAppliedListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18DE99702D211AB2003E315A /* StoryAppliedListView.swift */; };
 		18E818572B5EBDFC00595669 /* RewardTimesModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E818562B5EBDFC00595669 /* RewardTimesModal.swift */; };
 		18EA883E2B8C48AE00067FE7 /* SubModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18EA883D2B8C48AE00067FE7 /* SubModalView.swift */; };
-		18F95C462B51AB7200F8DBBB /* TittlesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18F95C452B51AB7200F8DBBB /* TittlesView.swift */; };
-		18F95C482B51AB7800F8DBBB /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18F95C472B51AB7800F8DBBB /* ContentView.swift */; };
 		18FE84F82CF190ED006968F9 /* ProgressStoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FE84F72CF190ED006968F9 /* ProgressStoryView.swift */; };
 		26071BF42B2B4BC60012B836 /* ModalExplanationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26071BF32B2B4BC60012B836 /* ModalExplanationView.swift */; };
 		260E44132AB572DC00FBB487 /* itApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260E44122AB572DC00FBB487 /* itApp.swift */; };
@@ -162,6 +160,21 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1801FFAC2D4480D1007625A2 /* TittlesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TittlesView.swift; sourceTree = "<group>"; };
+		1801FFAE2D4480FE007625A2 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		1801FFC82D4482F5007625A2 /* レベルアップ.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "レベルアップ.mp3"; sourceTree = "<group>"; };
+		1801FFC92D4482F5007625A2 /* 倒れる.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "倒れる.mp3"; sourceTree = "<group>"; };
+		1801FFCA2D4482F5007625A2 /* キャンセル.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "キャンセル.mp3"; sourceTree = "<group>"; };
+		1801FFCB2D4482F5007625A2 /* ゲームクリア.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "ゲームクリア.mp3"; sourceTree = "<group>"; };
+		1801FFCC2D4482F5007625A2 /* 正解.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "正解.mp3"; sourceTree = "<group>"; };
+		1801FFCD2D4482F5007625A2 /* 敵攻撃.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "敵攻撃.mp3"; sourceTree = "<group>"; };
+		1801FFCE2D4482F5007625A2 /* カウントダウン.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "カウントダウン.mp3"; sourceTree = "<group>"; };
+		1801FFCF2D4482F5007625A2 /* ゲームオーバー.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "ゲームオーバー.mp3"; sourceTree = "<group>"; };
+		1801FFD02D4482F5007625A2 /* 不正解.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "不正解.mp3"; sourceTree = "<group>"; };
+		1801FFD12D4482F5007625A2 /* 称号.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "称号.mp3"; sourceTree = "<group>"; };
+		1801FFD22D4482F5007625A2 /* 味方攻撃.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "味方攻撃.mp3"; sourceTree = "<group>"; };
+		1801FFD32D4482F5007625A2 /* ホームに戻る.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "ホームに戻る.mp3"; sourceTree = "<group>"; };
+		1801FFD42D4482F6007625A2 /* おとも切り替え.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "おとも切り替え.mp3"; sourceTree = "<group>"; };
 		180A9FBA2CD640ED00B35C83 /* ChangeNameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeNameView.swift; sourceTree = "<group>"; };
 		180A9FBC2CD66C5A00B35C83 /* TutorialModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialModalView.swift; sourceTree = "<group>"; };
 		180A9FC62CDF5CCA00B35C83 /* StampAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StampAnimationView.swift; sourceTree = "<group>"; };
@@ -171,23 +184,9 @@
 		181B25652CE8A43C00F8419B /* StoryQuizView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryQuizView.swift; sourceTree = "<group>"; };
 		181B25672CE987D900F8419B /* StoryQuizResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryQuizResultView.swift; sourceTree = "<group>"; };
 		181B25692CE99CE700F8419B /* StoryCoinModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryCoinModalView.swift; sourceTree = "<group>"; };
-		1820AE092B518D8C00BBA679 /* 正解.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "正解.mp3"; path = "../../../Downloads/it 効果音/正解.mp3"; sourceTree = "<group>"; };
-		1820AE0A2B518D8C00BBA679 /* カウントダウン.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "カウントダウン.mp3"; path = "../../../Downloads/it 効果音/カウントダウン.mp3"; sourceTree = "<group>"; };
-		1820AE0B2B518D8C00BBA679 /* 倒れる.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "倒れる.mp3"; path = "../../../Downloads/it 効果音/倒れる.mp3"; sourceTree = "<group>"; };
-		1820AE0D2B518D8C00BBA679 /* おとも切り替え.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "おとも切り替え.mp3"; path = "../../../Downloads/it 効果音/おとも切り替え.mp3"; sourceTree = "<group>"; };
-		1820AE0F2B518D8D00BBA679 /* キャンセル.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "キャンセル.mp3"; path = "../../../Downloads/it 効果音/キャンセル.mp3"; sourceTree = "<group>"; };
-		1820AE102B518D8D00BBA679 /* soundKettei.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = soundKettei.mp3; path = "../../../Downloads/it 効果音/soundKettei.mp3"; sourceTree = "<group>"; };
-		1820AE112B518D8D00BBA679 /* 不正解.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "不正解.mp3"; path = "../../../Downloads/it 効果音/不正解.mp3"; sourceTree = "<group>"; };
-		1820AE122B518D8D00BBA679 /* 味方攻撃.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "味方攻撃.mp3"; path = "../../../Downloads/it 効果音/味方攻撃.mp3"; sourceTree = "<group>"; };
-		1820AE132B518D8D00BBA679 /* 敵攻撃.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "敵攻撃.mp3"; path = "../../../Downloads/it 効果音/敵攻撃.mp3"; sourceTree = "<group>"; };
-		1820AE142B518D8D00BBA679 /* ホームに戻る.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "ホームに戻る.mp3"; path = "../../../Downloads/it 効果音/ホームに戻る.mp3"; sourceTree = "<group>"; };
-		1820AE152B518D8D00BBA679 /* レベルアップ.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "レベルアップ.mp3"; path = "../../../Downloads/it 効果音/レベルアップ.mp3"; sourceTree = "<group>"; };
 		18236D632BC195F3009C6CEB /* TermsOfServiceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TermsOfServiceView.swift; sourceTree = "<group>"; };
 		18236D652BC19613009C6CEB /* PrivacyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyView.swift; sourceTree = "<group>"; };
 		18236D672BC1964A009C6CEB /* TimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerView.swift; sourceTree = "<group>"; };
-		18236D692BC1967E009C6CEB /* ゲームオーバー.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "ゲームオーバー.mp3"; path = "../../その他/音声 2/ゲームオーバー.mp3"; sourceTree = "<group>"; };
-		18236D6A2BC1967E009C6CEB /* ゲームクリア.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "ゲームクリア.mp3"; path = "../../その他/音声 2/ゲームクリア.mp3"; sourceTree = "<group>"; };
-		18236D6D2BC1968B009C6CEB /* 称号.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "称号.mp3"; path = "../../その他/音声 2/称号.mp3"; sourceTree = "<group>"; };
 		18236D712BC26BC8009C6CEB /* QuizGoburinListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizGoburinListView.swift; sourceTree = "<group>"; };
 		18236D732BC26DFA009C6CEB /* QuizBossView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizBossView.swift; sourceTree = "<group>"; };
 		18236D752BC27810009C6CEB /* QuizKaijyuListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizKaijyuListView.swift; sourceTree = "<group>"; };
@@ -263,13 +262,10 @@
 		18B371B52CFAAC1D0016AEEF /* StoryMonsterModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryMonsterModalView.swift; sourceTree = "<group>"; };
 		18B371B72CFC5B140016AEEF /* StorySutaminaModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorySutaminaModalView.swift; sourceTree = "<group>"; };
 		18B371B92CFDC2B60016AEEF /* StoryInfoListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryInfoListView.swift; sourceTree = "<group>"; };
-		18BD10B72B6B601500ABB28F /* sound.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = sound.mp3; path = ../../../Downloads/sound.mp3; sourceTree = "<group>"; };
 		18C37B122D0DF9D600326A2E /* CheckUsersListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckUsersListView.swift; sourceTree = "<group>"; };
 		18DE99702D211AB2003E315A /* StoryAppliedListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryAppliedListView.swift; sourceTree = "<group>"; };
 		18E818562B5EBDFC00595669 /* RewardTimesModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardTimesModal.swift; sourceTree = "<group>"; };
 		18EA883D2B8C48AE00067FE7 /* SubModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubModalView.swift; sourceTree = "<group>"; };
-		18F95C452B51AB7200F8DBBB /* TittlesView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TittlesView.swift; path = ../../../Downloads/TittlesView.swift; sourceTree = "<group>"; };
-		18F95C472B51AB7800F8DBBB /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ContentView.swift; path = ../../../Downloads/ContentView.swift; sourceTree = "<group>"; };
 		18FE84F72CF190ED006968F9 /* ProgressStoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressStoryView.swift; sourceTree = "<group>"; };
 		26071BF32B2B4BC60012B836 /* ModalExplanationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModalExplanationView.swift; sourceTree = "<group>"; };
 		260E440F2AB572DC00FBB487 /* it.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = it.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -449,10 +445,10 @@
 				2641992B2AC2572F002013B9 /* AvatarListView.swift */,
 				267283122AFA84C600549219 /* IllustratedView.swift */,
 				269A87892AB86FC900F33C9E /* GachaView.swift */,
-				18F95C452B51AB7200F8DBBB /* TittlesView.swift */,
+				1801FFAC2D4480D1007625A2 /* TittlesView.swift */,
 				263C6AC22AFD1DC300564FF2 /* RareGachaView.swift */,
 				18B24A092D04BD55002F7BC8 /* MekaGachaView.swift */,
-				18F95C472B51AB7800F8DBBB /* ContentView.swift */,
+				1801FFAE2D4480FE007625A2 /* ContentView.swift */,
 				267743652B16371800043010 /* Interstitial.swift */,
 				18B24A032D0338FD002F7BC8 /* InterstitialStory.swift */,
 				18236D652BC19613009C6CEB /* PrivacyView.swift */,
@@ -491,22 +487,20 @@
 				18FE84F72CF190ED006968F9 /* ProgressStoryView.swift */,
 				180C1C602D0C681C004C4728 /* ProgressExpBar.swift */,
 				18C37B122D0DF9D600326A2E /* CheckUsersListView.swift */,
+				1801FFD42D4482F6007625A2 /* おとも切り替え.mp3 */,
+				1801FFCE2D4482F5007625A2 /* カウントダウン.mp3 */,
+				1801FFCA2D4482F5007625A2 /* キャンセル.mp3 */,
+				1801FFCF2D4482F5007625A2 /* ゲームオーバー.mp3 */,
+				1801FFCB2D4482F5007625A2 /* ゲームクリア.mp3 */,
+				1801FFD32D4482F5007625A2 /* ホームに戻る.mp3 */,
+				1801FFC82D4482F5007625A2 /* レベルアップ.mp3 */,
+				1801FFD12D4482F5007625A2 /* 称号.mp3 */,
+				1801FFCC2D4482F5007625A2 /* 正解.mp3 */,
+				1801FFCD2D4482F5007625A2 /* 敵攻撃.mp3 */,
+				1801FFC92D4482F5007625A2 /* 倒れる.mp3 */,
+				1801FFD02D4482F5007625A2 /* 不正解.mp3 */,
+				1801FFD22D4482F5007625A2 /* 味方攻撃.mp3 */,
 				260E44162AB572DE00FBB487 /* Assets.xcassets */,
-				1820AE102B518D8D00BBA679 /* soundKettei.mp3 */,
-				1820AE0D2B518D8C00BBA679 /* おとも切り替え.mp3 */,
-				1820AE0A2B518D8C00BBA679 /* カウントダウン.mp3 */,
-				18BD10B72B6B601500ABB28F /* sound.mp3 */,
-				1820AE0F2B518D8D00BBA679 /* キャンセル.mp3 */,
-				18236D6D2BC1968B009C6CEB /* 称号.mp3 */,
-				1820AE142B518D8D00BBA679 /* ホームに戻る.mp3 */,
-				18236D692BC1967E009C6CEB /* ゲームオーバー.mp3 */,
-				18236D6A2BC1967E009C6CEB /* ゲームクリア.mp3 */,
-				1820AE152B518D8D00BBA679 /* レベルアップ.mp3 */,
-				1820AE132B518D8D00BBA679 /* 敵攻撃.mp3 */,
-				1820AE092B518D8C00BBA679 /* 正解.mp3 */,
-				1820AE0B2B518D8C00BBA679 /* 倒れる.mp3 */,
-				1820AE112B518D8D00BBA679 /* 不正解.mp3 */,
-				1820AE122B518D8D00BBA679 /* 味方攻撃.mp3 */,
 				260E44202AB5958300FBB487 /* GoogleService-Info.plist */,
 				260E44182AB572DE00FBB487 /* Preview Content */,
 			);
@@ -610,24 +604,22 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1820AE172B518D8D00BBA679 /* 正解.mp3 in Resources */,
-				1820AE202B518D8D00BBA679 /* 味方攻撃.mp3 in Resources */,
+				1801FFDE2D4482F6007625A2 /* 称号.mp3 in Resources */,
+				1801FFDD2D4482F6007625A2 /* 不正解.mp3 in Resources */,
 				260E441A2AB572DE00FBB487 /* Preview Assets.xcassets in Resources */,
-				18236D6E2BC1968B009C6CEB /* 称号.mp3 in Resources */,
-				1820AE1F2B518D8D00BBA679 /* 不正解.mp3 in Resources */,
-				1820AE192B518D8D00BBA679 /* 倒れる.mp3 in Resources */,
-				1820AE1B2B518D8D00BBA679 /* おとも切り替え.mp3 in Resources */,
-				1820AE1D2B518D8D00BBA679 /* キャンセル.mp3 in Resources */,
-				18236D6B2BC1967E009C6CEB /* ゲームオーバー.mp3 in Resources */,
-				1820AE232B518D8D00BBA679 /* レベルアップ.mp3 in Resources */,
-				1820AE182B518D8D00BBA679 /* カウントダウン.mp3 in Resources */,
-				18BD10B82B6B601500ABB28F /* sound.mp3 in Resources */,
-				1820AE222B518D8D00BBA679 /* ホームに戻る.mp3 in Resources */,
-				18236D6C2BC1967E009C6CEB /* ゲームクリア.mp3 in Resources */,
 				260E44172AB572DE00FBB487 /* Assets.xcassets in Resources */,
+				1801FFDF2D4482F6007625A2 /* 味方攻撃.mp3 in Resources */,
+				1801FFE12D4482F6007625A2 /* おとも切り替え.mp3 in Resources */,
+				1801FFD92D4482F6007625A2 /* 正解.mp3 in Resources */,
+				1801FFDA2D4482F6007625A2 /* 敵攻撃.mp3 in Resources */,
+				1801FFE02D4482F6007625A2 /* ホームに戻る.mp3 in Resources */,
+				1801FFD52D4482F6007625A2 /* レベルアップ.mp3 in Resources */,
+				1801FFDB2D4482F6007625A2 /* カウントダウン.mp3 in Resources */,
 				260E44212AB5958300FBB487 /* GoogleService-Info.plist in Resources */,
-				1820AE1E2B518D8D00BBA679 /* soundKettei.mp3 in Resources */,
-				1820AE212B518D8D00BBA679 /* 敵攻撃.mp3 in Resources */,
+				1801FFD72D4482F6007625A2 /* キャンセル.mp3 in Resources */,
+				1801FFDC2D4482F6007625A2 /* ゲームオーバー.mp3 in Resources */,
+				1801FFD82D4482F6007625A2 /* ゲームクリア.mp3 in Resources */,
+				1801FFD62D4482F6007625A2 /* 倒れる.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -720,6 +712,7 @@
 				264F19172AF3B1A900B6FB10 /* RewardModalView.swift in Sources */,
 				2641992C2AC2572F002013B9 /* AvatarListView.swift in Sources */,
 				1896A2012BAD77E40072F12B /* ManagerListView.swift in Sources */,
+				1801FFAD2D4480D1007625A2 /* TittlesView.swift in Sources */,
 				183211792B9DBE4E0064F10A /* PentagonAppliedShape.swift in Sources */,
 				183211772B9DBCA30064F10A /* PentagonInfoShape.swift in Sources */,
 				26ADE3422ADC382F009BDF48 /* SettingView.swift in Sources */,
@@ -735,6 +728,7 @@
 				189892522C52677400970794 /* ITStoratagyManagerListView.swift in Sources */,
 				267743662B16371800043010 /* Interstitial.swift in Sources */,
 				18236D662BC19613009C6CEB /* PrivacyView.swift in Sources */,
+				1801FFAF2D4480FE007625A2 /* ContentView.swift in Sources */,
 				18C37B132D0DF9D600326A2E /* CheckUsersListView.swift in Sources */,
 				183A778D2CBA8D280000B839 /* ReviewView.swift in Sources */,
 				18A5A4B62B7C6A0D009EFAB6 /* TestAnimationView.swift in Sources */,
@@ -746,7 +740,6 @@
 				2650137F2B3FE04B006B81D6 /* HelpView1.swift in Sources */,
 				183211652B9CB7DF0064F10A /* QuizInfoStrategyListView.swift in Sources */,
 				18B371BA2CFDC2B60016AEEF /* StoryInfoListView.swift in Sources */,
-				18F95C462B51AB7200F8DBBB /* TittlesView.swift in Sources */,
 				26266B2D2B4A5395007B5964 /* GraphManagerView.swift in Sources */,
 				26266B2F2B4A53F8007B5964 /* BarChartView.swift in Sources */,
 				189892482C4FD84A00970794 /* ESManagerListView.swift in Sources */,
@@ -774,7 +767,6 @@
 				263C6AC32AFD1DC400564FF2 /* RareGachaView.swift in Sources */,
 				1832115F2B9C9E1D0064F10A /* InfoManagerListView.swift in Sources */,
 				183211872BA013EC0064F10A /* QuizInfoBasicListView.swift in Sources */,
-				18F95C482B51AB7800F8DBBB /* ContentView.swift in Sources */,
 				189F82C62BA549AC00C0247A /* RankMatchQuizView.swift in Sources */,
 				183211632B9CB7B60064F10A /* QuizITStrategyListView.swift in Sources */,
 				182899CA2CC36733001BD535 /* SplashScreenView.swift in Sources */,
@@ -958,7 +950,7 @@
 				CODE_SIGN_ENTITLEMENTS = it/it.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8.1;
+				CURRENT_PROJECT_VERSION = 8.2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"it/Preview Content\"";
 				DEVELOPMENT_TEAM = F3XS565TSX;
@@ -976,7 +968,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 8.1;
+				MARKETING_VERSION = 8.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "Swift-Beginners-app.it";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -995,7 +987,7 @@
 				CODE_SIGN_ENTITLEMENTS = it/it.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8.1;
+				CURRENT_PROJECT_VERSION = 8.2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"it/Preview Content\"";
 				DEVELOPMENT_TEAM = F3XS565TSX;
@@ -1013,7 +1005,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 8.1;
+				MARKETING_VERSION = 8.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "Swift-Beginners-app.it";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

@@ -425,14 +425,14 @@ struct PreView: View {
                                 }
                                 .font(.system(size: 20))
                                 .bold()
-                                .foregroundColor(.white)
+                                .foregroundColor(.black)
                                 .padding(10)
                                 .frame(maxWidth: .infinity)
-                                .background(Color.black)
+                                .background(Color.white)
                                 .cornerRadius(10)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 10)
-                                        .stroke(Color.white, lineWidth: 2)
+                                        .stroke(Color.black, lineWidth: 2)
                                 )
                                 .padding(.horizontal,20)
                                 .shadow(radius: 30)
