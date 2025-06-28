@@ -77,6 +77,11 @@ struct TopView: View {
     }
 }
 
+func generateHapticFeedback() {
+    let generator = UIImpactFeedbackGenerator(style: .medium)
+    generator.impactOccurred()
+}
+
 struct TopView_Previews: PreviewProvider {
     static var previews: some View {
         TopView()

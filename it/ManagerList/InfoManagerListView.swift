@@ -63,7 +63,8 @@ struct InfoManagerListView: View {
                             .padding(.leading,30)
                             .padding(.bottom)
                             .padding(.top)
-                            Button(action: {
+                            Button(action: { 
+                        generateHapticFeedback()
                                 audioManager.playKetteiSound()
                                 if userPreFlag != 1 {
                                     preFlag = true
@@ -161,7 +162,8 @@ struct InfoManagerListView: View {
                             .padding(.horizontal)
                             .padding(.bottom)
                             .padding(.leading,15)
-                                Button(action: {
+                                Button(action: { 
+                        generateHapticFeedback()
                                     audioManager.playKetteiSound()
                                     // 画面遷移のトリガーをオンにする
                                     self.isPresentingQuizIntermediate = true
@@ -181,7 +183,8 @@ struct InfoManagerListView: View {
                             .background(GeometryReader { geometry in
                                 Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
                             })
-                            Button(action: {
+                            Button(action: { 
+                        generateHapticFeedback()
                                 audioManager.playKetteiSound()
                                 self.isPresentingQuizNetwork = true
                             }) {
@@ -198,7 +201,8 @@ struct InfoManagerListView: View {
                                 QuizInfoStrategyListView(isPresenting: $isPresentingQuizNetwork)
                                         }
                             
-                        Button(action: {
+                        Button(action: { 
+                        generateHapticFeedback()
                             audioManager.playKetteiSound()
                             self.isPresentingQuizGod = true
                         }) {
@@ -214,7 +218,8 @@ struct InfoManagerListView: View {
                         .fullScreenCover(isPresented: $isPresentingQuizGod) {
                             QuizInfoTechnologyListView(isPresenting: $isPresentingQuizGod)
                                     }
-                            Button(action: {
+                            Button(action: { 
+                        generateHapticFeedback()
                                 audioManager.playKetteiSound()
                                 self.isPresentingQuizAdvanced = true
                             }) {
@@ -241,7 +246,8 @@ struct InfoManagerListView: View {
                                 VStack{
                                     Spacer()
                                     HStack {
-                                        Button(action: {
+                                        Button(action: { 
+                        generateHapticFeedback()
                                            reward.ExAndMoReward()
                                        }, label: {
                                            if reward.rewardLoaded{
@@ -343,7 +349,8 @@ struct InfoManagerListView: View {
                     .ignoresSafeArea()
                     VStack{
                         HStack{
-                            Button(action: {
+                            Button(action: { 
+                        generateHapticFeedback()
                                 tutorialNum = 0 // タップでチュートリアルを終了
                                 authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { success in
                                 }
@@ -421,7 +428,8 @@ struct InfoManagerListView: View {
                 PreView(audioManager: audioManager)
             }
                 .navigationBarBackButtonHidden(true)
-                .navigationBarItems(leading: Button(action: {
+                .navigationBarItems(leading: Button(action: { 
+                        generateHapticFeedback()
                     self.presentationMode.wrappedValue.dismiss()
                     audioManager.playCancelSound()
                 }) {

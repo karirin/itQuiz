@@ -64,7 +64,8 @@ struct ITManagerListView: View {
                             .padding(.leading,30)
                             .padding(.bottom)
                             .padding(.top)
-                            Button(action: {
+                            Button(action: { 
+                        generateHapticFeedback()
                                 audioManager.playKetteiSound()
                                 // 画面遷移のトリガーをオンにする
                                 if userPreFlag != 1 {
@@ -161,7 +162,8 @@ struct ITManagerListView: View {
                             .padding(.horizontal)
                             .padding(.bottom)
                             .padding(.leading,15)
-                                Button(action: {
+                                Button(action: { 
+                        generateHapticFeedback()
                                     audioManager.playKetteiSound()
                                     // 画面遷移のトリガーをオンにする
                                     self.isPresentingQuizBeginner = true
@@ -183,7 +185,8 @@ struct ITManagerListView: View {
                                                 QuizITBasicList(isPresenting: $isPresentingQuizBeginner)
                                             }
                             
-                            Button(action: {
+                            Button(action: { 
+                        generateHapticFeedback()
                                 audioManager.playKetteiSound()
                                 self.isPresentingQuizIntermediate = true
                             }) {
@@ -200,7 +203,8 @@ struct ITManagerListView: View {
                                 QuizITStrategyListView(isPresenting: $isPresentingQuizIntermediate)
                                         }
                             
-                            Button(action: {
+                            Button(action: { 
+                        generateHapticFeedback()
                                 audioManager.playKetteiSound()
                                 self.isPresentingQuizGod = true
                             }) {
@@ -216,7 +220,8 @@ struct ITManagerListView: View {
                             .fullScreenCover(isPresented: $isPresentingQuizGod) {
                                 QuizITTechnologyListView(isPresenting: $isPresentingQuizGod)
                                         }
-                            Button(action: {
+                            Button(action: { 
+                        generateHapticFeedback()
                                 audioManager.playKetteiSound()
                                 self.isPresentingQuizAdvanced = true
                             }) {
@@ -233,7 +238,8 @@ struct ITManagerListView: View {
                                 QuizITManagementListView(isPresenting: $isPresentingQuizAdvanced)
                                         }
                             // ネットワーク系の問題
-//                            Button(action: {
+//                            Button(action: { 
+//                        generateHapticFeedback()
 //                                audioManager.playKetteiSound()
 //                                self.isPresentingQuizNetwork = true
 //                            }) {
@@ -251,7 +257,8 @@ struct ITManagerListView: View {
 //                                        }
 //                            
 //                            // セキュリティ系の問題
-//                            Button(action: {
+//                            Button(action: { 
+//                        generateHapticFeedback()
 //                                audioManager.playKetteiSound()
 //                                self.isPresentingQuizSecurity = true
 //                            }) {
@@ -269,7 +276,8 @@ struct ITManagerListView: View {
 //                                        }
 //                            
 //                            // データベース系の問題
-//                            Button(action: {
+//                            Button(action: { 
+//                        generateHapticFeedback()
 //                                audioManager.playKetteiSound()
 //                                self.isPresentingQuizDatabase = true
 //                            }) {
@@ -298,7 +306,8 @@ struct ITManagerListView: View {
                                 VStack{
                                     Spacer()
                                     HStack {
-                                        Button(action: {
+                                        Button(action: { 
+                        generateHapticFeedback()
                                             reward.ExAndMoReward()
                                         }, label: {
                                             if reward.rewardLoaded{
@@ -397,7 +406,8 @@ struct ITManagerListView: View {
                     .ignoresSafeArea()
                     VStack{
                         HStack{
-                            Button(action: {
+                            Button(action: { 
+                        generateHapticFeedback()
                                 tutorialNum = 0 // タップでチュートリアルを終了
                                 authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { success in
                                 }
@@ -475,7 +485,8 @@ struct ITManagerListView: View {
                 PreView(audioManager: audioManager)
             }
             .navigationBarBackButtonHidden(true)
-            .navigationBarItems(leading: Button(action: {
+            .navigationBarItems(leading: Button(action: { 
+                        generateHapticFeedback()
                 self.presentationMode.wrappedValue.dismiss()
                 audioManager.playCancelSound()
             }) {

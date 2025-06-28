@@ -65,7 +65,8 @@ struct ManagerListTabView: View {
 //                            .padding(.horizontal,0)
                             .padding(.bottom)
                             .padding(.top)
-                            Button(action: {
+                            Button(action: { 
+                        generateHapticFeedback()
                                 audioManager.playKetteiSound()
                                 // 画面遷移のトリガーをオンにする
                                 self.isPresentingQuizIncorrectAnswer = true
@@ -133,7 +134,8 @@ struct ManagerListTabView: View {
                             }
                             .padding(.leading,30)
                             .padding(.bottom)
-                                Button(action: {
+                                Button(action: { 
+                        generateHapticFeedback()
                                     audioManager.playKetteiSound()
                                     // 画面遷移のトリガーをオンにする
                                     self.isPresentingITView = true
@@ -153,7 +155,8 @@ struct ManagerListTabView: View {
                             .background(GeometryReader { geometry in
                                 Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
                             })
-                            Button(action: {
+                            Button(action: { 
+                        generateHapticFeedback()
                                 audioManager.playKetteiSound()
                                 self.isPresentingInfoView = true
                             }) {
@@ -170,7 +173,8 @@ struct ManagerListTabView: View {
 //                                            QuizIntermediateList(isPresenting: $isPresentingQuizIntermediate)
 //                                        }
                             
-                            Button(action: {
+                            Button(action: { 
+                        generateHapticFeedback()
                                 audioManager.playKetteiSound()
                                 self.isPresentingAppliedView = true
                             }) {
@@ -183,7 +187,8 @@ struct ManagerListTabView: View {
                             .padding(.horizontal)
                             .padding(.bottom)
                             .shadow(radius: 3)
-                            Button(action: {
+                            Button(action: { 
+                        generateHapticFeedback()
                                 audioManager.playSound()
                                 self.isPresentingSystemArchitectView = true
                             }) {
@@ -196,7 +201,8 @@ struct ManagerListTabView: View {
                             .padding(.bottom)
                             .shadow(radius: 3)
                             
-                            Button(action: {
+                            Button(action: { 
+                        generateHapticFeedback()
                                 audioManager.playSound()
                                 self.isPresentingESView = true
                             }) {
@@ -211,7 +217,8 @@ struct ManagerListTabView: View {
 //                            .fullScreenCover(isPresented: $isPresentingQuizAdvanced) {
 //                                            QuizAdvancedList(isPresenting: $isPresentingQuizAdvanced)
 //                                        }
-//                            Button(action: {
+//                            Button(action: { 
+//                        generateHapticFeedback()
 //                                audioManager.playKetteiSound()
 //                                self.isPresentingQuizGod = true
 //                            }) {
@@ -228,7 +235,8 @@ struct ManagerListTabView: View {
 //                                            QuizGodList(isPresenting: $isPresentingQuizGod)
 //                                        }
                             // ネットワーク系の問題
-//                            Button(action: {
+//                            Button(action: { 
+//                        generateHapticFeedback()
 //                                audioManager.playKetteiSound()
 //                                self.isPresentingQuizNetwork = true
 //                            }) {
@@ -246,7 +254,8 @@ struct ManagerListTabView: View {
 //                                        }
                             
                             // セキュリティ系の問題
-//                            Button(action: {
+//                            Button(action: { 
+//                        generateHapticFeedback()
 //                                audioManager.playKetteiSound()
 //                                self.isPresentingQuizSecurity = true
 //                            }) {
@@ -264,7 +273,8 @@ struct ManagerListTabView: View {
 //                                        }
                             
                             // データベース系の問題
-//                            Button(action: {
+//                            Button(action: { 
+//                        generateHapticFeedback()
 //                                audioManager.playKetteiSound()
 //                                self.isPresentingQuizDatabase = true
 //                            }) {
@@ -297,7 +307,8 @@ struct ManagerListTabView: View {
                                 VStack{
                                     Spacer()
                                     HStack {
-                                        Button(action: {
+                                        Button(action: { 
+                        generateHapticFeedback()
                                            reward.ExAndMoReward()
                                        }, label: {
                                            if reward.rewardLoaded{
@@ -409,7 +420,8 @@ struct ManagerListTabView: View {
                 }
             }
             .navigationBarBackButtonHidden(true)
-//            .navigationBarItems(leading: Button(action: {
+//            .navigationBarItems(leading: Button(action: { 
+//                        generateHapticFeedback()
 //                self.presentationMode.wrappedValue.dismiss()
 //                audioManager.playCancelSound()
 //            }) {

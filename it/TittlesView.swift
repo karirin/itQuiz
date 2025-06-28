@@ -186,7 +186,8 @@ struct TittlesView: View {
 //                                    if authManager.avatars.contains(where: { $0.name == item.name }) {
                                     if userTitles[item.name] == true {
                                         // ユーザーが持っているアバターの画像を表示
-                                        Button(action: {
+                                        Button(action: { 
+                        generateHapticFeedback()
                                             selectedItem = item
                                             audioManager.playSound()
                                         }) {
@@ -199,7 +200,8 @@ struct TittlesView: View {
                                         }
                                     } else {
                                         // ユーザーが持っていないアバターのシルエットを表示
-                                        Button(action: {
+                                        Button(action: { 
+                        generateHapticFeedback()
                                             selectedItem = item
                                             audioManager.playSound()
                                         }) {
@@ -234,7 +236,8 @@ Spacer()
         }
         .background(Color(hue: 0.557, saturation: 0.098, brightness: 1.0))
         .navigationBarBackButtonHidden(true)
-        .navigationBarItems(leading: Button(action: {
+        .navigationBarItems(leading: Button(action: { 
+                        generateHapticFeedback()
             self.presentationMode.wrappedValue.dismiss()
             audioManager.playCancelSound()
         }) {

@@ -41,7 +41,8 @@ struct HelpModalView: View {
                             RoundedRectangle(cornerRadius: 10)
                                 .stroke(Color.gray, lineWidth: 1)
                         )
-                    Button(action: {
+                    Button(action: { 
+                        generateHapticFeedback()
                         if toggle == true {
                             authManager.updateUserCsFlag(userId: authManager.currentUserId!, userCsFlag: 1) { success in
                             }
@@ -98,7 +99,8 @@ struct HelpModalView: View {
         .shadow(radius: 10)
         .overlay(
             // 「×」ボタンを右上に配置
-            Button(action: {
+            Button(action: { 
+                        generateHapticFeedback()
                 audioManager.playCancelSound()
 //                print(toggle)
                 if toggle == true {

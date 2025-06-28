@@ -40,7 +40,8 @@ struct ReviewView: View {
                     
                     HStack{
                         Spacer()
-                        Button(action: {
+                        Button(action: { 
+                        generateHapticFeedback()
                             if toggle == true {
                                 authManager.updateUserCsFlag(userId: authManager.currentUserId!, userCsFlag: 1) { success in
                                 }
@@ -55,7 +56,8 @@ struct ReviewView: View {
                             }
                         })
                         Spacer()
-                        Button(action: {
+                        Button(action: { 
+                        generateHapticFeedback()
                             authManager.updateUserCsFlag(userId: authManager.currentUserId!, userCsFlag: 1) { success in
                             }
                             activeAlert = .dissatisfied
@@ -114,7 +116,8 @@ struct ReviewView: View {
         .shadow(radius: 10)
         .overlay(
             // 「×」ボタンを右上に配置
-            Button(action: {
+            Button(action: { 
+                        generateHapticFeedback()
                 audioManager.playCancelSound()
 //                print(toggle)
                 if toggle == true {

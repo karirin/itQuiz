@@ -138,7 +138,8 @@ struct SettingView: View {
             AuthManager.shared.fetchCurrentUserAdminFlag()
         }
         .navigationViewStyle(StackNavigationViewStyle())
-        .navigationBarItems(leading: Button(action: {
+        .navigationBarItems(leading: Button(action: { 
+                        generateHapticFeedback()
                             self.presentationMode.wrappedValue.dismiss()
                             audioManager.playCancelSound()
                         }) {

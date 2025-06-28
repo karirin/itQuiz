@@ -39,7 +39,8 @@ struct GachaManagerView: View {
     var body: some View {
             VStack {
                 ScrollView{
-                    Button(action: {
+                    Button(action: { 
+                        generateHapticFeedback()
                         audioManager.playSound()
                         // 画面遷移のトリガーをオンにする
                         self.isPresentingQuizBeginner = true
@@ -51,7 +52,8 @@ struct GachaManagerView: View {
                             .shadow(radius: 5)
                             .padding()
                     }
-                    Button(action: {
+                    Button(action: { 
+                        generateHapticFeedback()
                         audioManager.playSound()
                         self.isPresentingQuizIntermediate = true
                     }) {
@@ -62,7 +64,8 @@ struct GachaManagerView: View {
                             .shadow(radius: 5)
                             .padding()
                     }
-                    Button(action: {
+                    Button(action: { 
+                        generateHapticFeedback()
                         audioManager.playSound()
                         self.isPresentingQuizAdvanced = true
                     }) {
@@ -80,7 +83,8 @@ struct GachaManagerView: View {
 //                        Spacer()
 //                    }
 //                    .padding(.leading)
-//                    Button(action: {
+//                    Button(action: { 
+//                        generateHapticFeedback()
 //                        audioManager.playSound()
 //                        // 画面遷移のトリガーをオンにする
 //                        self.isPresentingQuizBeginner = true
@@ -103,7 +107,8 @@ struct GachaManagerView: View {
 //                        Spacer()
 //                    }
 //                    .padding(.leading)
-//                    Button(action: {
+//                    Button(action: { 
+//                        generateHapticFeedback()
 //                        audioManager.playSound()
 //                        self.isPresentingQuizIntermediate = true
 //                    }) {
@@ -157,7 +162,8 @@ struct GachaManagerView: View {
             }
         }
         .navigationBarBackButtonHidden(true)
-        .navigationBarItems(leading: Button(action: {
+        .navigationBarItems(leading: Button(action: { 
+                        generateHapticFeedback()
             self.presentationMode.wrappedValue.dismiss()
             audioManager.playCancelSound()
         }) {

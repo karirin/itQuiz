@@ -120,7 +120,8 @@ struct RankMatchListView: View {
                                     }
                                     Spacer()
                                     //                            }
-                                    Button(action: {
+                                    Button(action: { 
+                        generateHapticFeedback()
                                         // 画面遷移のトリガーをオンにする
                                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                                             self.selectedUser = user

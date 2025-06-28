@@ -181,7 +181,8 @@ struct GachaView: View {
         ZStack{
             VStack{
                 HStack{
-                    Button(action: {
+                    Button(action: { 
+                        generateHapticFeedback()
                         self.presentationMode.wrappedValue.dismiss()
                         audioManager.playCancelSound()
                     }) {
@@ -201,7 +202,8 @@ struct GachaView: View {
                             .padding(.leading,25)
                             .padding(.top,3)
                     }
-                    Button(action: {
+                    Button(action: { 
+                        generateHapticFeedback()
                         audioManager.playSound()
                         self.showCoinModal = true
                         showUnCoinModal = false
@@ -278,7 +280,8 @@ struct GachaView: View {
                     HStack{
                         Spacer()
                         VStack{
-                        Button(action: {
+                        Button(action: { 
+                        generateHapticFeedback()
                             authManager.decreaseUserMoney { success in
                                 if success {
                                     print("User money decreased successfully.")
@@ -320,7 +323,8 @@ struct GachaView: View {
                             .padding(.top,-5)
                     }
                         Spacer()
-                        Button(action: {
+                        Button(action: { 
+                        generateHapticFeedback()
                             reward.ShowReward()
                         }) {
                             if reward.rewardLoaded {
@@ -367,7 +371,8 @@ struct GachaView: View {
                         HStack{
                             Spacer()
                             VStack{
-                                Button(action: {
+                                Button(action: { 
+                        generateHapticFeedback()
                                     self.showResult = false
                                     authManager.decreaseUserMoney { success in
                                         if success {
@@ -405,7 +410,8 @@ struct GachaView: View {
                                     .padding(.top,-5)
                             }
                             Spacer()
-                            Button(action: {
+                            Button(action: { 
+                        generateHapticFeedback()
                                 reward.ShowReward()
                             }) {
                                 if reward.rewardLoaded {
@@ -569,7 +575,8 @@ struct GachaView: View {
 
         .frame(maxWidth: .infinity,maxHeight: .infinity)
         .navigationBarBackButtonHidden(true)
-//                .navigationBarItems(leading: Button(action: {
+//                .navigationBarItems(leading: Button(action: { 
+//                        generateHapticFeedback()
 //                    self.presentationMode.wrappedValue.dismiss()
 //                    audioManager.playCancelSound()
 //                }) {

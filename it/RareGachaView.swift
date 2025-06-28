@@ -115,7 +115,8 @@ struct RareGachaView: View {
         ZStack{
             VStack{
                 HStack{
-                    Button(action: {
+                    Button(action: { 
+                        generateHapticFeedback()
                         self.presentationMode.wrappedValue.dismiss()
                         audioManager.playCancelSound()
                     }) {
@@ -135,7 +136,8 @@ struct RareGachaView: View {
                             .padding(.leading,25)
                             .padding(.top,3)
                     }
-                    Button(action: {
+                    Button(action: { 
+                        generateHapticFeedback()
                     audioManager.playSound()
                     self.showCoinModal = true
                     showUnCoinModal = false
@@ -202,7 +204,8 @@ struct RareGachaView: View {
                     HStack{
                         Spacer()
                         VStack{
-                            Button(action: {
+                            Button(action: { 
+                        generateHapticFeedback()
                                 //                            authManager.decreaseUserMoney { success in
                                 authManager.decreaseRareUserMoney { success in
                                     if success {
@@ -244,7 +247,8 @@ struct RareGachaView: View {
                                 .frame(maxWidth:130,maxHeight:50)
                         }
                         Spacer()
-                        Button(action: {
+                        Button(action: { 
+                        generateHapticFeedback()
                             reward.ShowReward()
                         }) {
                             Image("獲得")
@@ -274,7 +278,8 @@ struct RareGachaView: View {
                         HStack{
                             Spacer()
                             VStack{
-                                Button(action: {
+                                Button(action: { 
+                        generateHapticFeedback()
                                     self.showResult = false
                                     //                                authManager.decreaseUserMoney { success in
                                     authManager.decreaseRareUserMoney { success in
@@ -313,7 +318,8 @@ struct RareGachaView: View {
                                     .frame(maxWidth:130,maxHeight:50)
                             }
                             Spacer()
-                            Button(action: {
+                            Button(action: { 
+                        generateHapticFeedback()
                                 reward.ShowReward()
                             }) {
                                 Image("獲得")
@@ -488,7 +494,8 @@ struct RareGachaView: View {
 
         .frame(maxWidth: .infinity,maxHeight: .infinity)
 //        .navigationBarBackButtonHidden(true)
-//                .navigationBarItems(leading: Button(action: {
+//                .navigationBarItems(leading: Button(action: { 
+//                        generateHapticFeedback()
 //                    self.presentationMode.wrappedValue.dismiss()
 //                    audioManager.playCancelSound()
 //                }) {

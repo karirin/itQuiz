@@ -31,7 +31,8 @@ struct ModalReturnView: View {
                         
                         HStack{
                             Spacer()
-                            Button(action: {
+                            Button(action: { 
+                        generateHapticFeedback()
                                 if isButtonActive {
 //                                    currentQuizIndex += 1
                                     isPresented = false

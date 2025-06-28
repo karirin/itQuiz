@@ -498,7 +498,8 @@ struct QuizView: View {
                      .edgesIgnoringSafeArea(.all)
                 VStack {
                     HStack{
-                        Button(action: {
+                        Button(action: { 
+                        generateHapticFeedback()
                             showHomeModal.toggle()
                             audioManager.playSound()
                         }) {
@@ -776,7 +777,8 @@ struct QuizView: View {
                     VStack{
                         Spacer()
                         HStack{
-                            Button(action: {
+                            Button(action: { 
+                        generateHapticFeedback()
                                 tutorialNum = 0 // タップでチュートリアルを終了
                                 authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { success in
                                     // データベースのアップデートが成功したかどうかをハンドリング
@@ -843,7 +845,8 @@ struct QuizView: View {
                     .ignoresSafeArea()
                     VStack{
                         HStack{
-                            Button(action: {
+                            Button(action: { 
+                        generateHapticFeedback()
                                 tutorialNum = 0 // タップでチュートリアルを終了
                                 authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { success in
                                     // データベースのアップデートが成功したかどうかをハンドリング
@@ -914,7 +917,8 @@ struct QuizView: View {
                     VStack{
                         Spacer()
                         HStack{
-                            Button(action: {
+                            Button(action: { 
+                        generateHapticFeedback()
                                 tutorialNum = 0 // タップでチュートリアルを終了
                                 authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { success in
                                     // データベースのアップデートが成功したかどうかをハンドリング
@@ -981,7 +985,8 @@ struct QuizView: View {
                     VStack{
                         Spacer()
                         HStack{
-                            Button(action: {
+                            Button(action: { 
+                        generateHapticFeedback()
                                 tutorialNum = 0 // タップでチュートリアルを終了
                                 authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { success in
                                     // データベースのアップデートが成功したかどうかをハンドリング

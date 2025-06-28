@@ -25,7 +25,8 @@ struct LoginModalView: View {
             .shadow(radius: 10)
             .overlay(
                 // 「×」ボタンを右上に配置
-                Button(action: {
+                Button(action: { 
+                        generateHapticFeedback()
                     audioManager.playCancelSound()
                     isPresented = false
                 }) {

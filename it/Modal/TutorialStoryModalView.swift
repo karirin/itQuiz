@@ -44,7 +44,8 @@ struct TutorialStoryModalView: View {
         .shadow(radius: 10)
         .overlay(
             // 「×」ボタンを右上に配置
-            Button(action: {
+            Button(action: { 
+                        generateHapticFeedback()
 //                isFlag = true
                 isPresented = false
                 isTutorialStart = true

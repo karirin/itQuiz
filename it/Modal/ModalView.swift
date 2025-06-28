@@ -25,7 +25,8 @@ struct ModalView: View {
     var body: some View {
         ZStack {
             VStack(spacing: 10) {
-                Button(action: {
+                Button(action: { 
+                        generateHapticFeedback()
                     isPresenting = false
                     audioManager.playReturnSound()
                 }) {
@@ -41,7 +42,8 @@ struct ModalView: View {
                 }.buttonStyle(.plain)
                 NavigationLink("", destination: TopView().navigationBarBackButtonHidden(true), isActive: $isContentView)
                 
-                Button(action: {
+                Button(action: { 
+                        generateHapticFeedback()
                     isSoundOn.toggle()
                     audioManager.playSound()
                     if userFlag == 0 {
@@ -68,7 +70,8 @@ struct ModalView: View {
                         .shadow(radius: 1)
                 }
                 
-                Button(action: {
+                Button(action: { 
+                        generateHapticFeedback()
                     showHomeModal = false
                     tutorialNum = 4
                     authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 4) { success in
@@ -93,7 +96,8 @@ struct ModalView: View {
             .shadow(radius: 10)
             .overlay(
                 // 「×」ボタンを右上に配置
-                Button(action: {
+                Button(action: { 
+                        generateHapticFeedback()
                     isPresented = false
                     resumeTimer()
                     audioManager.playCancelSound()

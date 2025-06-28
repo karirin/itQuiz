@@ -437,7 +437,8 @@ struct RankMatchQuizView: View {
         ZStack{
             VStack {
                 HStack{
-                    Button(action: {
+                    Button(action: { 
+                        generateHapticFeedback()
                         showHomeModal.toggle()
                         audioManager.playSound()
                     }) {

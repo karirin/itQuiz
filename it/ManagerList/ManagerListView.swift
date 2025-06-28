@@ -17,7 +17,8 @@ import Firebase
 //        
 //        HStack(spacing: 0) {
 //            ForEach(0 ..< list.count, id: \.self) { row in
-//                Button(action: {
+//                Button(action: { 
+//                        generateHapticFeedback()
 //                    withAnimation {
 //                        selectedTab = row
 //                    }
@@ -105,7 +106,8 @@ struct ManagerListView: View {
                             .padding(.leading,30)
                             .padding(.bottom)
                             .padding(.top)
-                                Button(action: {
+                                Button(action: { 
+                        generateHapticFeedback()
                                     audioManager.playSound()
                                     // 画面遷移のトリガーをオンにする
                                     self.isPresentingITView = true
@@ -122,7 +124,8 @@ struct ManagerListView: View {
                             .background(GeometryReader { geometry in
                                 Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
                             })
-                            Button(action: {
+                            Button(action: { 
+                        generateHapticFeedback()
                                 audioManager.playSound()
                                 self.isPresentingInfoView = true
                             }) {
@@ -135,7 +138,8 @@ struct ManagerListView: View {
                             .padding(.horizontal)
                             .padding(.bottom)
                             .shadow(radius: 3)
-                            Button(action: {
+                            Button(action: { 
+                        generateHapticFeedback()
                                 audioManager.playSound()
                                 self.isPresentingAppliedView = true
                             }) {
@@ -148,7 +152,8 @@ struct ManagerListView: View {
                             .padding(.horizontal)
                             .padding(.bottom)
                             .shadow(radius: 3)
-                            Button(action: {
+                            Button(action: { 
+                        generateHapticFeedback()
                                 audioManager.playSound()
                                 self.isPresentingSystemArchitectView = true
                             }) {
@@ -161,7 +166,8 @@ struct ManagerListView: View {
                             .padding(.bottom)
                             .shadow(radius: 3)
                             
-                            Button(action: {
+                            Button(action: { 
+                        generateHapticFeedback()
                                 audioManager.playSound()
                                 self.isPresentingESView = true
                             }) {
@@ -190,7 +196,8 @@ struct ManagerListView: View {
                                 VStack{
                                     Spacer()
                                     HStack {
-                                        Button(action: {
+                                        Button(action: { 
+                        generateHapticFeedback()
                                             reward.ExAndMoReward()
                                         }, label: {
                                             if reward.rewardLoaded{
@@ -290,7 +297,8 @@ struct ManagerListView: View {
                     VStack{
                         Spacer()
                         HStack{
-                            Button(action: {
+                            Button(action: { 
+                        generateHapticFeedback()
                                 tutorialNum = 0 // タップでチュートリアルを終了
                                 authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { success in
                                 }

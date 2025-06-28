@@ -64,7 +64,8 @@ struct AvatarListView: View {
                                     .frame(width: 80, height: 40)
                                     .position(x: UIScreen.main.bounds.width / 1.3, y: UIScreen.main.bounds.height / 6.0)
                             } else {
-                                Button(action: {
+                                Button(action: { 
+                        generateHapticFeedback()
                                     audioManager.playSound()
                                     self.switchingAvatar = selected
                                     self.showingAlert1 = true
@@ -133,7 +134,8 @@ struct AvatarListView: View {
                                                     .frame(width: 80, height: 80)
                                                     .cornerRadius(8)
                                             }
-                                Button(action: {
+                                Button(action: { 
+                        generateHapticFeedback()
                                     // ここにおともを切り替えるコードを書く
                                     self.switchingAvatar = avatar
                                     if selectedItem == avatar {
@@ -214,7 +216,8 @@ Spacer()
         }
         .background(Color("Color2"))
         .navigationBarBackButtonHidden(true)
-        .navigationBarItems(leading: Button(action: {
+        .navigationBarItems(leading: Button(action: { 
+                        generateHapticFeedback()
             self.presentationMode.wrappedValue.dismiss()
             audioManager.playCancelSound()
         }) {

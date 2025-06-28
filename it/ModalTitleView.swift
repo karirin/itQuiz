@@ -178,7 +178,8 @@ struct ModalTittleView: View {
         }
         .overlay(
             // 「×」ボタンを右上に配置
-            Button(action: {
+            Button(action: { 
+                        generateHapticFeedback()
                 showLevelUpModal = false
                 audioManager.playCancelSound()
             }) {

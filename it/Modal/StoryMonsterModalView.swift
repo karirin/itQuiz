@@ -96,7 +96,8 @@ struct StoryMonsterModalView: View {
                     HStack{
                         Spacer()
                             .frame(width:270)
-                        Button(action: {
+                        Button(action: { 
+                        generateHapticFeedback()
                             isPresented = false
                             audioManager.playCancelSound()
                         }) {
@@ -150,7 +151,8 @@ struct StoryMonsterModalView: View {
                             .foregroundStyle(.white)
                             .fontWeight(.bold)
                             .multilineTextAlignment(.center)
-                        Button(action: {
+                        Button(action: { 
+                        generateHapticFeedback()
                             isPresented = false
                             showQuizList = true
                             audioManager.playKetteiSound()

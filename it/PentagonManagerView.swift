@@ -56,7 +56,8 @@ struct PentagonManagerView: View {
                 .background(Color("Color2"))
             
 //            .navigationBarBackButtonHidden(true)
-//            .navigationBarItems(leading: Button(action: {
+//            .navigationBarItems(leading: Button(action: { 
+//                        generateHapticFeedback()
 //                self.presentationMode.wrappedValue.dismiss()
 //                audioManager.playCancelSound()
 //            }) {

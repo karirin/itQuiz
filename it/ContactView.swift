@@ -18,7 +18,8 @@ struct ContactView: View {
         ScrollView{
             VStack(spacing: -25) {
                 HStack{
-                    Button(action: {
+                    Button(action: { 
+                        generateHapticFeedback()
                         self.presentationMode.wrappedValue.dismiss()
                         audioManager.playCancelSound()
                     }) {
@@ -32,7 +33,8 @@ struct ContactView: View {
                     Text("お問合せ")
                         .font(.system(size:24))
                     Spacer()
-                    Button(action: {
+                    Button(action: { 
+                        generateHapticFeedback()
                         self.presentationMode.wrappedValue.dismiss()
                         audioManager.playCancelSound()
                     }) {
@@ -70,7 +72,8 @@ struct ContactView: View {
                             .stroke(Color.gray, lineWidth: 1)
                     )
                     .padding(.horizontal)
-                    Button(action: {
+                    Button(action: { 
+                        generateHapticFeedback()
                         authManager.updateContact(userId: authManager.currentUserId!, newContact: text){ success in
                             self.showAlert = true
                             self.text = ""

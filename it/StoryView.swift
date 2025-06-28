@@ -664,7 +664,8 @@ struct StoryView: View {
                         VStack(spacing:5) {
                                 HStack{
                                     if isReturnActive {
-                                        Button(action: {
+                                        Button(action: { 
+                        generateHapticFeedback()
                                             isPresented = false
                                             audioManager.playCancelSound()
                                         }) {
@@ -678,7 +679,8 @@ struct StoryView: View {
                                         .cornerRadius(30).buttonStyle(.plain)
                                     }
                                 Spacer()
-                                    Button(action: {
+                                    Button(action: { 
+                        generateHapticFeedback()
                                         audioManager.toggleSound()
                                         audioManager.playSound()
                                         isSoundOn.toggle()
@@ -733,7 +735,8 @@ struct StoryView: View {
                                 .padding(.bottom, 10)
                             HStack{
                                 Spacer()
-                                Button(action: {
+                                Button(action: { 
+                        generateHapticFeedback()
                                     audioManager.toggleSound()
                                     audioManager.playSound()
                                     isStoryRankingModal = true

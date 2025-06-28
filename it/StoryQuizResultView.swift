@@ -88,7 +88,8 @@ struct StoryQuizResultView: View {
                     VStack{
                         HStack{
                             Spacer()
-                            Button(action: {
+                            Button(action: { 
+                        generateHapticFeedback()
                                 preFlag = true
                                 audioManager.playSound()
                             }) {
@@ -120,7 +121,8 @@ struct StoryQuizResultView: View {
                                     .font(.system(size: 70))
                                 HStack{
                                     Spacer()
-                                    Button(action: {
+                                    Button(action: { 
+                        generateHapticFeedback()
                                         isHidden.toggle() // isHidden の値を切り替える
                                     }) {
                                         Text(isHidden ? "解説" : "解説") // ボタンのラベルを動的に設定
@@ -131,7 +133,8 @@ struct StoryQuizResultView: View {
                                     .foregroundColor(.white)
                                     .background(Color("skyBlue"),in: RoundedRectangle(cornerRadius: 25))
                                     Spacer()
-                                    Button(action: {
+                                    Button(action: { 
+                        generateHapticFeedback()
                                         //                                    isHidden.toggle() // isHidden の値を切り替える
                                     }) {
                                         Text("ランキング") // ボタンのラベルを動的に設定
@@ -336,7 +339,8 @@ struct StoryQuizResultView: View {
             }
             .background(Color("Color2"))
             .navigationBarBackButtonHidden(true)
-            .navigationBarItems(leading: Button(action: {
+            .navigationBarItems(leading: Button(action: { 
+                        generateHapticFeedback()
                 isPresenting = false
                 audioManager.playCancelSound()
             }) {

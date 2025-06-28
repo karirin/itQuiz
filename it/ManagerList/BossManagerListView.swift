@@ -61,7 +61,8 @@ struct BossManagerListView: View {
                             .padding(.bottom)
                             .padding(.leading,15)
                             if authManager.level > 2 {
-                                Button(action: {
+                                Button(action: { 
+                        generateHapticFeedback()
                                     audioManager.playKetteiSound()
                                     // 画面遷移のトリガーをオンにする
                                     self.isPresentingQuizBeginner = true
@@ -99,7 +100,8 @@ struct BossManagerListView: View {
                             .padding(.bottom)
                             .padding(.leading,15)
                             if authManager.level > 4 {
-                                Button(action: {
+                                Button(action: { 
+                        generateHapticFeedback()
                                     audioManager.playKetteiSound()
                                     self.isPresentingQuizIntermediate = true
                                 }) {
@@ -136,7 +138,8 @@ struct BossManagerListView: View {
                             .padding(.bottom)
                             .padding(.leading,15)
                             if authManager.level > 7 {
-                            Button(action: {
+                            Button(action: { 
+                        generateHapticFeedback()
                                 audioManager.playKetteiSound()
                                 self.isPresentingQuizGod = true
                             }) {
@@ -172,7 +175,8 @@ struct BossManagerListView: View {
 //                                VStack{
 //                                    Spacer()
 //                                    HStack {
-//                                        Button(action: {
+//                                        Button(action: { 
+//                        generateHapticFeedback()
 //                                            reward.ExAndMoReward()
 //                                        }, label: {
 //                                            if reward.rewardLoaded{
@@ -271,7 +275,8 @@ struct BossManagerListView: View {
                     .ignoresSafeArea()
                     VStack{
                         HStack{
-                            Button(action: {
+                            Button(action: { 
+                        generateHapticFeedback()
                                 tutorialNum = 0 // タップでチュートリアルを終了
                                 authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { success in
                                 }
@@ -347,7 +352,8 @@ struct BossManagerListView: View {
                 }
             }
             .navigationBarBackButtonHidden(true)
-//            .navigationBarItems(leading: Button(action: {
+//            .navigationBarItems(leading: Button(action: { 
+//                        generateHapticFeedback()
 //                self.presentationMode.wrappedValue.dismiss()
 //                audioManager.playCancelSound()
 //            }) {

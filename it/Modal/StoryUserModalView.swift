@@ -40,7 +40,8 @@ struct StoryUserModalView: View {
                     HStack{
                         Spacer()
                             .frame(width:270)
-                        Button(action: {
+                        Button(action: { 
+                        generateHapticFeedback()
                             isPresented = false
                             viewModel.incrementPosition()
                             audioManager.playCancelSound()
@@ -120,7 +121,8 @@ struct StoryUserModalView: View {
                             .foregroundStyle(.white)
                             .fontWeight(.bold)
                             .multilineTextAlignment(.center)
-                        Button(action: {
+                        Button(action: { 
+                        generateHapticFeedback()
                             isPresented = false
                             showQuizList = true
                             audioManager.playKetteiSound()

@@ -17,7 +17,8 @@ struct HelpView: View {
                 .font(.system(size: 30))
                 .foregroundColor(.white)
             VStack {
-                Button(action: {
+                Button(action: { 
+                        generateHapticFeedback()
                     self.isSheetPresented = true
                 }, label:  {
 //                    Image(systemName: "questionmark.circle")

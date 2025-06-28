@@ -91,7 +91,8 @@ struct PreView: View {
                 VStack {
                     // ヘッダー
                     HStack {
-                        Button(action: {
+                        Button(action: { 
+                        generateHapticFeedback()
                             self.presentationMode.wrappedValue.dismiss()
                             audioManager.playCancelSound()
                         }) {
@@ -111,7 +112,8 @@ struct PreView: View {
 //                            .font(.headline)
                         Spacer()
                         // レイアウトの対称性を保つために非表示のボタン
-                        Button(action: {
+                        Button(action: { 
+                        generateHapticFeedback()
                             self.presentationMode.wrappedValue.dismiss()
                             audioManager.playCancelSound()
                         }) {
@@ -329,7 +331,7 @@ struct PreView: View {
                             // 購入復元と解約リンク
                             HStack {
                                 Text("購入復元時は")
-                                Button(action: {
+                                Button(action: { 
                                     Task {
                                         do {
                                             try await AppStore.sync()
@@ -402,7 +404,7 @@ struct PreView: View {
                         .padding(.trailing)
                         .padding(.bottom,10)
                         ForEach(viewModel.products, id: \.id) { product in
-                            Button(action: {
+                            Button(action: { 
                                 Task {
                                     do {
                                         try await AppStore.sync()

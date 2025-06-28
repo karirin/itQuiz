@@ -135,7 +135,8 @@ class Reward: NSObject, FullScreenContentDelegate, ObservableObject {
 struct RewardView: View {
     @ObservedObject var reward = Reward()
     var body: some View {
-        Button(action: {
+        Button(action: { 
+                        generateHapticFeedback()
             reward.ShowReward()
         }) {
             Text(reward.rewardLoaded ? "リワード広告表示" : "読み込み中...")

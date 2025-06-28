@@ -34,7 +34,8 @@ struct CoinModalView: View {
                             .font(.system(size: isSmallDevice() ? 20 : 24))
                             
                         Spacer()
-                        Button(action: {
+                        Button(action: { 
+                        generateHapticFeedback()
                             audioManager.playSound()
                             Task {
                                 do {
@@ -67,7 +68,8 @@ struct CoinModalView: View {
                             Text("4000コイン")
                                 .font(.system(size: isSmallDevice() ? 22 : 26))
                             Spacer()
-                            Button(action: {
+                            Button(action: { 
+                        generateHapticFeedback()
                                 audioManager.playSound()
                                 Task {
                                     do {
@@ -93,7 +95,8 @@ struct CoinModalView: View {
                                 Text("1000コイン")
                                     .font(.system(size: isSmallDevice() ? 22 : 26))
                                 Spacer()
-                                Button(action: {
+                                Button(action: { 
+                        generateHapticFeedback()
                                     audioManager.playSound()
                                     Task {
                                         do {
@@ -131,7 +134,8 @@ struct CoinModalView: View {
             .shadow(radius: 10)
             .overlay(
                 // 「×」ボタンを右上に配置
-                Button(action: {
+                Button(action: { 
+                        generateHapticFeedback()
                     audioManager.playCancelSound()
                     isPresented = false
                 }) {

@@ -52,7 +52,8 @@ struct Story: View {
     var body: some View {
         ZStack{
             VStack {
-                Button(action: {
+                Button(action: { 
+                        generateHapticFeedback()
                     audioManager.playKetteiSound()
                     showAnimation1 = true
                     if authManager.story == 1 {
@@ -77,7 +78,8 @@ struct Story: View {
                 
                 
                 if authManager.story >= 2 {
-                    Button(action: {
+                    Button(action: { 
+                        generateHapticFeedback()
                         audioManager.playKetteiSound()
                         self.isPresentingQuizBeginnerStory1 = true
                     }) {
@@ -95,7 +97,8 @@ struct Story: View {
                     }
                 }
                 if authManager.story >= 3 {
-                    Button(action: {
+                    Button(action: { 
+                        generateHapticFeedback()
                         audioManager.playKetteiSound()
                         self.isPresentingQuizBeginnerStory2 = true
                     }) {
@@ -114,7 +117,8 @@ struct Story: View {
                 }
                 if authManager.story >= 4 {
                     // ネットワーク系の問題
-                    Button(action: {
+                    Button(action: { 
+                        generateHapticFeedback()
                         audioManager.playKetteiSound()
                         self.isPresentingQuizBeginnerStory3 = true
                     }) {
@@ -133,7 +137,8 @@ struct Story: View {
                 }
                 if authManager.story >= 5 {
                     // セキュリティ系の問題
-                    Button(action: {
+                    Button(action: { 
+                        generateHapticFeedback()
                         audioManager.playKetteiSound()
                         showAnimation2 = true
                         authManager.updateStory(story: 6) { success in
@@ -185,7 +190,8 @@ struct Story: View {
                                 .shadow(radius: 10)
                             HStack{
                                 Spacer()
-                                Button(action: {
+                                Button(action: { 
+                        generateHapticFeedback()
                                     audioManager.playKetteiSound()
                                     showModal1 = false
                                     authManager.updateStory(story: 1) { success in
@@ -253,7 +259,8 @@ struct Story: View {
                         .shadow(radius: 10)
                         HStack{
                             Spacer()
-                            Button(action: {
+                            Button(action: { 
+                        generateHapticFeedback()
                                 audioManager.playKetteiSound()
                                 showModal2 = false
                             }) {
@@ -289,7 +296,8 @@ struct Story: View {
                 TestAnimationView(showAnimation: $showAnimation1)
                 VStack{
                     HStack{
-                        Button(action: {
+                        Button(action: { 
+                        generateHapticFeedback()
                             showAnimation1 = false
                         }) {
                             Image("スキップ")
@@ -311,7 +319,8 @@ struct Story: View {
                 TestAnimation1View(showAnimation: $showAnimation2)
                 VStack{
                     HStack{
-                        Button(action: {
+                        Button(action: { 
+                        generateHapticFeedback()
                             showAnimation2 = false
                         }) {
                             Image("スキップ")
@@ -368,7 +377,8 @@ struct Story: View {
             }
         }
 //        .navigationBarBackButtonHidden(true)
-//        .navigationBarItems(leading: Button(action: {
+//        .navigationBarItems(leading: Button(action: { 
+//                        generateHapticFeedback()
 //            self.presentationMode.wrappedValue.dismiss()
 //            audioManager.playCancelSound()
 //        }) {

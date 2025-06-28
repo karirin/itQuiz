@@ -22,7 +22,8 @@ struct ManagerView: View {
     var body: some View {
             VStack{
                 HStack{
-                    Button(action: {
+                    Button(action: { 
+                        generateHapticFeedback()
                         self.presentationMode.wrappedValue.dismiss()
                         audioManager.playCancelSound()
                     }) {

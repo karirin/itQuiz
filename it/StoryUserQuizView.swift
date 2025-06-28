@@ -398,7 +398,8 @@ struct StoryUserQuizView: View {
                  .edgesIgnoringSafeArea(.all)
             VStack {
                 HStack{
-                    Button(action: {
+                    Button(action: { 
+                        generateHapticFeedback()
                         showHomeModal.toggle()
                         audioManager.playSound()
                     }) {

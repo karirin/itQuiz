@@ -403,7 +403,8 @@ struct PentagonView: View {
             }
         }
         .navigationBarBackButtonHidden(true)
-//        .navigationBarItems(leading: Button(action: {
+//        .navigationBarItems(leading: Button(action: { 
+//                        generateHapticFeedback()
 //            self.presentationMode.wrappedValue.dismiss()
 //            audioManager.playCancelSound()
 //        }) {

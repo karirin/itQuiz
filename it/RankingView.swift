@@ -489,7 +489,8 @@ struct StoryRankingView: View {
                 VStack {
                     if isReturnFlag {
                         HStack{
-                            Button(action: {
+                            Button(action: { 
+                        generateHapticFeedback()
                                 self.presentationMode.wrappedValue.dismiss()
                             }) {
                                 Image(systemName: "chevron.left")
@@ -505,7 +506,8 @@ struct StoryRankingView: View {
                                 .padding(.top)
                                 .foregroundColor(Color("fontGray"))
                             Spacer()
-                            Button(action: {
+                            Button(action: { 
+                        generateHapticFeedback()
                                 self.presentationMode.wrappedValue.dismiss()
                             }) {
                                 Image(systemName: "chevron.left")
@@ -937,7 +939,8 @@ struct TopTabView: View {
         
         HStack(spacing: 0) {
             ForEach(0 ..< list.count, id: \.self) { row in
-                Button(action: {
+                Button(action: { 
+                        generateHapticFeedback()
                     withAnimation {
                         selectedTab = row
                     }
@@ -998,7 +1001,8 @@ struct RankingView: View {
             .background(Color("Color2"))
         }
         .navigationBarBackButtonHidden(true)
-        .navigationBarItems(leading: Button(action: {
+        .navigationBarItems(leading: Button(action: { 
+                        generateHapticFeedback()
             self.presentationMode.wrappedValue.dismiss()
             audioManager.playCancelSound()
         }) {

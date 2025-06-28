@@ -84,7 +84,8 @@ struct RankMatchQuizResultView: View {
                     VStack{
                         HStack{
                             Spacer()
-                            Button(action: {
+                            Button(action: { 
+                        generateHapticFeedback()
                                 showSubFlag = true
                                 audioManager.playSound()
                             }) {
@@ -116,7 +117,8 @@ struct RankMatchQuizResultView: View {
                                     .font(.system(size: 70))
                                 HStack{
                                     Spacer()
-                                    Button(action: {
+                                    Button(action: { 
+                        generateHapticFeedback()
                                         isHidden.toggle() // isHidden の値を切り替える
                                     }) {
                                         Text(isHidden ? "解説" : "解説") // ボタンのラベルを動的に設定
@@ -127,7 +129,8 @@ struct RankMatchQuizResultView: View {
                                     .foregroundColor(.white)
                                     .background(Color("skyBlue"),in: RoundedRectangle(cornerRadius: 25))
                                     Spacer()
-                                    Button(action: {
+                                    Button(action: { 
+                        generateHapticFeedback()
                                         //                                    isHidden.toggle() // isHidden の値を切り替える
                                     }) {
                                         Text("ランキング") // ボタンのラベルを動的に設定
@@ -319,7 +322,8 @@ struct RankMatchQuizResultView: View {
             }
             .background(Color("Color2"))
             .navigationBarBackButtonHidden(true)
-            .navigationBarItems(leading: Button(action: {
+            .navigationBarItems(leading: Button(action: { 
+                        generateHapticFeedback()
                 isPresenting = false
                 audioManager.playCancelSound()
             }) {
@@ -488,7 +492,8 @@ struct RankMatchQuizExperienceModalView: View {
             .padding(30)
         }.overlay(
             // 「×」ボタンを右上に配置
-            Button(action: {
+            Button(action: { 
+                        generateHapticFeedback()
                 showModal = false
                 audioManager.playCancelSound()
             }) {
@@ -545,7 +550,8 @@ struct RankUpModalView: View {
         }
         .overlay(
             // 「×」ボタンを右上に配置
-            Button(action: {
+            Button(action: { 
+                        generateHapticFeedback()
                 showLevelUpModal = false
                 audioManager.playCancelSound()
             }) {
@@ -619,7 +625,8 @@ struct RankDownModalView: View {
         }
         .overlay(
             // 「×」ボタンを右上に配置
-            Button(action: {
+            Button(action: { 
+                        generateHapticFeedback()
                 showLevelUpModal = false
                 audioManager.playCancelSound()
             }) {
@@ -686,7 +693,8 @@ struct RankMatchQuizLevelUpModalView: View {
         }
         .overlay(
             // 「×」ボタンを右上に配置
-            Button(action: {
+            Button(action: { 
+                        generateHapticFeedback()
                 showLevelUpModal = false
                 audioManager.playCancelSound()
             }) {

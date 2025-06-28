@@ -14,7 +14,7 @@ struct ChangeNameView: View {
     @Binding var isReturnBtn: Bool
     @Binding var tutorialNum: Int
 //    @Binding var userName: Stringz
-    @State private var userName: String = "りょうや"
+    @State private var userName: String = ""
     @State private var showAlert = false
     @ObservedObject var authManager: AuthManager
     @Environment(\.presentationMode) var presentationMode
@@ -59,7 +59,8 @@ struct ChangeNameView: View {
                     Text("\(userName.count) / 10")
                         .font(.system(size: 20))
                         .font(.caption)
-                    Button(action: {
+                    Button(action: { 
+                        generateHapticFeedback()
                         authManager.updateUserName(userName: userName) { success in
                             if success {
                                 showAlert = true
@@ -112,7 +113,8 @@ struct ChangeNameView: View {
         }
         .overlay(
                 // 「×」ボタンを右上に配置
-                Button(action: {
+                Button(action: { 
+                        generateHapticFeedback()
                     if isReturnBtn {
                         isPresented = false
                     }

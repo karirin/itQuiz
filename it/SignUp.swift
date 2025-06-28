@@ -39,7 +39,8 @@ struct SignUp: View {
                                 .font(.system(size: 30))
                                 .padding(.trailing, userName.isEmpty ? 0 : 40)
                             if !userName.isEmpty {
-                                                   Button(action: {
+                                                   Button(action: { 
+                        generateHapticFeedback()
                                                        self.userName = ""
                                                    }) {
                                                        Image(systemName: "xmark.circle.fill")
@@ -60,7 +61,8 @@ struct SignUp: View {
                                        .foregroundColor(.secondary)
                                        .padding(.bottom)
                 NavigationLink(destination: ImagePickerView(userName: $userName), isActive: $showImagePicker) {
-                    Button(action: {
+                    Button(action: { 
+                        generateHapticFeedback()
                         self.showImagePicker = true
                     }) {
                         ZStack {
@@ -106,7 +108,8 @@ struct ImagePickerView: View {
     var body: some View {
         NavigationView{
             VStack {
-                Button(action: {
+                Button(action: { 
+                        generateHapticFeedback()
                     self.presentationMode.wrappedValue.dismiss()
                 }) {
                     HStack {
@@ -154,7 +157,8 @@ struct ImagePickerView: View {
                 Spacer()
                     HStack() {
                         ForEach(avatars, id: \.name) { avatar in
-                            Button(action: {
+                            Button(action: { 
+                        generateHapticFeedback()
                                 self.selectedAvatar = avatar
                             }) {
                                 Image(avatar.name)
@@ -167,7 +171,8 @@ struct ImagePickerView: View {
                         }
                     }
                 Spacer()
-                Button(action: {
+                Button(action: { 
+                        generateHapticFeedback()
                     let selectedAvatar = Avatar(name: self.selectedAvatar?.name ?? "ネッキー", attack: 20, health: 20 ,usedFlag: 1, count:1)
                     authManager.saveUserToDatabase(userName: userName) { success in
                         if success {
@@ -215,7 +220,8 @@ struct ImagePickerView: View {
             self.selectedAvatar = avatars[0]
         }
         .navigationBarBackButtonHidden(true)
-//        .navigationBarItems(leading: Button(action: {
+//        .navigationBarItems(leading: Button(action: { 
+//                        generateHapticFeedback()
 //            self.presentationMode.wrappedValue.dismiss()
 //        }) {
 //            Image(systemName: "chevron.left")

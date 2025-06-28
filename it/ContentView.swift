@@ -136,7 +136,8 @@ struct ContentView: View {
                                             .padding(.leading,25)
                                             .padding(.top,3)
                                     }
-                                    Button(action: {
+                                    Button(action: { 
+                        generateHapticFeedback()
                                         isPresentingSettingView = true
                                     }) {
                                         Image("お問い合わせバー")
@@ -144,7 +145,7 @@ struct ContentView: View {
                                             .frame(width:140,height:50)
                                             .shadow(radius: 1)
                                     }
-                                    .buttonStyle(.plain)
+                                    
                                 }
                                 HStack{
                                     ZStack {
@@ -251,7 +252,8 @@ struct ContentView: View {
                                             HStack{
                                                 Spacer()
                                                 ZStack {
-                                                    Button(action: {
+                                                    Button(action: { 
+                        generateHapticFeedback()
                                                         self.isPresentingTraining = true
                                                         audioManager.playSound()
                                                     }) {
@@ -261,18 +263,11 @@ struct ContentView: View {
                                                             .frame(width:150)
                                                     }.shadow(radius:3)
                                                         .padding(.leading ,10)
-                                                        .buttonStyle(.plain)
-//                                                                    Color.black.opacity(0.3)
-//                                                                        .edgesIgnoringSafeArea(.all)
-//                                                                        .cornerRadius(30)                 .padding(.leading, isSmallDevice() ? 25 : 35)             .padding(.trailing, isSmallDevice() ? 0 : 10)
-//                                                        Text("準備中")
-//                                                        .fontWeight(.bold)
-//                                                        .font(.system(size: 26))
-//                                                        .foregroundStyle(.white)
-//                                                        .padding(.leading,20)
+                                                        .buttonStyle(PressedEffectStyle())
                                                 }
                                                                                             Spacer()
-                                                Button(action: {
+                                                Button(action: { 
+                        generateHapticFeedback()
                                                     self.isPresentingQuizList = true
                                                     audioManager.playSound()
                                                 }) {
@@ -287,11 +282,11 @@ struct ContentView: View {
                                                 }
                                                 .shadow(radius:3)
                                                 .padding(.trailing,35)
-                                                .buttonStyle(.plain)
                                                 Spacer()
                                             }
                                             HStack{
-                                                Button(action: {
+                                                Button(action: { 
+                        generateHapticFeedback()
                                                     self.isPresentingGachaView = true
                                                     audioManager.playSound()
                                                 }) {
@@ -300,9 +295,10 @@ struct ContentView: View {
                                                         .scaledToFit()
                                                         .frame(height: isSmallDevice() ? 60 : 60)
                                                 }
+                                                .buttonStyle(PressedEffectStyle())
                                                 .shadow(radius:3)
-                                                .buttonStyle(.plain)
-                                                Button(action: {
+                                                Button(action: { 
+                        generateHapticFeedback()
                                                     self.isPresentingRankingView = true
                                                     audioManager.playSound()
                                                 }) {
@@ -312,10 +308,11 @@ struct ContentView: View {
                                                         .frame(height: isSmallDevice() ? 55 : 53)
                                                         .padding(.top,10)
                                                 }.shadow(radius:3)
-                                                    .buttonStyle(.plain)
+                                                    
                                             }
                                             HStack{
-                                                Button(action: {
+                                                Button(action: { 
+                        generateHapticFeedback()
                                                     // 画面遷移のトリガーをオンにする
                                                     self.isPresentingIllustratedView = true
                                                     audioManager.playSound()
@@ -326,8 +323,9 @@ struct ContentView: View {
                                                         .frame(height: isSmallDevice() ? 65 : 65)
                                                         .padding(.trailing, 10)
                                                 }.shadow(radius:3)
-                                                    .buttonStyle(.plain)
-                                                Button(action: {
+                                                    
+                                                Button(action: { 
+                        generateHapticFeedback()
                                                     self.isPresentingTittleView = true
                                                     audioManager.playSound()
                                                 }) {
@@ -337,7 +335,7 @@ struct ContentView: View {
                                                         .frame(height: isSmallDevice() ? 60 : 60)
                                                         .padding(.top,10)
                                                 }.shadow(radius:3)
-                                                    .buttonStyle(.plain)
+                                                    
                                             }
                                         }
                                     }
@@ -446,7 +444,8 @@ struct ContentView: View {
                     .ignoresSafeArea()
                     VStack{
                         HStack{
-                            Button(action: {
+                            Button(action: { 
+                        generateHapticFeedback()
                                 tutorialNum = 0 // タップでチュートリアルを終了
                                 authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { success in
                                    }
@@ -456,7 +455,6 @@ struct ContentView: View {
                                     .frame(width:200,height:60)
                                     .padding(.top,20)
                             }
-                            .buttonStyle(.plain)
                             Spacer()
                         }
                         .padding(.leading)
@@ -479,9 +477,12 @@ struct ContentView: View {
         .navigationBarBackButtonHidden(true)
         .navigationViewStyle(StackNavigationViewStyle())
         .frame(maxWidth: .infinity,maxHeight: .infinity)
-        .onTapGesture {
-            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-        }
+        .simultaneousGesture(               // ← Button と同時認識に変更
+            TapGesture().onEnded {
+                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder),
+                                                to: nil, from: nil, for: nil)
+            }
+        )
         .alert(isPresented: $showCoinAlert) {
             Alert(
                 title: Text("ログインボーナス！！"),
@@ -528,7 +529,7 @@ struct ContentView: View {
                         }
                         authManager.fetchUserCsFlag()
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                            if authManager.userCsFlag == 0 {
+                            if authManager.userCsFlag != 2 {
                                 executeProcessEveryThreeTimes()
                                 executeProcessEveryfifTimes()
                             }
@@ -659,7 +660,7 @@ struct ContentView: View {
         UserDefaults.standard.set(count, forKey: "launchCSCount")
         
         // 3回に1回の割合で処理を実行
-        if count % 20 == 0 {
+        if count % 10 == 0 {
             csFlag = true
         }
     }
@@ -690,6 +691,15 @@ struct ContentView: View {
             // 1日経過していない場合はボーナスを付与しない
             return false
         }
+    }
+}
+
+struct PressedEffectStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)   // ちょっと縮む
+            .opacity(configuration.isPressed ? 0.7  : 1.0)       // 少し暗く
+            .animation(.easeOut(duration: 0.15), value: configuration.isPressed)
     }
 }
 

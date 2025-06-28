@@ -206,7 +206,8 @@ struct IllustratedView: View {
                                     // ユーザーが持っているアバターの判定
                                     if authManager.avatars.contains(where: { $0.name == item.name }) {
                                         // ユーザーが持っているアバターの画像を表示
-                                        Button(action: {
+                                        Button(action: { 
+                        generateHapticFeedback()
                                             selectedItem = item
                                             audioManager.playSound()
                                         }) {
@@ -219,7 +220,8 @@ struct IllustratedView: View {
                                         }
                                     } else {
                                         // ユーザーが持っていないアバターのシルエットを表示
-                                        Button(action: {
+                                        Button(action: { 
+                        generateHapticFeedback()
                                             selectedItem = item
                                             audioManager.playSound()
                                         }) {
@@ -263,7 +265,8 @@ Spacer()
         }
         .background(Color("purple2"))
         .navigationBarBackButtonHidden(true)
-        .navigationBarItems(leading: Button(action: {
+        .navigationBarItems(leading: Button(action: { 
+                        generateHapticFeedback()
             self.presentationMode.wrappedValue.dismiss()
             audioManager.playCancelSound()
         }) {
