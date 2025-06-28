@@ -45,7 +45,7 @@ struct PentagonManagerView: View {
                         .foregroundColor(Color("fontGray"))
                     Text("戻る")
                         .foregroundColor(Color("fontGray"))
-                })
+                }).buttonStyle(.plain)
                 .toolbar {
                         ToolbarItem(placement: .principal) {
                             Text("ダンジョン一覧")

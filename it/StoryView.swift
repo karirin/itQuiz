@@ -675,7 +675,7 @@ struct StoryView: View {
                                         .foregroundColor(.white)
                                         .padding(10)
                                         .background(Color.black.opacity(0.5))
-                                        .cornerRadius(30)
+                                        .cornerRadius(30).buttonStyle(.plain)
                                     }
                                 Spacer()
                                     Button(action: {

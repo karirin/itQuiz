@@ -32,7 +32,7 @@ struct ManagerView: View {
                         Text("戻る")
                             .foregroundColor(Color("fontGray"))
                     }
-                    .padding(.top)
+                    .padding(.top).buttonStyle(.plain)
                     Spacer()
                 }
                 .padding(.leading)

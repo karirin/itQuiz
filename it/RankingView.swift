@@ -498,7 +498,7 @@ struct StoryRankingView: View {
                                 Text("戻る")
                                     .foregroundColor(Color("fontGray"))
                             }
-                            .padding(.top)
+                            .padding(.top).buttonStyle(.plain)
                             Spacer()
                             Text("コマ数ランキング")
                                 .font(.system(size: 20))
@@ -1006,7 +1006,7 @@ struct RankingView: View {
                 .foregroundColor(.gray)
             Text("戻る")
                 .foregroundColor(Color("fontGray"))
-        })
+        }).buttonStyle(.plain)
         .navigationTitle("ランキング")
         .navigationBarTitleDisplayMode(.inline)
     }

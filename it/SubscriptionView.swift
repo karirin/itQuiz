@@ -320,7 +320,7 @@ struct SubscriptionView: View {
                         Text("戻る")
                             .foregroundColor(Color("fontGray"))
                     }
-                    .padding(.leading)
+                    .padding(.leading).buttonStyle(.plain)
                     Spacer()
                     Text("プレミアムプラン")
                         .font(.system(size:24))

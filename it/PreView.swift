@@ -105,7 +105,7 @@ struct PreView: View {
                         .padding(10)
                         .background(Color.black.opacity(0.7))
                         .cornerRadius(30)
-                        .padding(.leading)
+                        .padding(.leading).buttonStyle(.plain)
                         Spacer()
 //                        Text("プレミアムプラン")
 //                            .font(.headline)

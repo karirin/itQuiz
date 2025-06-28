@@ -49,7 +49,7 @@ struct ModalReturnView: View {
                                 .cornerRadius(8)
                                 .shadow(radius: 1)
                             }
-                            .disabled(!isButtonActive)
+                            .disabled(!isButtonActive).buttonStyle(.plain)
                         }
                         }
                         

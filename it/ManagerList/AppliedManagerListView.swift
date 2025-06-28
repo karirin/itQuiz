@@ -422,7 +422,7 @@ struct AppliedManagerListView: View {
                     Image(systemName: "chevron.left")
                         .foregroundColor(Color("fontGray"))
                     Text("戻る")
-                        .foregroundColor(Color("fontGray"))
+                        .foregroundColor(Color("fontGray")).buttonStyle(.plain)
                 }.padding(.top))
         .navigationViewStyle(StackNavigationViewStyle())
         }

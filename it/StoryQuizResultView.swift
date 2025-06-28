@@ -344,7 +344,7 @@ struct StoryQuizResultView: View {
                     .foregroundColor(Color("fontGray1"))
                 Text("戻る")
                     .foregroundColor(Color("fontGray1"))
-            })
+            }).buttonStyle(.plain)
             .navigationTitle("結果画面")
             .navigationBarTitleDisplayMode(.inline)
             if showModal {

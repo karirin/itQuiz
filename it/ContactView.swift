@@ -27,7 +27,7 @@ struct ContactView: View {
                         Text("戻る")
                             .foregroundColor(Color("fontGray"))
                     }
-                    .padding(.leading)
+                    .padding(.leading).buttonStyle(.plain)
                     Spacer()
                     Text("お問合せ")
                         .font(.system(size:24))

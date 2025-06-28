@@ -14,7 +14,7 @@ struct ChangeNameView: View {
     @Binding var isReturnBtn: Bool
     @Binding var tutorialNum: Int
 //    @Binding var userName: Stringz
-    @State private var userName: String = ""
+    @State private var userName: String = "りょうや"
     @State private var showAlert = false
     @ObservedObject var authManager: AuthManager
     @Environment(\.presentationMode) var presentationMode

@@ -271,7 +271,7 @@ Spacer()
                 .foregroundColor(.gray)
             Text("戻る")
                 .foregroundColor(Color("fontGray"))
-        })
+        }).buttonStyle(.plain)
         .navigationTitle("おとも図鑑")
         .navigationBarTitleDisplayMode(.inline)
         }

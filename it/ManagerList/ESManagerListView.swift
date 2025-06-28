@@ -1,5 +1,5 @@
 //
-//  InfoManagerListView.swift
+//  AppliedManagerListView.swift
 //  it
 //
 //  Created by Apple on 2024/03/09.
@@ -9,7 +9,7 @@ import SwiftUI
 import AVFoundation
 import Firebase
 
-struct InfoManagerListView: View {
+struct ESManagerListView: View {
     @State private var isIntermediateQuizActive: Bool = false
     @State private var isPresentingQuizBeginnerList: Bool = false
     @ObservedObject var authManager = AuthManager.shared
@@ -60,6 +60,7 @@ struct InfoManagerListView: View {
                                     .foregroundColor(Color("fontGray"))
                                 Spacer()
                             }
+    //                            .padding(.horizontal,0)
                             .padding(.leading,30)
                             .padding(.bottom)
                             .padding(.top)
@@ -75,7 +76,7 @@ struct InfoManagerListView: View {
                             }) {
                                 if isLoading {
                                     ZStack{
-                                        Image("基本情報技術者試験復習ボタン白黒")
+                                        Image("ES復習ボタン白黒")
                                             .resizable()
                                             .frame(height: isIPad() ? 200 : 70)
                                         ProgressView()
@@ -84,11 +85,11 @@ struct InfoManagerListView: View {
                                 } else {
                                     ZStack {
                                         if isIncorrectAnswersEmpty == true {
-                                            Image("基本情報技術者試験復習ボタン白黒")
+                                            Image("ES復習ボタン白黒")
                                                 .resizable()
                                                 .frame(height: isIPad() ? 200 : 70)
                                         }else{
-                                            Image("基本情報技術者試験復習ボタン")
+                                            Image("ES復習ボタン")
                                                 .resizable()
                                                 .frame(height: isIPad() ? 200 : 70)
                                         }
@@ -114,7 +115,7 @@ struct InfoManagerListView: View {
                             .padding(.bottom)
                             .shadow(radius: 3)
                             .fullScreenCover(isPresented: $isPresentingQuizIncorrectAnswer) {
-                                QuizInfoIncorrectAnswerListView(isPresenting: $isPresentingQuizIncorrectAnswer)
+                                QuizESIncorrectAnswerListView(isPresenting: $isPresentingQuizIncorrectAnswer)
                                         }
                             .onChange(of: isPresentingQuizBeginner) { isPresenting in
                                     fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
@@ -164,10 +165,10 @@ struct InfoManagerListView: View {
                                 Button(action: {
                                     audioManager.playKetteiSound()
                                     // 画面遷移のトリガーをオンにする
-                                    self.isPresentingQuizIntermediate = true
+                                    self.isPresentingQuizDatabase = true
                                 }) {
                                     //                        Image("IT基礎知識の問題の初級")
-                                    Image("基本情報技術者試験基礎理解ボタン")
+                                    Image("コンピュータシステムの問題")
                                         .resizable()
                                         .frame(height: isIPad() ? 200 : 70)
                                 }
@@ -175,18 +176,18 @@ struct InfoManagerListView: View {
                                 .padding(.horizontal)
                                 .padding(.bottom)
                                 .shadow(radius: 3)
-                                .fullScreenCover(isPresented: $isPresentingQuizIntermediate) {
-                                    QuizInfoBasicListView(isPresenting: $isPresentingQuizIntermediate)
+                                .fullScreenCover(isPresented: $isPresentingQuizDatabase) {
+                                    QuizComputerSystemListView(isPresenting: $isPresentingQuizDatabase)
                                             }
                             .background(GeometryReader { geometry in
                                 Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
                             })
                             Button(action: {
                                 audioManager.playKetteiSound()
-                                self.isPresentingQuizNetwork = true
+                                self.isPresentingQuizIntermediate = true
                             }) {
                                 //                    Image("IT基礎知識の問題の中級")
-                                Image("基本情報技術者試験ストラテジボタン")
+                                Image("ソフトウェアハードウェアの問題")
                                     .resizable()
                                     .frame(height: isIPad() ? 200 : 70)
                             }
@@ -194,32 +195,16 @@ struct InfoManagerListView: View {
                             .padding(.horizontal)
                             .padding(.bottom)
                             .shadow(radius: 3)
-                            .fullScreenCover(isPresented: $isPresentingQuizNetwork) {
-                                QuizInfoStrategyListView(isPresenting: $isPresentingQuizNetwork)
+                            .fullScreenCover(isPresented: $isPresentingQuizIntermediate) {
+                                QuizSoftHardListView(isPresenting: $isPresentingQuizIntermediate)
                                         }
                             
-                        Button(action: {
-                            audioManager.playKetteiSound()
-                            self.isPresentingQuizGod = true
-                        }) {
-                            //                    Image("データベース系の問題")
-                            Image("基本情報技術者試験テクノロジボタン")
-                                .resizable()
-                                .frame(height: isIPad() ? 200 : 70)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.horizontal)
-                        .padding(.bottom)
-                        .shadow(radius: 3)
-                        .fullScreenCover(isPresented: $isPresentingQuizGod) {
-                            QuizInfoTechnologyListView(isPresenting: $isPresentingQuizGod)
-                                    }
                             Button(action: {
                                 audioManager.playKetteiSound()
                                 self.isPresentingQuizAdvanced = true
                             }) {
                                 //                    Image("IT基礎知識の問題の上級")
-                                Image("基本情報技術者試験マネジメントボタン")
+                                Image("通信・ネットワークの問題")
                                     .resizable()
                                     .frame(height: isIPad() ? 200 : 70)
                             }
@@ -228,7 +213,23 @@ struct InfoManagerListView: View {
                             .padding(.bottom)
                             .shadow(radius: 3)
                             .fullScreenCover(isPresented: $isPresentingQuizAdvanced) {
-                                QuizInfoManagementListView(isPresenting: $isPresentingQuizAdvanced)
+                                QuizTusinNetworkListView(isPresenting: $isPresentingQuizAdvanced)
+                                        }
+                            Button(action: {
+                                audioManager.playKetteiSound()
+                                self.isPresentingQuizGod = true
+                            }) {
+                                //                    Image("データベース系の問題")
+                                Image("セキュリティの問題")
+                                    .resizable()
+                                    .frame(height: isIPad() ? 200 : 70)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.horizontal)
+                            .padding(.bottom)
+                            .shadow(radius: 3)
+                            .fullScreenCover(isPresented: $isPresentingQuizGod) {
+                                QuizESsecurityListView(isPresenting: $isPresentingQuizGod)
                                         }
                             .padding(.bottom,130)
                         }
@@ -274,9 +275,6 @@ struct InfoManagerListView: View {
                                                 Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
                                             })
                                             .padding(.bottom)
-    //                                                .fullScreenCover(isPresented: $showAnotherView_post, content: {
-    //                                                    RewardRegistrationView()
-    //                                                })
                                         
                                             Spacer()
                                     }
@@ -373,6 +371,7 @@ struct InfoManagerListView: View {
             .frame(maxWidth:.infinity,maxHeight: .infinity)
             .background(Color("Color2"))
             .onAppear {
+//                print("isButtonClickable:\(isButtonClickable)")
                 reward.LoadReward()
                 fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
                     authManager.fetchPreFlag()
@@ -416,7 +415,6 @@ struct InfoManagerListView: View {
                     audioPlayerKettei?.volume = 1.0
                 }
             }
-        
             .fullScreenCover(isPresented: $preFlag) {
                 PreView(audioManager: audioManager)
             }
@@ -429,7 +427,15 @@ struct InfoManagerListView: View {
                         .foregroundColor(Color("fontGray"))
                     Text("戻る")
                         .foregroundColor(Color("fontGray"))
-                }.padding(.top))
+                }.padding(.top)).buttonStyle(.plain)
+//                .toolbar {
+//                        ToolbarItem(placement: .principal) {
+//                            Text("ダンジョン一覧")
+//                                .font(.system(size: 20)) // ここでフォントサイズを指定
+//                                .foregroundStyle(Color("fontGray"))
+//                        }
+//                    }
+//            }
         .navigationViewStyle(StackNavigationViewStyle())
         }
     func isIPad() -> Bool {
@@ -437,7 +443,7 @@ struct InfoManagerListView: View {
     }
 
     func fetchNumberOfIncorrectAnswers(userId: String, completion: @escaping (Int) -> Void) {
-    let ref = Database.database().reference().child("IncorrectInfoAnswers").child(userId)
+    let ref = Database.database().reference().child("IncorrectESAnswers").child(userId)
     ref.observeSingleEvent(of: .value) { snapshot in
         
     let count = snapshot.childrenCount // 子ノードの数を取得
@@ -452,5 +458,5 @@ struct InfoManagerListView: View {
 }
 
 #Preview {
-    InfoManagerListView(isPresenting: .constant(false))
+    ESManagerListView(isPresenting: .constant(false))
 }

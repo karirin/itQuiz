@@ -165,7 +165,7 @@ struct GachaManagerView: View {
                 .foregroundColor(Color("fontGray"))
             Text("戻る")
                 .foregroundColor(Color("fontGray"))
-        })
+        }).buttonStyle(.plain)
         .navigationTitle("ガチャ一覧")
         .navigationBarTitleDisplayMode(.inline)
     }

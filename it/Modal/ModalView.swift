@@ -38,7 +38,7 @@ struct ModalView: View {
                         .background(Color.white)
                         .cornerRadius(8)
                         .shadow(radius: 1)
-                }
+                }.buttonStyle(.plain)
                 NavigationLink("", destination: TopView().navigationBarBackButtonHidden(true), isActive: $isContentView)
                 
                 Button(action: {

@@ -1,4 +1,14 @@
 {
+  "appPolicies" : {
+    "eula" : "",
+    "policies" : [
+      {
+        "locale" : "en_US",
+        "policyText" : "",
+        "policyURL" : ""
+      }
+    ]
+  },
   "identifier" : "D7209E2D",
   "nonRenewingSubscriptions" : [
 
@@ -133,13 +143,16 @@
           "recurringSubscriptionPeriod" : "P1M",
           "referenceName" : "広告非表示プラン",
           "subscriptionGroupID" : "054ABA2C",
-          "type" : "RecurringSubscription"
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
         }
       ]
     }
   ],
   "version" : {
-    "major" : 3,
+    "major" : 4,
     "minor" : 0
   }
 }

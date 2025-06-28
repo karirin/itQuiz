@@ -146,7 +146,7 @@ struct SettingView: View {
                                 .foregroundColor(Color("fontGray"))
                             Text("戻る")
                                 .foregroundColor(Color("fontGray"))
-                        })
+                        }).buttonStyle(.plain)
     }
 }
 

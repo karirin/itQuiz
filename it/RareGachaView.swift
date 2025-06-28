@@ -123,7 +123,7 @@ struct RareGachaView: View {
                             .foregroundColor(Color("fontGray"))
                         Text("戻る")
                             .foregroundColor(Color("fontGray"))
-                    }
+                    }.buttonStyle(.plain)
                     .padding(.leading)
                     Spacer()
                     ZStack {

@@ -1,5 +1,5 @@
 //
-//  AppliedManagerListView.swift
+//  ITManagerListView.swift
 //  it
 //
 //  Created by Apple on 2024/03/09.
@@ -9,7 +9,7 @@ import SwiftUI
 import AVFoundation
 import Firebase
 
-struct ITStoratagyManagerListView: View {
+struct ITManagerListView: View {
     @State private var isIntermediateQuizActive: Bool = false
     @State private var isPresentingQuizBeginnerList: Bool = false
     @ObservedObject var authManager = AuthManager.shared
@@ -32,6 +32,7 @@ struct ITStoratagyManagerListView: View {
     @State private var buttonRect: CGRect = .zero
     @State private var bubbleHeight: CGFloat = 0.0
     @State private var isIncorrectAnswersEmpty: Bool = true
+//    @ObservedObject var reward = Reward()
     @StateObject var reward = Reward()
     @State private var showLoginModal: Bool = false
     @State private var isButtonClickable: Bool = false
@@ -39,7 +40,7 @@ struct ITStoratagyManagerListView: View {
     @State private var preFlag: Bool = false
     @State private var userPreFlag: Int = 0
     @State private var isLoading: Bool = true
-
+    
     init(isPresenting: Binding<Bool>) {
         _isPresenting = isPresenting
         _lastClickedDate = State(initialValue: Date())
@@ -60,12 +61,12 @@ struct ITStoratagyManagerListView: View {
                                     .foregroundColor(Color("fontGray"))
                                 Spacer()
                             }
-    //                            .padding(.horizontal,0)
                             .padding(.leading,30)
                             .padding(.bottom)
                             .padding(.top)
                             Button(action: {
                                 audioManager.playKetteiSound()
+                                // 画面遷移のトリガーをオンにする
                                 if userPreFlag != 1 {
                                     preFlag = true
                                 } else {
@@ -76,24 +77,25 @@ struct ITStoratagyManagerListView: View {
                             }) {
                                 if isLoading {
                                     ZStack{
-                                        Image("ITストラテジの復習問題白黒")
+                                        Image("ITパスポート復習ボタン白黒")
                                             .resizable()
                                             .frame(height: isIPad() ? 200 : 70)
                                         ProgressView()
                                             .scaleEffect(2)
                                     }
                                 } else {
-                                    ZStack{
+                                    ZStack {
                                         if isIncorrectAnswersEmpty == true {
-                                            Image("ITストラテジの復習問題白黒")
+                                            Image("ITパスポート復習ボタン白黒")
                                                 .resizable()
                                                 .frame(height: isIPad() ? 200 : 70)
                                         }else{
-                                            Image("ITストラテジの復習問題")
+                                            Image("ITパスポート復習ボタン")
                                                 .resizable()
                                                 .frame(height: isIPad() ? 200 : 70)
                                         }
                                         if userPreFlag != 1 {
+                                            
                                             ZStack{
                                                 Color.black.opacity(0.45)
                                                     .cornerRadius(30)
@@ -102,9 +104,6 @@ struct ITStoratagyManagerListView: View {
                                                     .foregroundStyle(.white)
                                                     .bold()
                                                     .multilineTextAlignment(.center)
-                                            }
-                                            .onTapGesture {
-                                                preFlag = true
                                             }
                                         }
                                     }
@@ -115,7 +114,7 @@ struct ITStoratagyManagerListView: View {
                             .padding(.bottom)
                             .shadow(radius: 3)
                             .fullScreenCover(isPresented: $isPresentingQuizIncorrectAnswer) {
-                                QuizITStrategyIncorrectAnswerListView(isPresenting: $isPresentingQuizIncorrectAnswer)
+                                QuizITIncorrectAnswerListView(isPresenting: $isPresentingQuizIncorrectAnswer)
                                         }
                             .onChange(of: isPresentingQuizBeginner) { isPresenting in
                                     fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
@@ -165,45 +164,31 @@ struct ITStoratagyManagerListView: View {
                                 Button(action: {
                                     audioManager.playKetteiSound()
                                     // 画面遷移のトリガーをオンにする
-                                    self.isPresentingQuizDatabase = true
+                                    self.isPresentingQuizBeginner = true
                                 }) {
                                     //                        Image("IT基礎知識の問題の初級")
-                                    Image("システム企画の問題")
+                                    Image("ITパスポート基礎理解ボタン")
                                         .resizable()
                                         .frame(height: isIPad() ? 200 : 70)
                                 }
                                 .frame(maxWidth: .infinity)
                                 .padding(.horizontal)
-                                .padding(.bottom)
-                                .shadow(radius: 3)
-                                .fullScreenCover(isPresented: $isPresentingQuizDatabase) {
-                                    QuizSystemKikakuListView(isPresenting: $isPresentingQuizDatabase)
-                                            }
+                            
                             .background(GeometryReader { geometry in
                                 Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
                             })
-                            Button(action: {
-                                audioManager.playKetteiSound()
-                                self.isPresentingQuizAdvanced = true
-                            }) {
-                                //                    Image("IT基礎知識の問題の上級")
-                                Image("システム開発の問題")
-                                    .resizable()
-                                    .frame(height: isIPad() ? 200 : 70)
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding(.horizontal)
-                            .padding(.bottom)
-                            .shadow(radius: 3)
-                            .fullScreenCover(isPresented: $isPresentingQuizAdvanced) {
-                                QuizSystemKaihatuListView(isPresenting: $isPresentingQuizAdvanced)
-                                        }
+                                .padding(.bottom)
+                                .shadow(radius: 3)
+                                .fullScreenCover(isPresented: $isPresentingQuizBeginner) {
+                                                QuizITBasicList(isPresenting: $isPresentingQuizBeginner)
+                                            }
+                            
                             Button(action: {
                                 audioManager.playKetteiSound()
                                 self.isPresentingQuizIntermediate = true
                             }) {
                                 //                    Image("IT基礎知識の問題の中級")
-                                Image("システム設計の問題")
+                                Image("ITパスポートストラテジボタン")
                                     .resizable()
                                     .frame(height: isIPad() ? 200 : 70)
                             }
@@ -212,14 +197,15 @@ struct ITStoratagyManagerListView: View {
                             .padding(.bottom)
                             .shadow(radius: 3)
                             .fullScreenCover(isPresented: $isPresentingQuizIntermediate) {
-                                QuizSystemSekkeiListView(isPresenting: $isPresentingQuizIntermediate)
+                                QuizITStrategyListView(isPresenting: $isPresentingQuizIntermediate)
                                         }
+                            
                             Button(action: {
                                 audioManager.playKetteiSound()
                                 self.isPresentingQuizGod = true
                             }) {
                                 //                    Image("データベース系の問題")
-                                Image("システム運用・保守の問題")
+                                Image("ITパスポートテクノロジボタン")
                                     .resizable()
                                     .frame(height: isIPad() ? 200 : 70)
                             }
@@ -228,8 +214,79 @@ struct ITStoratagyManagerListView: View {
                             .padding(.bottom)
                             .shadow(radius: 3)
                             .fullScreenCover(isPresented: $isPresentingQuizGod) {
-                                QuizSystemUnyouHoshuListView(isPresenting: $isPresentingQuizGod)
+                                QuizITTechnologyListView(isPresenting: $isPresentingQuizGod)
                                         }
+                            Button(action: {
+                                audioManager.playKetteiSound()
+                                self.isPresentingQuizAdvanced = true
+                            }) {
+                                //                    Image("IT基礎知識の問題の上級")
+                                Image("ITパスポートマネジメントボタン")
+                                    .resizable()
+                                    .frame(height: isIPad() ? 200 : 70)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.horizontal)
+                            .padding(.bottom)
+                            .shadow(radius: 3)
+                            .fullScreenCover(isPresented: $isPresentingQuizAdvanced) {
+                                QuizITManagementListView(isPresenting: $isPresentingQuizAdvanced)
+                                        }
+                            // ネットワーク系の問題
+//                            Button(action: {
+//                                audioManager.playKetteiSound()
+//                                self.isPresentingQuizNetwork = true
+//                            }) {
+//                                //                    Image("ネットワーク系の問題")
+//                                Image("選択肢4")
+//                                    .resizable()
+//                                    .frame(height: isIPad() ? 200 : 70)
+//                            }
+//                            .frame(maxWidth: .infinity)
+//                            .padding(.horizontal)
+//                            .padding(.bottom)
+//                            .shadow(radius: 1)
+//                            .fullScreenCover(isPresented: $isPresentingQuizNetwork) {
+//                                            QuizNetworkList(isPresenting: $isPresentingQuizNetwork)
+//                                        }
+//                            
+//                            // セキュリティ系の問題
+//                            Button(action: {
+//                                audioManager.playKetteiSound()
+//                                self.isPresentingQuizSecurity = true
+//                            }) {
+//                                //                    Image("セキュリティ系の問題")
+//                                Image("選択肢5")
+//                                    .resizable()
+//                                    .frame(height: isIPad() ? 200 : 70)
+//                            }
+//                            .frame(maxWidth: .infinity)
+//                            .padding(.horizontal)
+//                            .padding(.bottom)
+//                            .shadow(radius: 3)
+//                            .fullScreenCover(isPresented: $isPresentingQuizSecurity) {
+//                                            QuizSecurityList(isPresenting: $isPresentingQuizSecurity)
+//                                        }
+//                            
+//                            // データベース系の問題
+//                            Button(action: {
+//                                audioManager.playKetteiSound()
+//                                self.isPresentingQuizDatabase = true
+//                            }) {
+//                                //                    Image("データベース系の問題")
+//                                Image("選択肢6")
+//                                    .resizable()
+//                                    .frame(height: isIPad() ? 200 : 70)
+//                            }
+//                            .frame(maxWidth: .infinity)
+//                            .padding(.horizontal)
+//                            .padding(.bottom,120)
+//                            .shadow(radius: 3)
+//                            .fullScreenCover(isPresented: $isPresentingQuizDatabase) {
+//                                            QuizDatabaseList(isPresenting: $isPresentingQuizDatabase)
+//                                        }
+//                            
+                            
                             .padding(.bottom,130)
                         }
                     }
@@ -242,41 +299,38 @@ struct ITStoratagyManagerListView: View {
                                     Spacer()
                                     HStack {
                                         Button(action: {
-                                           reward.ExAndMoReward()
-                                       }, label: {
-                                           if reward.rewardLoaded{
-                                               Image("倍ボタン")
-                                                   .resizable()
-                                                   .frame(width: 110, height: 110)
-                                           }else{
-                                               Image("倍ボタン白黒")
-                                                   .resizable()
-                                                   .frame(width: 110, height: 110)
-                                           }
-                                       })
-                                           .shadow(radius: 5)
-                                           .disabled(!reward.rewardLoaded)
-                                           .onChange(of: reward.rewardEarned) { rewardEarned in
-                                               showAlert = rewardEarned
-                                               print("onchange reward.rewardEarned:\(showAlert)")
-                                           }
-                                           .alert(isPresented: $showAlert) {
-                                               Alert(
-                                                   title: Text("報酬獲得！"),
-                                                   message: Text("1時間だけ獲得した経験値とコインが2倍"),
-                                                   dismissButton: .default(Text("OK"), action: {
-                                                       showAlert = false
-                                                       reward.rewardEarned = false
-                                                   })
-                                               )
-                                           }
-                                            .background(GeometryReader { geometry in
-                                                Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
-                                            })
+                                            reward.ExAndMoReward()
+                                        }, label: {
+                                            if reward.rewardLoaded{
+                                                Image("倍ボタン")
+                                                    .resizable()
+                                                    .frame(width: 110, height: 110)
+                                            }else{
+                                                Image("倍ボタン白黒")
+                                                    .resizable()
+                                                    .frame(width: 110, height: 110)
+                                            }
+                                        })
+                                            .shadow(radius: 5)
+                                            .disabled(!reward.rewardLoaded)
+                                            .onChange(of: reward.rewardEarned) { rewardEarned in
+                                                showAlert = rewardEarned
+                                                print("onchange reward.rewardEarned:\(showAlert)")
+                                            }
+                                            .alert(isPresented: $showAlert) {
+                                                Alert(
+                                                    title: Text("報酬獲得！"),
+                                                    message: Text("1時間だけ獲得した経験値とコインが2倍"),
+                                                    dismissButton: .default(Text("OK"), action: {
+                                                        showAlert = false
+                                                        reward.rewardEarned = false
+                                                    })
+                                                )
+                                            }
                                             .padding(.bottom)
-    //                                                .fullScreenCover(isPresented: $showAnotherView_post, content: {
-    //                                                    RewardRegistrationView()
-    //                                                })
+//                                                .fullScreenCover(isPresented: $showAnotherView_post, content: {
+//                                                    RewardRegistrationView()
+//                                                })
                                         
                                             Spacer()
                                     }
@@ -294,14 +348,14 @@ struct ITStoratagyManagerListView: View {
                         RewardTimesModal(audioManager: audioManager, isPresented: $showLoginModal)
                     }
                 }
-                if tutorialNum == 2 {
+                if tutorialNum == 3 {
                     GeometryReader { geometry in
                         Color.black.opacity(0.5)
                         // スポットライトの領域をカットアウ
                             .overlay(
                                 RoundedRectangle(cornerRadius: 20, style: .continuous)
                                     .frame(width: buttonRect.width - 20, height: buttonRect.height)
-                                    .position(x: buttonRect.midX, y: isSmallDevice() ? buttonRect.midY-120 : buttonRect.midY-155)
+                                    .position(x: buttonRect.midX, y: isSmallDevice() ? buttonRect.midY : buttonRect.midY)
                                     .blendMode(.destinationOut)
                             )
                             .ignoresSafeArea()
@@ -310,13 +364,13 @@ struct ITStoratagyManagerListView: View {
                     }
                     VStack {
                         Spacer()
-                            .frame(height:isSmallDevice() ? buttonRect.minY + bubbleHeight-50 : buttonRect.minY + bubbleHeight-90)
+                            .frame(height:isSmallDevice() ? buttonRect.minY + bubbleHeight : buttonRect.minY + bubbleHeight)
                         VStack(alignment: .trailing, spacing: .zero) {
-    //                            Image("上矢印")
-    //                                .resizable()
-    //                                .frame(width: 20, height: 20)
-    //                                .padding(.trailing, 306.0)
-                            Text("「IT基礎知識の問題（初級）」をクリックしてください。")
+//                            Image("上矢印")
+//                                .resizable()
+//                                .frame(width: 20, height: 20)
+//                                .padding(.trailing, 306.0)
+                            Text("「基礎理解の問題」をクリックしてください。")
                                 .font(.callout)
                                 .padding(5)
                                 .font(.system(size: 24.0))
@@ -334,7 +388,7 @@ struct ITStoratagyManagerListView: View {
                         .background(GeometryReader { geometry in
                             Path { _ in
                                 DispatchQueue.main.async {
-                                    self.bubbleHeight = geometry.size.height - 40
+                                    self.bubbleHeight = geometry.size.height
                                 }
                             }
                         })
@@ -362,10 +416,10 @@ struct ITStoratagyManagerListView: View {
             }
             
             .onTapGesture {
-                if tutorialNum == 2 {
+                if tutorialNum == 3 {
                         audioManager.playSound()
                     tutorialNum = 0
-                    authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 3) { success in
+                    authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 4) { success in
                         // データベースのアップデートが成功したかどうかをハンドリング
                     }
                 }
@@ -373,7 +427,6 @@ struct ITStoratagyManagerListView: View {
             .frame(maxWidth:.infinity,maxHeight: .infinity)
             .background(Color("Color2"))
             .onAppear {
-//                print("isButtonClickable:\(isButtonClickable)")
                 reward.LoadReward()
                 fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
                     authManager.fetchPreFlag()
@@ -384,6 +437,7 @@ struct ITStoratagyManagerListView: View {
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { // 1秒後に
                     self.isButtonClickable = true // ボタンをクリック可能に設定
+                    
                 }
                 authManager.fetchUserInfo { (name, avatar, money, hp, attack, tutorialNum) in
                     if let fetchedTutorialNum = tutorialNum {
@@ -420,24 +474,32 @@ struct ITStoratagyManagerListView: View {
             .fullScreenCover(isPresented: $preFlag) {
                 PreView(audioManager: audioManager)
             }
-                .navigationBarBackButtonHidden(true)
-                .navigationBarItems(leading: Button(action: {
-                    self.presentationMode.wrappedValue.dismiss()
-                    audioManager.playCancelSound()
-                }) {
-                    Image(systemName: "chevron.left")
-                        .foregroundColor(Color("fontGray"))
-                    Text("戻る")
-                        .foregroundColor(Color("fontGray"))
-                }.padding(.top))
+            .navigationBarBackButtonHidden(true)
+            .navigationBarItems(leading: Button(action: {
+                self.presentationMode.wrappedValue.dismiss()
+                audioManager.playCancelSound()
+            }) {
+                Image(systemName: "chevron.left")
+                    .foregroundColor(Color("fontGray"))
+                Text("戻る")
+                    .foregroundColor(Color("fontGray"))
+            }.padding(.top)).buttonStyle(.plain)
+//            .toolbar {
+//                    ToolbarItem(placement: .principal) {
+//                        Text("ダンジョン一覧")
+//                            .font(.system(size: 20)) // ここでフォントサイズを指定
+//                            .foregroundStyle(Color("fontGray"))
+//                    }
+//                }
+//            }
         .navigationViewStyle(StackNavigationViewStyle())
         }
     func isIPad() -> Bool {
         return UIDevice.current.userInterfaceIdiom == .pad
     }
-
+    
     func fetchNumberOfIncorrectAnswers(userId: String, completion: @escaping (Int) -> Void) {
-    let ref = Database.database().reference().child("IncorrectITStrategyAnswers").child(userId)
+    let ref = Database.database().reference().child("IncorrectITAnswers").child(userId)
     ref.observeSingleEvent(of: .value) { snapshot in
         
     let count = snapshot.childrenCount // 子ノードの数を取得
@@ -449,8 +511,10 @@ struct ITStoratagyManagerListView: View {
     func isSmallDevice() -> Bool {
         return UIScreen.main.bounds.width < 390
     }
-}
+    }
 
 #Preview {
-    ITStoratagyManagerListView(isPresenting: .constant(false))
+//    ITManagerListView(isPresenting: .constant(false))
+//    ManagerListView(isPresenting: .constant(false))
+    TopView()
 }

@@ -327,7 +327,7 @@ struct RankMatchQuizResultView: View {
                     .foregroundColor(Color("fontGray1"))
                 Text("戻る")
                     .foregroundColor(Color("fontGray1"))
-            })
+            }).buttonStyle(.plain)
             .toolbar {
                     ToolbarItem(placement: .principal) {
                         Text("クイズ結果")

@@ -222,7 +222,7 @@ Spacer()
                 .foregroundColor(.gray)
             Text("戻る")
                 .foregroundColor(Color("fontGray"))
-        })
+        }).buttonStyle(.plain)
         }
     }
 

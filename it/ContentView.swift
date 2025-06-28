@@ -144,6 +144,7 @@ struct ContentView: View {
                                             .frame(width:140,height:50)
                                             .shadow(radius: 1)
                                     }
+                                    .buttonStyle(.plain)
                                 }
                                 HStack{
                                     ZStack {
@@ -260,6 +261,7 @@ struct ContentView: View {
                                                             .frame(width:150)
                                                     }.shadow(radius:3)
                                                         .padding(.leading ,10)
+                                                        .buttonStyle(.plain)
 //                                                                    Color.black.opacity(0.3)
 //                                                                        .edgesIgnoringSafeArea(.all)
 //                                                                        .cornerRadius(30)                 .padding(.leading, isSmallDevice() ? 25 : 35)             .padding(.trailing, isSmallDevice() ? 0 : 10)
@@ -285,6 +287,7 @@ struct ContentView: View {
                                                 }
                                                 .shadow(radius:3)
                                                 .padding(.trailing,35)
+                                                .buttonStyle(.plain)
                                                 Spacer()
                                             }
                                             HStack{
@@ -298,6 +301,7 @@ struct ContentView: View {
                                                         .frame(height: isSmallDevice() ? 60 : 60)
                                                 }
                                                 .shadow(radius:3)
+                                                .buttonStyle(.plain)
                                                 Button(action: {
                                                     self.isPresentingRankingView = true
                                                     audioManager.playSound()
@@ -308,6 +312,7 @@ struct ContentView: View {
                                                         .frame(height: isSmallDevice() ? 55 : 53)
                                                         .padding(.top,10)
                                                 }.shadow(radius:3)
+                                                    .buttonStyle(.plain)
                                             }
                                             HStack{
                                                 Button(action: {
@@ -321,7 +326,7 @@ struct ContentView: View {
                                                         .frame(height: isSmallDevice() ? 65 : 65)
                                                         .padding(.trailing, 10)
                                                 }.shadow(radius:3)
-                                                
+                                                    .buttonStyle(.plain)
                                                 Button(action: {
                                                     self.isPresentingTittleView = true
                                                     audioManager.playSound()
@@ -332,6 +337,7 @@ struct ContentView: View {
                                                         .frame(height: isSmallDevice() ? 60 : 60)
                                                         .padding(.top,10)
                                                 }.shadow(radius:3)
+                                                    .buttonStyle(.plain)
                                             }
                                         }
                                     }
@@ -450,6 +456,7 @@ struct ContentView: View {
                                     .frame(width:200,height:60)
                                     .padding(.top,20)
                             }
+                            .buttonStyle(.plain)
                             Spacer()
                         }
                         .padding(.leading)
