@@ -82,7 +82,7 @@ struct ContentView: View {
                 } else {
                     VStack {
                     if userPreFlag != 1 {
-                        BannerView()
+                        BannerAdView()
                             .frame(height: 60)
                             .padding(.bottom, -10)
                     }

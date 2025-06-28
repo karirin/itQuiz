@@ -16,6 +16,7 @@ struct RootView: View {
     @Environment(\.requestReview) var requestReview
     @Environment(\.scenePhase) var scenePhase
     let viewModel = PositionViewModel.shared
+    @State private var isShowingOtherAppsSheet = false
 
     var body: some View {
         Group {
@@ -24,7 +25,13 @@ struct RootView: View {
             } else if isUserExists == false || isUserExists == nil {
                 TopView()
             } else {
-                TopView()
+                TopView()        
+                .sheet(isPresented: $isShowingOtherAppsSheet) {
+                    OtherAppsPromotionView()
+                        .presentationDetents([.large,
+                                              .fraction(isSmallDevice() ? 0.95 : isiPhone12Or13() ? 0.7 : 0.7)
+                        ])
+                }
             }
         }
         .onAppear {
@@ -38,9 +45,19 @@ struct RootView: View {
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                 withAnimation {
                     self.isActive = true
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                        isShowingOtherAppsSheet = true
+                    }
                 }
             }
         }
+    }
+    func isiPhone12Or13() -> Bool {
+        let screenSize = UIScreen.main.bounds.size
+        let width = min(screenSize.width, screenSize.height)
+        let height = max(screenSize.width, screenSize.height)
+        // iPhone 12,13 の画面サイズは約幅390ポイント、高さ844ポイント
+        return abs(width - 390) < 1 && abs(height - 844) < 1
     }
 }
 

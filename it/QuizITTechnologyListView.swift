@@ -419,17 +419,6 @@ struct QuizITTechnologyListView: View {
             explanation: "DRAMは揮発性メモリであり、電力供給が断たれるとデータが失われます。"
         ),
         QuizQuestion(
-            question: "暗号化方式の特徴について記した表において, 表中の a〜d に入れる字句の適切な組合せはどれか。",
-            choices: [
-                "共通鍵暗号方式 公開鍵暗号方式 遅い 速い",
-                "共通鍵暗号方式 公開鍵暗号方式 速い 遅い",
-                "公開鍵暗号方式 共通鍵暗号方式 遅い 速い",
-                "公開鍵暗号方式 共通鍵暗号方式 速い 遅い"
-            ],
-            correctAnswerIndex: 1,
-            explanation: "共通鍵暗号方式は暗号化鍵と復号鍵が同一であり、処理速度が速い。一方、公開鍵暗号方式は鍵が異なり、処理速度が遅い。"
-        ),
-        QuizQuestion(
             question: "文書作成ソフトや表計算ソフトなどにおいて, 一連の操作手順をあらかじめ定義しておき, 実行する機能はどれか。",
             choices: [
                 "オートコンプリート",
@@ -450,17 +439,6 @@ struct QuizITTechnologyListView: View {
             ],
             correctAnswerIndex: 1,
             explanation: "OCR（Optical Character Recognition）は印刷文字や手書き文字を認識してテキストデータに変換します。"
-        ),
-        QuizQuestion(
-            question: "関係データベースを構成する要素の関係を表す図において,図中のa〜cに入れる字句の適切な組合せはどれか。",
-            choices: [
-                "表 フィールド レコード",
-                "表表 フィールド レコード",
-                "フィールド 表 レコード",
-                "レコード 表 フィールド"
-            ],
-            correctAnswerIndex: 3,
-            explanation: "関係データベースでは、表がデータの集合、フィールドが項目、レコードが各データの行を表します。"
         ),
         QuizQuestion(
             question: "cookie を説明したものはどれか。",
@@ -494,17 +472,6 @@ struct QuizITTechnologyListView: View {
             ],
             correctAnswerIndex: 1,
             explanation: "サイバー保険に加入することで、リスクを第三者と共有するリスク共有の例となります。"
-        ),
-        QuizQuestion(
-            question: "AI における機械学習の学習方法に関する次の記述中の ac に入れる字句の適切な組合せはどれか。",
-            choices: [
-                "回帰 分類 クラスタリング",
-                "クラスタリング 分類 回帰",
-                "分類 回帰 クラスタリング",
-                "分類 クラスタリング 回帰"
-            ],
-            correctAnswerIndex: 3,
-            explanation: "教師あり学習は分類や回帰、教師なし学習はクラスタリングを指します。"
         ),
         QuizQuestion(
             question: "PKI における CA (Certificate Authority) の役割に関する記述として適切なものはどれか。",
@@ -582,17 +549,6 @@ struct QuizITTechnologyListView: View {
             ],
             correctAnswerIndex: 3,
             explanation: "ログはデータベースの更新履歴を記録したもので、トランザクションの管理に使用されます。他の選択肢は定義が誤っています。"
-        ),
-        QuizQuestion(
-            question: "情報セキュリティの3要素である機密性, 完全性及び可用性と,それらを確保するための対策の例 a〜c の適切な組合せはどれか。",
-            choices: [
-                "可用性 完全性 機密性",
-                "可用性 機密性 完全性",
-                "完全性 機密性可用性",
-                "機密性 完全性 可用性"
-            ],
-            correctAnswerIndex: 3,
-            explanation: "アクセス制御は機密性、デジタル署名は完全性、ディスクの二重化は可用性を確保する対策です。"
         ),
         QuizQuestion(
             question: "スマートフォンなどのタッチパネルで広く採用されている方式であり,指がタッチパネルの表面に近づいたときに、その位置を検出する方式はどれか。",

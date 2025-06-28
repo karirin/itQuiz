@@ -8,16 +8,16 @@
 import SwiftUI
 import GoogleMobileAds
 
-class InterstitialStory: NSObject, GADFullScreenContentDelegate, ObservableObject {
+class InterstitialStory: NSObject, FullScreenContentDelegate, ObservableObject {
     @Published var interstitialAdLoaded: Bool = false
     @Published var flag: Bool = false
     @Published var wasAdDismissed = false
     
-    var interstitialAd: GADInterstitialAd?
+    var interstitialAd: InterstitialAd?
     
     func loadInterstitial(completion: ((Bool) -> Void)? = nil) {
 //      GADInterstitialAd.load(withAdUnitID: "ca-app-pub-3940256099942544/4411468910", request: GADRequest()) { (ad, error) in //テスト
-        GADInterstitialAd.load(withAdUnitID: "ca-app-pub-4898800212808837/6252239732", request: GADRequest()) { (ad, error) in
+        InterstitialAd.load(with: "ca-app-pub-4898800212808837/6252239732", request: Request()) { (ad, error) in
         if let _ = error {
           print("loadInterstitial 😭: 読み込みに失敗しました　ストーリー")
           print("loadInterstitial 広告の読み込みに失敗しました　ストーリー: \(error!.localizedDescription)")
@@ -38,31 +38,31 @@ class InterstitialStory: NSObject, GADFullScreenContentDelegate, ObservableObjec
         return print("Ad wasn't ready　ストーリー")
       }
 
-      fullScreenAd.present(fromRootViewController: viewController)
+        fullScreenAd.present(from: viewController)
     }
     
-    func adDidRecordImpression(_ ad: GADFullScreenPresentingAd) {
+    func adDidRecordImpression(_ ad: FullScreenPresentingAd) {
       print("\(#function) called　ストーリー")
     }
 
-    func adDidRecordClick(_ ad: GADFullScreenPresentingAd) {
+    func adDidRecordClick(_ ad: FullScreenPresentingAd) {
       print("\(#function) called　ストーリー")
     }
     
     // 失敗通知
-    func ad(_ ad: GADFullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
+    func ad(_ ad: FullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
         print("インタースティシャル広告の表示に失敗しました　ストーリー")
         self.interstitialAdLoaded = false
         self.loadInterstitial()
     }
 
     // 表示通知
-    func adWillPresentFullScreenContent(_ ad: GADFullScreenPresentingAd) {
+    func adWillPresentFullScreenContent(_ ad: FullScreenPresentingAd) {
         print("インタースティシャル広告を表示しました　ストーリー")
 //        self.interstitialAdLoaded = false // 広告表示時に false に設定
     }
 
-    func adDidDismissFullScreenContent(_ ad: GADFullScreenPresentingAd) {
+    func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd) {
         print("インタースティシャル広告を閉じました　ストーリー")
         self.interstitialAdLoaded = false // 広告閉じた時に false に設定
         self.wasAdDismissed = true

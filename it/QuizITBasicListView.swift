@@ -667,17 +667,6 @@ struct QuizITBasicList: View {
               explanation: "フィッシング攻撃は、偽のウェブサイトやメールなどを用いて、ユーザーから個人情報を騙し取る詐欺行為です。"
           ),
           QuizQuestion(
-              question: "データベースで「外部キー」の役割は何か？",
-              choices: [
-                  "テーブル内のレコードを一意に識別する",
-                  "テーブル間の関係を表す",
-                  "データの整合性を保つ",
-                  "両方BとC"
-              ],
-              correctAnswerIndex: 3,
-              explanation: "外部キーは、異なるテーブル間の関係を表し、関連するデータ間の整合性を保つ役割を持っています。"
-          ),
-          QuizQuestion(
               question: "ソフトウェア開発プロジェクトで、要件収集と分析を行うフェーズはどれか？",
               choices: [
                   "設計",

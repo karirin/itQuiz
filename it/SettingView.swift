@@ -12,15 +12,16 @@ struct OtherApp: Identifiable {
     let id = UUID()
     let name: String
     let description: String
+    let description2: String
     let appStoreLink: String
 }
 
 extension OtherApp {
     static let allApps = [
-        OtherApp(name: "簿記クエスト", description: "ゲーム感覚で簿記の資格が学べるアプリ。４級〜１級の階級ごとに、「基礎知識と仕訳」「帳簿と帳簿組織」「決算と財務諸表」「原価計算と管理会計」「税務と法務」の分野別に問題を解くことができます。", appStoreLink: "https://apps.apple.com/us/app/%E7%B0%BF%E8%A8%98%E3%82%AF%E3%82%A8%E3%82%B9%E3%83%88-%E7%B0%BF%E8%A8%98%E3%81%AE%E8%B3%87%E6%A0%BC%E3%81%AB%E5%90%88%E6%A0%BC%E3%81%A7%E3%81%8D%E3%82%8B%E3%82%A2%E3%83%97%E3%83%AA/id6740277636"),
-        OtherApp(name: "FPクエスト", description: "ゲーム感覚でFPの資格が学べるアプリ。３〜１級の階級別に「資産計画」「リスク管理」「金融資産運用」「タックスプランニング」「不動産」「相続・事業継承」で分野別に問題を解くことができます。", appStoreLink: "https://apps.apple.com/us/app/%E3%81%8A%E9%87%91%E3%82%AF%E3%82%A8%E3%82%B9%E3%83%88/id6476828253"),
-        OtherApp(name: "ドリルクエスト", description: "ゲーム感覚で小学生の勉強ができるアプリ。「算数」「国語」「社会」「理科」に分かれており、それぞれ学年別レベルで出題されます。", appStoreLink: "https://apps.apple.com/us/app/%E3%83%89%E3%83%AA%E3%83%AB%E3%82%AF%E3%82%A8%E3%82%B9%E3%83%88-%E5%B0%8F%E5%AD%A6%E7%94%9F%E3%81%AE%E5%AD%A6%E7%BF%92%E3%82%A2%E3%83%97%E3%83%AA/id6711333088"),
-        OtherApp(name: "英語クエスト", description: "ゲーム感覚で英語の知識が学べるアプリ。「英単語」「英熟語」「英文法」に分かれており、それぞれ『英検』『TOIEC』の難易度別に勉強をゲーム感覚で学べます。", appStoreLink: "https://apps.apple.com/us/app/%E8%8B%B1%E8%AA%9E%E3%82%AF%E3%82%A8%E3%82%B9%E3%83%88-%E8%8B%B1%E8%AA%9E%E3%81%AE%E5%95%8F%E9%A1%8C%E3%81%AE%E5%8B%89%E5%BC%B7%E3%81%A8%E5%AD%A6%E7%BF%92%E3%81%8C%E3%81%A7%E3%81%8D%E3%82%8B%E3%82%A2%E3%83%97%E3%83%AA/id6477769441"),
+        OtherApp(name: "簿記クエスト", description: "ゲーム感覚で簿記の資格が学べるアプリ。４級〜１級の階級ごとに、「基礎知識と仕訳」「帳簿と帳簿組織」「決算と財務諸表」「原価計算と管理会計」「税務と法務」の分野別に問題を解くことができます。", description2: "ゲーム感覚で簿記の資格が学べるアプリ。４級〜１級の階級ごとに分野別で問題を解くことができます。", appStoreLink: "https://apps.apple.com/us/app/%E7%B0%BF%E8%A8%98%E3%82%AF%E3%82%A8%E3%82%B9%E3%83%88-%E7%B0%BF%E8%A8%98%E3%81%AE%E8%B3%87%E6%A0%BC%E3%81%AB%E5%90%88%E6%A0%BC%E3%81%A7%E3%81%8D%E3%82%8B%E3%82%A2%E3%83%97%E3%83%AA/id6740277636"),
+        OtherApp(name: "FPクエスト", description: "ゲーム感覚でFPの資格が学べるアプリ。３〜１級の階級別に「資産計画」「リスク管理」「金融資産運用」「タックスプランニング」「不動産」「相続・事業継承」で分野別に問題を解くことができます。", description2: "ゲーム感覚でFPの資格が学べるアプリ。３〜１級の階級ごとに分野別で問題を解くことができます。", appStoreLink: "https://apps.apple.com/us/app/%E3%81%8A%E9%87%91%E3%82%AF%E3%82%A8%E3%82%B9%E3%83%88/id6476828253"),
+        OtherApp(name: "ドリルクエスト", description: "ゲーム感覚で小学生の勉強ができるアプリ。「算数」「国語」「社会」「理科」に分かれており、それぞれ学年別レベルで出題されます。", description2: "ゲーム感覚で小学生の勉強ができるアプリ。「算数」「国語」「社会」「理科」の分野別で学習できます", appStoreLink: "https://apps.apple.com/us/app/%E3%83%89%E3%83%AA%E3%83%AB%E3%82%AF%E3%82%A8%E3%82%B9%E3%83%88-%E5%B0%8F%E5%AD%A6%E7%94%9F%E3%81%AE%E5%AD%A6%E7%BF%92%E3%82%A2%E3%83%97%E3%83%AA/id6711333088"),
+        OtherApp(name: "英語クエスト", description: "ゲーム感覚で英語の知識が学べるアプリ。「英単語」「英熟語」「英文法」に分かれており、それぞれ『英検』『TOIEC』の難易度別に勉強をゲーム感覚で学べます。", description2: "ゲーム感覚で英語の知識が学べるアプリ。「英単語」「英熟語」「英文法」の分野別で学習できます。", appStoreLink: "https://apps.apple.com/us/app/%E8%8B%B1%E8%AA%9E%E3%82%AF%E3%82%A8%E3%82%B9%E3%83%88-%E8%8B%B1%E8%AA%9E%E3%81%AE%E5%95%8F%E9%A1%8C%E3%81%AE%E5%8B%89%E5%BC%B7%E3%81%A8%E5%AD%A6%E7%BF%92%E3%81%8C%E3%81%A7%E3%81%8D%E3%82%8B%E3%82%A2%E3%83%97%E3%83%AA/id6477769441"),
     ]
 }
 

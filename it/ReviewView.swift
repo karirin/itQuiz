@@ -31,9 +31,6 @@ struct ReviewView: View {
         ZStack {
             Color.black.opacity(0.4)
                 .edgesIgnoringSafeArea(.all)
-                .onTapGesture {
-                    isPresented = false
-                }
             VStack(spacing: -25) {
                 VStack(alignment: .center){
                     Text("")

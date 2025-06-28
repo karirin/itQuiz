@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Firebase
+import FirebaseAuth
 import Combine
 import UIKit
 
@@ -657,7 +658,7 @@ struct StoryView: View {
 
                     VStack {
                         if userPreFlag != 1 {
-                            BannerStoryView()
+                            BannerStortyView()
                                 .frame(height: 60)
                         }
                         VStack(spacing:5) {
