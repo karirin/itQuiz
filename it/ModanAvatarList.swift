@@ -89,7 +89,7 @@ struct AvatarListView: View {
     // MARK: - Header View
     private var headerView: some View {
         HStack {
-            Text("おとも")
+            Text("おとも一覧")
                 .font(.system(size: 28, weight: .bold, design: .rounded))
                 .foregroundStyle(
                     LinearGradient(
@@ -293,9 +293,6 @@ struct AvatarListView: View {
     // MARK: - Avatar Grid View
     private var avatarGridView: some View {
         VStack(alignment: .leading, spacing:10) {
-            Text("おとも一覧")
-                .font(.system(size: 20, weight: .semibold))
-                .foregroundColor(Color("fontGray"))
             ScrollView(showsIndicators: false) {
                 LazyVGrid(columns: columns, spacing: 16) {
                     ForEach(authManager.avatars, id: \.name) { avatar in
