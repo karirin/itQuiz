@@ -8,7 +8,7 @@
 import SwiftUI
 import Firebase
 
-struct AvatarListView: View {
+struct AvatarListView1: View {
     let items = ["もりこう","ライム", "レッドドラゴン", "レインボードラゴン"]
     
     @State private var selectedItem: Avatar?
@@ -229,8 +229,8 @@ Spacer()
         }
     }
 
-struct OtomoListView_Previews: PreviewProvider {
+struct OtomoListView1_Previews: PreviewProvider {
     static var previews: some View {
-        AvatarListView(isPresenting: .constant(false))
+        AvatarListView1(isPresenting: .constant(false))
     }
 }

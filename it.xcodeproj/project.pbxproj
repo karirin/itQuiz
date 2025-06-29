@@ -25,6 +25,7 @@
 		180A9FBB2CD640ED00B35C83 /* ChangeNameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180A9FBA2CD640ED00B35C83 /* ChangeNameView.swift */; };
 		180A9FC72CDF5CCA00B35C83 /* StampAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180A9FC62CDF5CCA00B35C83 /* StampAnimationView.swift */; };
 		180A9FD12CE3875A00B35C83 /* StoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180A9FD02CE3875A00B35C83 /* StoryView.swift */; };
+		180BEDBB2E10DD8200F92223 /* ModanAvatarList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180BEDBA2E10DD7700F92223 /* ModanAvatarList.swift */; };
 		180C1C612D0C681C004C4728 /* ProgressExpBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180C1C602D0C681C004C4728 /* ProgressExpBar.swift */; };
 		181B25642CE8A3B400F8419B /* StoryITListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181B25632CE8A3B400F8419B /* StoryITListView.swift */; };
 		181B25662CE8A43C00F8419B /* StoryQuizView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181B25652CE8A43C00F8419B /* StoryQuizView.swift */; };
@@ -125,6 +126,7 @@
 		180A9FBA2CD640ED00B35C83 /* ChangeNameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeNameView.swift; sourceTree = "<group>"; };
 		180A9FC62CDF5CCA00B35C83 /* StampAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StampAnimationView.swift; sourceTree = "<group>"; };
 		180A9FD02CE3875A00B35C83 /* StoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryView.swift; sourceTree = "<group>"; };
+		180BEDBA2E10DD7700F92223 /* ModanAvatarList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModanAvatarList.swift; sourceTree = "<group>"; };
 		180C1C602D0C681C004C4728 /* ProgressExpBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressExpBar.swift; sourceTree = "<group>"; };
 		181B25632CE8A3B400F8419B /* StoryITListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryITListView.swift; sourceTree = "<group>"; };
 		181B25652CE8A43C00F8419B /* StoryQuizView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryQuizView.swift; sourceTree = "<group>"; };
@@ -207,6 +209,7 @@
 		180BE92C2E0FF72B00F92223 /* Quiz */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Quiz; sourceTree = "<group>"; };
 		180BE92E2E0FF82100F92223 /* Modal */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Modal; sourceTree = "<group>"; };
 		180BE92F2E0FF92200F92223 /* ManagerList */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = ManagerList; sourceTree = "<group>"; };
+		180BEDB92E10DD6900F92223 /* old */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = old; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -288,6 +291,8 @@
 				26A25D4F2AB9FB1A006B368F /* TitleListView.swift */,
 				180BE92C2E0FF72B00F92223 /* Quiz */,
 				2641992B2AC2572F002013B9 /* AvatarListView.swift */,
+				180BEDBA2E10DD7700F92223 /* ModanAvatarList.swift */,
+				180BEDB92E10DD6900F92223 /* old */,
 				267283122AFA84C600549219 /* IllustratedView.swift */,
 				269A87892AB86FC900F33C9E /* GachaView.swift */,
 				1801FFAC2D4480D1007625A2 /* TittlesView.swift */,
@@ -394,6 +399,7 @@
 				180BE92C2E0FF72B00F92223 /* Quiz */,
 				180BE92E2E0FF82100F92223 /* Modal */,
 				180BE92F2E0FF92200F92223 /* ManagerList */,
+				180BEDB92E10DD6900F92223 /* old */,
 			);
 			name = it;
 			packageProductDependencies = (
@@ -510,6 +516,7 @@
 				264F19152AF2824700B6FB10 /* RankingView.swift in Sources */,
 				18A8D06C2C1B044B004DB532 /* MugenQuizView.swift in Sources */,
 				267283132AFA84C600549219 /* IllustratedView.swift in Sources */,
+				180BEDBB2E10DD8200F92223 /* ModanAvatarList.swift in Sources */,
 				269A87882AB7757C00F33C9E /* QuizResultView.swift in Sources */,
 				18975FC12D61AD0E0063EE42 /* OtherAppsPromotionView.swift in Sources */,
 				180A9FBB2CD640ED00B35C83 /* ChangeNameView.swift in Sources */,

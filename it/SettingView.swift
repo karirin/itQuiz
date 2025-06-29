@@ -31,123 +31,233 @@ struct SettingView: View {
     @State private var isSoundOn: Bool = true
     @ObservedObject var authManager = AuthManager()
     @State private var showingDeleteAlert = false
+    @Environment(\.colorScheme) private var colorScheme
+    var backgroundColor: Color { colorScheme == .dark ? Color(.systemBackground) : Color(.white) }
 
     var body: some View {
         NavigationView {
-            List {
-                Section(header: Text("情報")) {
-                    Toggle(isOn: $isSoundOn) {
-                        if isSoundOn {
-                            Image(systemName: "speaker.wave.2")
-                            Text("音声オン")
-                        } else {
-                            Image(systemName: "speaker.slash")
-                            Text("音声オフ")
-                        }
-                    }
-                    .toggleStyle(SwitchToggleStyle(tint: .blue)) // Switch color. You can adjust as per your need.
-                    .onChange(of: isSoundOn, perform: { newValue in
-                        audioManager.toggleSound()
-                    })
-                    NavigationLink(destination: TermsOfServiceView()) {
+            ScrollView {
+                VStack(spacing: 0) {
+                    // フィードバックセクション
+                    VStack(spacing: 0) {
                         HStack {
-                            Text("利用規約")
+                            Text("各種設定")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
                             Spacer()
-                            Image(systemName: "chevron.right")
-                                .foregroundColor(Color(.systemGray4))
                         }
+                        .padding(.horizontal, 20)
+                        .padding(.top, 20)
+                        .padding(.bottom, 8)
+                        
+                        VStack(spacing: 0) {
+                            soundToggleRow
+                            Divider().padding(.leading, 56)
+                            
+                            NavigationLink(destination: TermsOfServiceView()) {
+                                settingRow(icon: "doc.text", iconColor: .blue, title: "利用規約")
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                            Divider().padding(.leading, 56)
+                            
+                            NavigationLink(destination: PrivacyView()) {
+                                settingRow(icon: "lock.shield", iconColor: .orange, title: "プライバシーポリシー")
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                            Divider().padding(.leading, 56)
+                            
+                            NavigationLink(destination: WebView(urlString: "https://docs.google.com/forms/d/e/1FAIpQLSfHxhubkEjUw_gexZtQGU8ujZROUgBkBcIhB3R6b8KZpKtOEQ/viewform?embedded=true")) {
+                                settingRow(icon: "envelope", iconColor: .green, title: "お問い合せ")
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                            Divider().padding(.leading, 56)
+                            
+                            NavigationLink(destination: PreView(audioManager: audioManager).navigationBarBackButtonHidden(true)) {
+                                settingRow(icon: "eye.slash", iconColor: .purple, title: "広告を非表示にする")
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                            Divider().padding(.leading, 56)
+                            
+                            deleteAccountRow
+                        }
+                        .background(Color.white)
+                        .cornerRadius(12)
                     }
+                    .shadow(color: Color.black.opacity(0.1), radius: 5)
                     
-                    NavigationLink(destination: PrivacyView()) {
+                    // おすすめのアプリセクション
+                    VStack(spacing: 0) {
                         HStack {
-                            Text("プライバシーポリシー")
+                            Text("おすすめのアプリ")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
                             Spacer()
-                            Image(systemName: "chevron.right")
-                                .foregroundColor(Color(.systemGray4))
                         }
-                    }
-                    
-                    NavigationLink(destination: WebView(urlString: "https://docs.google.com/forms/d/e/1FAIpQLSfHxhubkEjUw_gexZtQGU8ujZROUgBkBcIhB3R6b8KZpKtOEQ/viewform?embedded=true")) {
-                        HStack {
-                            Text("お問い合せ")
-                            Spacer()
-                            Image(systemName: "chevron.right")
-                                .foregroundColor(Color(.systemGray4))
-                        }
-                    }
-//                    if authManager.adminFlag == 1 {
-                    NavigationLink(destination: PreView(audioManager: audioManager).navigationBarBackButtonHidden(true)) {
-                        HStack {
-                            Text("広告を非表示にする")
-                            Spacer()
-                            Image(systemName: "chevron.right")
-                                .foregroundColor(Color(.systemGray4))
-                        }
-                    }
-                    Button("アカウントを削除") {
-                        showingDeleteAlert = true
-                    }
-                    .foregroundColor(.red)
-                    .alert("アカウントを削除してもよろしいですか？この操作は元に戻せません。", isPresented: $showingDeleteAlert) {
-                        Button("削除", role: .destructive) {
-                            authManager.deleteUserAccount { success, error in
-                                if success {
-                                    // アカウント削除成功時の処理
-                                } else {
-                                    // エラー処理
+                        .padding(.horizontal, 20)
+                        .padding(.top, 32)
+                        .padding(.bottom, 8)
+                        
+                        VStack(spacing: 0) {
+                            ForEach(Array(OtherApp.allApps.enumerated()), id: \.element.id) { index, app in
+                                appRow(app: app)
+                                if index < OtherApp.allApps.count - 1 {
+                                    Divider().padding(.leading, 72)
                                 }
                             }
                         }
-                        Button("キャンセル", role: .cancel) {}
+                        .background(Color.white)
+                        .cornerRadius(12)
                     }
-//                    }
-//                    NavigationLink(destination: Interstitial1()) {
-//                        HStack {
-//                            Text("インタースティシャル")
-//                            Spacer()
-//                            Image(systemName: "chevron.right")
-//                                .foregroundColor(Color(.systemGray4))
-//                        }
-//                    }
+                    .shadow(color: Color.black.opacity(0.1), radius: 5)
+                    Spacer(minLength: 40)
                 }
-                Section(header: Text("他のアプリ")) {
-                    ForEach(OtherApp.allApps) { app in
-                        Link(destination: URL(string: app.appStoreLink)!) {
-                            HStack {
-                                Image(app.name)
-                                    .resizable()
-                                    .frame(width:80,height: 80)
-                                    .cornerRadius(15)
-                                VStack(alignment: .leading) {
-                                    Text(app.name)
-                                        .font(.headline)
-                                        .foregroundColor(.black)
-                                    Text(app.description)
-                                        .font(.subheadline)
-                                        .foregroundColor(.gray)
-                                }
-                            }
-                        }
-                    }
-                }
+                .padding(.horizontal, 16)
             }
-            .listStyle(GroupedListStyle())
-            .navigationBarTitle("設定")
+            .background(backgroundColor.ignoresSafeArea())
+            .navigationBarTitle("", displayMode: .inline)
         }
-        .onAppear{
+        .onAppear {
             AuthManager.shared.fetchCurrentUserAdminFlag()
         }
         .navigationViewStyle(StackNavigationViewStyle())
-        .navigationBarItems(leading: Button(action: { 
-                        generateHapticFeedback()
-                            self.presentationMode.wrappedValue.dismiss()
-                            audioManager.playCancelSound()
-                        }) {
-                            Image(systemName: "chevron.left")
-                                .foregroundColor(Color("fontGray"))
-                            Text("戻る")
-                                .foregroundColor(Color("fontGray"))
-                        }).buttonStyle(.plain)
+    }
+    
+    // MARK: - Components
+    
+    private var backButton: some View {
+        Button(action: {
+            generateHapticFeedback()
+            self.presentationMode.wrappedValue.dismiss()
+            audioManager.playCancelSound()
+        }) {
+            HStack(spacing: 4) {
+                Image(systemName: "chevron.left")
+                    .font(.system(size: 17, weight: .medium))
+                Text("戻る")
+                    .font(.system(size: 17))
+            }
+            .foregroundColor(.blue)
+        }
+    }
+    
+    private var soundToggleRow: some View {
+        HStack(spacing: 12) {
+            Image(systemName: isSoundOn ? "speaker.wave.2" : "speaker.slash")
+                .font(.system(size: 20))
+                .foregroundColor(isSoundOn ? .blue : .gray)
+                .frame(width: 24, height: 24)
+            
+            Text(isSoundOn ? "音声オン" : "音声オフ")
+                .font(.system(size: 16))
+                .foregroundColor(.black)
+            
+            Spacer()
+            
+            Toggle("", isOn: $isSoundOn)
+                .toggleStyle(SwitchToggleStyle())
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 12)
+        .contentShape(Rectangle())
+        .onChange(of: isSoundOn) { newValue in
+            audioManager.toggleSound()
+        }
+    }
+    
+    private func settingRow(icon: String, iconColor: Color, title: String) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 20))
+                .foregroundColor(iconColor)
+                .frame(width: 24, height: 24)
+            
+            Text(title)
+                .font(.system(size: 16))
+                .foregroundColor(.black)
+            
+            Spacer()
+            
+            Image(systemName: "chevron.right")
+                .font(.system(size: 14, weight: .medium))
+//                .foregroundColor(.tertiaryLabel)
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 12)
+        .contentShape(Rectangle())
+    }
+    
+    private var deleteAccountRow: some View {
+        Button(action: {
+            showingDeleteAlert = true
+        }) {
+            HStack(spacing: 12) {
+                Image(systemName: "trash")
+                    .font(.system(size: 20))
+                    .foregroundColor(.red)
+                    .frame(width: 24, height: 24)
+                
+                Text("アカウントを削除")
+                    .font(.system(size: 16))
+                    .foregroundColor(.red)
+                
+                Spacer()
+                
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 14, weight: .medium))
+//                    .foregroundColor(.tertiaryLabel)
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 12)
+            .contentShape(Rectangle())
+        }
+        .alert("アカウントを削除してもよろしいですか？この操作は元に戻せません。", isPresented: $showingDeleteAlert) {
+            Button("削除", role: .destructive) {
+                authManager.deleteUserAccount { success, error in
+                    if success {
+                        // アカウント削除成功時の処理
+                    } else {
+                        // エラー処理
+                    }
+                }
+            }
+            Button("キャンセル", role: .cancel) {}
+        }
+    }
+    
+    private func appRow(app: OtherApp) -> some View {
+        Link(destination: URL(string: app.appStoreLink)!) {
+            HStack(spacing: 12) {
+                Image(app.name)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 48, height: 48)
+                    .cornerRadius(10)
+                    .clipped()
+                
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(app.name)
+                        .font(.system(size: 16, weight: .medium))
+                    
+                    .foregroundColor(.black)
+                        .lineLimit(1)
+                    
+                    Text(app.description2)
+                        .font(.system(size: 13))
+                        .foregroundColor(.black)
+                        .lineLimit(3)
+                        .multilineTextAlignment(.leading)
+                }
+                
+                Spacer()
+                
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 14, weight: .medium))
+//                    .foregroundColor(.tertiaryLabel)
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 12)
+            .contentShape(Rectangle())
+        }
     }
 }
 
@@ -179,8 +289,6 @@ struct WebView: UIViewRepresentable {
         }
     }
 }
-
-
 
 struct SettingsView_Previews: PreviewProvider {
     static var previews: some View {
