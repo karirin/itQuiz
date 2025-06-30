@@ -12,12 +12,12 @@ struct TittlesView: View {
     let items = ["もりこう","ライム", "レッドドラゴン", "レインボードラゴン"]
     
     struct Item: Identifiable {
-        let name: String  // これが一意の識別子として機能します
+        let name: String
         let attack: String
         let probability: Int
         let health: String
         let rarity: Rarity
-        var id: String { name }  // Identifiable の要件を満たすために name を id として使用
+        var id: String { name }
     }
 
     enum Rarity {
@@ -30,7 +30,7 @@ struct TittlesView: View {
         var displayString: String {
             switch self {
             case .normal:
-                return "ノーマル" // 任意の文字列を返す
+                return "ノーマル"
             case .rare:
                 return "レア"
             case .superRare:
@@ -41,11 +41,41 @@ struct TittlesView: View {
                 return "レジェンドレア"
             }
         }
+        
+        var color: Color {
+            switch self {
+            case .normal:
+                return Color.gray
+            case .rare:
+                return Color.blue
+            case .superRare:
+                return Color.purple
+            case .ultraRare:
+                return Color.orange
+            case .legendRare:
+                return Color.red
+            }
+        }
+        
+        var backgroundColor: Color {
+            switch self {
+            case .normal:
+                return Color.gray.opacity(0.1)
+            case .rare:
+                return Color.blue.opacity(0.1)
+            case .superRare:
+                return Color.purple.opacity(0.1)
+            case .ultraRare:
+                return Color.orange.opacity(0.1)
+            case .legendRare:
+                return Color.red.opacity(0.1)
+            }
+        }
     }
     
     let allItems: [Item] = [
-        Item(name: "レベル３", attack: "スリースター", probability: 25,health: "レベル３を達成したことを讃える称号", rarity: .normal),
-        Item(name: "レベル５", attack: "ネオンスター", probability: 25,health: "レベル５を達成したことを讃える称号", rarity: .normal),
+        Item(name: "レベル３", attack: "スリースター", probability: 25, health: "レベル３を達成したことを讃える称号", rarity: .normal),
+        Item(name: "レベル５", attack: "ネオンスター", probability: 25, health: "レベル５を達成したことを讃える称号", rarity: .normal),
         Item(name: "レベル１０", attack: "プラチナスター", probability: 25, health: "レベル１０を達成したことを讃える称号", rarity: .normal),
         Item(name: "回答数３０", attack: "ブロンズコイン", probability: 25, health: "問題の回答数が３０問を達成したことを讃える称号", rarity: .normal),
         Item(name: "回答数５０", attack: "シルバーコイン", probability: 25, health: "問題の回答数が５０問を達成したことを讃える称号", rarity: .normal),
@@ -62,10 +92,8 @@ struct TittlesView: View {
     @ObservedObject var authManager = AuthManager.shared
     @Environment(\.presentationMode) var presentationMode
     @ObservedObject var audioManager = AudioManager.shared
-    // アラートを表示するかどうかを制御するState変数
     @State private var showingAlert1 = false
     @State private var showingAlert2 = false
-    // 切り替えるアバターを保持するState変数
     @State private var switchingAvatar: Avatar?
     @Binding var isPresenting: Bool
     
@@ -73,184 +101,237 @@ struct TittlesView: View {
         _isPresenting = isPresenting
     }
     
-    // グリッドのレイアウトを定義
     var columns: [GridItem] = [
         GridItem(.flexible()),
         GridItem(.flexible()),
         GridItem(.flexible())
     ]
     
-    @State private var userTitles: [String: Bool] = [:] // ユーザーの称号データ
+    @State private var userTitles: [String: Bool] = [:]
 
-    // ユーザーの称号データを取得する関数
     func fetchUserTitles(userId: String) {
         let titlesRef = Database.database().reference().child("titles").child(userId)
         titlesRef.observeSingleEvent(of: .value) { snapshot in
             if let titles = snapshot.value as? [String: Bool] {
                 self.userTitles = titles
-//                print("self.userTitles:\(self.userTitles)")
             }
         }
     }
 
     var body: some View {
-        VStack {
-            // 選択されたアイテムを大きく表示
-            if let selected = selectedItem {
-                if userTitles[selected.name] == true {
-                    ZStack{
-//                        Image("\(selected.rarity.displayString)")
-//                            .resizable()
-//                            .frame(width: 70,height:70)
-//                            .padding(.trailing,240)
-//                            .padding(.bottom,100)
-                        VStack {
-                            Text(selected.attack)
-                                .font(.system(size:28))
-                                .fontWeight(.bold)
-                                .foregroundColor(Color.gray)
-                            Image(selected.name)
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(height: 180)
-                                .cornerRadius(15)
-                                .frame(height:180)
-                            Text(selected.health)
-                                .font(.system(size:24))
-                                .foregroundColor(Color("fontGray"))
-                                .padding(.horizontal)
-                                .frame(height:60)
-//                            HStack{
-//                                Image("ハート")
-//                                    .resizable()
-//                                    .frame(width: 20,height:20)
-//                                Text("\(selected.health)")
-//                                    .font(.system(size:24))
-//                                    .foregroundColor(Color("fontGray"))
-//                                Image("ソード")
-//                                    .resizable()
-//                                    .frame(width: 25,height:20)
-//                                Text("\(selected.attack)")
-//                                    .font(.system(size:24))
-//                                    .foregroundColor(Color("fontGray"))
-//                            }
-                        }
-                    }
-                    
-                }else{
-                    ZStack{
-//                        Image("\(selected.rarity.displayString)")
-//                            .resizable()
-//                            .frame(width: 70,height:70)
-//                            .padding(.trailing,240)
-//                            .padding(.bottom,100)
-                        VStack {
-                            Text("???")
-                                .font(.system(size:28))
-                                .fontWeight(.bold)
-                                .foregroundColor(Color.gray)
-                            Image("\(selected.name)_シルエット")
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(height: 180)
-                                .cornerRadius(15)
-                                .frame(height:180)
-                            Text(selected.health)
-                                .font(.system(size:24))
-                                .foregroundColor(Color("fontGray"))
-                                .padding(.horizontal)
-                                .frame(height:60)
-//                            HStack{
-//                                Image("ハート")
-//                                    .resizable()
-//                                    .frame(width: 20,height:20)
-//                                Text("???")
-//                                    .font(.system(size:24))
-//                                    .foregroundColor(Color("fontGray"))
-//                                Image("ソード")
-//                                    .resizable()
-//                                    .frame(width: 25,height:20)
-//                                Text("???")
-//                                    .font(.system(size:24))
-//                                    .foregroundColor(Color("fontGray"))
-//                            }
-                        }
-                    }
-                }
-            }
+        VStack{
+            // 詳細表示エリア
+            titleDetailView
             ScrollView {
-                        LazyVGrid(columns: columns, spacing: 20) {
-                            ForEach(allItems) { item in
-                                VStack{
-                                    // ユーザーが持っているアバターの判定
-//                                    if authManager.avatars.contains(where: { $0.name == item.name }) {
-                                    if userTitles[item.name] == true {
-                                        // ユーザーが持っているアバターの画像を表示
-                                        Button(action: { 
-                        generateHapticFeedback()
-                                            selectedItem = item
-                                            audioManager.playSound()
-                                        }) {
-                                            Image(item.name)
-                                                .resizable()
-                                                .aspectRatio(contentMode: .fit)
-                                                .frame(width: 100, height: 100)
-                                                .padding(5)
-                                                .cornerRadius(8)
-                                        }
-                                    } else {
-                                        // ユーザーが持っていないアバターのシルエットを表示
-                                        Button(action: { 
-                        generateHapticFeedback()
-                                            selectedItem = item
-                                            audioManager.playSound()
-                                        }) {
-                                            Image("\(item.name)_シルエット") // シルエット画像は適宜用意してください
-                                                .resizable()
-                                                .aspectRatio(contentMode: .fit)
-                                                .frame(width: 100, height: 100)
-                                        }
-                                    }
-                                }
-                                .overlay(
-                                   RoundedRectangle(cornerRadius: 10)
-                                       .stroke((selectedItem?.name == item.name) ? Color.gray : Color.clear, lineWidth: 4)
-                               )
-                            }
-                        }
-                    }
-            .frame(maxWidth:.infinity,maxHeight:.infinity)
-            .onAppear {
-                self.fetchUserTitles(userId: authManager.currentUserId ?? "")
-                authManager.fetchAvatars {
-                    for item in allItems {
-                        let contains = authManager.avatars.contains(where: { $0.name == item.name })
-                    }
+                VStack(spacing: 30) {
+                    // 称号グリッド
+                    titleGridView
                 }
             }
-Spacer()
         }
-        .padding(.top,5)
-        .onAppear {
-            self.selectedItem = Item(name: "レベル３", attack: "スリースター", probability: 25,health: "レベル３を達成したことを讃える称号", rarity: .normal)
-        }
-        .background(Color(hue: 0.557, saturation: 0.098, brightness: 1.0))
+        .padding(.horizontal, 20)
+        .background(
+            LinearGradient(
+                gradient: Gradient(colors: [
+                    Color(red: 0.95, green: 0.97, blue: 1.0),
+                    Color(red: 0.90, green: 0.94, blue: 0.98)
+                ]),
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        )
         .navigationBarBackButtonHidden(true)
-        .navigationBarItems(leading: Button(action: { 
-                        generateHapticFeedback()
+        .navigationBarItems(leading: Button(action: {
+            generateHapticFeedback()
             self.presentationMode.wrappedValue.dismiss()
             audioManager.playCancelSound()
         }) {
-            Image(systemName: "chevron.left")
-                .foregroundColor(.gray)
-            Text("戻る")
-                .foregroundColor(Color("fontGray"))
-        }).buttonStyle(.plain)
+            HStack(spacing: 5) {
+                Image(systemName: "chevron.left")
+                    .foregroundColor(.primary)
+                    .font(.system(size: 16, weight: .medium))
+                Text("戻る")
+                    .foregroundColor(.primary)
+                    .font(.system(size: 16, weight: .medium))
+            }
+        })
         .navigationTitle("称号一覧")
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            self.selectedItem = allItems.first
+            self.fetchUserTitles(userId: authManager.currentUserId ?? "")
+            authManager.fetchAvatars {
+                for item in allItems {
+                    let contains = authManager.avatars.contains(where: { $0.name == item.name })
+                }
+            }
         }
     }
+    
+    // 詳細表示ビュー
+    private var titleDetailView: some View {
+        VStack {
+            if let selected = selectedItem {
+                VStack(spacing: 20) {
+                    
+                    if userTitles[selected.name] == true {
+                        // 取得済み称号の表示
+                        VStack(spacing: 16) {
+                            Text(selected.attack)
+                                .font(.system(size: 28, weight: .bold, design: .rounded))
+                                .foregroundColor(.primary)
+                                .multilineTextAlignment(.center)
+                            
+                            Image(selected.name)
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(height: 160)
+                                .clipShape(RoundedRectangle(cornerRadius: 20))
+                                .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 5)
+                            
+                            Text(selected.health)
+                                .font(.system(size: 16, weight: .medium))
+                                .foregroundColor(.secondary)
+                                .multilineTextAlignment(.center)
+                                .lineLimit(3)
+                                .padding(.horizontal, 10)
+                        }
+                    } else {
+                        // 未取得称号の表示
+                        VStack(spacing: 16) {
+                            Text("???")
+                                .font(.system(size: 28, weight: .bold, design: .rounded))
+                                .foregroundColor(.secondary)
+                            
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 20)
+                                    .fill(Color.black.opacity(0.05))
+                                    .frame(height: 160)
+                                
+                                Image("\(selected.name)_シルエット")
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(height: 160)
+                                    .clipShape(RoundedRectangle(cornerRadius: 20))
+                                    .opacity(0.6)
+                            }
+                            
+                            Text(selected.health)
+                                .font(.system(size: 16, weight: .medium))
+                                .foregroundColor(.secondary)
+                                .multilineTextAlignment(.center)
+                                .lineLimit(3)
+                                .padding(.horizontal, 10)
+                        }
+                    }
+                }
+                .padding(24)
+                .background(
+                    RoundedRectangle(cornerRadius: 24)
+                        .fill(Color.white)
+                        .shadow(color: .black.opacity(0.05), radius: 20, x: 0, y: 10)
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 24)
+                        .stroke(selected.rarity.color.opacity(0.3), lineWidth: 2)
+                )
+            }
+        }
+    }
+    
+    // グリッドビュー
+    private var titleGridView: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            LazyVGrid(columns: columns, spacing: 16) {
+                ForEach(allItems) { item in
+                    titleCardView(for: item)
+                }
+            }
+        }.padding(5)
+    }
+    
+    // 個別称号カードビュー
+    private func titleCardView(for item: Item) -> some View {
+        VStack(spacing: 8) {
+            ZStack {
+                // 背景
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(
+                        userTitles[item.name] == true ?
+                        Color.white :
+                        Color.gray.opacity(0.1)
+                    )
+                    .frame(height: 100)
+                
+                // 画像
+                if userTitles[item.name] == true {
+                    Image(item.name)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 70, height: 70)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                } else {
+                    Image("\(item.name)_シルエット")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 70, height: 70)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .opacity(0.5)
+                }
+                
+                // 取得済みバッジ
+                if userTitles[item.name] == true {
+                    VStack {
+                        HStack {
+                            Spacer()
+                            Circle()
+                                .fill(Color.green)
+                                .frame(width: 12, height: 12)
+                                .overlay(
+                                    Image(systemName: "checkmark")
+                                        .font(.system(size: 8, weight: .bold))
+                                        .foregroundColor(.white)
+                                )
+                        }
+                        Spacer()
+                    }
+                    .padding(8)
+                }
+            }
+            
+            
+            // 称号名（省略表示）
+            Text(item.name)
+                .font(.system(size: 12, weight: .medium))
+                .foregroundColor(userTitles[item.name] == true ? .primary : .secondary)
+                .lineLimit(1)
+                .truncationMode(.tail)
+        }
+        .padding(8)
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(item.rarity.backgroundColor)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 20)
+                        .stroke(
+                            selectedItem?.name == item.name ?
+                            item.rarity.color :
+                            Color.clear,
+                            lineWidth: 3
+                        )
+                )
+        )
+        .scaleEffect(selectedItem?.name == item.name ? 1.05 : 1.0)
+        .animation(.spring(response: 0.3, dampingFraction: 0.8), value: selectedItem?.name == item.name)
+        .onTapGesture {
+            generateHapticFeedback()
+            selectedItem = item
+            audioManager.playSound()
+        }
+    }
+}
 
 #Preview {
-    TittlesView(isPresenting: .constant(false))
+//    TittlesView(isPresenting: .constant(false))
+    TopView()
 }

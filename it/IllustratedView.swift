@@ -136,27 +136,12 @@ struct IllustratedView: View {
 
     var body: some View {
         GeometryReader { geometry in
-            VStack(spacing: 40) {
-                HStack {
-                    Text("おとも図鑑")
-                        .font(.system(size: 28, weight: .bold, design: .rounded))
-                        .foregroundStyle(
-                            LinearGradient(
-                                colors: [Color("fontGray"), Color("fontGray").opacity(0.7)],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                    
-                    Spacer()
-                }
-                .padding(.top, 10)
-                .padding(.leading)
+            VStack(spacing: 30) {
                 // 詳細表示エリア
                 DetailCardView(selectedItem: selectedItem, authManager: authManager, animateSelection: animateSelection)
                     .frame(height: 180)
                     .padding(.horizontal, 20)
-                
+                    .padding(.top,20)
                 // グリッドエリア
                 ScrollView {
                     LazyVGrid(columns: columns, spacing: 16) {
@@ -203,6 +188,7 @@ struct IllustratedView: View {
             presentationMode.wrappedValue.dismiss()
             audioManager.playCancelSound()
         }))
+        .navigationTitle("おとも図鑑")
         .navigationBarTitleDisplayMode(.inline)
     }
 }
@@ -460,5 +446,6 @@ struct BackButton: View {
 }
 
 #Preview {
-    IllustratedView(isPresenting: .constant(false))
+//    IllustratedView(isPresenting: .constant(false))
+    TopView()
 }

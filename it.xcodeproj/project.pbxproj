@@ -25,7 +25,7 @@
 		180A9FBB2CD640ED00B35C83 /* ChangeNameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180A9FBA2CD640ED00B35C83 /* ChangeNameView.swift */; };
 		180A9FC72CDF5CCA00B35C83 /* StampAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180A9FC62CDF5CCA00B35C83 /* StampAnimationView.swift */; };
 		180A9FD12CE3875A00B35C83 /* StoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180A9FD02CE3875A00B35C83 /* StoryView.swift */; };
-		180BEDBB2E10DD8200F92223 /* ModanAvatarList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180BEDBA2E10DD7700F92223 /* ModanAvatarList.swift */; };
+		180BEDBB2E10DD8200F92223 /* AvatarList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180BEDBA2E10DD7700F92223 /* AvatarList.swift */; };
 		180C1C612D0C681C004C4728 /* ProgressExpBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180C1C602D0C681C004C4728 /* ProgressExpBar.swift */; };
 		181B25642CE8A3B400F8419B /* StoryITListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181B25632CE8A3B400F8419B /* StoryITListView.swift */; };
 		181B25662CE8A43C00F8419B /* StoryQuizView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181B25652CE8A43C00F8419B /* StoryQuizView.swift */; };
@@ -84,7 +84,6 @@
 		262F0FF42B1ADB85004C0C47 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 262F0FF32B1ADB85004C0C47 /* StoreKit.framework */; };
 		262F0FF62B1ADBC5004C0C47 /* SubscriptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 262F0FF52B1ADBC5004C0C47 /* SubscriptionView.swift */; };
 		263C6AC32AFD1DC400564FF2 /* RareGachaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 263C6AC22AFD1DC300564FF2 /* RareGachaView.swift */; };
-		2641992C2AC2572F002013B9 /* AvatarListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2641992B2AC2572F002013B9 /* AvatarListView.swift */; };
 		264F19152AF2824700B6FB10 /* RankingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 264F19142AF2824700B6FB10 /* RankingView.swift */; };
 		2650137F2B3FE04B006B81D6 /* HelpView1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2650137E2B3FE04B006B81D6 /* HelpView1.swift */; };
 		266A07282AC6E10200B85D4E /* ProgressBar3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 266A07272AC6E10200B85D4E /* ProgressBar3.swift */; };
@@ -126,7 +125,7 @@
 		180A9FBA2CD640ED00B35C83 /* ChangeNameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeNameView.swift; sourceTree = "<group>"; };
 		180A9FC62CDF5CCA00B35C83 /* StampAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StampAnimationView.swift; sourceTree = "<group>"; };
 		180A9FD02CE3875A00B35C83 /* StoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryView.swift; sourceTree = "<group>"; };
-		180BEDBA2E10DD7700F92223 /* ModanAvatarList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModanAvatarList.swift; sourceTree = "<group>"; };
+		180BEDBA2E10DD7700F92223 /* AvatarList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarList.swift; sourceTree = "<group>"; };
 		180C1C602D0C681C004C4728 /* ProgressExpBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressExpBar.swift; sourceTree = "<group>"; };
 		181B25632CE8A3B400F8419B /* StoryITListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryITListView.swift; sourceTree = "<group>"; };
 		181B25652CE8A43C00F8419B /* StoryQuizView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryQuizView.swift; sourceTree = "<group>"; };
@@ -181,7 +180,6 @@
 		262F0FF32B1ADB85004C0C47 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		262F0FF52B1ADBC5004C0C47 /* SubscriptionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionView.swift; sourceTree = "<group>"; };
 		263C6AC22AFD1DC300564FF2 /* RareGachaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RareGachaView.swift; sourceTree = "<group>"; };
-		2641992B2AC2572F002013B9 /* AvatarListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarListView.swift; sourceTree = "<group>"; };
 		264F19142AF2824700B6FB10 /* RankingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RankingView.swift; sourceTree = "<group>"; };
 		2650137E2B3FE04B006B81D6 /* HelpView1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpView1.swift; sourceTree = "<group>"; };
 		266A07272AC6E10200B85D4E /* ProgressBar3.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressBar3.swift; sourceTree = "<group>"; };
@@ -290,8 +288,7 @@
 				260E44222AB5963A00FBB487 /* AuthManager.swift */,
 				26A25D4F2AB9FB1A006B368F /* TitleListView.swift */,
 				180BE92C2E0FF72B00F92223 /* Quiz */,
-				2641992B2AC2572F002013B9 /* AvatarListView.swift */,
-				180BEDBA2E10DD7700F92223 /* ModanAvatarList.swift */,
+				180BEDBA2E10DD7700F92223 /* AvatarList.swift */,
 				180BEDB92E10DD6900F92223 /* old */,
 				267283122AFA84C600549219 /* IllustratedView.swift */,
 				269A87892AB86FC900F33C9E /* GachaView.swift */,
@@ -516,11 +513,10 @@
 				264F19152AF2824700B6FB10 /* RankingView.swift in Sources */,
 				18A8D06C2C1B044B004DB532 /* MugenQuizView.swift in Sources */,
 				267283132AFA84C600549219 /* IllustratedView.swift in Sources */,
-				180BEDBB2E10DD8200F92223 /* ModanAvatarList.swift in Sources */,
+				180BEDBB2E10DD8200F92223 /* AvatarList.swift in Sources */,
 				269A87882AB7757C00F33C9E /* QuizResultView.swift in Sources */,
 				18975FC12D61AD0E0063EE42 /* OtherAppsPromotionView.swift in Sources */,
 				180A9FBB2CD640ED00B35C83 /* ChangeNameView.swift in Sources */,
-				2641992C2AC2572F002013B9 /* AvatarListView.swift in Sources */,
 				1801FFAD2D4480D1007625A2 /* TittlesView.swift in Sources */,
 				183211792B9DBE4E0064F10A /* PentagonAppliedShape.swift in Sources */,
 				183211772B9DBCA30064F10A /* PentagonInfoShape.swift in Sources */,
