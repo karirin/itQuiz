@@ -413,7 +413,14 @@ struct MekaGachaView: View {
                 }
             }
         }
-        
+        .gesture(
+            DragGesture()
+                .onEnded { value in
+                    if value.translation.width > 80 {
+                        presentationMode.wrappedValue.dismiss()
+                    }
+                }
+        )
         .alert(isPresented: $showAlert) { // rewardEarnedがtrueになった時にアラートを表示
             Alert(
                 title: Text("報酬獲得！"),

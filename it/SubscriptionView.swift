@@ -434,6 +434,14 @@ struct SubscriptionView: View {
                 .padding(.top)
                 .foregroundStyle(Color.blue)
             }
+            .gesture(
+                DragGesture()
+                    .onEnded { value in
+                        if value.translation.width > 80 {
+                            presentationMode.wrappedValue.dismiss()
+                        }
+                    }
+            )
             .onAppear {
                 Task {
                     await viewModel.loadProducts()

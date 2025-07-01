@@ -56,6 +56,14 @@ struct ManagerView: View {
 //                            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
 //                LevelRankingView(viewModel: viewModel)
             }
+            .gesture(
+                DragGesture()
+                    .onEnded { value in
+                        if value.translation.width > 80 {
+                            presentationMode.wrappedValue.dismiss()
+                        }
+                    }
+            )
             .background(Color("Color2"))
             .onAppear{
                 reward.LoadReward()

@@ -423,7 +423,14 @@ struct InfoManagerListView: View {
                     audioPlayerKettei?.volume = 1.0
                 }
             }
-        
+            .gesture(
+                DragGesture()
+                    .onEnded { value in
+                        if value.translation.width > 80 {
+                            presentationMode.wrappedValue.dismiss()
+                        }
+                    }
+            )
             .fullScreenCover(isPresented: $preFlag) {
                 PreView(audioManager: audioManager)
             }

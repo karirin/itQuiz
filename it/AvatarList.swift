@@ -68,6 +68,14 @@ struct AvatarListView: View {
         }
         .navigationBarBackButtonHidden(true)
         .navigationBarItems(leading: backButton)
+        .gesture(
+            DragGesture()
+                .onEnded { value in
+                    if value.translation.width > 80 {
+                        presentationMode.wrappedValue.dismiss()
+                    }
+                }
+        )
         .onReceive(authManager.$avatars) { newAvatars in
             if let updatedAvatar = newAvatars.first(where: { $0.usedFlag == 1 }) {
                 withAnimation(.easeInOut(duration: 0.3)) {

@@ -120,6 +120,14 @@ struct QuizResultView: View {
                 .navigationTitle("結果")
                 .navigationBarTitleDisplayMode(.inline)
             }
+            .gesture(
+                DragGesture()
+                    .onEnded { value in
+                        if value.translation.width > 80 {
+                            presentationMode.wrappedValue.dismiss()
+                        }
+                    }
+            )
             .background {
                 if userPreFlag != 1 {
                     adViewControllerRepresentable

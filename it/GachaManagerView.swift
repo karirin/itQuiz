@@ -161,6 +161,14 @@ struct GachaManagerView: View {
                 audioPlayerKettei?.volume = 1.0
             }
         }
+        .gesture(
+            DragGesture()
+                .onEnded { value in
+                    if value.translation.width > 80 {
+                        presentationMode.wrappedValue.dismiss()
+                    }
+                }
+        )
         .navigationBarBackButtonHidden(true)
         .navigationBarItems(leading: Button(action: { 
                         generateHapticFeedback()

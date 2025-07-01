@@ -492,6 +492,14 @@ struct GachaView: View {
                 ModalTittleView(showLevelUpModal: $otomo20flag, authManager: authManager, tittleNumber: .constant(02))
             }
         }
+        .gesture(
+            DragGesture()
+                .onEnded { value in
+                    if value.translation.width > 80 {
+                        presentationMode.wrappedValue.dismiss()
+                    }
+                }
+        )
         .alert(isPresented: $showAlert) {
             Alert(
                 title: Text("報酬獲得！"),

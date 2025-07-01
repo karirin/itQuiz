@@ -116,6 +116,14 @@ struct SettingView: View {
             .background(backgroundColor.ignoresSafeArea())
             .navigationBarTitle("", displayMode: .inline)
         }
+        .gesture(
+            DragGesture()
+                .onEnded { value in
+                    if value.translation.width > 80 {
+                        presentationMode.wrappedValue.dismiss()
+                    }
+                }
+        )
         .onAppear {
             AuthManager.shared.fetchCurrentUserAdminFlag()
         }

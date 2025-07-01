@@ -167,6 +167,14 @@ struct IllustratedView: View {
                 .background(Color("purple2").opacity(0.3))
             }
         }
+        .gesture(
+            DragGesture()
+                .onEnded { value in
+                    if value.translation.width > 80 {
+                        presentationMode.wrappedValue.dismiss()
+                    }
+                }
+        )
         .background(
             LinearGradient(
                 gradient: Gradient(colors: [Color("purple2"), Color("purple2").opacity(0.8)]),

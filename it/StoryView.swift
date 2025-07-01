@@ -892,7 +892,13 @@ struct StoryView: View {
                     }
                     userDefaults.set(true, forKey: "hasLaunchedStoryOnappear")
                     
-                    // その他の初期化処理...
+                    userDefaults.synchronize()
+                    authManager.fetchUserStoryCsFlag()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                        if authManager.userStoryCsFlag == 0 {
+                            executeProcessEveryfifTimes()
+                        }
+                    }
                     position = viewModel.userPosition
                     index = viewModel.userPosition
                     
@@ -963,6 +969,14 @@ struct StoryView: View {
                 }
             }
         }
+        .gesture(
+            DragGesture()
+                .onEnded { value in
+                    if value.translation.width > 80 {
+                        isPresented = false
+                    }
+                }
+        )
         // アプリのライフサイクルの変更を監視
         .onChange(of: scenePhase) { newPhase in
             switch newPhase {
