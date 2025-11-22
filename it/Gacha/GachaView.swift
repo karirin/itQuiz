@@ -263,16 +263,6 @@ struct GachaView: View {
                                     .padding(.leading,65)
                                     .padding(.top,10)
                             }
-//                            Image("ハート")
-//                                .resizable()
-//                                .frame(width: 30,height:30)
-//                            Text("体力：\(item.health)")
-//                                .font(.system(size: 24))
-//                            Image("ソード")
-//                                .resizable()
-//                                .frame(width: 40,height:30)
-//                            Text("攻撃力：\(item.attack)")
-//                                .font(.system(size: 24))
                         }
                         .foregroundColor(Color("fontGray"))
                     }
@@ -282,6 +272,7 @@ struct GachaView: View {
                         VStack{
                         Button(action: { 
                         generateHapticFeedback()
+                            self.animationFinished = false
                             authManager.decreaseUserMoney { success in
                                 if success {
                                     print("User money decreased successfully.")
@@ -296,7 +287,9 @@ struct GachaView: View {
                             DispatchQueue.global().async {
                                 // UIの更新はメインスレッドで実行
                                 DispatchQueue.main.async {
-                                    //                                self.isShowingActivityIndicator = false
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                        self.showResult = false
+                                    }
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
                                         self.obtainedItem = self.obtainedRareItem
                                         animationFinished = true
@@ -373,7 +366,10 @@ struct GachaView: View {
                             VStack{
                                 Button(action: { 
                         generateHapticFeedback()
-                                    self.showResult = false
+                                    self.animationFinished = false
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                        self.showResult = false
+                                    }
                                     authManager.decreaseUserMoney { success in
                                         if success {
                                             print("User money decreased successfully.")

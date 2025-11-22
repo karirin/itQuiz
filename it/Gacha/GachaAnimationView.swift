@@ -21,13 +21,14 @@ struct AVPlayerViewControllerRepresentable: UIViewControllerRepresentable {
     }
 
     func updateUIViewController(_ uiViewController: AVPlayerViewController, context: Context) {
-        if uiViewController.player == nil {
-          uiViewController.player = player
-        }
+        // 毎回バインディングされた player を反映する
+        uiViewController.player = player
+        
         if showAnimation {
-          uiViewController.player?.play()
+            uiViewController.player?.seek(to: .zero)
+            uiViewController.player?.play()
         } else {
-          uiViewController.player?.pause()
+            uiViewController.player?.pause()
         }
     }
 }
@@ -38,7 +39,7 @@ struct GachaAnimationView: View {
     var rarity: GachaManager.Rarity?
 //    @Binding var showResult: Bool
 
-    private func createPlayer() -> AVPlayer {
+    private func createPlayer() -> AVPlayer? {
         let videoName: String
         switch rarity {
         case .normal:
@@ -69,27 +70,37 @@ struct GachaAnimationView: View {
             videoName = "normal"
         }
 
-        let asset = NSDataAsset(name: videoName)
-        print("videoName    :\(videoName)")
-//        print(videoName)
-        let videoUrl = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("\(videoName).mp4")
-        try? asset?.data.write(to: videoUrl, options: [.atomic])
-        let playerItem = AVPlayerItem(url: videoUrl)
-//        print("playerItem:\(playerItem)")
-        return AVPlayer(playerItem: playerItem)
+//        let asset = NSDataAsset(name: videoName)
+//        print("videoName    :\(videoName)")
+////        print(videoName)
+//        let videoUrl = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("\(videoName).mp4")
+//        try? asset?.data.write(to: videoUrl, options: [.atomic])
+//        let playerItem = AVPlayerItem(url: videoUrl)
+////        print("playerItem:\(playerItem)")
+//        return AVPlayer(playerItem: playerItem)
+        guard let asset = NSDataAsset(name: videoName) else {
+            print("❌ video not found in Assets.xcassets: \(videoName)")
+            return nil
+        }
+        let videoUrl = URL(fileURLWithPath: NSTemporaryDirectory())
+            .appendingPathComponent("\(videoName).mp4")
+        try? asset.data.write(to: videoUrl, options: [.atomic])
+        return AVPlayer(url: videoUrl)
     }
 
     var body: some View {
         AVPlayerViewControllerRepresentable(player: $player, showAnimation: $showAnimation)
             .onAppear {
                 self.player = createPlayer()
-                NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: self.player?.currentItem, queue: .main) { _ in
-                  showAnimation.toggle()
-//                  showResult = true
-                }
+                self.player?.play()
             }
             .onChange(of: rarity) { _ in
                 self.player = createPlayer()
+                self.player?.play()
+            }
+            .onDisappear {
+                self.player?.pause()
+                self.player = nil
             }
     }
 }

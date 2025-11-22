@@ -86,8 +86,11 @@ class AuthManager: ObservableObject {
     
     var onLoginCompleted: (() -> Void)?
     var currentUserId: String? {
-//        print("user?.uid:\(user?.uid)")
-        return user?.uid
+        if let uid = user?.uid {
+            return uid
+        }
+        // user がまだセットされていない場合は FirebaseAuth 側から取得
+        return Auth.auth().currentUser?.uid
     }
     
     func addAvatarToUser(avatar: Avatar, completion: @escaping (Bool) -> Void) {
@@ -1273,7 +1276,10 @@ class AuthManager: ObservableObject {
     }
     
     func getUserMoney(completion: @escaping (Int) -> Void) {
-        guard let userId = user?.uid else { return }
+        guard let userId = currentUserId else {
+            completion(0)   // 少なくとも 0 で返しておく
+            return
+        }
         
         let userRef = Database.database().reference().child("users").child(userId)
         
