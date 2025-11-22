@@ -1139,23 +1139,15 @@ struct QuizView: View {
                     userPreFlag = authManager.userPreFlag
                 }            }
             .onDisappear {
-                // QuizViewが閉じるときの時刻を記録する
-                // ただし、playerExperienceとplayerMoneyが5以外の時だけ
-                // ここで条件を確認してください
+                // 画面を離れるときは必ずタイマーを止める
+                timer?.invalidate()
+                timer = nil
+
+                // 経過時間の記録だけを行う（遷移はここでは行わない）
                 if playerExperience != 5 && playerMoney != 5 {
                     self.endTime = Date()
                     self.elapsedTime = self.endTime?.timeIntervalSince(self.startTime)
-                    // QuizResultViewへの遷移フラグを設定
-                    self.navigateToQuizResult = true
-                    // ここで経過時間を表示または保存する
-                    //                    print("経過時間: \(self.elapsedTime!) 秒")
-                    //                    authManager.saveElapsedTime(category: quizLevel.description, elapsedTime: elapsedTime!) { success in
-                    //                        if success {
-                    //                            print("経過時間を保存しました。")
-                    //                        } else {
-                    //                            print("経過時間の保存に失敗しました。")
-                    //                        }
-                    //                    }
+                    // self.navigateToQuizResult = true  // ← ここは削除
                 }
             }
             .alert(isPresented: $showAlert) {

@@ -66,7 +66,8 @@ class Interstitial: NSObject, FullScreenContentDelegate, ObservableObject {
         print("インタースティシャル広告を閉じました")
         self.interstitialAdLoaded = false // 広告閉じた時に false に設定
         self.wasAdDismissed = true
-//        loadInterstitial()  // 新しい広告をロード
+        self.interstitialAd = nil        // ★ ここを追加
+    //        loadInterstitial()  // 新しい広告をロード
     }
 }
 

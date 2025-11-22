@@ -45,6 +45,8 @@ struct StoryQuizResultView: View {
     @Binding var victoryFlag: Bool
     @Binding var isUserStoryFlag: Bool
     @ObservedObject var viewModel: PositionViewModel
+    @State private var hasRequestedInterstitial = false
+    @State private var hasPresentedInterstitial = false
 
     init(results: [QuizResult], authManager: AuthManager, isPresenting: Binding<Bool>, navigateToQuizResultView: Binding<Bool>, playerExperience: Int, playerMoney: Int, elapsedTime: TimeInterval, quizLevel: QuizLevel, victoryFlag: Binding<Bool>, isUserStoryFlag: Binding<Bool>, viewModel: PositionViewModel) {
         _results = State(initialValue: results)
@@ -642,6 +644,23 @@ struct StoryQuizResultView: View {
                 })
             } else if !interstitial.wasAdDismissed {
                 interstitial.presentInterstitial(from: adViewControllerRepresentable.viewController)
+            }
+        }
+        
+        // 広告処理
+        if userPreFlag != 1 && !hasRequestedInterstitial {
+            hasRequestedInterstitial = true
+
+            interstitial.loadInterstitial { isLoaded in
+                DispatchQueue.main.async {
+                    guard isLoaded,
+                          !self.hasPresentedInterstitial,
+                          !self.interstitial.wasAdDismissed
+                    else { return }
+
+                    self.hasPresentedInterstitial = true
+                    self.interstitial.presentInterstitial(from: adViewControllerRepresentable.viewController)
+                }
             }
         }
         

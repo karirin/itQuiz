@@ -772,9 +772,9 @@ struct StoryQuizView: View {
                     self.playerHP = self.userHp
                 }
                 if self.tutorialNum == 0 {
-//                        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
-                        startTimer() // Viewが表示されたときにタイマーを開始
-//                        }
+                    //                        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                    startTimer() // Viewが表示されたときにタイマーを開始
+                    //                        }
                 }
                 if self.tutorialNum == 2 {
                     authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { success in
@@ -787,52 +787,57 @@ struct StoryQuizView: View {
             
             if quizLevel == .incorrectITAnswer{
                 fetchNumberOfIncorrectITAnswers(userId: authManager.currentUserId!) { count in
-                self.incorrectAnswerCount = count
-                incorrectCount = count
+                    self.incorrectAnswerCount = count
+                    incorrectCount = count
                 }
                 if quizLevel == .incorrectITAnswer {
-                userAttack = 0
+                    userAttack = 0
                 }
             }else if quizLevel == .incorrectInfoAnswer {
                 fetchNumberOfIncorrectInfoAnswers(userId: authManager.currentUserId!) { count in
-                self.incorrectAnswerCount = count
-                incorrectCount = count
+                    self.incorrectAnswerCount = count
+                    incorrectCount = count
                 }
                 if quizLevel == .incorrectInfoAnswer {
-                userAttack = 0
+                    userAttack = 0
                 }
             }else if quizLevel == .incorrectAppliedAnswer {
                 fetchNumberOfIncorrectAppliedAnswers(userId: authManager.currentUserId!) { count in
-                self.incorrectAnswerCount = count
-                incorrectCount = count
+                    self.incorrectAnswerCount = count
+                    incorrectCount = count
                 }
                 if quizLevel == .incorrectAppliedAnswer {
-                userAttack = 0
+                    userAttack = 0
                 }
             }else if quizLevel == .incorrectAnswer {
                 fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
-                self.incorrectAnswerCount = count
-                incorrectCount = count
+                    self.incorrectAnswerCount = count
+                    incorrectCount = count
                 }
                 if quizLevel == .incorrectAnswer {
-                userAttack = 0
+                    userAttack = 0
                 }
             }
             if quizLevel == .incorrectAnswer {
-            userAttack = 0
+                userAttack = 0
             }
             authManager.fetchPreFlag()
             authManager.fetchUserFlag()
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                 userFlag = authManager.userFlag
                 userPreFlag = authManager.userPreFlag
-            }            }
+            }
+        }
         .onDisappear {
+            // 画面を離れるときは必ずタイマーを止める
+            timer?.invalidate()
+            timer = nil
+
+            // 経過時間の記録だけを行う（遷移はここでは行わない）
             if playerExperience != 5 && playerMoney != 5 {
                 self.endTime = Date()
                 self.elapsedTime = self.endTime?.timeIntervalSince(self.startTime)
-                // QuizResultViewへの遷移フラグを設定
-                self.navigateToQuizResult = true
+                // self.navigateToQuizResult = true  // ← ここは削除
             }
         }
         .alert(isPresented: $showAlert) {

@@ -55,6 +55,8 @@ struct QuizResultView: View {
     @Binding var navigateToQuizResultView: Bool
     @State private var isHidden = false
     @State private var selectedTab = 0 // 0: 結果, 1: 統計
+    @State private var hasRequestedInterstitial = false
+    @State private var hasPresentedInterstitial = false
     private let interstitial = Interstitial()
     @Environment(\.presentationMode) var presentationMode
     private let adViewControllerRepresentable = AdViewControllerRepresentable()
@@ -622,15 +624,19 @@ struct QuizResultView: View {
         }
         
         // 広告処理
-        DispatchQueue.main.async {
-            if !interstitial.interstitialAdLoaded && interstitial.wasAdDismissed == false {
-                interstitial.loadInterstitial(completion: { isLoaded in
-                    if isLoaded {
-                        self.interstitial.presentInterstitial(from: adViewControllerRepresentable.viewController)
-                    }
-                })
-            } else if !interstitial.wasAdDismissed {
-                interstitial.presentInterstitial(from: adViewControllerRepresentable.viewController)
+        if userPreFlag != 1 && !hasRequestedInterstitial {
+            hasRequestedInterstitial = true
+
+            interstitial.loadInterstitial { isLoaded in
+                DispatchQueue.main.async {
+                    guard isLoaded,
+                          !self.hasPresentedInterstitial,
+                          !self.interstitial.wasAdDismissed
+                    else { return }
+
+                    self.hasPresentedInterstitial = true
+                    self.interstitial.presentInterstitial(from: adViewControllerRepresentable.viewController)
+                }
             }
         }
         
