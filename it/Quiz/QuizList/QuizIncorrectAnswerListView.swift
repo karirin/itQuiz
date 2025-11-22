@@ -14,6 +14,8 @@ struct QuizQuestion {
     var choices: [String]
     var correctAnswerIndex: Int
     var explanation: String
+    
+    var isFourChoices: Bool { choices.count == 4 }
 }
 
 struct QuizIncorrectAnswerListView: View {

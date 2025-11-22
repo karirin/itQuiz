@@ -23,13 +23,17 @@ class Reward: NSObject, FullScreenContentDelegate, ObservableObject {
     // リワード広告の読み込み
     func LoadReward() {
         RewardedAd.load(with: "ca-app-pub-4898800212808837/5768331457", request: Request()) { (ad, error) in
-//        GADRewardedAd.load(withAdUnitID: "ca-app-pub-3940256099942544/1712485313", request: GADRequest()) { (ad, error) in //テスト
-            if let _ = error {
-                print("😭: 読み込みに失敗しました")
+            if let error = error {
+                print("LoadReward 😭: 読み込みに失敗しました: \(error.localizedDescription)")
                 self.rewardLoaded = false
+
+                // デバッグ用：5秒後に自動でリトライ（必要なければ消してOK）
+                DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                    self.LoadReward()
+                }
                 return
             }
-            print("😍: 読み込みに成功しました LoadReward")
+            print("LoadReward 😍: 読み込みに成功しました")
             self.rewardLoaded = true
             self.rewardedAd = ad
             self.rewardedAd?.fullScreenContentDelegate = self
@@ -37,14 +41,20 @@ class Reward: NSObject, FullScreenContentDelegate, ObservableObject {
     }
     
     func LoadStoryReward() {
-        RewardedAd.load(with: "ca-app-pub-4898800212808837/6563091309", request: Request()) { (ad, error) in
-//        GADRewardedAd.load(withAdUnitID: "ca-app-pub-3940256099942544/1712485313", request: GADRequest()) { (ad, error) in //テスト
-            if let _ = error {
-                print("😭: 読み込みに失敗しました")
+        //        GADRewardedAd.load(withAdUnitID: "ca-app-pub-3940256099942544/1712485313", request: GADRequest()) { (ad, error) in //テスト
+        RewardedAd.load(with: "ca-app-pub-4898800212808837/6563091309",
+                        request: Request()) { (ad, error) in
+            if let error = error {
+                print("LoadStoryReward 😭: 読み込みに失敗しました: \(error.localizedDescription)")
                 self.rewardLoaded = false
+
+                // デバッグ用リトライ
+                DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                    self.LoadStoryReward()
+                }
                 return
             }
-            print("😍: 読み込みに成功しました LoadReward")
+            print("LoadStoryReward 😍: 読み込みに成功しました")
             self.rewardLoaded = true
             self.rewardedAd = ad
             self.rewardedAd?.fullScreenContentDelegate = self
