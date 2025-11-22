@@ -54,7 +54,7 @@ struct ContentView: View {
     @State private var rewardFlag: Int = 0
     @State private var customerFlag: Bool = false
     @Environment(\.requestReview) var requestReview
-    @State private var userPreFlag: Int = 0
+    @EnvironmentObject var appState: AppState
     @State private var preFlag: Bool = false
     @State private var helpFlag: Bool = false
     @State private var csFlag: Bool = false
@@ -81,7 +81,7 @@ struct ContentView: View {
                     .frame(maxWidth: .infinity,maxHeight: .infinity)
                 } else {
                     VStack {
-                    if userPreFlag != 1 {
+                    if !appState.isSubscribed {
                         BannerAdView()
                             .frame(height: 60)
                             .padding(.bottom, -10)
@@ -519,11 +519,9 @@ struct ContentView: View {
                 authManager.checkIfUserIdExists(userId: userId) { exists in
                     self.isUserExists = exists
                     if isUserExists != nil {
-                        authManager.fetchPreFlag()
+                        appState.checkSubscription()
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                            userPreFlag = authManager.userPreFlag
-//                            isLoading = false
-                            if userPreFlag != 1 {
+                            if !appState.isSubscribed {
                                 executeProcessEveryFortyTimes()
                             }
                         }

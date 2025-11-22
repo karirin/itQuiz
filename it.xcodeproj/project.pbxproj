@@ -42,7 +42,6 @@
 		182FF4D32ED18CA0001DE74F /* ProgressExpBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182FF4842ED18CA0001DE74F /* ProgressExpBar.swift */; };
 		182FF4D42ED18CA0001DE74F /* TittlesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182FF48E2ED18CA0001DE74F /* TittlesView.swift */; };
 		182FF4D52ED18CA0001DE74F /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182FF4792ED18CA0001DE74F /* LoadingView.swift */; };
-		182FF4D62ED18CA0001DE74F /* Story.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182FF4AF2ED18CA0001DE74F /* Story.swift */; };
 		182FF4D72ED18CA0001DE74F /* Banner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182FF4712ED18CA0001DE74F /* Banner.swift */; };
 		182FF4D82ED18CA0001DE74F /* ProgressBar3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182FF4832ED18CA0001DE74F /* ProgressBar3.swift */; };
 		182FF4D92ED18CA0001DE74F /* ContactView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182FF4A62ED18CA0001DE74F /* ContactView.swift */; };
@@ -164,7 +163,6 @@
 		182FF4AB2ED18CA0001DE74F /* TermsOfServiceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TermsOfServiceView.swift; sourceTree = "<group>"; };
 		182FF4AD2ED18CA0001DE74F /* InterstitialStory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterstitialStory.swift; sourceTree = "<group>"; };
 		182FF4AE2ED18CA0001DE74F /* ProgressStoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressStoryView.swift; sourceTree = "<group>"; };
-		182FF4AF2ED18CA0001DE74F /* Story.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Story.swift; sourceTree = "<group>"; };
 		182FF4B02ED18CA0001DE74F /* StoryITListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryITListView.swift; sourceTree = "<group>"; };
 		182FF4B12ED18CA0001DE74F /* StorySutaminaModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorySutaminaModalView.swift; sourceTree = "<group>"; };
 		182FF4B22ED18CA0001DE74F /* StoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryView.swift; sourceTree = "<group>"; };
@@ -307,7 +305,6 @@
 			children = (
 				182FF4AD2ED18CA0001DE74F /* InterstitialStory.swift */,
 				182FF4AE2ED18CA0001DE74F /* ProgressStoryView.swift */,
-				182FF4AF2ED18CA0001DE74F /* Story.swift */,
 				182FF4B02ED18CA0001DE74F /* StoryITListView.swift */,
 				182FF4B12ED18CA0001DE74F /* StorySutaminaModalView.swift */,
 				182FF4B22ED18CA0001DE74F /* StoryView.swift */,
@@ -568,7 +565,6 @@
 				182FF4D32ED18CA0001DE74F /* ProgressExpBar.swift in Sources */,
 				182FF4D42ED18CA0001DE74F /* TittlesView.swift in Sources */,
 				182FF4D52ED18CA0001DE74F /* LoadingView.swift in Sources */,
-				182FF4D62ED18CA0001DE74F /* Story.swift in Sources */,
 				182FF4D72ED18CA0001DE74F /* Banner.swift in Sources */,
 				182FF4D82ED18CA0001DE74F /* ProgressBar3.swift in Sources */,
 				182FF4D92ED18CA0001DE74F /* ContactView.swift in Sources */,

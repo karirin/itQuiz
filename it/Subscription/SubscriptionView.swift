@@ -10,6 +10,7 @@ import StoreKit
 
 class AppState: ObservableObject {
     @Published var isBannerVisible = true
+    @Published var isSubscribed: Bool = false
 
     init() {
         DispatchQueue.main.async {
@@ -50,10 +51,8 @@ class AppState: ObservableObject {
                 let subscribed = try await self.isSubscribed()
 //                print("subscribed:\(subscribed)")
                 DispatchQueue.main.async {
-                    self.isBannerVisible = !subscribed
-//                    self.isBannerVisible = !true
-                    print("self.isBannerVisible = !subscribed")
-//                    print(self.isBannerVisible)
+                    self.isSubscribed = subscribed        // 端末のサブスク状態
+                    self.isBannerVisible = !subscribed    // バナー表示はその逆
                 }
             } catch {
                 print("サブスクリプションの確認中にエラー: \(error)")
@@ -167,8 +166,6 @@ class SubscriptionViewModel: ObservableObject {
     func purchaseProduct(_ product: Product, showAlert: Binding<Bool>) async throws {
         do {
             let transaction = try await purchase(product: product)
-            authManager.updatePreFlag(userId: authManager.currentUserId!, userPreFlag: 1){ success in
-            }
             DispatchQueue.main.async {
                 showAlert.wrappedValue = true
             }

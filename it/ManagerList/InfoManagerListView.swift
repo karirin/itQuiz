@@ -37,7 +37,7 @@ struct InfoManagerListView: View {
     @State private var isButtonClickable: Bool = false
     @State private var showAlert: Bool = false
     @State private var preFlag: Bool = false
-    @State private var userPreFlag: Int = 0
+    @StateObject private var appState = AppState()
     @State private var isLoading: Bool = true
 
     init(isPresenting: Binding<Bool>) {
@@ -66,7 +66,7 @@ struct InfoManagerListView: View {
                             Button(action: { 
                         generateHapticFeedback()
                                 audioManager.playKetteiSound()
-                                if userPreFlag != 1 {
+                                if appState.isBannerVisible {
                                     preFlag = true
                                 } else {
                                     if !isIncorrectAnswersEmpty {
@@ -93,7 +93,7 @@ struct InfoManagerListView: View {
                                                 .resizable()
                                                 .frame(height: isIPad() ? 200 : 70)
                                         }
-                                        if userPreFlag != 1 {
+                                        if appState.isBannerVisible {
                                             ZStack{
                                                 Color.black.opacity(0.45)
                                                     .cornerRadius(30)
@@ -382,9 +382,7 @@ struct InfoManagerListView: View {
             .onAppear {
                 reward.LoadReward()
                 fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
-                    authManager.fetchPreFlag()
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                        userPreFlag = authManager.userPreFlag
                         isLoading = false
                     }
                 }

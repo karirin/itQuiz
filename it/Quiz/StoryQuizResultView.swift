@@ -34,7 +34,7 @@ struct StoryQuizResultView: View {
     @State private var answer100flag: Bool = false
     @State private var rankUpFlag: Bool = false
     @State private var rankDownFlag: Bool = false
-    @State private var userPreFlag: Int = 0
+    @StateObject private var appState = AppState()
     @Binding var isPresenting: Bool
     @Binding var navigateToQuizResultView: Bool
     @State private var isHidden = false
@@ -87,8 +87,10 @@ struct StoryQuizResultView: View {
             
             NavigationView {
                 VStack(spacing: 0) {
-                    // ヘッダー部分
-                    headerView
+                    if appState.isBannerVisible {
+                        // ヘッダー部分
+                        headerView
+                    }
                     ScrollView{
                         // 結果サマリーカード
                         resultSummaryCard
@@ -110,7 +112,7 @@ struct StoryQuizResultView: View {
                 .navigationBarTitleDisplayMode(.inline)
             }
             .background {
-                if userPreFlag != 1 {
+                if appState.isBannerVisible {
                     adViewControllerRepresentable
                         .frame(width: .zero, height: .zero)
                 }
@@ -621,11 +623,9 @@ struct StoryQuizResultView: View {
     }
     
     private func setupOnAppear() {
-        authManager.fetchPreFlag()
         authManager.fetchUserStory()
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            userPreFlag = authManager.userPreFlag
-            if userPreFlag != 1 {
+            if appState.isBannerVisible {
                 executeProcessEveryFortyTimes()
             }
         }
@@ -644,7 +644,7 @@ struct StoryQuizResultView: View {
         }
         
         // 広告処理
-        if userPreFlag != 1 && !hasRequestedInterstitial {
+        if appState.isBannerVisible && !hasRequestedInterstitial {
             hasRequestedInterstitial = true
 
             interstitial.loadInterstitial { isLoaded in

@@ -38,7 +38,7 @@ struct ITManagerListView: View {
     @State private var isButtonClickable: Bool = false
     @State private var showAlert: Bool = false
     @State private var preFlag: Bool = false
-    @State private var userPreFlag: Int = 0
+    @StateObject private var appState = AppState()
     @State private var isLoading: Bool = true
     
     init(isPresenting: Binding<Bool>) {
@@ -68,7 +68,7 @@ struct ITManagerListView: View {
                         generateHapticFeedback()
                                 audioManager.playKetteiSound()
                                 // 画面遷移のトリガーをオンにする
-                                if userPreFlag != 1 {
+                                if appState.isBannerVisible {
                                     preFlag = true
                                 } else {
                                     if !isIncorrectAnswersEmpty {
@@ -95,7 +95,7 @@ struct ITManagerListView: View {
                                                 .resizable()
                                                 .frame(height: isIPad() ? 200 : 70)
                                         }
-                                        if userPreFlag != 1 {
+                                        if appState.isBannerVisible {
                                             
                                             ZStack{
                                                 Color.black.opacity(0.45)
@@ -439,9 +439,7 @@ struct ITManagerListView: View {
             .onAppear {
                 reward.LoadReward()
                 fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
-                    authManager.fetchPreFlag()
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                        userPreFlag = authManager.userPreFlag
                         isLoading = false
                     }
                 }

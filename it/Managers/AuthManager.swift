@@ -65,7 +65,6 @@ class AuthManager: ObservableObject {
     @Published var userAvatars: [Avatar] = []
     @Published var rewardFlag: Int = 1
     @Published var story: Int = 0
-    @Published var userPreFlag: Int = 0
     @State private var selectedAvatar: Avatar?
     @Published var loginCount: Int = 0 // 追加: ログイン回数を保持
     @Published var loginBonus: Int = 0  // 追加: 現在のボーナス額を保持
@@ -470,30 +469,6 @@ class AuthManager: ObservableObject {
                 completion(false)
             } else {
                 completion(true)
-            }
-        }
-    }
-    
-    func updatePreFlag(userId: String, userPreFlag: Int, completion: @escaping (Bool) -> Void) {
-        let userRef = Database.database().reference().child("users").child(userId)
-        let updates = ["userPreFlag": userPreFlag]
-        userRef.updateChildValues(updates) { (error, _) in
-            if let error = error {
-                completion(false)
-            } else {
-                completion(true)
-            }
-        }
-    }
-    
-    func fetchPreFlag() {
-        guard let userId = user?.uid else { return }
-        
-        let userRef = Database.database().reference().child("users").child(userId)
-        userRef.observeSingleEvent(of: .value) { (snapshot) in
-            if let data = snapshot.value as? [String: Any] {
-                self.userPreFlag = data["userPreFlag"] as? Int ?? 0
-                print("self.userPreFlag:\(self.userPreFlag)")
             }
         }
     }

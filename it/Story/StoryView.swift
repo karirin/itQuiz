@@ -664,7 +664,7 @@ struct StoryView: View {
     @State private var currentVisiblePosition: Int = 1
     @State private var isSoundOn: Bool = true
     @Environment(\.scenePhase) var scenePhase
-    @State private var userPreFlag: Int = 0
+    @StateObject private var appState = AppState()
     @State private var isStoryFlag: Bool = false
     @State private var isTutorialStart: Bool = false
     @State private var csFlag: Bool = false
@@ -684,7 +684,7 @@ struct StoryView: View {
                         .animation(.easeInOut(duration: 0.5), value: currentVisiblePosition)
 
                     VStack {
-                        if userPreFlag != 1 {
+                        if appState.isBannerVisible {
                             BannerStortyView()
                                 .frame(height: 60)
                         }
@@ -907,10 +907,6 @@ struct StoryView: View {
                         viewModel.fetchUserStamina(for: userId)
                     }
                     
-                    authManager.fetchPreFlag()
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                        userPreFlag = authManager.userPreFlag
-                    }
                     
                     DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
                         isLoading = false

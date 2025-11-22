@@ -45,7 +45,7 @@ struct StoryUserQuizView: View {
     @State private var userHp: Int = 100
     @State private var userMaxHp: Int = 100
     @State private var userFlag: Int = 0
-    @State private var userPreFlag: Int = 0
+    @StateObject private var appState = AppState()
     @State private var avatarHp: Int = 100
     @State private var userAttack: Int = 30
     @State private var tutorialNum: Int = 0
@@ -76,7 +76,6 @@ struct StoryUserQuizView: View {
     @State private var navigateToQuizResult = false
     @State private var victoryFlag = false
     @ObservedObject var interstitial: Interstitial
-    @StateObject var appState = AppState()
     @State private var rewardFlag: Int = 0
     @Environment(\.presentationMode) var presentationMode
     var user: User
@@ -262,7 +261,7 @@ struct StoryUserQuizView: View {
                 correctAnswerIndex: currentQuiz.correctAnswerIndex, explanation: currentQuiz.explanation
                 )
                 // incorrectAnswer以外のクイズなら不正解の問題をincorrectAnswerテーブルに保存する
-                if userPreFlag == 1 {
+                if !appState.isBannerVisible {
                     if quizLevel != .incorrectAnswer && quizLevel != .incorrectITAnswer && quizLevel != .incorrectInfoAnswer && quizLevel != .incorrectAppliedAnswer {
                         switch quizLevel {
                         case .itBasic,.itStrategy,.itTechnology,.itManagement:
@@ -757,11 +756,9 @@ struct StoryUserQuizView: View {
             if quizLevel == .incorrectAnswer {
             userAttack = 0
             }
-            authManager.fetchPreFlag()
             authManager.fetchUserFlag()
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                 userFlag = authManager.userFlag
-                userPreFlag = authManager.userPreFlag
             }            }
         .onDisappear {
             // ここで条件を確認してください
