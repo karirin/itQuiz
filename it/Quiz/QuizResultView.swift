@@ -1,15 +1,29 @@
 //
-//  StoryQuizResultView.swift
+//  QuizResultView.swift main
 //  it
 //
-//  Created by Apple on 2024/11/17.
+//  Created by hashimo ryoya on 2023/09/18.
 //
 
 import SwiftUI
 
-struct StoryQuizResultView: View {
+struct QuizResult {
+    var question: String
+    var userAnswer: String
+    var correctAnswer: String
+    var explanation: String
+    var isCorrect: Bool
+    var showExplanation: Bool = false
+}
+
+struct QuizTotal {
+    var totalAnswers: Int
+}
+
+struct QuizResultView: View {
     let quizLevel: QuizLevel
     @State private var showModal = false
+    @State private var adFlag = false
     @State private var showLevelUpModal = false
     @State private var showTittleModal = false
     @State private var showMemoView = false
@@ -22,6 +36,7 @@ struct StoryQuizResultView: View {
     @State private var isContentView: Bool = false
     var elapsedTime: TimeInterval
     @State var results: [QuizResult]
+    let quizBossLevel: QuizBossLevel
     @State private var isShow: Bool = true
     @State private var flag: Bool = false
     @State private var preFlag: Bool = false
@@ -32,23 +47,23 @@ struct StoryQuizResultView: View {
     @State private var answer30flag: Bool = false
     @State private var answer50flag: Bool = false
     @State private var answer100flag: Bool = false
-    @State private var rankUpFlag: Bool = false
-    @State private var rankDownFlag: Bool = false
+    @State private var goburinflag: Bool = false
+    @State private var kaijyuflag: Bool = false
+    @State private var shinjyuflag: Bool = false
     @State private var userPreFlag: Int = 0
     @Binding var isPresenting: Bool
     @Binding var navigateToQuizResultView: Bool
     @State private var isHidden = false
     @State private var selectedTab = 0 // 0: 結果, 1: 統計
+    @State private var hasRequestedInterstitial = false
+    @State private var hasPresentedInterstitial = false
     private let interstitial = Interstitial()
     @Environment(\.presentationMode) var presentationMode
     private let adViewControllerRepresentable = AdViewControllerRepresentable()
-    @Binding var victoryFlag: Bool
-    @Binding var isUserStoryFlag: Bool
-    @ObservedObject var viewModel: PositionViewModel
-    @State private var hasRequestedInterstitial = false
-    @State private var hasPresentedInterstitial = false
+    @State private var restart = false
+    @State private var showingAllResults = false
 
-    init(results: [QuizResult], authManager: AuthManager, isPresenting: Binding<Bool>, navigateToQuizResultView: Binding<Bool>, playerExperience: Int, playerMoney: Int, elapsedTime: TimeInterval, quizLevel: QuizLevel, victoryFlag: Binding<Bool>, isUserStoryFlag: Binding<Bool>, viewModel: PositionViewModel) {
+    init(results: [QuizResult], authManager: AuthManager, isPresenting: Binding<Bool>, navigateToQuizResultView: Binding<Bool>, playerExperience: Int, playerMoney: Int, elapsedTime: TimeInterval, quizBossLevel: QuizBossLevel, quizLevel: QuizLevel) {
         _results = State(initialValue: results)
         self.authManager = authManager
         _isPresenting = isPresenting
@@ -56,10 +71,8 @@ struct StoryQuizResultView: View {
         _playerExperience = State(initialValue: playerExperience)
         _playerMoney = State(initialValue: playerMoney)
         self.elapsedTime = elapsedTime
+        self.quizBossLevel = quizBossLevel
         self.quizLevel = quizLevel
-        _victoryFlag = victoryFlag
-        _isUserStoryFlag = isUserStoryFlag
-        self.viewModel = viewModel
     }
     
     // 正解率を計算
@@ -106,9 +119,17 @@ struct StoryQuizResultView: View {
                 }
                 .navigationBarBackButtonHidden(true)
                 .navigationBarItems(leading: backButton)
-                .navigationTitle("ストーリー結果")
+                .navigationTitle("結果")
                 .navigationBarTitleDisplayMode(.inline)
             }
+            .gesture(
+                DragGesture()
+                    .onEnded { value in
+                        if value.translation.width > 80 {
+                            isPresenting = false
+                        }
+                    }
+            )
             .background {
                 if userPreFlag != 1 {
                     adViewControllerRepresentable
@@ -119,14 +140,6 @@ struct StoryQuizResultView: View {
             // モーダル類
             modalOverlays
         }
-        .gesture(
-            DragGesture()
-                .onEnded { value in
-                    if value.translation.width > 80 {
-                        isPresenting = false
-                    }
-                }
-        )
         .fullScreenCover(isPresented: $preFlag) {
             PreView(audioManager: audioManager)
         }
@@ -138,38 +151,11 @@ struct StoryQuizResultView: View {
                 }
             }
         }
-        .onChange(of: authManager.rankUp) { newValue in
-            if newValue {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                    rankUpFlag = true
-                    audioManager.playLevelUpSound()
-                }
-            }
-        }
-        .onChange(of: authManager.rankDown) { newValue in
-            if newValue {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                    rankDownFlag = true
-                    audioManager.playLevelUpSound()
-                }
-            }
-        }
         .onAppear {
             setupOnAppear()
             // モーダルを少し遅れて表示
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 showModal = true
-            }
-        }
-        .onDisappear {
-            if victoryFlag {
-                if isUserStoryFlag {
-                    viewModel.incrementUserPosition()
-                } else {
-                    viewModel.incrementPosition()
-                }
-            } else {
-                viewModel.decreaseStamina(by: 10)
             }
         }
     }
@@ -182,7 +168,7 @@ struct StoryQuizResultView: View {
                 Spacer()
                 Button(action: {
                     generateHapticFeedback()
-                    preFlag = true
+                    showSubFlag = true
                     audioManager.playSound()
                 }) {
                     Image("プレミアムプランボタン")
@@ -191,7 +177,7 @@ struct StoryQuizResultView: View {
                 }
                 .shadow(color: .black.opacity(0.2), radius: 5, x: 0, y: 2)
                 .fullScreenCover(isPresented: $showSubFlag) {
-                    SubscriptionView(audioManager: audioManager)
+                    PreView(audioManager: audioManager)
                 }
                 Spacer()
             }
@@ -494,11 +480,6 @@ struct StoryQuizResultView: View {
                 statisticRow(title: "最高連続正解", value: "\(maxConsecutiveCorrect())問")
                 statisticRow(title: "レベル", value: "Level \(authManager.level)")
                 statisticRow(title: "経験値", value: "\(authManager.experience) XP")
-                if victoryFlag {
-                    statisticRow(title: "ステータス", value: "勝利 🏆")
-                } else {
-                    statisticRow(title: "ステータス", value: "敗北 😔")
-                }
             }
         }
         .padding(16)
@@ -585,18 +566,17 @@ struct StoryQuizResultView: View {
         if level10flag {
             ModalTittleView(showLevelUpModal: $level10flag, authManager: authManager, tittleNumber: .constant(10))
         }
-        if rankUpFlag {
-            // ランクアップモーダルの実装
+        if goburinflag {
+            ModalTittleView(showLevelUpModal: $goburinflag, authManager: authManager, tittleNumber: .constant(44))
         }
-        if rankDownFlag {
-            // ランクダウンモーダルの実装
+        if kaijyuflag {
+            ModalTittleView(showLevelUpModal: $kaijyuflag, authManager: authManager, tittleNumber: .constant(55))
+        }
+        if shinjyuflag {
+            ModalTittleView(showLevelUpModal: $shinjyuflag, authManager: authManager, tittleNumber: .constant(66))
         }
         
         NavigationLink("", destination: ContentView().navigationBarBackButtonHidden(true), isActive: $isContentView)
-        
-        if showMemoView {
-            MemoView(memo: $currentMemo, question: selectedQuestion)
-        }
     }
     
     // MARK: - Helper Functions
@@ -634,17 +614,9 @@ struct StoryQuizResultView: View {
             }
         }
         
-        // 広告処理
-        DispatchQueue.main.async {
-            if !interstitial.interstitialAdLoaded && interstitial.wasAdDismissed == false {
-                interstitial.loadInterstitial(completion: { isLoaded in
-                    if isLoaded {
-                        self.interstitial.presentInterstitial(from: adViewControllerRepresentable.viewController)
-                    }
-                })
-            } else if !interstitial.wasAdDismissed {
-                interstitial.presentInterstitial(from: adViewControllerRepresentable.viewController)
-            }
+        // タイトル獲得処理
+        if playerExperience != 5 {
+            checkBossTitles()
         }
         
         // 広告処理
@@ -669,6 +641,33 @@ struct StoryQuizResultView: View {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             checkLevelTitles()
             checkAnswerTitles()
+        }
+    }
+    
+    private func checkBossTitles() {
+        if quizBossLevel == .goburin {
+            authManager.checkTitles(userId: authManager.currentUserId!, title: "ゴブリン") { exists in
+                if !exists {
+                    goburinflag = true
+                    authManager.saveTitleForUser(userId: authManager.currentUserId!, title: "ゴブリン")
+                }
+            }
+        }
+        if quizBossLevel == .kaijyu {
+            authManager.checkTitles(userId: authManager.currentUserId!, title: "ガルーラ") { exists in
+                if !exists {
+                    kaijyuflag = true
+                    authManager.saveTitleForUser(userId: authManager.currentUserId!, title: "ガルーラ")
+                }
+            }
+        }
+        if quizBossLevel == .shinjyu {
+            authManager.checkTitles(userId: authManager.currentUserId!, title: "ルーン") { exists in
+                if !exists {
+                    shinjyuflag = true
+                    authManager.saveTitleForUser(userId: authManager.currentUserId!, title: "ルーン")
+                }
+            }
         }
     }
     
@@ -737,8 +736,328 @@ struct StoryQuizResultView: View {
     }
 }
 
+// MARK: - Enhanced Modal Views
+struct ExperienceModalView: View {
+    @Binding var showModal: Bool
+    var addedExperience: Int
+    var addedMoney: Int
+    @State private var currentExperience: Double = 0
+    @State private var currentMoney: Double = 0
+    @State private var showContent = false
+    let maxExperience: Double = 100
+    @ObservedObject var authManager: AuthManager
+    @ObservedObject var audioManager = AudioManager.shared
+
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.3)
+                .ignoresSafeArea()
+                .onTapGesture {
+                    dismissModal()
+                }
+            
+            VStack(spacing: 24) {
+                // アニメーション付きアイコン
+                ZStack {
+                    Circle()
+                        .fill(currentExperience != 5 ? Color.green.opacity(0.2) : Color.red.opacity(0.2))
+                        .frame(width: 100, height: 100)
+                        .scaleEffect(showContent ? 1.0 : 0.8)
+                        .animation(.spring(response: 0.6, dampingFraction: 0.6), value: showContent)
+                    
+                    Image(systemName: currentExperience != 5 ? "checkmark.circle.fill" : "xmark.circle.fill")
+                        .font(.system(size: 50))
+                        .foregroundColor(currentExperience != 5 ? .green : .red)
+                        .scaleEffect(showContent ? 1.0 : 0.5)
+                        .animation(.spring(response: 0.8, dampingFraction: 0.6).delay(0.2), value: showContent)
+                }
+                
+                VStack(spacing: 8) {
+                    Text(currentExperience != 5 ? "クリア！" : "ゲームオーバー")
+                        .font(.system(size: 32, weight: .bold, design: .rounded))
+                        .foregroundColor(.primary)
+                        .opacity(showContent ? 1 : 0)
+                        .animation(.easeInOut(duration: 0.5).delay(0.4), value: showContent)
+                }
+                
+                // 獲得リワード
+                VStack(spacing: 16) {
+                    rewardRow(icon: "経験値", title: "経験値", value: "+\(Int(currentExperience))")
+                    rewardRow(icon: "コイン", title: "コイン", value: "+\(Int(currentMoney))")
+                }
+                .opacity(showContent ? 1 : 0)
+                .animation(.easeInOut(duration: 0.5).delay(0.6), value: showContent)
+                
+                // プログレスバー
+                VStack(spacing: 12) {
+                    Text("\(authManager.experience) / \(authManager.level * 100) 経験値")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(.secondary)
+                    
+                    ProgressBar1(value: Double(authManager.experience), maxValue: Double(authManager.level * 100))
+                        .frame(height: 12)
+                }
+                .opacity(showContent ? 1 : 0)
+                .animation(.easeInOut(duration: 0.5).delay(0.8), value: showContent)
+                
+                // 閉じるボタン
+                Button(action: dismissModal) {
+                    Text("続ける")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color.accentColor)
+                        )
+                }
+                .opacity(showContent ? 1 : 0)
+                .animation(.easeInOut(duration: 0.5).delay(1.0), value: showContent)
+            }
+            .padding(24)
+            .background(
+                RoundedRectangle(cornerRadius: 20)
+                    .fill(Color(.systemBackground))
+                    .shadow(color: .black.opacity(0.3), radius: 20, x: 0, y: 10)
+            )
+            .padding(.horizontal, 32)
+            .scaleEffect(showContent ? 1.0 : 0.8)
+            .animation(.spring(response: 0.6, dampingFraction: 0.8), value: showContent)
+        }
+        .onAppear {
+            authManager.fetchUserFlag()
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                showContent = true
+                withAnimation(.easeInOut(duration: 1.0).delay(0.5)) {
+                    currentExperience = Double(addedExperience) * Double(authManager.rewardFlag)
+                    currentMoney = Double(addedMoney) * Double(authManager.rewardFlag)
+                }
+            }
+            
+            if currentExperience != 5 {
+                audioManager.playGameClearSound()
+            } else {
+                audioManager.playGameOverSound()
+            }
+            
+            DispatchQueue.global(qos: .background).async {
+                authManager.fetchUserExperienceAndLevel()
+            }
+        }
+    }
+    
+    private func rewardRow(icon: String, title: String, value: String) -> some View {
+        HStack(spacing: 12) {
+            Image(icon)
+                .resizable()
+                .frame(width: 24, height: 24)
+            
+            Text(title)
+                .font(.body)
+                .foregroundColor(.primary)
+            
+            Spacer()
+            
+            Text(value)
+                .font(.headline)
+                .foregroundColor(.green)
+                .fontWeight(.semibold)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color(.systemGray6))
+        )
+    }
+    
+    private func dismissModal() {
+        generateHapticFeedback()
+        withAnimation(.spring()) {
+            showContent = false
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            showModal = false
+        }
+        audioManager.playCancelSound()
+    }
+}
+
+struct LevelUpModalView: View {
+    @Binding var showLevelUpModal: Bool
+    @State private var showContent = false
+    @State private var showParticles = false
+    @ObservedObject var authManager: AuthManager
+    @ObservedObject var audioManager = AudioManager.shared
+
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.7)
+                .ignoresSafeArea()
+                .onTapGesture {
+                    dismissModal()
+                }
+            
+            VStack(spacing: 24) {
+                // パーティクルエフェクト背景
+                ZStack {
+                    if showParticles {
+                        ForEach(0..<20, id: \.self) { _ in
+                            Circle()
+                                .fill(Color.yellow.opacity(0.8))
+                                .frame(width: CGFloat.random(in: 4...8))
+                                .position(
+                                    x: CGFloat.random(in: 0...300),
+                                    y: CGFloat.random(in: 0...300)
+                                )
+                                .animation(
+                                    Animation.easeInOut(duration: Double.random(in: 2...4))
+                                        .repeatForever(autoreverses: true),
+                                    value: showParticles
+                                )
+                        }
+                    }
+                    
+                    // レベルアップアイコン
+                    ZStack {
+                        Circle()
+                            .fill(
+                                RadialGradient(
+                                    gradient: Gradient(colors: [Color.yellow, Color.orange]),
+                                    center: .center,
+                                    startRadius: 0,
+                                    endRadius: 60
+                                )
+                            )
+                            .frame(width: 120, height: 120)
+                            .scaleEffect(showContent ? 1.0 : 0.5)
+                            .animation(.spring(response: 0.8, dampingFraction: 0.6), value: showContent)
+                        
+                        Image("レベルアップ")
+                            .resizable()
+                            .frame(width: 100, height: 100)
+                            .scaleEffect(showContent ? 1.0 : 0.5)
+                            .animation(.spring(response: 0.8, dampingFraction: 0.6).delay(0.2), value: showContent)
+                    }
+                    
+                    // レベル数字
+                    Text("\(authManager.level)")
+                        .font(.system(size: 48, weight: .bold, design: .rounded))
+                        .foregroundColor(.white)
+                        .shadow(color: .black.opacity(0.3), radius: 2, x: 0, y: 2)
+                        .scaleEffect(showContent ? 1.0 : 0.3)
+                        .animation(.spring(response: 1.0, dampingFraction: 0.6).delay(0.4), value: showContent)
+                }
+                .frame(width: 200, height: 200)
+                
+                VStack(spacing: 12) {
+                    Text("レベルアップ！")
+                        .font(.system(size: 28, weight: .bold, design: .rounded))
+                        .foregroundColor(.primary)
+                        .opacity(showContent ? 1 : 0)
+                        .animation(.easeInOut(duration: 0.5).delay(0.6), value: showContent)
+                    
+                    Text("レベル \(authManager.level) に到達しました！")
+                        .font(.headline)
+                        .foregroundColor(.secondary)
+                        .opacity(showContent ? 1 : 0)
+                        .animation(.easeInOut(duration: 0.5).delay(0.8), value: showContent)
+                }
+                
+                // 閉じるボタン
+                Button(action: dismissModal) {
+                    Text("素晴らしい！")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(
+                                    LinearGradient(
+                                        gradient: Gradient(colors: [Color.yellow, Color.orange]),
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
+                                )
+                        )
+                }
+                .opacity(showContent ? 1 : 0)
+                .animation(.easeInOut(duration: 0.5).delay(1.0), value: showContent)
+            }
+            .padding(24)
+            .background(
+                RoundedRectangle(cornerRadius: 20)
+                    .fill(Color(.systemBackground))
+                    .shadow(color: .black.opacity(0.3), radius: 20, x: 0, y: 10)
+            )
+            .padding(.horizontal, 32)
+            .scaleEffect(showContent ? 1.0 : 0.8)
+            .animation(.spring(response: 0.6, dampingFraction: 0.8), value: showContent)
+        }
+        .onAppear {
+            authManager.fetchUserExperienceAndLevel()
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                showContent = true
+                showParticles = true
+            }
+        }
+    }
+    
+    private func dismissModal() {
+        generateHapticFeedback()
+        withAnimation(.spring()) {
+            showContent = false
+            showParticles = false
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            showLevelUpModal = false
+        }
+        audioManager.playCancelSound()
+    }
+}
+
+struct ProgressBar1: View {
+    var value: Double
+    var maxValue: Double
+    @State private var animatedValue: Double = 0
+
+    var body: some View {
+        GeometryReader { geometry in
+            ZStack(alignment: .leading) {
+                RoundedRectangle(cornerRadius: 6)
+                    .fill(Color(.systemGray5))
+                
+                RoundedRectangle(cornerRadius: 6)
+                    .fill(
+                        LinearGradient(
+                            gradient: Gradient(colors: [Color.blue, Color.purple]),
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .frame(width: CGFloat(animatedValue / maxValue) * geometry.size.width)
+                    .animation(.easeInOut(duration: 1.5), value: animatedValue)
+            }
+        }
+        .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                animatedValue = value
+            }
+        }
+        .onChange(of: value) { newValue in
+            withAnimation(.easeInOut(duration: 0.8)) {
+                animatedValue = newValue
+            }
+        }
+    }
+}
+
 // MARK: - Preview
-struct StoryQuizResultView_Previews: PreviewProvider {
+struct QuizResultView_Previews: PreviewProvider {
     @State static var isPresenting = false
     @State static var navigateToQuizResultView = false
 
@@ -750,7 +1069,7 @@ struct StoryQuizResultView_Previews: PreviewProvider {
         ]
         let authManager = AuthManager()
 
-        StoryQuizResultView(
+        QuizResultView(
             results: dummyResults,
             authManager: authManager,
             isPresenting: $isPresenting,
@@ -758,10 +1077,8 @@ struct StoryQuizResultView_Previews: PreviewProvider {
             playerExperience: 25,
             playerMoney: 15,
             elapsedTime: 0,
-            quizLevel: .beginner,
-            victoryFlag: .constant(true),
-            isUserStoryFlag: .constant(false),
-            viewModel: PositionViewModel.shared
+            quizBossLevel: .none,
+            quizLevel: .beginner
         )
     }
 }
