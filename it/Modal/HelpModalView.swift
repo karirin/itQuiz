@@ -1,144 +1,180 @@
 //
 //  HelpModalView.swift
-//  chatAi
+//  osimono
 //
-//  Created by Apple on 2024/02/20.
+//  Created by Apple on 2025/05/03.
 //
 
 import SwiftUI
-import StoreKit
+import Foundation
 
 struct HelpModalView: View {
-    @ObservedObject var audioManager:AudioManager
-    @ObservedObject var authManager = AuthManager.shared
+    @ObservedObject var authManager = AuthManager()
+    @Environment(\.colorScheme) var colorScheme
     @Binding var isPresented: Bool
-    @StateObject var store: Store = Store()
     @State var toggle = false
     @State private var text: String = ""
-    @State private var showAlert = false
+    @State private var showAlert: Bool = false
+    @State private var alertTitle: String = ""
+    @State private var alertMessage: String = ""
+    @FocusState private var isFocused: Bool
+    
+    init(isPresented: Binding<Bool>) {
+        self._isPresented = isPresented        // Binding を保持
+        UITextView.appearance().backgroundColor = .clear
+    }
     
     var body: some View {
         ZStack {
-            Color.black.opacity(0.4)
+            // 背景オーバーレイ - より滑らかなトランジション用にアニメーション追加
+            Color.black.opacity(0.5)
                 .edgesIgnoringSafeArea(.all)
-                .onTapGesture {
-                    isPresented = false
+            
+            // メインモーダルコンテンツ
+            VStack(spacing: 10) {
+                // ヘッダー部分
+                VStack(alignment: .center, spacing: 15) {
+                    Text("お問い合わせ")
+                        .font(.headline)
+                        .fontWeight(.bold)
+                        .foregroundStyle(.black)
+                    Text("ご意見やご要望がありましたら、お気軽にお知らせください。可能な限り対応いたします。")
+                        .font(.system(size: isSmallDevice() ? 16 : 17))
+                        .multilineTextAlignment(.leading)
+                        .padding(.bottom, 5)
+                        .foregroundColor(.black)
                 }
-            VStack(spacing: -25) {
-                VStack(alignment: .center){
-                    Text("改善してほしい点や\n追加を希望する機能などありましたら\nお気軽にご連絡ください\n可能な限りご要望にお応えいたします")
-                        .font(.system(size: isSmallDevice() ? 17 : 18))
-                        .multilineTextAlignment(.center)
-                        .padding(.vertical)
-                        TextField(
-                            "例）メッセージが送信されない",
-                            text: $text,
-                            axis: .vertical
-                        )
-                        .padding()
-                        .background(.white)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color.gray, lineWidth: 1)
-                        )
-                    Button(action: { 
-                        generateHapticFeedback()
-                        if toggle == true {
-                            authManager.updateUserCsFlag(userId: authManager.currentUserId!, userCsFlag: 1) { success in
-                            }
+                
+                // テキスト入力エリア - より洗練されたデザイン
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("問い合わせ内容")
+                        .font(.subheadline)
+                        .foregroundStyle(.black)
+                    ZStack(alignment: .topLeading) {
+                        if text.isEmpty && !isFocused {
+                            Text("問題画面が表示されない")
+                                .foregroundColor(Color(.gray))
+                                .padding(.horizontal, 14)
+                                .padding(.vertical, 12)
                         }
-                        authManager.updateContact(userId: authManager.currentUserId!, newContact: text){ success in
-                            if success {
-                                self.showAlert = true
-                                print("Heart added successfully.")
-                            } else {
-                                print("Failed to add heart.")
-                            }
-                        }
-                    }, label: {
-                        Text("送信")
-                            .fontWeight(.semibold)
-                            .frame(width: 130, height:40)
-                            .foregroundColor(Color.white)
-                            .background(Color.gray)
-                            .cornerRadius(24)
-                    })
-                    .opacity(text.isEmpty ? 0.5 : 1)
-                    .disabled(text.isEmpty)
-                    .shadow(radius: 3)
-                    .padding(.top,10)
-
-                    HStack{
-                        Spacer()
-                        Toggle("今後は表示しない", isOn: $toggle)
-                            .frame(width:200)
-                            .toggleStyle(SwitchToggleStyle())
-                            .padding(.horizontal)
-                            .padding(.top)
+                        TextEditor(text: $text)
+                            .focused($isFocused)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 10)
+                            .scrollContentBackground(.hidden)
+                            .foregroundColor(colorScheme == .dark ? .black : .black)
                     }
+                    .background(colorScheme == .dark ? Color(.white) : Color.white)
+                    .frame(height: 120)
+                    .cornerRadius(12)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Color(.systemGray4), lineWidth: 1)
+                    )
+
                 }
+                .padding(.vertical, 5)
+                
+                // 送信ボタン - より現代的なデザイン
+                Button(action: {
+                    if toggle {
+                        authManager.updateUserFlag(userId: authManager.currentUserId!, userFlag: 1) { _ in }
+                    }
+                    authManager.updateContact(userId: authManager.currentUserId!, newContact: text){ success in
+                        if success {
+                            alertTitle = "送信完了"
+                            alertMessage = "お問い合わせいただきありがとうございます🙇"
+                            showAlert = true
+//                            isPresented = false
+                        }
+                    }
+                }) {
+                    Text("送信する")
+                        .fontWeight(.semibold)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 50)
+                        .foregroundColor(.white)
+                        .background(text.isEmpty ? Color.gray.opacity(0.5) : Color.blue)
+                        .cornerRadius(15)
+                        .shadow(color: text.isEmpty ? .clear : Color.blue.opacity(0.3), radius: 5, y: 2)
+                }
+                .disabled(text.isEmpty)
+                .padding(.vertical, 10)
+                
+                // トグルスイッチ - より整理されたデザイン
+                HStack {
+                    Toggle("今後は表示しない", isOn: $toggle)
+                        .toggleStyle(SwitchToggleStyle(tint: .blue))
+                        .font(.subheadline)
+                        .foregroundStyle(.black)
+                    Spacer()
+                }
+                .padding(.vertical, 5)
             }
-            .alert(isPresented: $showAlert) { // アラートを表示する
-                Alert(
-                    title: Text("送信されました"),
-                    message: Text("お問い合わせありがとうございます！"),
-                    dismissButton: .default(Text("OK")) {
+            .padding(25)
+            .background(
+                // モーダル背景 - より美しいグラデーション
+                RoundedRectangle(cornerRadius: 20)
+                    .fill(Color.white)
+                    .shadow(color: Color.black.opacity(0.15), radius: 15, x: 0, y: 5)
+            )
+            .frame(width: isSmallDevice() ? 320 : 350)
+            .overlay(
+                // 閉じるボタン - よりエレガントなデザイン
+                Button(action: {
+                    if toggle {
+                        authManager.updateUserFlag(userId: authManager.currentUserId!, userFlag: 1) { _ in }
+                    }
+                    withAnimation(.easeOut(duration: 0.2)) {
                         isPresented = false
                     }
-                )
-            }
-            .frame(width: isSmallDevice() ? 290: 320)
-            .foregroundColor(Color("fontGray"))
-            .padding()
-        .background(Color("Color2"))
-//        .overlay(
-//            RoundedRectangle(cornerRadius: 20)
-//                .stroke(Color.gray, lineWidth: 15)
-//        )
-        .cornerRadius(20)
-        .shadow(radius: 10)
-        .overlay(
-            // 「×」ボタンを右上に配置
-            Button(action: { 
-                        generateHapticFeedback()
-                audioManager.playCancelSound()
-//                print(toggle)
-                if toggle == true {
-                    authManager.updateUserCsFlag(userId: authManager.currentUserId!, userCsFlag: 1) { success in
-                    }
+                }) {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(.secondary)
+                        .padding(8)
+                        .background(Color(.systemGray6))
+                        .clipShape(Circle())
                 }
-                isPresented = false
-            }) {
-                Image(systemName: "xmark.circle.fill")
-                    .resizable()
-                    .frame(width: 50, height: 50)
-                    .foregroundColor(.gray)
-                    .background(.white)
-                    .cornerRadius(30)
-                    .padding()
-            }
-                .offset(x: 35, y: -35), // この値を調整してボタンを正しい位置に移動させます
-            alignment: .topTrailing // 枠の右上を基準に位置を調整します
-        )
-        .padding(25)
-                }
-//            }
-                .onAppear{
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-//                        print(store.productList)
-                    }
-                }
-            //            .padding(50)
-          
+                .padding(16),
+                alignment: .topTrailing
+            )
+            .dismissKeyboardOnTap()
         }
-//    }
+        .alert(isPresented: $showAlert) { // アラートを表示する
+            Alert(
+                title: Text("送信されました"),
+                message: Text("L10n.sentMessage"),
+                dismissButton: .default(Text("OK")) {
+                    isPresented = false
+                }
+            )
+        }
+        .transition(.opacity)
+    }
     
     func isSmallDevice() -> Bool {
         return UIScreen.main.bounds.width < 390
     }
 }
 
-#Preview {
-    HelpModalView(audioManager: AudioManager(), isPresented: .constant(true))
+struct KeyboardDismissModifier: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .onTapGesture {
+                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder),
+                                                to: nil, from: nil, for: nil)
+            }
+    }
 }
 
+// ★ここを新しく追加
+extension View {
+    func dismissKeyboardOnTap() -> some View {
+        self.modifier(KeyboardDismissModifier())
+    }
+}
+
+#Preview{
+    HelpModalView(isPresented: .constant(false))
+}

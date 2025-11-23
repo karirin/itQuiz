@@ -377,15 +377,15 @@ struct ContentView: View {
                 }
                 
                 if customerFlag {
-                    ReviewView(audioManager: audioManager, isPresented: $customerFlag, helpFlag: $helpFlag)
+                    ReviewView(isPresented: $customerFlag, helpFlag: $helpFlag)
                 }
                 
                 if csFlag {
-                    HelpModalView(audioManager: audioManager, isPresented: $csFlag)
+                    HelpModalView(isPresented: $csFlag)
                 }
-                
+
                 if helpFlag {
-                    HelpModalView(audioManager: audioManager, isPresented: $helpFlag)
+                    HelpModalView(isPresented: $helpFlag)
                 }
                 
                 if isFlag {
