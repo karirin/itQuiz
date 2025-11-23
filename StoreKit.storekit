@@ -147,6 +147,90 @@
           "winbackOffers" : [
 
           ]
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "4.80",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "5BE2824E",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "広告非表示",
+              "displayName" : "広告非表示",
+              "locale" : "ja"
+            }
+          ],
+          "productID" : "it_premium_weekly_480",
+          "recurringSubscriptionPeriod" : "P1W",
+          "referenceName" : "広告非表示プラン（週間）",
+          "subscriptionGroupID" : "054ABA2C",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "9.80",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "F42D1C3A",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "広告非表示",
+              "displayName" : "広告非表示",
+              "locale" : "ja"
+            }
+          ],
+          "productID" : "it_premium_monthly_980",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "広告非表示プラン（月間）",
+          "subscriptionGroupID" : "054ABA2C",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "98.0",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "951C0160",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "広告非表示",
+              "displayName" : "広告非表示",
+              "locale" : "ja"
+            }
+          ],
+          "productID" : "it_premium_yearly_9800",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "広告非表示プラン（年間） ",
+          "subscriptionGroupID" : "054ABA2C",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
         }
       ]
     }

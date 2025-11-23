@@ -131,7 +131,9 @@ class SubscriptionViewModel: ObservableObject {
     @EnvironmentObject var appState: AppState
 
     let productIdList = [
-        "IT",
+        "it_premium_weekly_480",
+        "it_premium_monthly_980",
+        "it_premium_yearly_9800",
     ]
 
     func loadProducts() async {

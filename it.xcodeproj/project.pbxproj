@@ -731,7 +731,7 @@
 				CODE_SIGN_ENTITLEMENTS = it/it.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8.7;
+				CURRENT_PROJECT_VERSION = 8.8;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"it/Preview Content\"";
 				DEVELOPMENT_TEAM = F3XS565TSX;
@@ -749,7 +749,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 8.7;
+				MARKETING_VERSION = 8.8;
 				PRODUCT_BUNDLE_IDENTIFIER = "Swift-Beginners-app.it";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -767,7 +767,7 @@
 				CODE_SIGN_ENTITLEMENTS = it/it.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8.7;
+				CURRENT_PROJECT_VERSION = 8.8;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"it/Preview Content\"";
 				DEVELOPMENT_TEAM = F3XS565TSX;
@@ -785,7 +785,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 8.7;
+				MARKETING_VERSION = 8.8;
 				PRODUCT_BUNDLE_IDENTIFIER = "Swift-Beginners-app.it";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
