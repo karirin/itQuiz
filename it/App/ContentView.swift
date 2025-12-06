@@ -81,7 +81,7 @@ struct ContentView: View {
                     .frame(maxWidth: .infinity,maxHeight: .infinity)
                 } else {
                     VStack {
-                    if !appState.isSubscribed {
+                        if !appState.isSubscribed && authManager.currentUserId != "dzarHuAdiXXLtDjtwIRvIfVhA1A2" {
                         BannerAdView()
                             .frame(height: 60)
                             .padding(.bottom, -10)

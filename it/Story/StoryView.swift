@@ -684,7 +684,7 @@ struct StoryView: View {
                         .animation(.easeInOut(duration: 0.5), value: currentVisiblePosition)
 
                     VStack {
-                        if appState.isBannerVisible {
+                        if appState.isBannerVisible && authManager.currentUserId != "dzarHuAdiXXLtDjtwIRvIfVhA1A2" {
                             BannerStortyView()
                                 .frame(height: 60)
                         }

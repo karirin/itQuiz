@@ -44,7 +44,7 @@ struct GraphManagerView: View {
                 .background(Color("Color2"))
                 .frame(maxWidth: .infinity,maxHeight: .infinity)
             } else {
-                if appState.isBannerVisible {
+                if appState.isBannerVisible && authManager.currentUserId != "dzarHuAdiXXLtDjtwIRvIfVhA1A2" {
                     VStack{
                         TopTabView(list: list, selectedTab: $selectedTab)
                         TabView(selection: $selectedTab,

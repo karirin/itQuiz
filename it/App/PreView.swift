@@ -411,7 +411,22 @@ struct PreView: View {
                                                                         )
                                                                 )
                                                             default:
-                                                                EmptyView()
+                                                                Text("お試しに最適")
+                                                                    .font(.system(size: 11))
+                                                                    .fontWeight(.bold)
+                                                                    .foregroundColor(.white)
+                                                                    .padding(.horizontal, 10)
+                                                                    .padding(.vertical, 4)
+                                                                    .background(
+                                                                        Capsule()
+                                                                            .fill(
+                                                                                LinearGradient(
+                                                                                    gradient: Gradient(colors: [Color.green, Color.teal]),
+                                                                                    startPoint: .leading,
+                                                                                    endPoint: .trailing
+                                                                                )
+                                                                            )
+                                                                    )
                                                             }
                                                         }
                                                     }
@@ -450,7 +465,9 @@ struct PreView: View {
                                                                 .font(.system(size: 13))
                                                                 .foregroundColor(.white.opacity(0.7))
                                                         default:
-                                                            EmptyView()
+                                                            Text("まずは1週間から")
+                                                                .font(.system(size: 13))
+                                                                .foregroundColor(.white.opacity(0.7))
                                                         }
                                                     }
                                                 }
@@ -715,7 +732,7 @@ struct PreView: View {
             case .year:
                 return "/年"
             default:
-                return ""
+                return "/週"
             }
         }
         
@@ -762,16 +779,16 @@ struct PreView: View {
             if let period = product.subscription?.subscriptionPeriod {
                 switch period.unit {
                 case .week:
-                    return "週額"
+                    return "週間"
                 case .month:
                     return "月額"
                 case .year:
                     return "年額"
                 default:
-                    return "料金"
+                    return "週額"
                 }
             }
-            return "料金"
+            return "週額"
         }
         
         func fontSizeSE(for text: String, isIPad: Bool) -> CGFloat {
