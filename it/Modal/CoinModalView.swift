@@ -6,157 +6,206 @@
 //
 
 import SwiftUI
+import StoreKit
 
 struct CoinModalView: View {
-    @ObservedObject var audioManager:AudioManager
+    @ObservedObject var audioManager: AudioManager
     @ObservedObject var authManager = AuthManager.shared
     @Binding var isPresented: Bool
     @StateObject var store: Store = Store()
     
     var body: some View {
         ZStack {
-            VStack(spacing: -25) {
-                ForEach(store.productList, id: \.self) { product in
-                    if product.displayName == "15000コイン" {
-                        
-                    HStack{
-                        Image("3倍お得")
-                            .resizable()
-                            .frame(width:90,height:80)
-                        Spacer()
-                    }
-                    HStack{
-                        Image("コイン")
-                            .resizable()
-                            .frame(width:25,height:25)
-                            .padding(.trailing,-5)
-                        Text("15000コイン")
-                            .font(.system(size: isSmallDevice() ? 20 : 24))
-                            
-                        Spacer()
-                        Button(action: { 
-                        generateHapticFeedback()
-                            audioManager.playSound()
-                            Task {
-                                do {
-                                    try await purchase(product)
-                                } catch {
-                                    // エラーハンドリングをここで行う
-                                    print("Purchase failed: \(error)")
-                                }
-                            }
-                        }) {
-                            Image("500円で購入")
-                                .resizable()
-                                .frame(width:130,height:40)
-                                .shadow(radius: 3)
-                        }
-                        
-                    }//.padding(.top,-20)
-                    } else if product.displayName == "4000コイン" {
-                        HStack{
-                            Image("2倍お得")
-                                .resizable()
-                                .frame(width:90,height:80)
-                            Spacer()
-                        }.padding(.top)
-                        HStack{
-                            Image("コイン")
-                                .resizable()
-                                .frame(width:25,height:25)
-                                .padding(.trailing,-5)
-                            Text("4000コイン")
-                                .font(.system(size: isSmallDevice() ? 22 : 26))
-                            Spacer()
-                            Button(action: { 
-                        generateHapticFeedback()
-                                audioManager.playSound()
-                                Task {
-                                    do {
-                                        try await purchase(product)
-                                    } catch {
-                                        // エラーハンドリングをここで行う
-                                        print("Purchase failed: \(error)")
-                                    }
-                                }
-                            }) {
-                                Image("200円で購入")
-                                    .resizable()
-                                    .frame(width:130,height:40)
-                                    .shadow(radius: 3)
-                            }
-                        }
-                    } else {
-                            HStack{
-                                Image("コイン")
-                                    .resizable()
-                                    .frame(width:24,height:24)
-                                    .padding(.trailing,-5)
-                                Text("1000コイン")
-                                    .font(.system(size: isSmallDevice() ? 22 : 26))
-                                Spacer()
-                                Button(action: { 
-                        generateHapticFeedback()
-                                    audioManager.playSound()
-                                    Task {
-                                        do {
-                                            try await purchase(product)
-                                        } catch {
-                                            // エラーハンドリングをここで行う
-                                            print("Purchase failed: \(error)")
-                                        }
-                                    }
-                                }) {
-                                    Image("100円で購入")
-                                        .resizable()
-                                        .frame(width:130,height:40)
-                                        .shadow(radius: 3)
-                                }
-                            }.padding(.top,60)
-                    }
-                }
-            }
-                .onAppear{
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        print(store.productList)
-                    }
-                }
-            //            .padding(50)
-                .frame(width: isSmallDevice() ? 290: 310, height:270)
-                .padding()
-            .background(Color("Color2"))
-            .foregroundColor(Color("fontGray"))
-            .overlay(
-                RoundedRectangle(cornerRadius: 20)
-                    .stroke(Color.gray, lineWidth: 15)
-            )
-            .cornerRadius(20)
-            .shadow(radius: 10)
-            .overlay(
-                // 「×」ボタンを右上に配置
-                Button(action: { 
-                        generateHapticFeedback()
+            // 背景のぼかし
+            Color.black.opacity(0.4)
+                .ignoresSafeArea()
+                .onTapGesture {
+                    generateHapticFeedback()
                     audioManager.playCancelSound()
                     isPresented = false
-                }) {
-                    Image(systemName: "xmark.circle.fill")
-                        .resizable()
-                        .frame(width: 50, height: 50)
-                        .foregroundColor(.gray)
-                        .background(.white)
-                        .cornerRadius(30)
-                        .padding()
                 }
-                    .offset(x: 35, y: -35), // この値を調整してボタンを正しい位置に移動させます
-                alignment: .topTrailing // 枠の右上を基準に位置を調整します
+            
+            VStack(spacing: 0) {
+                // ヘッダー
+                ZStack {
+                    Text("コインを購入")
+                        .font(.system(size: 24, weight: .bold))
+                        .foregroundColor(.white)
+                    HStack {
+                        Spacer()
+                        Button(action: {
+                            generateHapticFeedback()
+                            audioManager.playCancelSound()
+                            isPresented = false
+                        }) {
+                            Image(systemName: "xmark")
+                                .font(.system(size: 18, weight: .semibold))
+                                .foregroundColor(.white.opacity(0.8))
+                                .frame(width: 32, height: 32)
+                                .background(Color.white.opacity(0.2))
+                                .clipShape(Circle())
+                        }
+                    }
+                }
+                .padding()
+                .background(
+                    LinearGradient(
+                        colors: [Color.purple, Color.blue],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                    VStack(spacing: 12) {
+                        ForEach(store.productList, id: \.self) { product in
+                            coinPackageView(for: product)
+                        }
+                    }
+                    .padding()
+                .background(Color("Color2"))
+            }
+            .frame(width: isSmallDevice() ? 340 : 360)
+            .background(Color("Color2"))
+            .cornerRadius(24)
+            .shadow(color: .black.opacity(0.3), radius: 20, y: 10)
+            .onAppear {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    print(store.productList)
+                }
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func coinPackageView(for product: Product) -> some View {
+        let packageInfo = getPackageInfo(for: product)
+        
+        Button(action: {
+            generateHapticFeedback()
+            audioManager.playSound()
+            Task {
+                do {
+                    try await purchase(product)
+                } catch {
+                    print("Purchase failed: \(error)")
+                }
+            }
+        }) {
+            ZStack(alignment: .topTrailing) {
+                HStack(spacing: 16) {
+                    // コイン情報
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack{
+                            Image(systemName: "dollarsign.circle.fill")
+                                .font(.system(size: 16))
+                                .foregroundColor(.yellow)
+                            Text(packageInfo.coinText)
+                                .font(.system(size: 20, weight: .bold))
+                                .foregroundColor(Color("fontGray"))
+                        }
+                        
+                        if let bonus = packageInfo.bonus {
+                            HStack(spacing: 4) {
+                                Image(systemName: "star.fill")
+                                    .font(.system(size: 12))
+                                    .foregroundColor(.orange)
+                                Text(bonus)
+                                    .font(.system(size: 13, weight: .semibold))
+                                    .foregroundColor(.orange)
+                            }
+                        }
+                    }
+                    
+                    Spacer()
+                    
+                    // 価格ボタン
+                    VStack(spacing: 2) {
+                        Text(packageInfo.price)
+                            .font(.system(size: 24, weight: .bold))
+                            .foregroundColor(.white)
+                    }
+                    .frame(width: 100)
+                    .padding(.vertical, 12)
+                    .background(
+                        LinearGradient(
+                            colors: packageInfo.gradientColors,
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .cornerRadius(12)
+                    .shadow(color: packageInfo.gradientColors[0].opacity(0.4), radius: 8, y: 4)
+                }
+                .padding(16)
+                .background(
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(Color.white)
+                        .shadow(color: .black.opacity(0.08), radius: 8, y: 2)
+                )
+                
+                // お得バッジ
+                if let badge = packageInfo.badge {
+                    Text(badge)
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 4)
+                        .background(
+                            Capsule()
+                                .fill(
+                                    LinearGradient(
+                                        colors: [Color.red, Color.pink],
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
+                                )
+                        )
+                        .offset(x: -8, y: -8)
+                }
+            }.padding(.vertical,10)
+        }
+        .buttonStyle(ScaleButtonStyle())
+    }
+    
+    private func getPackageInfo(for product: Product) -> PackageInfo {
+        switch product.displayName {
+        case "15000コイン":
+            return PackageInfo(
+                coinText: "15,000コイン",
+                price: "¥500",
+                bonus: "3倍お得!",
+                badge: "人気No.1",
+                gradientColors: [Color.purple, Color.blue]
             )
-            .padding(25)
+        case "4000コイン":
+            return PackageInfo(
+                coinText: "4,000コイン",
+                price: "¥200",
+                bonus: "2倍お得!",
+                badge: "おすすめ",
+                gradientColors: [Color.blue, Color.cyan]
+            )
+        default:
+            return PackageInfo(
+                coinText: "1,000コイン",
+                price: "¥100",
+                bonus: nil,
+                badge: nil,
+                gradientColors: [Color.green, Color.mint]
+            )
         }
     }
     
     func isSmallDevice() -> Bool {
         return UIScreen.main.bounds.width < 390
     }
+}
+
+struct PackageInfo {
+    let coinText: String
+    let price: String
+    let bonus: String?
+    let badge: String?
+    let gradientColors: [Color]
 }
 
 #Preview {

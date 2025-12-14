@@ -18,7 +18,7 @@ struct TestModalView: View {
 //                Image("300コインゲット")
 //                    .resizable()
 //                    .frame(width:300,height:200)
-                TestAnimationView(showAnimation: .constant(false))
+//                TestAnimationView(showAnimation: .constant(false))
             }
 //            .padding(50)
             .background(Color.white)
