@@ -99,7 +99,6 @@ enum QuizITLevel {
 extension QuizITLevel: CaseIterable {
     static var allCases: [QuizITLevel] {
         return [.itBasic, .itStrategy, .itTechnology, .itManagement]
-        // 除外したいケースをここで除外
     }
 }
 
@@ -115,7 +114,7 @@ struct PentagonITGraphShape: Shape {
 
         for (i, level) in QuizITLevel.allCases.enumerated() {
             let data = quizData[level] ?? QuizData(answer: 1, correct: 0)
-            let radius = baseRadius * data.correctRate // 正解率に基づく半径
+            let radius = baseRadius * data.correctRate
             let x = center.x + radius * cos(angle * CGFloat(i) - .pi / 2)
             let y = center.y + radius * sin(angle * CGFloat(i) - .pi / 2)
             let point = CGPoint(x: x, y: y)
@@ -135,14 +134,12 @@ struct PentagonITGraphShape: Shape {
 struct PentagonITGraphLabelView: View {
     var label: String
     var index: Int
-    // radius パラメータを削除して、ビューのサイズに基づいて計算するようにします
 
     var body: some View {
         GeometryReader { geometry in
             let angle = (2 * CGFloat.pi) / CGFloat(QuizITLevel.allCases.count) * CGFloat(index) - .pi / 2
             let center = CGPoint(x: geometry.size.width / 2, y: geometry.size.height / 2)
-            // ビューのサイズに基づいて radius を計算します
-            let radius = min(geometry.size.width, geometry.size.height) / 2 * 1.13 // 85% をラベルの配置に使用します
+            let radius = min(geometry.size.width, geometry.size.height) / 2 * 1.13
 
             let x = center.x + radius * cos(angle) - 20
             let y = center.y + radius * sin(angle) - 20
@@ -150,17 +147,11 @@ struct PentagonITGraphLabelView: View {
             Image("\(label)")
                 .resizable()
                 .frame(width: 40, height: 40)
-                // ラベルの中心が正しい位置に来るように調整します
-//                .offset(x: radius * cos(angle) + 178, y: radius * sin(angle) + 155)
-//                .offset(x: radius * cos(angle) + 0, y: radius * sin(angle) + 0)
-                .offset(x:x,y:y)
-                // position ではなく offset を使って配置することで、
-                // より詳細な位置調整が可能になります
+                .offset(x: x, y: y)
+                .shadow(color: Color.black.opacity(0.1), radius: 3, x: 0, y: 2)
         }
-        
     }
 }
-
 
 struct PentagonITGraphBackgroundShape: Shape {
     func path(in rect: CGRect) -> Path {
@@ -168,8 +159,7 @@ struct PentagonITGraphBackgroundShape: Shape {
         let radius = min(rect.width, rect.height) / 2 - 10
         let angle = (2 * CGFloat.pi) / 4
 
-        // ここから追加
-        let scale: [CGFloat] = [0.1,0.2,0.3, 0.4,0.5, 0.6,0.7, 0.8,0.9, 1.0]
+        let scale: [CGFloat] = [0.2, 0.4, 0.6, 0.8, 1.0]
         var path = Path()
 
         // 目盛りの円を追加
@@ -177,7 +167,6 @@ struct PentagonITGraphBackgroundShape: Shape {
             let scaledRadius = radius * factor
             path.addEllipse(in: CGRect(x: center.x - scaledRadius, y: center.y - scaledRadius, width: scaledRadius * 2, height: scaledRadius * 2))
         }
-        // ここまで追加
 
         for i in 0..<4 {
             let x = center.x + radius * cos(angle * CGFloat(i) - .pi / 2)
@@ -190,7 +179,6 @@ struct PentagonITGraphBackgroundShape: Shape {
     }
 }
 
-
 struct PentagonITGraphView: View {
     @State private var quizData = [QuizITLevel: QuizData]()
     let userId: String
@@ -201,48 +189,105 @@ struct PentagonITGraphView: View {
     let graphRadius = min(UIScreen.main.bounds.width, UIScreen.main.bounds.height) / 2
     
     var body: some View {
-            GeometryReader { geometry in
-                let graphCenter = CGPoint(x: geometry.size.width / 2, y: geometry.size.height / 2 - 170)
-                // graphRadiusの最大値を100とするための計算
-                let graphRadius = min(geometry.size.width, geometry.size.height) / 2 - 10
-                let maxScaleValue: CGFloat = 100 // スケールの最大値
-                let scaleFactor = graphRadius / maxScaleValue // スケールファクター
+        GeometryReader { geometry in
+            let graphCenter = CGPoint(x: geometry.size.width / 2, y: geometry.size.height / 2 - 170)
+            let graphRadius = min(geometry.size.width, geometry.size.height) / 2 - 10
+            let maxScaleValue: CGFloat = 100
+            let scaleFactor = graphRadius / maxScaleValue
 
-                ZStack {
-                    PentagonITGraphBackgroundShape()
-                                    .stroke(Color.gray, lineWidth: 1)
-                    PentagonITGraphShape(quizData: quizData)
-                        .fill(Color.orange.opacity(0.2)) // 先に塗りつぶしを適用
-                           .overlay(
-                               PentagonITGraphShape(quizData: quizData)
-                                   .stroke(Color.orange, lineWidth: 2)
-                           )
-
-                    ForEach(Array(QuizITLevel.allCases.enumerated()), id: \.offset) { (i, _) in
-                        PentagonITGraphLabelView(label: labels[i], index: i)
-                    }
-                    // 目盛りの数字を表示する
-                    ForEach(scaleNumbers, id: \.self) { scaleValue in
-                        // スケール値に基づいて半径を計算
-                        let scaledRadius = scaleFactor * scaleValue
-                        
-                        // centerをgraphCenterに修正
-                        let numberPosition = CGPoint(x: graphCenter.x, y: graphCenter.y - scaledRadius)
-                        
-                        // Text Viewを使って数字を表示
-                        Text("\(Int(scaleValue))") // "%.1f" から整数に変更
-                            .position(numberPosition)
-                            .offset(x: -25, y: 170) // Textの位置を適宜調整
-                    }
+            ZStack {
+                // 背景グラデーション（オプション）
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            gradient: Gradient(colors: [Color.orange.opacity(0.05), Color.clear]),
+                            center: .center,
+                            startRadius: 0,
+                            endRadius: graphRadius
+                        )
+                    )
+                    .frame(width: graphRadius * 2, height: graphRadius * 2)
+                    .offset(y: -170)
+                
+                // 背景グリッド
+                PentagonITGraphBackgroundShape()
+                    .stroke(Color.gray.opacity(0.3), style: StrokeStyle(lineWidth: 1, dash: [5, 5]))
+                    .padding()
+                
+                // データグラフ - グラデーション塗りつぶし
+                PentagonITGraphShape(quizData: quizData)
+                    .fill(
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                Color.orange.opacity(0.4),
+                                Color.orange.opacity(0.2)
+                            ]),
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+                    .shadow(color: Color.orange.opacity(0.3), radius: 10, x: 0, y: 0)
+                
+                // データグラフ - 枠線
+                PentagonITGraphShape(quizData: quizData)
+                    .stroke(
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                Color.orange,
+                                Color.orange.opacity(0.8)
+                            ]),
+                            startPoint: .top,
+                            endPoint: .bottom
+                        ),
+                        style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round)
+                    )
+                    .shadow(color: Color.orange.opacity(0.5), radius: 5, x: 0, y: 2)
+                
+                // データポイント
+                ForEach(Array(QuizITLevel.allCases.enumerated()), id: \.offset) { (i, level) in
+                    let data = quizData[level] ?? QuizData(answer: 1, correct: 0)
+                    let radius = graphRadius * data.correctRate
+                    let angle = (2 * CGFloat.pi) / 4 * CGFloat(i) - .pi / 2
+                    let x = graphCenter.x + radius * cos(angle)
+                    let y = graphCenter.y + radius * sin(angle)
+                    
+                    Circle()
+                        .fill(Color.white)
+                        .frame(width: 12, height: 12)
+                        .overlay(
+                            Circle()
+                                .stroke(Color.orange, lineWidth: 3)
+                        )
+                        .shadow(color: Color.orange.opacity(0.5), radius: 4, x: 0, y: 2)
+                        .position(x: x, y: y + 170)
                 }
-                .onAppear {
-                    RateManager.shared.fetchITQuizData(userId: userId) { data in
-                        self.quizData = data
-                    }
+
+                // ラベル
+                ForEach(Array(QuizITLevel.allCases.enumerated()), id: \.offset) { (i, _) in
+                    PentagonITGraphLabelView(label: labels[i], index: i)
+                    .padding(40)
+                }
+                
+                // 目盛りの数字 - モダンスタイル
+                ForEach(scaleNumbers, id: \.self) { scaleValue in
+                    let scaledRadius = scaleFactor * scaleValue
+                    let numberPosition = CGPoint(x: graphCenter.x, y: graphCenter.y - scaledRadius)
+                    
+                    Text("\(Int(scaleValue))")
+                        .font(.system(size: 12, weight: .medium, design: .rounded))
+                        .foregroundColor(Color.gray.opacity(0.7))
+                        .position(numberPosition)
+                        .offset(x: -30, y: 170)
+                }
+            }
+            .onAppear {
+                RateManager.shared.fetchITQuizData(userId: userId) { data in
+                    self.quizData = data
                 }
             }
         }
     }
+}
 
 struct PentagonITView: View {
     @ObservedObject var authManager : AuthManager
@@ -250,68 +295,103 @@ struct PentagonITView: View {
     @ObservedObject var audioManager = AudioManager.shared
     @Environment(\.presentationMode) var presentationMode
     @Binding var flag: Bool
+    
     var body: some View {
-        VStack{
-            PentagonITGraphView(userId: authManager.currentUserId!, labels: ["ITパスポート基礎理解", "ITパスポートストラテジ", "ITパスポートテクノロジ", "ITパスポートマネジメント"])
-                .padding(.top,30)
+        VStack(spacing: 0) {
+            // グラフエリア
+            PentagonITGraphView(
+                userId: authManager.currentUserId!,
+                labels: ["ITパスポート基礎理解", "ITパスポートストラテジ", "ITパスポートテクノロジ", "ITパスポートマネジメント"]
+            )
+            .padding(.top, 30)
+            
+            // データリストエリア
             VStack(spacing: 0) {
-                HStack{
+                // ヘッダー
+                HStack {
                     Image("beginnerMonster1")
                         .resizable()
-                        .frame(width:30,height:30)
+                        .frame(width: 30, height: 30)
                     Text("ダンジョンの種類")
+                        .font(.system(size: 18, weight: .semibold))
                     Spacer()
                     Text("正答率")
+                        .font(.system(size: 18, weight: .semibold))
                 }
-                .font(.system(size: 18))
                 .padding()
-                ScrollView{
-                    ForEach(QuizITLevel.allCases, id: \.self) { level in
-                        if let quizDataForLevel = quizData[level] {
-                            VStack{
-                                HStack{
+                .background(Color("Color2").opacity(0.5))
+                
+                // スクロールリスト
+                ScrollView {
+                    VStack(spacing: 0) {
+                        ForEach(QuizITLevel.allCases, id: \.self) { level in
+                            if let quizDataForLevel = quizData[level] {
+                                HStack(alignment: .center, spacing: 12) {
+                                    // カテゴリーボタン
                                     Image("\(level.description)ボタン")
                                         .resizable()
-                                        .frame(width: 200,height: 40)
+                                        .frame(width: 200, height: 40)
+                                    
                                     Spacer()
+                                    
+                                    // 正答率 - モダンスタイル
                                     Text("\(quizDataForLevel.correctPerRate, specifier: "%.0f")%")
-                                        .font(.system(size: 22))
+                                        .font(.system(size: 24, weight: .bold, design: .rounded))
+                                        .foregroundColor(percentageColor(for: quizDataForLevel.correctPerRate))
                                 }
-                                .padding(.horizontal)
-                            Divider()
+                                .padding(.horizontal, 20)
+                                .padding(.vertical, 16)
+                                .background(Color.white.opacity(0.05))
+                                
+                                Divider()
+                                    .background(Color.gray.opacity(0.2))
                             }
                         }
                     }
                 }
             }
-            .padding(.top)
-            
+            .padding(.top, 20)
             .foregroundColor(Color("fontGray"))
-        }.background(Color("Color2"))
+        }
+        .background(
+            LinearGradient(
+                gradient: Gradient(colors: [Color("Color2"), Color("Color2").opacity(0.8)]),
+                startPoint: .top,
+                endPoint: .bottom
+            )
+        )
         .onAppear {
-//            print("currentuser:\(authManager.currentUserId)")
             RateManager.shared.fetchITQuizData(userId: authManager.currentUserId!) { data in
                 self.quizData = data
-                print("self.quizData2:\(self.quizData)")
             }
             self.flag = true
         }
         .onChange(of: flag) { flag in
             RateManager.shared.fetchITQuizData(userId: authManager.currentUserId!) { data in
                 self.quizData = data
-//                print("self.quizData:\(self.quizData)")
             }
         }
         .navigationBarBackButtonHidden(true)
+    }
+    
+    // 正答率に応じた色を返すヘルパー関数
+    private func percentageColor(for percentage: CGFloat) -> Color {
+        switch percentage {
+        case 80...100:
+            return Color.green
+        case 60..<80:
+            return Color.orange
+        case 40..<60:
+            return Color.yellow
+        default:
+            return Color.red
+        }
     }
 }
 
 struct PentagonITShape_Previews: PreviewProvider {
     static let dummyAuthManager = AuthManager()
     static var previews: some View {
-//        PentagonGraphView(userId: "VQ0MZw8snHSY23rOXbhN9wxORF42", labels: ["初級", "中級", "上級", "ネットワーク", "セキュリティ","データベース", "デイリー", "神級", "初級(タイムアタック)", "中級(タイムアタック)", "上級(タイムアタック)"])
-//        PentagonGraphView(userId: "VQ0MZw8snHSY23rOXbhN9wxORF42", labels: ["初級", "中級", "上級", "神級", "ネットワーク", "セキュリティ","データベース"])
         PentagonITView(authManager: dummyAuthManager, flag: .constant(false))
     }
 }
-

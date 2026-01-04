@@ -23,7 +23,6 @@ struct DailyData {
 
 struct BarChartView: View {
     @ObservedObject var authManager: AuthManager
-    // サンプルデータの作成
     let sampleData = createSampleData()
     @State private var currentDate = Date()
     @State var data: [DailyData] = []
@@ -33,32 +32,33 @@ struct BarChartView: View {
     @State private var isLoading: Bool = true
     @State private var preFlag: Bool = false
     @State private var userPreFlag: Int = 0
+    @State private var animateChart = false
     
     private var displayFormatter: DateFormatter {
         let formatter = DateFormatter()
-        formatter.dateFormat = "M/d" // 月-日の形式に変更
-        formatter.locale = Locale(identifier: "ja_JP") // ロケールを日本に設定
+        formatter.dateFormat = "M/d"
+        formatter.locale = Locale(identifier: "ja_JP")
         return formatter
     }
     
     private var yearMonthFormatter: DateFormatter {
         let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy年 M月" // 「2024年 1月」のような形式
+        formatter.dateFormat = "yyyy年 M月"
         formatter.locale = Locale(identifier: "ja_JP")
         return formatter
     }
     
     private var monthFormatter: DateFormatter {
         let formatter = DateFormatter()
-        formatter.dateFormat = "M月" // 「2024年 1月」のような形式
+        formatter.dateFormat = "M月"
         formatter.locale = Locale(identifier: "ja_JP")
         return formatter
     }
     
     private var fullDateFormatter: DateFormatter {
         let formatter = DateFormatter()
-        formatter.dateFormat = "M月 d日" // 「2024年 1月 1日」の形式
-        formatter.locale = Locale(identifier: "ja_JP") // ロケールを日本に設定
+        formatter.dateFormat = "M月 d日"
+        formatter.locale = Locale(identifier: "ja_JP")
         return formatter
     }
 
@@ -70,144 +70,325 @@ struct BarChartView: View {
     }
 
     var body: some View {
-            VStack{
-                HStack{
-                    Spacer()
-                    Image(systemName: "chevron.left")
-                        .foregroundColor(Color("fontGray"))
-                    Spacer()
-                        .frame(width:20)
-                    Text(yearMonthFormatter.string(from: currentDate)) // currentDateをフォーマットして表示
-                                .font(.system(size: 20))
+        ZStack {
+            // グラデーション背景
+            LinearGradient(
+                gradient: Gradient(colors: [
+                    Color(red: 0.95, green: 0.97, blue: 1.0),
+                    Color(red: 0.98, green: 0.95, blue: 1.0)
+                ]),
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+            
+            VStack(spacing: 0) {
+                // ヘッダー
+                HStack(spacing: 16) {
+                    Button(action: { changeMonth(by: -1) }) {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundColor(.white)
+                            .frame(width: 40, height: 40)
+                            .background(
+                                LinearGradient(
+                                    colors: [Color.blue.opacity(0.8), Color.purple.opacity(0.6)],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                            .clipShape(Circle())
+                            .shadow(color: Color.blue.opacity(0.3), radius: 8, x: 0, y: 4)
+                    }
                     
-                    .foregroundColor(Color("fontGray"))
                     Spacer()
-                        .frame(width:20)
-                    Image(systemName: "chevron.right")
                     
-                    .foregroundColor(Color("fontGray"))
+                    Text(yearMonthFormatter.string(from: currentDate))
+                        .font(.system(size: 24, weight: .bold))
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [Color.blue, Color.purple],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                    
                     Spacer()
+                    
+                    Button(action: { changeMonth(by: 1) }) {
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundColor(.white)
+                            .frame(width: 40, height: 40)
+                            .background(
+                                LinearGradient(
+                                    colors: [Color.blue.opacity(0.8), Color.purple.opacity(0.6)],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                            .clipShape(Circle())
+                            .shadow(color: Color.blue.opacity(0.3), radius: 8, x: 0, y: 4)
+                    }
                 }
-                .padding(.top)
-                VStack{
-                    if isLoading {
-                        // ローディング画面を表示
-                        VStack{
-                            CustomSpinner2()
+                .padding(.horizontal, 24)
+                .padding(.vertical, 20)
+                
+                if isLoading {
+                    VStack {
+                        CustomSpinner2()
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    if !isDataAvailable {
+                        VStack(spacing: 24) {
+                            Image("ライムグラフ")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 180, height: 180)
+                                .shadow(color: Color.black.opacity(0.1), radius: 20, x: 0, y: 10)
+                            
+                            Text("\(Text(monthFormatter.string(from: currentDate)))はデータがありません")
+                                .font(.system(size: 18, weight: .semibold))
+                                .foregroundColor(Color("fontGray").opacity(0.6))
                         }
-                        .frame(maxWidth:.infinity,maxHeight:.infinity)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .gesture(
+                            DragGesture()
+                                .onEnded { gesture in
+                                    if gesture.translation.width > 0 {
+                                        changeMonth(by: -1)
+                                    } else {
+                                        changeMonth(by: 1)
+                                    }
+                                }
+                        )
                     } else {
-                       
-                            if !isDataAvailable {
-                                VStack{
-                                    Text("\(Text(monthFormatter.string(from: currentDate)))はデータがありません")
-                                        .font(.system(size: 26))
-                                        .padding()
+                        ScrollView {
+                            VStack(spacing: 20) {
+                                // グラフカード
+                                VStack(alignment: .leading, spacing: 20) {
+                                    HStack(spacing: 10) {
+                                        ZStack {
+                                            Circle()
+                                                .fill(
+                                                    LinearGradient(
+                                                        colors: [Color.blue.opacity(0.2), Color.cyan.opacity(0.1)],
+                                                        startPoint: .topLeading,
+                                                        endPoint: .bottomTrailing
+                                                    )
+                                                )
+                                                .frame(width: 40, height: 40)
+                                            
+                                            Image(systemName: "chart.bar.fill")
+                                                .foregroundStyle(
+                                                    LinearGradient(
+                                                        colors: [.blue, .cyan],
+                                                        startPoint: .topLeading,
+                                                        endPoint: .bottomTrailing
+                                                    )
+                                                )
+                                                .font(.system(size: 18, weight: .semibold))
+                                        }
+                                        
+                                        Text("学習グラフ")
+                                            .font(.system(size: 20, weight: .bold))
+                                            .foregroundColor(Color("fontGray"))
+                                    }
                                     
-                                        .foregroundColor(Color("fontGray"))
-                                    Image("ライムグラフ")
-                                        .resizable()
-                                        .frame(width:300,height:300)
-                                }.frame(maxWidth: .infinity,maxHeight: .infinity)
-                                    .gesture(
-                                        DragGesture()
-                                            .onEnded { gesture in
-                                                // スワイプの方向に応じて月を変更
-                                                if gesture.translation.width > 0 {
-                                                    // 右スワイプ: 前月に戻る
-                                                    changeMonth(by: -1)
-                                                } else {
-                                                    // 左スワイプ: 次月に進む
-                                                    changeMonth(by: 1)
-                                                }
-                                            }
-                                    )
-                            }else{
-                                VStack{
                                     Chart {
                                         ForEach(data, id: \.date) { dailyData in
                                             BarMark(
                                                 x: .value("Date", dailyData.date),
-                                                y: .value("Count", dailyData.count)
+                                                y: .value("Count", animateChart ? dailyData.count : 0)
                                             )
+                                            .foregroundStyle(
+                                                LinearGradient(
+                                                    colors: [
+                                                        Color.blue.opacity(0.8),
+                                                        Color.cyan.opacity(0.6),
+                                                        Color.purple.opacity(0.4)
+                                                    ],
+                                                    startPoint: .bottom,
+                                                    endPoint: .top
+                                                )
+                                            )
+                                            .cornerRadius(8)
                                         }
                                     }
                                     .chartXAxis {
                                         AxisMarks(position: .bottom, values: .automatic) { value in
                                             if let dateStr = value.as(String.self),
                                                let date = dateFormatter.date(from: dateStr),
-                                               Calendar.current.component(.day, from: date) % 3 == 0 { // 日付が5の倍数であるかをチェック
-                                                
+                                               Calendar.current.component(.day, from: date) % 3 == 0 {
                                                 AxisValueLabel(displayFormatter.string(from: date))
+                                                    .foregroundStyle(Color("fontGray").opacity(0.5))
+                                                    .font(.system(size: 11, weight: .medium))
                                             } else {
-                                                AxisValueLabel("") // 5の倍数でない場合はラベルを空にする
+                                                AxisValueLabel("")
                                             }
                                         }
                                     }
-                                    .frame(height:200)
-                                    .padding()
-                                    Spacer()
-                                    HStack{
-                                        Image(systemName: "calendar")
-                                            .foregroundColor(.red)
-                                        Text("日付")
-                                        
-                                            .foregroundColor(Color("fontGray"))
-                                        Spacer()
-                                        Image(systemName: "checkmark.square")
-                                            .foregroundColor(.blue)
-                                        Text("回答数")
-                                        
-                                            .foregroundColor(Color("fontGray"))
-                                    }
-                                    .font(.system(size: 24))
-                                    .padding(.horizontal)
-                                    ScrollView{
-                                        ForEach(data, id: \.date) { item in
-                                            if item.count != 0 {
-                                                VStack{
-                                                    HStack {
-                                                        Text(formattedDate(from: item.date)) // ここを更新
-                                                            .font(.system(size: 26))
-                                                        Spacer()
-                                                        Text("\(item.count)")
-                                                            .font(.system(size: 26))
-                                                        Text("問")
-                                                            .padding(.top,5)
-                                                    }
-                                                    .font(.system(size: 20))
-                                                    .padding(.horizontal)
-                                                    Divider()
-                                                }
-                                            }
+                                    .chartYAxis {
+                                        AxisMarks(position: .leading) { value in
+                                            AxisValueLabel()
+                                                .foregroundStyle(Color("fontGray").opacity(0.5))
+                                                .font(.system(size: 11, weight: .medium))
+                                            AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5))
+                                                .foregroundStyle(Color.gray.opacity(0.15))
                                         }
                                     }
-                                    .foregroundColor(Color("fontGray"))
-                                    .onAppear {
-                                        fetchData(userId: authManager.currentUserId!,for: currentDate)
-                                    }
-                                }.gesture(
-                                    DragGesture()
-                                        .onEnded { gesture in
-                                            // スワイプの方向に応じて月を変更
-                                            if gesture.translation.width > 0 {
-                                                // 右スワイプ: 前月に戻る
-                                                changeMonth(by: -1)
-                                            } else {
-                                                // 左スワイプ: 次月に進む
-                                                changeMonth(by: 1)
-                                            }
-                                        }
+                                    .frame(height: 240)
+                                    .padding(.top, 8)
+                                }
+                                .padding(24)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 20)
+                                        .fill(Color.white)
+                                        .shadow(color: Color.black.opacity(0.08), radius: 20, x: 0, y: 8)
                                 )
+                                .padding(.horizontal, 20)
+                                
+                                // 凡例カード
+                                HStack(spacing: 32) {
+                                    HStack(spacing: 10) {
+                                        ZStack {
+                                            Circle()
+                                                .fill(Color.red.opacity(0.15))
+                                                .frame(width: 36, height: 36)
+                                            
+                                            Image(systemName: "calendar")
+                                                .foregroundStyle(
+                                                    LinearGradient(
+                                                        colors: [.red, .orange],
+                                                        startPoint: .topLeading,
+                                                        endPoint: .bottomTrailing
+                                                    )
+                                                )
+                                                .font(.system(size: 16, weight: .semibold))
+                                        }
+                                        
+                                        Text("日付")
+                                            .font(.system(size: 15, weight: .semibold))
+                                            .foregroundColor(Color("fontGray"))
+                                    }
+                                    Spacer()
+                                    HStack(spacing: 10) {
+                                        ZStack {
+                                            Circle()
+                                                .fill(Color.blue.opacity(0.15))
+                                                .frame(width: 36, height: 36)
+                                            
+                                            Image(systemName: "checkmark.square.fill")
+                                                .foregroundStyle(
+                                                    LinearGradient(
+                                                        colors: [.blue, .cyan],
+                                                        startPoint: .topLeading,
+                                                        endPoint: .bottomTrailing
+                                                    )
+                                                )
+                                                .font(.system(size: 16, weight: .semibold))
+                                        }
+                                        
+                                        Text("回答数")
+                                            .font(.system(size: 15, weight: .semibold))
+                                            .foregroundColor(Color("fontGray"))
+                                    }
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 8)
+                                .padding(.horizontal, 20)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 16)
+                                        .fill(Color.white)
+                                        .shadow(color: Color.black.opacity(0.06), radius: 12, x: 0, y: 4)
+                                )
+                                .padding(.horizontal, 20)
+                                
+                                // データリスト
+                                VStack(spacing: 12) {
+                                    ForEach(data.filter { $0.count != 0 }, id: \.date) { item in
+                                        HStack {
+                                            HStack(spacing: 14) {
+                                                ZStack {
+                                                    Circle()
+                                                        .fill(
+                                                            LinearGradient(
+                                                                colors: [Color.red.opacity(0.15), Color.orange.opacity(0.1)],
+                                                                startPoint: .topLeading,
+                                                                endPoint: .bottomTrailing
+                                                            )
+                                                        )
+                                                        .frame(width: 44, height: 44)
+                                                    
+                                                    Image(systemName: "calendar.circle.fill")
+                                                        .foregroundStyle(
+                                                            LinearGradient(
+                                                                colors: [.red, .orange],
+                                                                startPoint: .topLeading,
+                                                                endPoint: .bottomTrailing
+                                                            )
+                                                        )
+                                                        .font(.system(size: 22))
+                                                }
+                                                
+                                                Text(formattedDate(from: item.date))
+                                                    .font(.system(size: 16, weight: .semibold))
+                                                    .foregroundColor(Color("fontGray"))
+                                            }
+                                            
+                                            Spacer()
+                                            
+                                            HStack(spacing: 6) {
+                                                Text("\(item.count)")
+                                                    .font(.system(size: 28, weight: .bold))
+                                                    .foregroundStyle(
+                                                        LinearGradient(
+                                                            colors: [.blue, .cyan],
+                                                            startPoint: .leading,
+                                                            endPoint: .trailing
+                                                        )
+                                                    )
+                                                Text("問")
+                                                    .font(.system(size: 14, weight: .semibold))
+                                                    .foregroundColor(Color("fontGray").opacity(0.5))
+                                                    .padding(.top, 6)
+                                            }
+                                        }
+                                        .padding(.horizontal, 20)
+                                        .padding(.vertical, 8)
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 16)
+                                                .fill(Color.white)
+                                                .shadow(color: Color.black.opacity(0.06), radius: 12, x: 0, y: 4)
+                                        )
+                                    }
+                                }
+                                .padding(.horizontal, 20)
+                                .padding(.bottom, 24)
                             }
-//                        }
+                            .padding(.top, 8)
+                        }
+                        .gesture(
+                            DragGesture()
+                                .onEnded { gesture in
+                                    if gesture.translation.width > 0 {
+                                        changeMonth(by: -1)
+                                    } else {
+                                        changeMonth(by: 1)
+                                    }
+                                }
+                        )
                     }
                 }
-                .onAppear {
-                    fetchData(userId: authManager.currentUserId!,for: currentDate)
-                }
             }
-            .background(Color("Color2"))
+        }
+        .onAppear {
+            fetchData(userId: authManager.currentUserId!, for: currentDate)
+            withAnimation(.spring(response: 0.8, dampingFraction: 0.8)) {
+                animateChart = true
+            }
+        }
     }
     
     func isSmallDevice() -> Bool {
@@ -215,11 +396,8 @@ struct BarChartView: View {
     }
     
     static func createSampleData() -> [DailyData] {
-        // 日付フォーマッタの設定
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
-
-        // サンプルデータの作成
         return [
             DailyData(date: dateFormatter.date(from: "2023-12-01")!, count: 10),
             DailyData(date: dateFormatter.date(from: "2023-12-02")!, count: 15),
@@ -240,25 +418,20 @@ struct BarChartView: View {
         return ""
     }
     
-    // 表示用の DateFormatter
-//    private var displayFormatter: DateFormatter {
-//        let formatter = DateFormatter()
-//        formatter.dateFormat = "d"
-//        return formatter
-//    }
-    
     func shouldDisplayLabel(for date: Date) -> Bool {
-        print("shouldDisplayLabel")
         let calendar = Calendar.current
         let dayComponent = calendar.component(.day, from: date)
-        // 5日ごとにラベルを表示する条件を設定
         return [1, 6, 11, 16, 21, 26].contains(dayComponent)
     }
     
     func changeMonth(by months: Int) {
+        animateChart = false
         if let newDate = Calendar.current.date(byAdding: .month, value: months, to: currentDate) {
             currentDate = newDate
             fetchData(userId: authManager.currentUserId!, for: newDate)
+            withAnimation(.spring(response: 0.8, dampingFraction: 0.8).delay(0.1)) {
+                animateChart = true
+            }
         }
     }
     
@@ -287,31 +460,27 @@ struct BarChartView: View {
                 }
             }
 
-            // 月の全ての日に対するデータを確認
             self.data = range.compactMap { day -> DailyData? in
-                var dateComponents = DateComponents(year: year, month: month, day: day)
+                let dateComponents = DateComponents(year: year, month: month, day: day)
                 let date = Calendar.current.date(from: dateComponents)!
                 let count = dailyTotals[dateFormatter.string(from: date)] ?? 0
                 return DailyData(date: date, count: count)
             }
             self.isDataAvailable = self.data.contains { $0.count > 0 }
-            self.isLoading = false // データ取得が完了
+            self.isLoading = false
         })
     }
 
     private var dateFormatter: DateFormatter {
         let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd" // x軸の日付表示形式
+        formatter.dateFormat = "yyyy-MM-dd"
         return formatter
     }
 }
 
 struct BarChartView_Previews: PreviewProvider {
     static var previews: some View {
-        // プレビュー用のサンプルデータを作成
         let sampleData = createSampleData()
-
-        // BarChartAllViewにサンプルデータを渡して初期化
         BarChartView(authManager: AuthManager(), data: sampleData)
     }
 
@@ -325,5 +494,3 @@ struct BarChartView_Previews: PreviewProvider {
         ]
     }
 }
-
-

@@ -70,6 +70,8 @@ struct ContentView: View {
     @State private var isSignUpFlag: Bool = true
     @State private var updateNameFlag: Bool = false
     
+    @State private var isPresentingMissionView: Bool = false
+    
     var body: some View {
         NavigationView {
             ZStack{
@@ -250,9 +252,22 @@ struct ContentView: View {
                                     HStack{
                                         VStack{
                                             HStack{
+                                                
+//                                                    Button(action: {
+//                                                        generateHapticFeedback()
+//                                                        self.isPresentingMissionView = true
+//                                                        audioManager.playSound()
+//                                                    }) {
+//                                                        Image("ダンジョンボタン")  // 適切な画像を用意
+//                                                            .resizable()
+//                                                            .scaledToFit()
+//                                                            .frame(height: 60)
+//                                                    }
+//                                                    .buttonStyle(PressedEffectStyle())
+//                                                    .shadow(radius:3)
                                                 Spacer()
                                                 ZStack {
-                                                    Button(action: { 
+                                                    Button(action: {
                         generateHapticFeedback()
                                                         self.isPresentingTraining = true
                                                         audioManager.playSound()
@@ -352,6 +367,8 @@ struct ContentView: View {
                                     NavigationLink("", destination: TittlesView(isPresenting: .constant(false)).navigationBarBackButtonHidden(true), isActive: $isPresentingTittleView)
                                     NavigationLink("", destination: RankingView(audioManager: audioManager).navigationBarBackButtonHidden(true), isActive: $isPresentingRankingView)
                                     NavigationLink("", destination: ContactView(audioManager: audioManager).navigationBarBackButtonHidden(true), isActive: $isPresentingSettingView)
+                                    
+                                    NavigationLink("", destination: MissionView().navigationBarBackButtonHidden(true), isActive: $isPresentingMissionView)
                                     
                                 }
                             }
@@ -726,5 +743,6 @@ struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
 //        ContentView()
         TopView()
+            .environmentObject(AppState())
     }
 }

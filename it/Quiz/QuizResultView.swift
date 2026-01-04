@@ -621,8 +621,8 @@ struct QuizResultView: View {
         }
         
         // 広告処理
-        if appState.isBannerVisible && !hasRequestedInterstitial
-            && authManager.currentUserId != "dzarHuAdiXXLtDjtwIRvIfVhA1A2" {  // ★ここを追加
+        if appState.isBannerVisible && !hasRequestedInterstitial {
+//            && authManager.currentUserId != "dzarHuAdiXXLtDjtwIRvIfVhA1A2" {  // ★ここを追加
             hasRequestedInterstitial = true
 
             interstitial.loadInterstitial { isLoaded in
