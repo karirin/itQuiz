@@ -391,6 +391,7 @@ struct ManagerListView: View {
     }
 
 #Preview {
-//    ManagerListView(isPresenting: .constant(false))
-    TopView()
+    ManagerListView(isPresenting: .constant(false))
+    
+//    TopView()
 }

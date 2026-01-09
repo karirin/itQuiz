@@ -1,82 +1,125 @@
 //
-//  IllustratedView.swift
+//  IllustratedViewUpdated.swift
 //  it
 //
-//  Created by hashimo ryoya on 2023/11/07.
+//  Modern redesign with card-based UI, smooth animations, and premium feel
 //
 
 import SwiftUI
 import Firebase
 
-// MARK: - Models
-struct Item: Identifiable {
-    let name: String
-    let attack: Int
-    let probability: Int
-    let health: Int
-    let rarity: Rarity
-    var id: String { name }
-}
-
-enum Rarity {
-    case normal
-    case rare
-    case superRare
-    case ultraRare
-    case legendRare
-    
-    var displayString: String {
-        switch self {
-        case .normal:
-            return "ノーマル"
-        case .rare:
-            return "レア"
-        case .superRare:
-            return "スーパーレア"
-        case .ultraRare:
-            return "ウルトラレア"
-        case .legendRare:
-            return "レジェンドレア"
-        }
-    }
-    
-    var color: Color {
-        switch self {
-        case .normal:
-            return Color.gray
-        case .rare:
-            return Color.blue
-        case .superRare:
-            return Color.purple
-        case .ultraRare:
-            return Color.orange
-        case .legendRare:
-            return Color.yellow
-        }
-    }
-    
-    var gradientColors: [Color] {
-        switch self {
-        case .normal:
-            return [Color.gray.opacity(0.3), Color.gray.opacity(0.1)]
-        case .rare:
-            return [Color.blue.opacity(0.3), Color.blue.opacity(0.1)]
-        case .superRare:
-            return [Color.purple.opacity(0.3), Color.purple.opacity(0.1)]
-        case .ultraRare:
-            return [Color.orange.opacity(0.3), Color.orange.opacity(0.1)]
-        case .legendRare:
-            return [Color.yellow.opacity(0.3), Color.yellow.opacity(0.1)]
-        }
-    }
-}
-
+// MARK: - Illustrated View Updated
 struct IllustratedView: View {
-    let items = ["もりこう","ライム", "レッドドラゴン", "レインボードラゴン"]
     
+    // MARK: - Item Model
+    struct Item: Identifiable {
+        let name: String
+        let attack: Int
+        let probability: Int
+        let health: Int
+        let rarity: Rarity
+        var id: String { name }
+    }
+    
+    // MARK: - Rarity Enum
+    enum Rarity: CaseIterable {
+        case normal, rare, superRare, ultraRare, legendRare
+        
+        var displayString: String {
+            switch self {
+            case .normal: return "ノーマル"
+            case .rare: return "レア"
+            case .superRare: return "スーパーレア"
+            case .ultraRare: return "ウルトラレア"
+            case .legendRare: return "レジェンド"
+            }
+        }
+        
+        var color: Color {
+            switch self {
+            case .normal: return Color(red: 0.6, green: 0.6, blue: 0.65)
+            case .rare: return Color(red: 0.3, green: 0.5, blue: 0.9)
+            case .superRare: return Color(red: 0.6, green: 0.3, blue: 0.9)
+            case .ultraRare: return Color(red: 0.95, green: 0.6, blue: 0.2)
+            case .legendRare: return Color(red: 0.95, green: 0.8, blue: 0.2)
+            }
+        }
+        
+        var gradient: LinearGradient {
+            switch self {
+            case .normal:
+                return LinearGradient(
+                    colors: [Color(red: 0.5, green: 0.5, blue: 0.55), Color(red: 0.4, green: 0.4, blue: 0.45)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            case .rare:
+                return LinearGradient(
+                    colors: [Color(red: 0.3, green: 0.5, blue: 0.95), Color(red: 0.2, green: 0.4, blue: 0.8)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            case .superRare:
+                return LinearGradient(
+                    colors: [Color(red: 0.7, green: 0.3, blue: 0.95), Color(red: 0.5, green: 0.2, blue: 0.8)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            case .ultraRare:
+                return LinearGradient(
+                    colors: [Color(red: 1, green: 0.6, blue: 0.2), Color(red: 0.9, green: 0.4, blue: 0.1)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            case .legendRare:
+                return LinearGradient(
+                    colors: [Color(red: 1, green: 0.9, blue: 0.3), Color(red: 0.95, green: 0.7, blue: 0.1)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            }
+        }
+        
+        var backgroundGradient: LinearGradient {
+            switch self {
+            case .normal:
+                return LinearGradient(
+                    colors: [Color(red: 0.2, green: 0.2, blue: 0.25), Color(red: 0.15, green: 0.15, blue: 0.18)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            case .rare:
+                return LinearGradient(
+                    colors: [Color(red: 0.1, green: 0.15, blue: 0.3), Color(red: 0.08, green: 0.1, blue: 0.2)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            case .superRare:
+                return LinearGradient(
+                    colors: [Color(red: 0.2, green: 0.1, blue: 0.3), Color(red: 0.15, green: 0.08, blue: 0.25)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            case .ultraRare:
+                return LinearGradient(
+                    colors: [Color(red: 0.25, green: 0.15, blue: 0.1), Color(red: 0.2, green: 0.1, blue: 0.05)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            case .legendRare:
+                return LinearGradient(
+                    colors: [Color(red: 0.25, green: 0.22, blue: 0.1), Color(red: 0.2, green: 0.18, blue: 0.05)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            }
+        }
+    }
+    
+    // MARK: - Data
     let allItems: [Item] = [
-        Item(name: "ネッキー", attack: 10, probability: 25,health: 20, rarity: .normal),
-        Item(name: "ピョン吉", attack: 15, probability: 25,health: 15, rarity: .normal),
+        Item(name: "ネッキー", attack: 10, probability: 25, health: 20, rarity: .normal),
+        Item(name: "ピョン吉", attack: 15, probability: 25, health: 15, rarity: .normal),
         Item(name: "ルイーカ", attack: 20, probability: 25, health: 10, rarity: .normal),
         Item(name: "もりこう", attack: 20, probability: 25, health: 100, rarity: .normal),
         Item(name: "うっさん", attack: 25, probability: 25, health: 150, rarity: .normal),
@@ -84,376 +127,518 @@ struct IllustratedView: View {
         Item(name: "カゲロウ", attack: 35, probability: 10, health: 220, rarity: .rare),
         Item(name: "ライム", attack: 40, probability: 10, health: 240, rarity: .rare),
         Item(name: "ラオン", attack: 45, probability: 10, health: 260, rarity: .rare),
-        Item(name: "ぴょこん", attack: 20,probability: 25, health: 220, rarity: .rare),
-        Item(name: "忍太", attack: 20,probability: 25, health: 210, rarity: .rare),
-        Item(name: "かみ蔵", attack: 20,probability: 25, health: 220, rarity: .rare),
-        Item(name: "キャット夫人", attack: 25,probability: 25, health: 225, rarity: .rare),
-        Item(name: "ミッチー", attack: 30,probability: 25, health: 240, rarity: .rare),
-        Item(name: "ライム兄", attack: 40,probability: 10, health: 250, rarity: .rare),
-        Item(name: "幸福のパンダ", attack: 47,probability: 5, health: 260, rarity: .rare),
-        Item(name: "メカマウス", attack: 20,probability: 25, health: 210, rarity: .rare),
-        Item(name: "メカドック", attack: 20,probability: 25, health: 215, rarity: .rare),
-        Item(name: "メカベアー", attack: 20,probability: 25, health: 220, rarity: .rare),
-        Item(name: "ロボン", attack: 25,probability: 25, health: 225, rarity: .rare),
-        Item(name: "ロボノコ", attack: 30,probability: 25, health: 240, rarity: .rare),
-        Item(name: "ロボカー", attack: 40,probability: 10, health: 250, rarity: .rare),
-        Item(name: "バースト", attack: 47,probability: 5, health: 260, rarity: .rare),
+        Item(name: "ぴょこん", attack: 20, probability: 25, health: 220, rarity: .rare),
+        Item(name: "忍太", attack: 20, probability: 25, health: 210, rarity: .rare),
+        Item(name: "かみ蔵", attack: 20, probability: 25, health: 220, rarity: .rare),
+        Item(name: "キャット夫人", attack: 25, probability: 25, health: 225, rarity: .rare),
+        Item(name: "ミッチー", attack: 30, probability: 25, health: 240, rarity: .rare),
+        Item(name: "ライム兄", attack: 40, probability: 10, health: 250, rarity: .rare),
+        Item(name: "幸福のパンダ", attack: 47, probability: 5, health: 260, rarity: .rare),
+        Item(name: "メカマウス", attack: 20, probability: 25, health: 210, rarity: .rare),
+        Item(name: "メカドック", attack: 20, probability: 25, health: 215, rarity: .rare),
+        Item(name: "メカベアー", attack: 20, probability: 25, health: 220, rarity: .rare),
+        Item(name: "ロボン", attack: 25, probability: 25, health: 225, rarity: .rare),
+        Item(name: "ロボノコ", attack: 30, probability: 25, health: 240, rarity: .rare),
+        Item(name: "ロボカー", attack: 40, probability: 10, health: 250, rarity: .rare),
+        Item(name: "バースト", attack: 47, probability: 5, health: 260, rarity: .rare),
         Item(name: "レッドドラゴン", attack: 47, probability: 5, health: 280, rarity: .superRare),
         Item(name: "ブルードラゴン", attack: 48, probability: 5, health: 285, rarity: .superRare),
-        Item(name: "英雄デル", attack: 50,probability: 10, health: 300, rarity: .superRare),
-        Item(name: "覚醒 ライム", attack: 56,probability: 10, health: 300, rarity: .superRare),
-        Item(name: "古代ロボ マーク", attack: 30,probability: 10, health: 600, rarity: .superRare),
-        Item(name: "メカライオネル", attack: 70,probability: 10, health: 200, rarity: .superRare),
+        Item(name: "英雄デル", attack: 50, probability: 10, health: 300, rarity: .superRare),
+        Item(name: "覚醒 ライム", attack: 56, probability: 10, health: 300, rarity: .superRare),
+        Item(name: "古代ロボ マーク", attack: 30, probability: 10, health: 600, rarity: .superRare),
+        Item(name: "メカライオネル", attack: 70, probability: 10, health: 200, rarity: .superRare),
         Item(name: "レインボードラゴン", attack: 50, probability: 3, health: 300, rarity: .ultraRare),
-        Item(name: "七福神 玉", attack: 72,probability: 5, health: 350, rarity: .ultraRare),
-        Item(name: "七福神 福天丸", attack: 75,probability: 3, health: 380, rarity: .ultraRare),
-        Item(name: "ロボ長 バーグ", attack: 60,probability: 5, health: 400, rarity: .ultraRare),
-        Item(name: "悪意ロボ ルーク", attack: 70,probability: 3, health: 450, rarity: .ultraRare),
-        Item(name: "七福神 金満徳", attack: 100,probability: 3, health: 500, rarity: .legendRare),
-        Item(name: "究極完全体バーグ", attack: 200,probability: 3, health: 400, rarity: .legendRare)
+        Item(name: "七福神 玉", attack: 72, probability: 5, health: 350, rarity: .ultraRare),
+        Item(name: "七福神 福天丸", attack: 75, probability: 3, health: 380, rarity: .ultraRare),
+        Item(name: "ロボ長 バーグ", attack: 60, probability: 5, health: 400, rarity: .ultraRare),
+        Item(name: "悪意ロボ ルーク", attack: 70, probability: 3, health: 450, rarity: .ultraRare),
+        Item(name: "七福神 金満徳", attack: 100, probability: 3, health: 500, rarity: .legendRare),
+        Item(name: "究極完全体バーグ", attack: 200, probability: 3, health: 400, rarity: .legendRare)
     ]
     
+    // MARK: - State
     @State private var selectedItem: Item?
-    @State private var avatars: [String] = []
+    @State private var selectedRarity: Rarity? = nil
+    @State private var showDetail = false
     @ObservedObject var authManager = AuthManager.shared
     @Environment(\.presentationMode) var presentationMode
     @ObservedObject var audioManager = AudioManager.shared
-    @State private var showingAlert1 = false
-    @State private var showingAlert2 = false
-    @State private var switchingAvatar: Avatar?
     @Binding var isPresenting: Bool
-    @State private var animateSelection = false
+    
+    let columns = [
+        GridItem(.flexible(), spacing: 12),
+        GridItem(.flexible(), spacing: 12),
+        GridItem(.flexible(), spacing: 12)
+    ]
     
     init(isPresenting: Binding<Bool>) {
         _isPresenting = isPresenting
     }
     
-    var columns: [GridItem] = [
-        GridItem(.flexible(), spacing: 16),
-        GridItem(.flexible(), spacing: 16),
-        GridItem(.flexible(), spacing: 16)
-    ]
-
+    var filteredItems: [Item] {
+        if let rarity = selectedRarity {
+            return allItems.filter { $0.rarity == rarity }
+        }
+        return allItems
+    }
+    
+    // MARK: - Body
     var body: some View {
-        GeometryReader { geometry in
-            VStack(spacing: 30) {
-                // 詳細表示エリア
-                DetailCardView(selectedItem: selectedItem, authManager: authManager, animateSelection: animateSelection)
-                    .frame(height: 180)
-                    .padding(.horizontal, 20)
-                    .padding(.top,20)
-                // グリッドエリア
-                ScrollView {
-                    LazyVGrid(columns: columns, spacing: 16) {
-                        ForEach(allItems) { item in
-                            GridItemView(
+        ZStack {
+            // Background
+            LinearGradient(
+                colors: [
+                    Color(red: 0.08, green: 0.08, blue: 0.12),
+                    Color(red: 0.1, green: 0.1, blue: 0.15)
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
+            
+            VStack(spacing: 0) {
+                // Header
+                headerView
+                
+                // Rarity filter
+                rarityFilterView
+                    .padding(.vertical, 12)
+                
+                // Grid
+                ScrollView(showsIndicators: false) {
+                    LazyVGrid(columns: columns, spacing: 12) {
+                        ForEach(filteredItems) { item in
+                            ItemCardView(
                                 item: item,
                                 isOwned: authManager.avatars.contains(where: { $0.name == item.name }),
-                                isSelected: selectedItem?.name == item.name,
-                                onTap: {
-                                    generateHapticFeedback()
-                                    withAnimation(.spring(response: 0.5, dampingFraction: 0.6)) {
-                                        selectedItem = item
-                                        animateSelection.toggle()
-                                    }
-                                    audioManager.playSound()
-                                }
+                                isSelected: selectedItem?.name == item.name
                             )
+                            .onTapGesture {
+                                withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+                                    selectedItem = item
+                                    showDetail = true
+                                }
+                                generateHapticFeedback()
+                                audioManager.playSound()
+                            }
                         }
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 16)
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 100)
                 }
-                .background(Color("purple2").opacity(0.3))
+            }
+            
+            // Detail overlay
+            if showDetail, let item = selectedItem {
+                DetailOverlayView(
+                    item: item,
+                    isOwned: authManager.avatars.contains(where: { $0.name == item.name }),
+                    onClose: {
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                            showDetail = false
+                        }
+                    }
+                )
             }
         }
+        .navigationBarBackButtonHidden(true)
+        .navigationBarItems(leading: backButton)
         .gesture(
             DragGesture()
                 .onEnded { value in
-                    if value.translation.width > 80 {
+                    if value.translation.width > 80 && !showDetail {
                         presentationMode.wrappedValue.dismiss()
                     }
                 }
         )
-        .background(
-            LinearGradient(
-                gradient: Gradient(colors: [Color("purple2"), Color("purple2").opacity(0.8)]),
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-        )
         .onAppear {
-            selectedItem = allItems.first
-            authManager.fetchAvatars {
-                for item in allItems {
-                    let contains = authManager.avatars.contains(where: { $0.name == item.name })
-                }
+            authManager.fetchAvatars {}
+        }
+    }
+    
+    // MARK: - Header View
+    private var headerView: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("おとも図鑑")
+                    .font(.system(size: 28, weight: .bold, design: .rounded))
+                    .foregroundColor(.white)
+                
+                Text("\(authManager.avatars.count) / \(allItems.count) 収集済み")
+                    .font(.system(size: 14, weight: .medium, design: .rounded))
+                    .foregroundColor(.white.opacity(0.6))
+            }
+            
+            Spacer()
+            
+            // Collection progress ring
+            ZStack {
+                Circle()
+                    .stroke(Color.white.opacity(0.1), lineWidth: 4)
+                    .frame(width: 50, height: 50)
+                
+                Circle()
+                    .trim(from: 0, to: CGFloat(authManager.avatars.count) / CGFloat(allItems.count))
+                    .stroke(
+                        LinearGradient(
+                            colors: [.purple, .cyan],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        style: StrokeStyle(lineWidth: 4, lineCap: .round)
+                    )
+                    .frame(width: 50, height: 50)
+                    .rotationEffect(.degrees(-90))
+                
+                Text("\(Int(Double(authManager.avatars.count) / Double(allItems.count) * 100))%")
+                    .font(.system(size: 12, weight: .bold, design: .rounded))
+                    .foregroundColor(.white)
             }
         }
-        .navigationBarBackButtonHidden(true)
-        .navigationBarItems(leading: BackButton(action: {
-            generateHapticFeedback()
-            presentationMode.wrappedValue.dismiss()
-            audioManager.playCancelSound()
-        }))
-        .navigationTitle("おとも図鑑")
-        .navigationBarTitleDisplayMode(.inline)
+        .padding(.horizontal, 20)
+        .padding(.top, 16)
     }
-}
-
-// MARK: - Detail Card View
-struct DetailCardView: View {
-    let selectedItem: Item?
-    let authManager: AuthManager
-    let animateSelection: Bool
     
-    var body: some View {
-        if let selected = selectedItem {
-            VStack(spacing: 16) {
-                // レアリティとタイトル
-                HStack {
-                    RarityBadge(rarity: selected.rarity)
-                    Text(authManager.avatars.contains(where: { $0.name == selected.name }) ? selectedItem!.name : "???")
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .foregroundColor(authManager.avatars.contains(where: { $0.name == selected.name }) ? .primary : .secondary)
-                        .multilineTextAlignment(.center)
-                    Spacer()
+    // MARK: - Rarity Filter View
+    private var rarityFilterView: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 10) {
+                FilterChip(
+                    title: "すべて",
+                    isSelected: selectedRarity == nil,
+                    color: .white
+                ) {
+                    withAnimation(.spring(response: 0.3)) {
+                        selectedRarity = nil
+                    }
                 }
                 
-                // メインコンテンツ
-                HStack(alignment: .center, spacing: 30) {
-                    // キャラクター画像
-                    CharacterImageView(
-                        item: selected,
-                        isOwned: authManager.avatars.contains(where: { $0.name == selected.name }),
-                        animate: animateSelection
-                    )
-                    
-//                    Spacer()
-                    
-                    // ステータス
-                    VStack(alignment: .trailing, spacing: 12) {
-                        VStack{
-                            ZStack {
-                                Image("ハートバー")
-                                    .resizable()
-                                    .frame(width:120,height:40)
-                                Text("\(selected.health)")
-                                    .multilineTextAlignment(.leading)
-                                    .font(.system(size: 26))
-                                    .foregroundColor(Color("fontGray"))
-                                    .padding(.leading,65)
-                                    .padding(.top,15)
-                            }
-                            ZStack {
-                                Image("攻撃バー")
-                                    .resizable()
-                                    .frame(width:116,height:40)
-                                Text("\(selected.attack)")
-                                    .multilineTextAlignment(.leading)
-                                    .font(.system(size: 26))
-                                    .foregroundColor(Color("fontGray"))
-                                    .padding(.leading,65)
-                                    .padding(.top,10)
-                            }.padding(.top,5)
+                ForEach(Rarity.allCases, id: \.self) { rarity in
+                    FilterChip(
+                        title: rarity.displayString,
+                        isSelected: selectedRarity == rarity,
+                        color: rarity.color
+                    ) {
+                        withAnimation(.spring(response: 0.3)) {
+                            selectedRarity = rarity
                         }
                     }
                 }
             }
-            .padding(20)
-            .background(
-                RoundedRectangle(cornerRadius: 20)
-                    .fill(.ultraThinMaterial)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 20)
-                            .stroke(selected.rarity.color.opacity(0.3), lineWidth: 2)
-                    )
-            )
-        } else {
-            RoundedRectangle(cornerRadius: 20)
-                .fill(.ultraThinMaterial)
-                .overlay(
-                    Text("キャラクターを選択してください")
-                        .foregroundColor(.secondary)
-                        .font(.headline)
-                )
+            .padding(.horizontal, 16)
         }
     }
-}
-
-// MARK: - Character Image View
-struct CharacterImageView: View {
-    let item: Item
-    let isOwned: Bool
-    let animate: Bool
     
-    var body: some View {
-        VStack(spacing: 8) {
-            ZStack {
-                // 背景の光効果（レジェンドレアの場合）
-                if item.rarity == .legendRare && isOwned {
-                    Circle()
-                        .fill(
-                            RadialGradient(
-                                gradient: Gradient(colors: [item.rarity.color.opacity(0.3), Color.clear]),
-                                center: .center,
-                                startRadius: 10,
-                                endRadius: 80
-                            )
-                        )
-                        .frame(width: 160, height: 160)
-                        .scaleEffect(animate ? 1.1 : 1.0)
-                        .animation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true), value: animate)
-                }
-                
-                Image(isOwned ? item.name : "\(item.name)_シルエット")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 140, height: 140)
-                    .clipShape(RoundedRectangle(cornerRadius: 20))
-                    .shadow(color: item.rarity.color.opacity(0.5), radius: 10, x: 0, y: 5)
-                    .scaleEffect(animate ? 1.05 : 1.0)
-                    .animation(.spring(response: 0.5, dampingFraction: 0.6), value: animate)
+    // MARK: - Back Button
+    private var backButton: some View {
+        Button(action: {
+            generateHapticFeedback()
+            presentationMode.wrappedValue.dismiss()
+            audioManager.playCancelSound()
+        }) {
+            HStack(spacing: 6) {
+                Image(systemName: "chevron.left")
+                    .font(.system(size: 16, weight: .semibold))
+                Text("戻る")
+                    .font(.system(size: 16, weight: .medium))
             }
-        }
-    }
-}
-
-// MARK: - Status Bar
-struct StatusBar: View {
-    let icon: String
-    let value: String
-    let color: Color
-    let maxWidth: CGFloat
-    
-    var body: some View {
-        HStack(spacing: 8) {
-            Image(systemName: icon)
-                .foregroundColor(color)
-                .frame(width: 20)
-            
-            Text(value)
-                .font(.headline)
-                .fontWeight(.semibold)
-                .foregroundColor(.primary)
-                .frame(maxWidth: maxWidth, alignment: .leading)
-        }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 8)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(.ultraThinMaterial)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(color.opacity(0.3), lineWidth: 1)
-                )
-        )
-    }
-}
-
-// MARK: - Rarity Badge
-struct RarityBadge: View {
-    let rarity: Rarity
-    
-    var body: some View {
-        Text(rarity.displayString)
-            .font(.caption)
-            .fontWeight(.bold)
             .foregroundColor(.white)
             .padding(.horizontal, 12)
-            .padding(.vertical, 4)
+            .padding(.vertical, 8)
             .background(
                 Capsule()
-                    .fill(
-                        LinearGradient(
-                            gradient: Gradient(colors: rarity.gradientColors),
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
-                    .overlay(
-                        Capsule()
-                            .stroke(rarity.color, lineWidth: 1)
-                    )
+                    .fill(Color.white.opacity(0.15))
             )
-    }
-}
-
-// MARK: - Grid Item View
-struct GridItemView: View {
-    let item: Item
-    let isOwned: Bool
-    let isSelected: Bool
-    let onTap: () -> Void
-    
-    var body: some View {
-        Button(action: onTap) {
-            VStack(spacing: 8) {
-                ZStack {
-                    // 選択時の光効果
-                    if isSelected {
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(item.rarity.color.opacity(0.2))
-                            .frame(width: 90, height: 90)
-//                            .scaleEffect(1.2)
-                            .animation(.easeInOut(duration: 0.8).repeatForever(autoreverses: true), value: isSelected)
-                    }
-                    
-                    Image(isOwned ? item.name : "\(item.name)_シルエット")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 80, height: 80)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                        .opacity(isOwned ? 1.0 : 0.6)
-                }
-//                
-//                // レアリティインジケータ
-//                Rectangle()
-//                    .fill(item.rarity.color)
-//                    .frame(height: 3)
-//                    .frame(maxWidth: 60)
-//                    .clipShape(Capsule())
-            }
-            .padding(8)
-            .background(
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(.ultraThinMaterial)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                            .stroke(
-                                isSelected ? item.rarity.color : Color.clear,
-                                lineWidth: isSelected ? 3 : 0
-                            )
-                    )
-            )
-            .shadow(color: .black.opacity(0.1), radius: 5, x: 0, y: 2)
-            .scaleEffect(isSelected ? 1.05 : 1.0)
-            .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isSelected)
         }
-        .buttonStyle(PlainButtonStyle())
     }
 }
 
-// MARK: - Back Button
-struct BackButton: View {
+// MARK: - Filter Chip
+struct FilterChip: View {
+    let title: String
+    let isSelected: Bool
+    let color: Color
     let action: () -> Void
     
     var body: some View {
         Button(action: action) {
-            HStack(spacing: 4) {
-                Image(systemName: "chevron.left")
-                    .font(.system(size: 16, weight: .medium))
-                Text("戻る")
-                    .font(.system(size: 16))
-            }
-            .foregroundColor(Color("fontGray"))
+            Text(title)
+                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                .foregroundColor(isSelected ? .white : color.opacity(0.8))
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+                .background(
+                    Capsule()
+                        .fill(isSelected ? color.opacity(0.8) : color.opacity(0.15))
+                )
+                .overlay(
+                    Capsule()
+                        .stroke(color.opacity(isSelected ? 0 : 0.3), lineWidth: 1)
+                )
         }
         .buttonStyle(PlainButtonStyle())
     }
 }
 
-#Preview {
-//    IllustratedView(isPresenting: .constant(false))
-    TopView()
+// MARK: - Item Card View
+struct ItemCardView: View {
+    let item: IllustratedView.Item
+    let isOwned: Bool
+    let isSelected: Bool
+    
+    @State private var shimmer = false
+    
+    var body: some View {
+        VStack(spacing: 8) {
+            ZStack {
+                // Background glow for owned items
+                if isOwned {
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(item.rarity.color.opacity(0.2))
+                        .blur(radius: 8)
+                }
+                
+                // Card background
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(item.rarity.backgroundGradient)
+                
+                // Border
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(
+                        isSelected ?
+                        item.rarity.color :
+                        Color.white.opacity(0.1),
+                        lineWidth: isSelected ? 2 : 1
+                    )
+                
+                VStack(spacing: 8) {
+                    // Character image
+                    ZStack {
+                        if isOwned && item.rarity == .legendRare {
+                            // Shimmer effect for legend
+                            Circle()
+                                .fill(
+                                    AngularGradient(
+                                        colors: [.yellow, .orange, .yellow, .white, .yellow],
+                                        center: .center
+                                    )
+                                )
+                                .frame(width: 70, height: 70)
+                                .blur(radius: 15)
+                                .rotationEffect(.degrees(shimmer ? 360 : 0))
+                        }
+                        
+                        Image(isOwned ? item.name : "\(item.name)_シルエット")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 70, height: 70)
+                            .opacity(isOwned ? 1 : 0.4)
+                    }
+                    
+                    // Rarity indicator
+                    HStack(spacing: 2) {
+                        ForEach(0..<rarityStars, id: \.self) { _ in
+                            Image(systemName: "star.fill")
+                                .font(.system(size: 8))
+                                .foregroundColor(item.rarity.color)
+                        }
+                    }
+                }
+                .padding(12)
+            }
+            .frame(height: 120)
+            
+            // Name
+            Text(isOwned ? item.name : "???")
+                .font(.system(size: 12, weight: .semibold, design: .rounded))
+                .foregroundColor(isOwned ? .white : .white.opacity(0.4))
+                .lineLimit(1)
+        }
+        .scaleEffect(isSelected ? 1.05 : 1)
+        .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isSelected)
+        .onAppear {
+            if isOwned && item.rarity == .legendRare {
+                withAnimation(.linear(duration: 3).repeatForever(autoreverses: false)) {
+                    shimmer = true
+                }
+            }
+        }
+    }
+    
+    private var rarityStars: Int {
+        switch item.rarity {
+        case .normal: return 1
+        case .rare: return 2
+        case .superRare: return 3
+        case .ultraRare: return 4
+        case .legendRare: return 5
+        }
+    }
+}
+
+// MARK: - Detail Overlay View
+struct DetailOverlayView: View {
+    let item: IllustratedView.Item
+    let isOwned: Bool
+    let onClose: () -> Void
+    
+    @State private var appear = false
+    @State private var floatAnimation = false
+    @State private var glowAnimation = false
+    
+    var body: some View {
+        ZStack {
+            // Background blur
+            Color.black.opacity(0.7)
+                .ignoresSafeArea()
+                .onTapGesture {
+                    onClose()
+                }
+            
+            // Detail card
+            VStack(spacing: 24) {
+                // Close button
+                HStack {
+                    Spacer()
+                    Button(action: onClose) {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 16, weight: .bold))
+                            .foregroundColor(.white)
+                            .frame(width: 36, height: 36)
+                            .background(Circle().fill(Color.white.opacity(0.2)))
+                    }
+                }
+                
+                // Rarity badge
+                Text(item.rarity.displayString)
+                    .font(.system(size: 14, weight: .bold, design: .rounded))
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 8)
+                    .background(
+                        Capsule()
+                            .fill(item.rarity.gradient)
+                    )
+                
+                // Character
+                ZStack {
+                    // Glow effect
+                    if isOwned {
+                        Circle()
+                            .fill(
+                                RadialGradient(
+                                    colors: [item.rarity.color.opacity(0.5), Color.clear],
+                                    center: .center,
+                                    startRadius: 0,
+                                    endRadius: 120
+                                )
+                            )
+                            .frame(width: 240, height: 240)
+                            .scaleEffect(glowAnimation ? 1.1 : 0.9)
+                    }
+                    
+                    Image(isOwned ? item.name : "\(item.name)_シルエット")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 180, height: 180)
+                        .shadow(color: item.rarity.color.opacity(0.5), radius: 20, x: 0, y: 10)
+                        .offset(y: floatAnimation ? -10 : 10)
+                        .opacity(isOwned ? 1 : 0.5)
+                }
+                
+                // Name
+                Text(isOwned ? item.name : "???")
+                    .font(.system(size: 28, weight: .bold, design: .rounded))
+                    .foregroundColor(.white)
+                
+                // Stats
+                if isOwned {
+                    HStack(spacing: 40) {
+                        StatDisplay(
+                            icon: "heart.fill",
+                            value: item.health,
+                            label: "HP",
+                            color: .red
+                        )
+                        
+                        StatDisplay(
+                            icon: "bolt.fill",
+                            value: item.attack,
+                            label: "ATK",
+                            color: .blue
+                        )
+                    }
+                }
+            }
+            .padding(24)
+            .background(
+                RoundedRectangle(cornerRadius: 32)
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                Color(red: 0.15, green: 0.15, blue: 0.2),
+                                Color(red: 0.1, green: 0.1, blue: 0.15)
+                            ],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 32)
+                            .stroke(item.rarity.color.opacity(0.5), lineWidth: 2)
+                    )
+            )
+            .padding(.horizontal, 32)
+            .scaleEffect(appear ? 1 : 0.8)
+            .opacity(appear ? 1 : 0)
+        }
+        .onAppear {
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+                appear = true
+            }
+            withAnimation(.easeInOut(duration: 2).repeatForever(autoreverses: true)) {
+                floatAnimation = true
+            }
+            withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
+                glowAnimation = true
+            }
+        }
+    }
+}
+
+// MARK: - Stat Display
+struct StatDisplay: View {
+    let icon: String
+    let value: Int
+    let label: String
+    let color: Color
+    
+    var body: some View {
+        VStack(spacing: 8) {
+            ZStack {
+                Circle()
+                    .fill(color.opacity(0.2))
+                    .frame(width: 56, height: 56)
+                
+                Image(systemName: icon)
+                    .font(.system(size: 24, weight: .bold))
+                    .foregroundColor(color)
+            }
+            
+            Text("\(value)")
+                .font(.system(size: 24, weight: .bold, design: .rounded))
+                .foregroundColor(.white)
+            
+            Text(label)
+                .font(.system(size: 12, weight: .medium, design: .rounded))
+                .foregroundColor(.white.opacity(0.6))
+        }
+    }
+}
+
+// MARK: - Preview
+struct IllustratedViewUpdated_Previews: PreviewProvider {
+    static var previews: some View {
+        IllustratedView(isPresenting: .constant(false))
+    }
 }

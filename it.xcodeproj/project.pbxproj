@@ -20,6 +20,8 @@
 		1801FFDF2D4482F6007625A2 /* 味方攻撃.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1801FFD22D4482F5007625A2 /* 味方攻撃.mp3 */; };
 		1801FFE02D4482F6007625A2 /* ホームに戻る.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1801FFD32D4482F5007625A2 /* ホームに戻る.mp3 */; };
 		1801FFE12D4482F6007625A2 /* おとも切り替え.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1801FFD42D4482F6007625A2 /* おとも切り替え.mp3 */; };
+		181BFFA02F10F8ED0075C9BE /* UIComponentsUpdated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181BFF9F2F10F8EB0075C9BE /* UIComponentsUpdated.swift */; };
+		181BFFA22F10FB1F0075C9BE /* QuizDesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181BFFA12F10FB180075C9BE /* QuizDesignSystem.swift */; };
 		182FF4BD2ED18CA0001DE74F /* ProgressStoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182FF4AE2ED18CA0001DE74F /* ProgressStoryView.swift */; };
 		182FF4BE2ED18CA0001DE74F /* PentagonManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182FF49F2ED18CA0001DE74F /* PentagonManagerView.swift */; };
 		182FF4BF2ED18CA0001DE74F /* ChangeNameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182FF4722ED18CA0001DE74F /* ChangeNameView.swift */; };
@@ -78,7 +80,6 @@
 		182FF4FA2ED18CA0001DE74F /* RateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182FF4A02ED18CA0001DE74F /* RateManager.swift */; };
 		182FF4FC2ED18CA0001DE74F /* InterstitialStory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182FF4AD2ED18CA0001DE74F /* InterstitialStory.swift */; };
 		182FF4FD2ED18CA0001DE74F /* MekaGachaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182FF4972ED18CA0001DE74F /* MekaGachaView.swift */; };
-		182FF4FE2ED18CA0001DE74F /* GachaAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182FF4942ED18CA0001DE74F /* GachaAnimationView.swift */; };
 		182FF4FF2ED18CA0001DE74F /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182FF4862ED18CA0001DE74F /* RootView.swift */; };
 		182FF5022ED192E6001DE74F /* ManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182FF5012ED192E6001DE74F /* ManagerView.swift */; };
 		18B9E1FA2E0FC355000F4B57 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 18B9E1F92E0FC355000F4B57 /* FirebaseFirestore */; };
@@ -88,6 +89,9 @@
 		18B9E2032E0FE194000F4B57 /* FirebaseDatabaseSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 18B9E2022E0FE194000F4B57 /* FirebaseDatabaseSwift */; };
 		18B9E2052E0FE194000F4B57 /* FirebaseDynamicLinks in Frameworks */ = {isa = PBXBuildFile; productRef = 18B9E2042E0FE194000F4B57 /* FirebaseDynamicLinks */; };
 		18B9E2072E0FE1F8000F4B57 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 18B9E2062E0FE1F8000F4B57 /* FirebaseAuth */; };
+		18F6F22F2EF1833800488BCA /* Mission.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18F6F22E2EF1833400488BCA /* Mission.swift */; };
+		18F6F2312EF1834D00488BCA /* MissionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18F6F2302EF1834C00488BCA /* MissionManager.swift */; };
+		18F6F2332EF1836E00488BCA /* MisssionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18F6F2322EF1836700488BCA /* MisssionView.swift */; };
 		260E44172AB572DE00FBB487 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 260E44162AB572DE00FBB487 /* Assets.xcassets */; };
 		260E441A2AB572DE00FBB487 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 260E44192AB572DE00FBB487 /* Preview Assets.xcassets */; };
 		260E44212AB5958300FBB487 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 260E44202AB5958300FBB487 /* GoogleService-Info.plist */; };
@@ -111,6 +115,8 @@
 		1801FFD22D4482F5007625A2 /* 味方攻撃.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "味方攻撃.mp3"; sourceTree = "<group>"; };
 		1801FFD32D4482F5007625A2 /* ホームに戻る.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "ホームに戻る.mp3"; sourceTree = "<group>"; };
 		1801FFD42D4482F6007625A2 /* おとも切り替え.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "おとも切り替え.mp3"; sourceTree = "<group>"; };
+		181BFF9F2F10F8EB0075C9BE /* UIComponentsUpdated.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIComponentsUpdated.swift; sourceTree = "<group>"; };
+		181BFFA12F10FB180075C9BE /* QuizDesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizDesignSystem.swift; sourceTree = "<group>"; };
 		182FF4702ED18CA0001DE74F /* AnswerSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnswerSelectionView.swift; sourceTree = "<group>"; };
 		182FF4712ED18CA0001DE74F /* Banner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Banner.swift; sourceTree = "<group>"; };
 		182FF4722ED18CA0001DE74F /* ChangeNameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeNameView.swift; sourceTree = "<group>"; };
@@ -143,7 +149,6 @@
 		182FF48D2ED18CA0001DE74F /* TitleListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleListView.swift; sourceTree = "<group>"; };
 		182FF48E2ED18CA0001DE74F /* TittlesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TittlesView.swift; sourceTree = "<group>"; };
 		182FF48F2ED18CA0001DE74F /* TopView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopView.swift; sourceTree = "<group>"; };
-		182FF4942ED18CA0001DE74F /* GachaAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GachaAnimationView.swift; sourceTree = "<group>"; };
 		182FF4952ED18CA0001DE74F /* GachaManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GachaManagerView.swift; sourceTree = "<group>"; };
 		182FF4962ED18CA0001DE74F /* GachaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GachaView.swift; sourceTree = "<group>"; };
 		182FF4972ED18CA0001DE74F /* MekaGachaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MekaGachaView.swift; sourceTree = "<group>"; };
@@ -174,6 +179,9 @@
 		182FF5012ED192E6001DE74F /* ManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagerView.swift; sourceTree = "<group>"; };
 		186C39A82B70B3B7007F625E /* StoreKit.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = StoreKit.storekit; sourceTree = "<group>"; };
 		186C39AD2B71D2B3007F625E /* it.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = it.entitlements; sourceTree = "<group>"; };
+		18F6F22E2EF1833400488BCA /* Mission.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mission.swift; sourceTree = "<group>"; };
+		18F6F2302EF1834C00488BCA /* MissionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MissionManager.swift; sourceTree = "<group>"; };
+		18F6F2322EF1836700488BCA /* MisssionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MisssionView.swift; sourceTree = "<group>"; };
 		260E440F2AB572DC00FBB487 /* it.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = it.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		260E44162AB572DE00FBB487 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		260E44192AB572DE00FBB487 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
@@ -256,7 +264,6 @@
 		182FF4992ED18CA0001DE74F /* Gacha */ = {
 			isa = PBXGroup;
 			children = (
-				182FF4942ED18CA0001DE74F /* GachaAnimationView.swift */,
 				182FF4952ED18CA0001DE74F /* GachaManagerView.swift */,
 				182FF4962ED18CA0001DE74F /* GachaView.swift */,
 				182FF4972ED18CA0001DE74F /* MekaGachaView.swift */,
@@ -353,6 +360,8 @@
 		260E44112AB572DC00FBB487 /* it */ = {
 			isa = PBXGroup;
 			children = (
+				181BFFA12F10FB180075C9BE /* QuizDesignSystem.swift */,
+				181BFF9F2F10F8EB0075C9BE /* UIComponentsUpdated.swift */,
 				182FF4902ED18CA0001DE74F /* App */,
 				182FF4992ED18CA0001DE74F /* Gacha */,
 				182FF4A12ED18CA0001DE74F /* Managers */,
@@ -381,6 +390,9 @@
 				1801FFD02D4482F5007625A2 /* 不正解.mp3 */,
 				1801FFD22D4482F5007625A2 /* 味方攻撃.mp3 */,
 				260E44162AB572DE00FBB487 /* Assets.xcassets */,
+				18F6F22E2EF1833400488BCA /* Mission.swift */,
+				18F6F2302EF1834C00488BCA /* MissionManager.swift */,
+				18F6F2322EF1836700488BCA /* MisssionView.swift */,
 				260E44202AB5958300FBB487 /* GoogleService-Info.plist */,
 				260E44182AB572DE00FBB487 /* Preview Content */,
 			);
@@ -547,6 +559,7 @@
 				182FF4BF2ED18CA0001DE74F /* ChangeNameView.swift in Sources */,
 				182FF4C02ED18CA0001DE74F /* TestAnimationView.swift in Sources */,
 				182FF4C12ED18CA0001DE74F /* PentagonShape.swift in Sources */,
+				181BFFA22F10FB1F0075C9BE /* QuizDesignSystem.swift in Sources */,
 				182FF4C22ED18CA0001DE74F /* BarChartView.swift in Sources */,
 				182FF4C32ED18CA0001DE74F /* StorySutaminaModalView.swift in Sources */,
 				182FF4C42ED18CA0001DE74F /* ContentView.swift in Sources */,
@@ -571,6 +584,7 @@
 				182FF4DA2ED18CA0001DE74F /* SubscriptionView.swift in Sources */,
 				182FF4DB2ED18CA0001DE74F /* PreView.swift in Sources */,
 				182FF4DC2ED18CA0001DE74F /* GachaView.swift in Sources */,
+				181BFFA02F10F8ED0075C9BE /* UIComponentsUpdated.swift in Sources */,
 				182FF4DD2ED18CA0001DE74F /* RankingView.swift in Sources */,
 				182FF4DE2ED18CA0001DE74F /* SignUp.swift in Sources */,
 				182FF4DF2ED18CA0001DE74F /* TimerView.swift in Sources */,
@@ -582,6 +596,9 @@
 				182FF4E52ED18CA0001DE74F /* UsersListView.swift in Sources */,
 				182FF4E62ED18CA0001DE74F /* GachaManagerView.swift in Sources */,
 				182FF4E72ED18CA0001DE74F /* CheckUsersListView.swift in Sources */,
+				18F6F2312EF1834D00488BCA /* MissionManager.swift in Sources */,
+				18F6F2332EF1836E00488BCA /* MisssionView.swift in Sources */,
+				18F6F22F2EF1833800488BCA /* Mission.swift in Sources */,
 				182FF4E82ED18CA0001DE74F /* Interstitial.swift in Sources */,
 				182FF4E92ED18CA0001DE74F /* StampAnimationView.swift in Sources */,
 				182FF4EA2ED18CA0001DE74F /* StoreKitView.swift in Sources */,
@@ -601,7 +618,6 @@
 				182FF4FA2ED18CA0001DE74F /* RateManager.swift in Sources */,
 				182FF4FC2ED18CA0001DE74F /* InterstitialStory.swift in Sources */,
 				182FF4FD2ED18CA0001DE74F /* MekaGachaView.swift in Sources */,
-				182FF4FE2ED18CA0001DE74F /* GachaAnimationView.swift in Sources */,
 				182FF4FF2ED18CA0001DE74F /* RootView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -731,7 +747,7 @@
 				CODE_SIGN_ENTITLEMENTS = it/it.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8.8;
+				CURRENT_PROJECT_VERSION = 9.1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"it/Preview Content\"";
 				DEVELOPMENT_TEAM = F3XS565TSX;
@@ -749,7 +765,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 8.8;
+				MARKETING_VERSION = 9.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "Swift-Beginners-app.it";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -767,7 +783,7 @@
 				CODE_SIGN_ENTITLEMENTS = it/it.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8.8;
+				CURRENT_PROJECT_VERSION = 9.1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"it/Preview Content\"";
 				DEVELOPMENT_TEAM = F3XS565TSX;
@@ -785,7 +801,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 8.8;
+				MARKETING_VERSION = 9.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "Swift-Beginners-app.it";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
