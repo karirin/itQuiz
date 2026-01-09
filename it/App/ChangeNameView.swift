@@ -1,5 +1,5 @@
 //
-//  RankingView.swift
+//  ChangeNameView.swift
 //  sukimaKanji
 //
 //  Created by Apple on 2024/06/23.
@@ -16,124 +16,223 @@ struct ChangeNameView: View {
     
     @State private var userName: String = ""
     @State private var showAlert = false
-    @State private var isSaving = false // 保存中のインジケーター用
+    @State private var isSaving = false
+    @State private var appearAnimation = false
+    @State private var shakeAnimation = false
     
     @ObservedObject var authManager: AuthManager
     @Environment(\.presentationMode) var presentationMode
 
-    // 色の定義（アセットカタログがない場合のために定義していますが、既存のColor("Color2")などがあればそちらを使ってください）
-    let mainColor = Color.blue // アプリのテーマカラーに変更してください
-    let cardBackground = Color.white
+    // カラーテーマ
+    private let primaryGradient = LinearGradient(
+        colors: [Color(red: 0.4, green: 0.6, blue: 1.0), Color(red: 0.6, green: 0.4, blue: 1.0)],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
     
     var body: some View {
         ZStack {
-            // 背景のディム（暗くする）
-            Color.black.opacity(0.4)
-                .edgesIgnoringSafeArea(.all)
+            // 背景オーバーレイ
+            Color.black.opacity(appearAnimation ? 0.5 : 0)
+                .ignoresSafeArea()
                 .onTapGesture {
                     if isReturnBtn {
-                        isPresented = false
+                        dismissWithAnimation()
                     }
                 }
+                .animation(.easeInOut(duration: 0.3), value: appearAnimation)
             
-            // メインのカード
-            VStack(spacing: 20) {
-                
-                // タイトルセクション
-                VStack(spacing: 8) {
-                    ZStack(alignment: .center) {
-                        Text("名前を登録する")
-                            .font(.title3)
-                            .fontWeight(.bold)
-                            .foregroundColor(.primary)
+            // メインカード
+            VStack(spacing: 0) {
+                // ヘッダー部分
+                ZStack {
+                    // 背景グラデーション
+                    primaryGradient
+                        .frame(height: 100)
+                    
+                    VStack(spacing: 8) {
+                        // アイコン
+                        ZStack {
+                            Circle()
+                                .fill(Color.white.opacity(0.2))
+                                .frame(width: 56, height: 56)
+                            
+                            Image(systemName: "person.crop.circle.badge.plus")
+                                .font(.system(size: 28, weight: .medium))
+                                .foregroundColor(.white)
+                        }
                         
-                        // 閉じるボタンを右端に配置
-                        if isReturnBtn {
+                        Text("名前を登録")
+                            .font(.system(size: 18, weight: .bold))
+                            .foregroundColor(.white)
+                    }
+                    
+                    // 閉じるボタン
+                    if isReturnBtn {
+                        VStack {
                             HStack {
                                 Spacer()
                                 Button(action: {
                                     generateHapticFeedback()
-                                    isPresented = false
+                                    dismissWithAnimation()
                                 }) {
-                                    Image(systemName: "xmark")
-                                        .font(.system(size: 12, weight: .bold)) // アイコンサイズ調整
-                                        .foregroundColor(.black)
-                                        .frame(width: 30, height: 30)
-                                        .background(Color(UIColor.systemGray6)) // 薄いグレー背景
-                                        .clipShape(Circle())
+                                    ZStack {
+                                        Circle()
+                                            .fill(Color.white.opacity(0.2))
+                                            .frame(width: 32, height: 32)
+                                        
+                                        Image(systemName: "xmark")
+                                            .font(.system(size: 12, weight: .bold))
+                                            .foregroundColor(.white)
+                                    }
+                                }
+                                .padding(.trailing, 16)
+                                .padding(.top, 12)
+                            }
+                            Spacer()
+                        }
+                    }
+                }
+                .clipShape(
+                    RoundedCorner(radius: 24, corners: [.topLeft, .topRight])
+                )
+                
+                // コンテンツ部分
+                VStack(spacing: 24) {
+                    // 警告メッセージ
+                    HStack(spacing: 8) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .font(.system(size: 14))
+                            .foregroundColor(.orange)
+                        
+                        Text("一度登録すると変更できません")
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundColor(.orange)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color.orange.opacity(0.1))
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Color.orange.opacity(0.3), lineWidth: 1)
+                    )
+                    
+                    // 入力フィールド
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("ユーザー名")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundColor(Color("fontGray").opacity(0.7))
+                        
+                        HStack(spacing: 12) {
+                            Image(systemName: "person.fill")
+                                .font(.system(size: 16))
+                                .foregroundColor(Color.gray.opacity(0.5))
+                            
+                            TextField("例: IT太郎", text: $userName)
+                                .font(.system(size: 16, weight: .medium))
+                                .foregroundColor(Color("fontGray"))
+                                .onChange(of: userName) { newValue in
+                                    if newValue.count > 10 {
+                                        userName = String(newValue.prefix(10))
+                                        withAnimation(.default) {
+                                            shakeAnimation = true
+                                        }
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                            shakeAnimation = false
+                                        }
+                                    }
+                                }
+                            
+                            Spacer()
+                            
+                            Text("\(userName.count)/10")
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundColor(
+                                    userName.count >= 10
+                                    ? .orange
+                                    : Color("fontGray").opacity(0.5)
+                                )
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 14)
+                        .background(
+                            RoundedRectangle(cornerRadius: 14)
+                                .fill(Color(UIColor.systemGray6))
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 14)
+                                .stroke(
+                                    userName.isEmpty
+                                    ? Color.gray.opacity(0.2)
+                                    : Color.blue.opacity(0.5),
+                                    lineWidth: 1.5
+                                )
+                        )
+                        .offset(x: shakeAnimation ? -5 : 0)
+                        .animation(.default.repeatCount(3, autoreverses: true).speed(6), value: shakeAnimation)
+                    }
+                    
+                    // 登録ボタン
+                    Button(action: {
+                        generateHapticFeedback()
+                        isSaving = true
+                        
+                        authManager.updateUserName(userName: userName) { success in
+                            isSaving = false
+                            if success {
+                                showAlert = true
+                            }
+                        }
+                    }) {
+                        HStack(spacing: 10) {
+                            if isSaving {
+                                ProgressView()
+                                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                                    .scaleEffect(0.9)
+                            } else {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .font(.system(size: 18, weight: .semibold))
+                            }
+                            
+                            Text(isSaving ? "登録中..." : "登録する")
+                                .font(.system(size: 16, weight: .bold))
+                        }
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 52)
+                        .background(
+                            Group {
+                                if userName.isEmpty {
+                                    Color.gray.opacity(0.4)
+                                } else {
+                                    primaryGradient
                                 }
                             }
-                        }
-                    }
-                    
-                    HStack(spacing: 4) {
-                        Image(systemName: "exclamationmark.triangle.fill")
-                        Text("一度登録すると変更できません")
-                    }
-                    .font(.caption)
-                    .fontWeight(.medium)
-                    .foregroundColor(.red) // 重要なので赤文字で強調
-                }
-                
-                // 入力セクション
-                VStack(alignment: .trailing, spacing: 5) {
-                    TextField("名前を入力 (例: IT太郎)", text: $userName)
-                        .padding()
-                        .background(Color(UIColor.systemGray6)) // 薄いグレーの背景
-                        .cornerRadius(12)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
                         )
-                        .onChange(of: userName) { newValue in
-                            if newValue.count > 10 {
-                                userName = String(newValue.prefix(10))
-                            }
-                        }
-                    
-                    Text("\(userName.count) / 10")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                        .padding(.trailing, 4)
-                }
-                
-                // 登録ボタン
-                Button(action: {
-                    generateHapticFeedback()
-                    isSaving = true
-                    
-                    // ロジックの修正: 完了後にアラートを出す
-                    authManager.updateUserName(userName: userName) { success in
-                        isSaving = false
-                        if success {
-                            showAlert = true
-                        }
+                        .clipShape(RoundedRectangle(cornerRadius: 14))
+                        .shadow(
+                            color: userName.isEmpty ? .clear : Color.blue.opacity(0.3),
+                            radius: 12,
+                            x: 0,
+                            y: 6
+                        )
                     }
-                }) {
-                    HStack {
-                        if isSaving {
-                            ProgressView()
-                                .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                                .padding(.trailing, 5)
-                        }
-                        Text("登録する")
-                            .fontWeight(.bold)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 50)
-                    .foregroundColor(.white)
-                    .background(userName.isEmpty ? Color.gray : mainColor)
-                    .cornerRadius(25)
+                    .disabled(userName.isEmpty || isSaving)
+                    .scaleEffect(userName.isEmpty ? 1.0 : 1.0)
+                    .animation(.spring(response: 0.3), value: userName.isEmpty)
                 }
-                .disabled(userName.isEmpty || isSaving)
-                .shadow(color: mainColor.opacity(0.3), radius: 5, x: 0, y: 3)
-                
+                .padding(24)
+                .background(Color.white)
             }
-            .padding(25)
-            .background(cardBackground)
-            .cornerRadius(24)
-            .shadow(radius: 20)
-            .padding(.horizontal, 30)
+            .clipShape(RoundedRectangle(cornerRadius: 24))
+            .shadow(color: Color.black.opacity(0.2), radius: 30, x: 0, y: 15)
+            .padding(.horizontal, 28)
+            .scaleEffect(appearAnimation ? 1.0 : 0.9)
+            .opacity(appearAnimation ? 1.0 : 0)
+            .animation(.spring(response: 0.4, dampingFraction: 0.8), value: appearAnimation)
         }
         .alert(isPresented: $showAlert) {
             Alert(
@@ -151,18 +250,51 @@ struct ChangeNameView: View {
                 }
             )
         }
+        .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                appearAnimation = true
+            }
+        }
+    }
+    
+    private func dismissWithAnimation() {
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+            appearAnimation = false
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+            isPresented = false
+        }
+    }
+}
+
+// カスタムコーナー用のShape
+struct RoundedCorner: Shape {
+    var radius: CGFloat = .infinity
+    var corners: UIRectCorner = .allCorners
+
+    func path(in rect: CGRect) -> Path {
+        let path = UIBezierPath(
+            roundedRect: rect,
+            byRoundingCorners: corners,
+            cornerRadii: CGSize(width: radius, height: radius)
+        )
+        return Path(path.cgPath)
     }
 }
 
 // プレビュー用
 struct ChangeNameView_Previews: PreviewProvider {
     static var previews: some View {
-        // プレビュー用にダミーのAuthManagerが必要な場合のモックなどは適宜調整してください
-        ChangeNameView(
-            isPresented: .constant(true),
-            isReturnBtn: .constant(true), // trueにすると×ボタンが見えます
-            tutorialNum: .constant(0),
-            authManager: AuthManager.shared
-        )
+        ZStack {
+            Color.gray.opacity(0.3)
+                .ignoresSafeArea()
+            
+            ChangeNameView(
+                isPresented: .constant(true),
+                isReturnBtn: .constant(true),
+                tutorialNum: .constant(0),
+                authManager: AuthManager.shared
+            )
+        }
     }
 }
