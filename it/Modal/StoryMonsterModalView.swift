@@ -3,6 +3,7 @@
 //  it
 //
 //  Created by Apple on 2024/11/30.
+//  Updated with modern design system
 //
 
 import SwiftUI
@@ -13,18 +14,16 @@ struct StoryMonsterModalView: View {
     @Binding var isPresented: Bool
     @Binding var showQuizList: Bool
     @State var toggle = false
-    @State private var text: String = ""
-    @State private var coinImage: String = ""
-    @State private var coinTitle: String = ""
-    @State private var isMovingUp = false
     @State private var monsterName: String = ""
     @State private var monsterHP: Int = 100
     @State private var monsterAttack: Int = 10
     @State private var quizTitle: String = ""
-    @State private var slideOut = false
     @ObservedObject var audioManager: AudioManager
-//    @ObservedObject var userPositionViewModel: UserPositionViewModel
     @ObservedObject var viewModel: PositionViewModel
+    
+    @State private var scale: CGFloat = 0.85
+    @State private var opacity: Double = 0
+    @State private var monsterScale: CGFloat = 0.8
 
     let monsters: [Int: Monster] = [
         1: Monster(name: "モンスター1", playerExperience: 30, playerMoney: 30, monsterHP: 160, monsterUnderHP: 160, monsterAttack: 30),
@@ -71,7 +70,6 @@ struct StoryMonsterModalView: View {
         42: Monster(name: "モンスター42", playerExperience: 240, playerMoney: 240, monsterHP: 550, monsterUnderHP: 550, monsterAttack: 170),
         43: Monster(name: "モンスター43", playerExperience: 250, playerMoney: 250, monsterHP: 570, monsterUnderHP: 570, monsterAttack: 190),
         44: Monster(name: "モンスター44", playerExperience: 260, playerMoney: 270, monsterHP: 600, monsterUnderHP: 600, monsterAttack: 210),
-        
         45: Monster(name: "モンスター45", playerExperience: 280, playerMoney: 280, monsterHP: 630, monsterUnderHP: 630, monsterAttack: 230),
         46: Monster(name: "モンスター46", playerExperience: 310, playerMoney: 310, monsterHP: 660, monsterUnderHP: 660, monsterAttack: 250),
         47: Monster(name: "モンスター47", playerExperience: 340, playerMoney: 340, monsterHP: 690, monsterUnderHP: 690, monsterAttack: 270),
@@ -79,126 +77,189 @@ struct StoryMonsterModalView: View {
         49: Monster(name: "モンスター49", playerExperience: 400, playerMoney: 400, monsterHP: 750, monsterUnderHP: 550, monsterAttack: 310),
         50: Monster(name: "モンスター50", playerExperience: 430, playerMoney: 430, monsterHP: 800, monsterUnderHP: 800, monsterAttack: 350),
         51: Monster(name: "モンスター51", playerExperience: 460, playerMoney: 460, monsterHP: 850, monsterUnderHP: 850, monsterAttack: 400),
-        
         52: Monster(name: "モンスター52", playerExperience: 500, playerMoney: 500, monsterHP: 900, monsterUnderHP: 900, monsterAttack: 500),
     ]
 
     var body: some View {
         ZStack {
-            Color.black.opacity(0.6)
-                .edgesIgnoringSafeArea(.all)
+            // 背景オーバーレイ
+            Color.black.opacity(0.75)
+                .ignoresSafeArea()
                 .onTapGesture {
-                    isPresented = false
-                    audioManager.playCancelSound()
+                    dismissModal()
                 }
-                ZStack{
-                    VStack {
-                    HStack{
-                        Spacer()
-                            .frame(width:270)
-                        Button(action: { 
-                        generateHapticFeedback()
-                            isPresented = false
-                            audioManager.playCancelSound()
-                        }) {
-                            Image(systemName: "xmark.circle.fill")
-                                .resizable()
-                                .frame(width: 60, height: 60)
-                                .foregroundColor(.gray)
-                                .background(.white)
-                                .cornerRadius(50)
-                        }
+            
+            // メインコンテンツ
+            VStack(spacing: 16) {
+                // モンスター情報
+                VStack(spacing: 16) {
+                    // モンスター画像
+                    ZStack {
+                        Circle()
+                            .fill(
+                                RadialGradient(
+                                    colors: [
+                                        Color(hex: "ff416c").opacity(0.3),
+                                        Color.clear
+                                    ],
+                                    center: .center,
+                                    startRadius: 40,
+                                    endRadius: 120
+                                )
+                            )
+                            .frame(width: 240, height: 240)
+                        
+                        Image(monsterName)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 180)
+                            .scaleEffect(monsterScale)
+                            .modifier(FloatingAnimation(amplitude: 6, duration: 1.5))
                     }
-                    .padding(.bottom, -50)
-                    Image("\(monsterName)")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(height: 200)
-                        .offset(y: isMovingUp ? -5 : 5)
-                        .onAppear {
-                            withAnimation(Animation.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
-                                isMovingUp.toggle()
-                            }
-                        }
-                    HStack{
-                        HStack{
-                            Image("HPマーク")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(height:30)
-                            Text("\(monsterHP)")
-                                .font(.system(size: 30))
-                                .foregroundStyle(.white)
-                                .fontWeight(.bold)
-                                .multilineTextAlignment(.center)
-                        }
-                        Spacer()
-                            .frame(width:30)
-                        HStack{
-                            Image("攻撃マーク")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(height:30)
-                            Text("\(monsterAttack)")
-                                .font(.system(size: 30))
-                                .foregroundStyle(.white)
-                                .fontWeight(.bold)
-                                .multilineTextAlignment(.center)
-                        }
+                    
+                    // ステータス
+                    HStack(spacing: 16) {
+                        StatBadge(icon: "HPマーク", value: "\(monsterHP)", color: Color(hex: "38ef7d"))
+                        StatBadge(icon: "攻撃マーク", value: "\(monsterAttack)", color: Color(hex: "ff416c"))
                     }
-                        Text("問題：\(quizTitle)")
-                            .font(.system(size: isSmallDevice() ? 26 : 28))
-                            .foregroundStyle(.white)
-                            .fontWeight(.bold)
-                            .multilineTextAlignment(.center)
-                        Button(action: { 
-                        generateHapticFeedback()
-                            isPresented = false
-                            showQuizList = true
-                            audioManager.playKetteiSound()
-                        }) {
-                            Image("たたかう")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(height:80)
-                                .foregroundColor(.gray)
-                        }
+                }
+                
+                // クイズ情報
+                VStack(spacing: 8) {
+                    Text("出題カテゴリ")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundColor(.white.opacity(0.6))
+                    
+                    HStack(spacing: 6) {
+                        Image(systemName: "book.fill")
+                            .font(.system(size: 16))
+                        Text(quizTitle)
+                            .font(.system(size: 18, weight: .bold))
+                    }
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 10)
+                    .background(
+                        Capsule()
+                            .fill(Color.white.opacity(0.15))
+                            .overlay(Capsule().stroke(Color.white.opacity(0.2), lineWidth: 1))
+                    )
+                }
+                
+                Spacer().frame(height: 10)
+                
+                // バトルボタン
+                Button(action: startBattle) {
+                    HStack(spacing: 12) {
+                        Image(systemName: "bolt.fill")
+                            .font(.system(size: 20, weight: .bold))
+                        Text("たたかう")
+                            .font(.system(size: 20, weight: .bold))
+                    }
+                    .foregroundColor(.white)
+                    .frame(maxWidth: 300)
+                    .frame(height: 60)
+                    .background(
+                        LinearGradient(
+                            colors: [Color(hex: "ff416c"), Color(hex: "ff4b2b")],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .shadow(color: Color(hex: "ff416c").opacity(0.5), radius: 12, y: 6)
+                }
+                .buttonStyle(ScaleButtonStyle())
+                .padding(.horizontal, 24)
+                
+                Button(action: dismissModal) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "hand.tap.fill")
+                            .font(.system(size: 18))
+                        
+                        Text("タップして閉じる")
+                            .font(.system(size: 16, weight: .semibold))
+                    }
+                    .foregroundColor(.white.opacity(0.7))
                 }
             }
-            
-            .foregroundColor(Color("fontGray"))
-        .shadow(radius: 10)
-        .padding(25)
+            .padding(.vertical, 20)
+            .scaleEffect(scale)
+            .opacity(opacity)
         }
         .onAppear {
-            // ビューが表示された際にパラメータを設定
-            print("monster  :\(monster)")
             setMonsterParameters(monster: monster)
-            switch viewModel.userPosition {
-                case 1...52:
-                    quizTitle = "ITパスポート"
-                case 53...101:
-                    quizTitle = "基本情報技術者試験"
-                case 102...150:
-                    quizTitle = "応用情報技術者試験"
-            default:
-                quizTitle = "ITパスポート"
+            setQuizTitle()
+            
+            withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
+                scale = 1.0
+                opacity = 1.0
             }
-        }
+            withAnimation(.spring(response: 0.6, dampingFraction: 0.6).delay(0.2)) {
+                monsterScale = 1.0
             }
-    private func setMonsterParameters(monster: Int) {
-        if let monster = monsters[monster] {
-            monsterName = monster.name
-            monsterHP = monster.monsterHP
-            monsterAttack = monster.monsterAttack
-        } else {
-            // 未定義のモンスターの場合のデフォルト値
-                print("未知の宝物")
         }
     }
     
-    func isSmallDevice() -> Bool {
-        return UIScreen.main.bounds.width < 390
+    private func setMonsterParameters(monster: Int) {
+        if let m = monsters[monster] {
+            monsterName = m.name
+            monsterHP = m.monsterHP
+            monsterAttack = m.monsterAttack
+        }
+    }
+    
+    private func setQuizTitle() {
+        switch viewModel.userPosition {
+        case 1...52: quizTitle = "ITパスポート"
+        case 53...101: quizTitle = "基本情報技術者試験"
+        case 102...150: quizTitle = "応用情報技術者試験"
+        default: quizTitle = "ITパスポート"
+        }
+    }
+    
+    private func startBattle() {
+        generateHapticFeedback()
+        audioManager.playKetteiSound()
+        isPresented = false
+        showQuizList = true
+    }
+    
+    private func dismissModal() {
+        generateHapticFeedback()
+        audioManager.playCancelSound()
+        withAnimation(.easeOut(duration: 0.2)) {
+            scale = 0.85
+            opacity = 0
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            isPresented = false
+        }
+    }
+}
+
+struct StatBadge: View {
+    let icon: String
+    let value: String
+    let color: Color
+    
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(icon)
+                .resizable()
+                .scaledToFit()
+                .frame(height: 26)
+            Text(value)
+                .font(.system(size: 22, weight: .bold))
+                .foregroundColor(.white)
+        }
+        .padding(.horizontal, 18)
+        .padding(.vertical, 10)
+        .background(
+            Capsule()
+                .fill(color.opacity(0.25))
+                .overlay(Capsule().stroke(color.opacity(0.5), lineWidth: 1.5))
+        )
     }
 }
 

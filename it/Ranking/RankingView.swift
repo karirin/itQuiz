@@ -38,10 +38,8 @@ class RankingViewModel: ObservableObject {
     @Published var rankedUsers = [User]()
     @Published var currentUserRankRank: Int?
 
-    
     init() {
         fetchUsers()
-//        fetchMonthlyAnswers()
     }
     
     func fetchUsers() {
@@ -49,10 +47,7 @@ class RankingViewModel: ObservableObject {
         usersRef.observeSingleEvent(of: .value, with: { (snapshot) in
             var users: [User] = []
 
-            guard let usersData = snapshot.value as? [String: [String: Any]] else {
-                print("Error: Could not parse users data")
-                return
-            }
+            guard let usersData = snapshot.value as? [String: [String: Any]] else { return }
 
             for (userId, data) in usersData {
                 if let userName = data["userName"] as? String,
@@ -74,18 +69,7 @@ class RankingViewModel: ObservableObject {
                         }
                     }
 
-                    let user = User(id: userId,
-                                    userName: userName,
-                                    level: level,
-                                    experience: experience,
-                                    avatars: filteredAvatars,
-                                    userMoney: userMoney,
-                                    userHp: userHp,
-                                    userAttack: userAttack,
-                                    userFlag: 1,
-                                    adminFlag: 0,
-                                    rankMatchPoint: rankMatchPoint,
-                                    rank: rank)
+                    let user = User(id: userId, userName: userName, level: level, experience: experience, avatars: filteredAvatars, userMoney: userMoney, userHp: userHp, userAttack: userAttack, userFlag: 1, adminFlag: 0, rankMatchPoint: rankMatchPoint, rank: rank)
                     users.append(user)
                 }
             }
@@ -98,9 +82,7 @@ class RankingViewModel: ObservableObject {
                 self.calculateRankRankings()
             }
             self.fetchMonthlyAnswers()
-        }) { (error) in
-            print("Error getting users: \(error.localizedDescription)")
-        }
+        }) { (error) in }
     }
     
     @Published var storys: [String: Story] = [:]
@@ -116,14 +98,11 @@ class RankingViewModel: ObservableObject {
         Database.database().reference().child("storys").observe(.value) { [weak self] snapshot in
             var tempStorys: [String: Story] = [:]
             for child in snapshot.children {
-                print("fetchStorys1")
                 if let childSnapshot = child as? DataSnapshot,
                    let value = childSnapshot.value as? [String: Any],
                    let position = value["position"] as? Int,
                    let stamina = value["stamina"] as? Int {
-                    print("fetchStorys2")
                     let lastActiveTime = value["lastActiveTime"] as? Double
-                    
                     let story = Story(lastActiveTime: lastActiveTime, position: position, stamina: stamina)
                     tempStorys[childSnapshot.key] = story
                 }
@@ -131,15 +110,11 @@ class RankingViewModel: ObservableObject {
             DispatchQueue.main.async {
                 self?.storys = tempStorys
                 self?.updateRankedUsers() { success in
-                    print("fetchStorys() success1    :\(success)")
                     if success {
                         self!.storyUsers = self!.storyUsers.sorted { $0.position > $1.position }
                         if let currentStoryUserIndex = self!.storyUsers.firstIndex(where: { $0.id == self!.authManager.currentUserId }) {
-                //            print("currentUserIndex:\(currentUserIndex)")
-                            // 順位はインデックス+1（配列は0から始まるため）
                             self!.currentStoryUser = currentStoryUserIndex + 1
                         }
-                        print("fetchStorys() success2    :\(self!.storyUsers)")
                         self!.assignRanks()
                     }
                 }
@@ -172,8 +147,7 @@ class RankingViewModel: ObservableObject {
         let ranked = users.compactMap { user -> RankedUser? in
             guard let story = storys[user.id] else { return nil }
             return RankedUser(user: user, position: story.position)
-        }
-        .sorted { $1.position < $0.position } // positionが小さいほど上位
+        }.sorted { $1.position < $0.position }
 
         DispatchQueue.main.async {
             self.storyUsers = ranked
@@ -183,7 +157,6 @@ class RankingViewModel: ObservableObject {
     }
     
     func updateCurrentUserRank() {
-        // ここで現在のユーザーIDを取得します。例えば、Firebase Authenticationを使用している場合：
         guard let currentUserID = Auth.auth().currentUser?.uid else { return }
         if let index = storyUsers.firstIndex(where: { $0.user.id == currentUserID }) {
             currentUserLevelRank = index + 1
@@ -200,12 +173,7 @@ class RankingViewModel: ObservableObject {
         let usersRef = Database.database().reference().child("users")
         usersRef.observeSingleEvent(of: .value, with: { (snapshot) in
             var users: [User] = []
-            
-            guard let usersData = snapshot.value as? [String: [String: Any]] else {
-                print("Error: Could not parse users data")
-                return
-            }
-            
+            guard let usersData = snapshot.value as? [String: [String: Any]] else { return }
             guard let currentUserUID = Auth.auth().currentUser?.uid else { return }
             
             var currentUserRank: Int? = nil
@@ -227,7 +195,6 @@ class RankingViewModel: ObservableObject {
                        let userAttack = data["userAttack"] as? Int,
                        let level = data["level"] as? Int,
                        let experience = data["experience"] as? Int {
-                        // rankMatchPointが存在しない場合は100をデフォルト値として使用
                         let rankMatchPoint = data["rankMatchPoint"] as? Int ?? 100
                         let rank = data["rank"] as? Int ?? 1
                         
@@ -246,31 +213,20 @@ class RankingViewModel: ObservableObject {
                 }
             }
             
-            // ここでユーザーリストの更新とその他の処理を行います
             self.rankMatchUsers = users
-            DispatchQueue.main.async {
-                self.calculateLevelRankings()
-            }
+            DispatchQueue.main.async { self.calculateLevelRankings() }
             self.fetchMonthlyAnswers()
-        }) { (error) in
-            // エラーハンドリング
-        }
+        }) { _ in }
     }
 
     private func calculateLevelRankings() {
-        // ユーザーをレベルが高い順にソート（レベルが同じ場合は経験値でソート、それでも同じ場合はIDでソート）
         let sortedUsers = users.sorted {
             if $0.level == $1.level {
                 return $0.experience == $1.experience ? $0.id < $1.id : $0.experience > $1.experience
             }
             return $0.level > $1.level
         }
-//        print("sortedUsers:\(sortedUsers)")
-
-        // ログイン中のユーザーの順位を見つける
         if let currentUserIndex = sortedUsers.firstIndex(where: { $0.id == self.authManager.currentUserId }) {
-//            print("currentUserIndex:\(currentUserIndex)")
-            // 順位はインデックス+1（配列は0から始まるため）
             self.currentUserLevelRank = currentUserIndex + 1
         }
     }
@@ -285,23 +241,14 @@ class RankingViewModel: ObservableObject {
         answersRef.observeSingleEvent(of: .value, with: { [weak self] snapshot in
             guard let self = self else { return }
             var answerCounts: [String: Int] = [:]
-
-            guard let answersData = snapshot.value as? [String: AnyObject] else {
-                print("Error: Could not parse answers data")
-                return
-            }
+            guard let answersData = snapshot.value as? [String: AnyObject] else { return }
 
             for (userId, categoriesData) in answersData {
-                guard let categories = categoriesData as? [String: [String: Int]] else {
-                    continue
-                }
-
+                guard let categories = categoriesData as? [String: [String: Int]] else { continue }
                 var totalAnswersForMonth = 0
                 for (_, dates) in categories {
                     for (date, count) in dates {
-                        if date.hasPrefix(currentMonth) {
-                            totalAnswersForMonth += count
-                        }
+                        if date.hasPrefix(currentMonth) { totalAnswersForMonth += count }
                     }
                 }
                 answerCounts[userId] = totalAnswersForMonth
@@ -309,32 +256,21 @@ class RankingViewModel: ObservableObject {
         
             DispatchQueue.main.async {
                 self.userAnswerDataList = self.users.compactMap { user in
-                    // ユーザーのアバター情報から、表示に使用するアバターの名前を選択します。
-                    // ここではシンプルに最初のアバターの名前を使用しています。
                     let avatarName = user.avatars.first?["name"] as? String ?? ""
                     guard let answerCount = answerCounts[user.id] else { return nil }
                     return UserAnswerData(userId: user.id, userName: user.userName, answerCount: answerCount, avatarName: avatarName)
-                }
-                .sorted { $0.answerCount > $1.answerCount }
-                .prefix(10)
-                .map { $0 }
+                }.sorted { $0.answerCount > $1.answerCount }.prefix(10).map { $0 }
             }
+            
             DispatchQueue.main.async {
-                // ここでuserAnswerDataListが更新された後...
                 let sortedAnswerCounts = answerCounts.sorted {
-                    if $0.value == $1.value {
-                        return $0.key < $1.key // 回答数が同じ場合はユーザーIDでソート
-                    }
-                    return $0.value > $1.value // まずは回答数で降順にソート
+                    $0.value == $1.value ? $0.key < $1.key : $0.value > $1.value
                 }
-                let maxRank = sortedAnswerCounts.count // 最下位の順位
+                let maxRank = sortedAnswerCounts.count
                 let userRankings = sortedAnswerCounts.enumerated().map { (index, element) -> (userId: String, rank: Int) in
-                    let rank = element.value > 0 ? index + 1 : maxRank // 回答数が0の場合は最下位
-                    return (element.key, rank)
+                    (element.key, element.value > 0 ? index + 1 : maxRank)
                 }
-                // ログインユーザーの順位を見つける
                 if let currentUserRanking = userRankings.first(where: { $0.userId == self.authManager.currentUserId }) {
-                    // ここでログインユーザーの順位が currentUserRanking.rank に格納される
                     self.currentUserRank = currentUserRanking.rank
                 }
             }
@@ -345,137 +281,219 @@ class RankingViewModel: ObservableObject {
         let usersRef = Database.database().reference().child("users")
         usersRef.observeSingleEvent(of: .value, with: { snapshot in
             var userAvatarCounts: [UserAvatarCount] = []
-
-            guard let usersData = snapshot.value as? [String: [String: Any]] else {
-                print("Error: Could not parse users data")
-                return
-            }
+            guard let usersData = snapshot.value as? [String: [String: Any]] else { return }
 
             for (userId, data) in usersData {
                 if let userName = data["userName"] as? String,
                    let avatarsData = data["avatars"] as? [String: [String: Any]] {
-                    var totalAvatarCount = 0 // アバターの合計数を保持する変数
-                    var usedAvatarName: String? = nil // 使用中のアバター名
+                    var totalAvatarCount = 0
+                    var usedAvatarName: String? = nil
 
-                    // アバターデータをループして合計を計算
                     for (_, avatarData) in avatarsData {
-                        if let count = avatarData["count"] as? Int {
-                            totalAvatarCount += count // 各アバターのcountを合算
-                        }
+                        if let count = avatarData["count"] as? Int { totalAvatarCount += count }
                         if avatarData["usedFlag"] as? Int == 1, usedAvatarName == nil {
-                            usedAvatarName = avatarData["name"] as? String // 使用中のアバター名を設定
+                            usedAvatarName = avatarData["name"] as? String
                         }
                     }
 
-                    let userAvatarCount = UserAvatarCount(
-                        userId: userId,
-                        userName: userName,
-                        avatarCount: totalAvatarCount,
-                        avatarName: usedAvatarName ?? "defaultAvatar" // 使用中のアバター名がない場合はデフォルト名を使用
-                    )
-                    userAvatarCounts.append(userAvatarCount)
+                    userAvatarCounts.append(UserAvatarCount(userId: userId, userName: userName, avatarCount: totalAvatarCount, avatarName: usedAvatarName ?? "defaultAvatar"))
                 }
             }
 
-            // アバター数が多い順にソート
-            self.userAvatarCounts = userAvatarCounts.sorted(by: { $0.avatarCount > $1.avatarCount })
-            
-            // ログインユーザーの順位を計算
+            self.userAvatarCounts = userAvatarCounts.sorted { $0.avatarCount > $1.avatarCount }
             if let currentUserIndex = self.userAvatarCounts.firstIndex(where: { $0.userId == self.authManager.currentUserId }) {
                 self.currentUserAvatarRank = currentUserIndex + 1
             }
         })
     }
     
-    func showMoreUsers() {
-        displayedUserCount = 10  // 表示するユーザー数を10に更新
-    }
-
+    func showMoreUsers() { displayedUserCount = 10 }
 }
 
+// MARK: - モダンタブビュー
+struct ModernTopTabView: View {
+    let list: [String]
+    @Binding var selectedTab: Int
+    
+    var body: some View {
+        HStack(spacing: 0) {
+            ForEach(0..<list.count, id: \.self) { index in
+                Button(action: {
+                    generateHapticFeedback()
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) { selectedTab = index }
+                }) {
+                    VStack(spacing: 8) {
+                        Text(list[index])
+                            .font(.system(size: 14, weight: selectedTab == index ? .bold : .medium))
+                            .foregroundColor(selectedTab == index ? .blue : Color("fontGray").opacity(0.6))
+                        
+                        RoundedRectangle(cornerRadius: 2)
+                            .fill(selectedTab == index
+                                ? LinearGradient(colors: [.blue, .purple], startPoint: .leading, endPoint: .trailing)
+                                : LinearGradient(colors: [.clear, .clear], startPoint: .leading, endPoint: .trailing))
+                            .frame(height: 3)
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.top, 12)
+        .padding(.bottom, 8)
+        .background(Color.white.shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 4))
+    }
+}
+
+// MARK: - ランキングカード
+struct RankingCard: View {
+    let rank: Int
+    let userName: String
+    let avatarName: String
+    let value: String
+    let valueIcon: String
+    let isCurrentUser: Bool
+    @State private var appearAnimation = false
+    
+    private var rankColor: Color {
+        switch rank {
+        case 1: return Color(red: 1.0, green: 0.84, blue: 0)
+        case 2: return Color(red: 0.75, green: 0.75, blue: 0.75)
+        case 3: return Color(red: 0.8, green: 0.5, blue: 0.2)
+        default: return Color.gray
+        }
+    }
+    
+    private var rankGradient: LinearGradient {
+        switch rank {
+        case 1: return LinearGradient(colors: [Color(red: 1.0, green: 0.84, blue: 0), Color(red: 1.0, green: 0.7, blue: 0)], startPoint: .topLeading, endPoint: .bottomTrailing)
+        case 2: return LinearGradient(colors: [Color(red: 0.85, green: 0.85, blue: 0.85), Color(red: 0.65, green: 0.65, blue: 0.65)], startPoint: .topLeading, endPoint: .bottomTrailing)
+        case 3: return LinearGradient(colors: [Color(red: 0.9, green: 0.6, blue: 0.3), Color(red: 0.7, green: 0.4, blue: 0.2)], startPoint: .topLeading, endPoint: .bottomTrailing)
+        default: return LinearGradient(colors: [.gray, .gray], startPoint: .topLeading, endPoint: .bottomTrailing)
+        }
+    }
+    
+    private var rankBadge: some View {
+        Group {
+            if rank <= 3 {
+                ZStack {
+                    Circle().fill(rankGradient).frame(width: 44, height: 44)
+                    Text("\(rank)").font(.system(size: 20, weight: .bold, design: .rounded)).foregroundColor(.white)
+                }.shadow(color: rankColor.opacity(0.4), radius: 6, x: 0, y: 3)
+            } else {
+                ZStack {
+                    Circle().fill(Color(.systemGray5)).frame(width: 44, height: 44)
+                    Text("\(rank)").font(.system(size: 18, weight: .bold, design: .rounded)).foregroundColor(Color("fontGray"))
+                }
+            }
+        }
+    }
+    
+    var body: some View {
+        HStack(spacing: 14) {
+            rankBadge
+            
+            Image(avatarName)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 46, height: 46)
+                .clipShape(Circle())
+                .overlay(Circle().stroke(isCurrentUser ? LinearGradient(colors: [.blue, .purple], startPoint: .topLeading, endPoint: .bottomTrailing) : LinearGradient(colors: [Color.gray.opacity(0.2), Color.gray.opacity(0.2)], startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: isCurrentUser ? 3 : 1))
+                .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
+            
+            VStack(alignment: .leading, spacing: 2) {
+                Text(userName).font(.system(size: 15, weight: .semibold)).foregroundColor(Color("fontGray")).lineLimit(1)
+                if isCurrentUser { Text("あなた").font(.system(size: 11, weight: .medium)).foregroundColor(.blue) }
+            }
+            
+            Spacer()
+            
+            HStack(spacing: 6) {
+                if valueIcon.hasPrefix("checkmark") {
+                    Image(systemName: valueIcon).font(.system(size: 16, weight: .semibold)).foregroundColor(.blue)
+                } else {
+                    Image(valueIcon).resizable().scaledToFit().frame(width: 22, height: 22)
+                }
+                Text(value).font(.system(size: 16, weight: .bold, design: .rounded)).foregroundColor(Color("fontGray"))
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(Capsule().fill(Color(.systemGray6)))
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .background(RoundedRectangle(cornerRadius: 16).fill(isCurrentUser ? Color.blue.opacity(0.05) : Color.white).shadow(color: .black.opacity(0.04), radius: 8, x: 0, y: 4))
+        .overlay(RoundedRectangle(cornerRadius: 16).stroke(isCurrentUser ? Color.blue.opacity(0.3) : Color.clear, lineWidth: 1.5))
+        .scaleEffect(appearAnimation ? 1.0 : 0.95)
+        .opacity(appearAnimation ? 1.0 : 0)
+        .onAppear {
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.7).delay(Double(rank) * 0.05)) { appearAnimation = true }
+        }
+    }
+}
+
+// MARK: - 現在のユーザー順位バナー
+struct CurrentUserRankBanner: View {
+    let rank: Int
+    let type: String
+    
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "person.fill").font(.system(size: 18, weight: .semibold)).foregroundColor(.white)
+            Text("あなたの\(type)順位").font(.system(size: 14, weight: .medium)).foregroundColor(.white.opacity(0.9))
+            Spacer()
+            Text("\(rank)位").font(.system(size: 24, weight: .bold, design: .rounded)).foregroundColor(.white)
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 16)
+        .background(LinearGradient(colors: [.blue, .purple], startPoint: .leading, endPoint: .trailing))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .shadow(color: Color.blue.opacity(0.3), radius: 10, x: 0, y: 5)
+        .padding(.top, 8)
+    }
+}
+
+// MARK: - ローディングビュー
+struct LoadingView: View {
+    @State private var isAnimating = false
+    
+    var body: some View {
+        VStack(spacing: 16) {
+            ZStack {
+                Circle().stroke(Color.gray.opacity(0.2), lineWidth: 4).frame(width: 50, height: 50)
+                Circle().trim(from: 0, to: 0.7)
+                    .stroke(LinearGradient(colors: [.blue, .purple], startPoint: .leading, endPoint: .trailing), style: StrokeStyle(lineWidth: 4, lineCap: .round))
+                    .frame(width: 50, height: 50)
+                    .rotationEffect(Angle(degrees: isAnimating ? 360 : 0))
+                    .animation(.linear(duration: 1).repeatForever(autoreverses: false), value: isAnimating)
+            }
+            Text("読み込み中...").font(.system(size: 14, weight: .medium)).foregroundColor(Color("fontGray").opacity(0.6))
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color(red: 0.96, green: 0.96, blue: 0.98))
+        .onAppear { isAnimating = true }
+    }
+}
+
+// MARK: - ランクランキングビュー
 struct RankRankingView: View {
     @ObservedObject var viewModel: RankingViewModel
     
     var body: some View {
-        if viewModel.rankedUsers.isEmpty {
-            VStack {
-                ActivityIndicator()
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-        } else {
+        if viewModel.rankedUsers.isEmpty { LoadingView() }
+        else {
             ScrollView {
-                VStack {
+                LazyVStack(spacing: 10) {
                     ForEach(Array(viewModel.rankedUsers.prefix(viewModel.displayedUserCount).enumerated()), id: \.element.id) { index, user in
-                        HStack {
-                            if index < 3 {
-                                Image("\(index)")
-                                    .resizable()
-                                    .frame(width: 50, height: 50)
-                                    .padding(.trailing)
-                            } else {
-                                Text("\(index + 1)位")
-                                    .font(.system(size: 40))
-                                    .padding(.trailing, 5)
-                            }
-                            ForEach(user.avatars.indices, id: \.self) { index in
-                                let avatarData = user.avatars[index]
-                                if let name = avatarData["name"] as? String, let usedFlag = avatarData["usedFlag"] as? Int, usedFlag == 1 {
-                                    Image(name)
-                                        .resizable()
-                                        .frame(width: 50, height: 50)
-                                }
-                            }
-                            Text(user.userName)
-                                .font(.system(size: fontSize(for: user.userName, isIPad: isIPad())))
-                            Spacer()
-                            VStack(spacing:5) {
-                                Text("ランク値")
-                                HStack {
-                                    Image("ランクマッチマーク")
-                                        .resizable()
-                                        .frame(width:30,height:30)
-                                    Text("\(user.rankMatchPoint)")
-                                }
-                            }.font(.system(size: 20))
-                        }
-                        .padding(.horizontal)
-                        Divider()
+                        RankingCard(rank: index + 1, userName: user.userName, avatarName: user.avatars.first?["name"] as? String ?? "defaultIcon", value: "\(user.rankMatchPoint)", valueIcon: "ランクマッチマーク", isCurrentUser: user.id == viewModel.authManager.currentUserId)
                     }
-                    if let currentUserRankRank = viewModel.currentUserRankRank {
-                        Text("あなたの順位: \(currentUserRankRank)位")
-                            .font(.headline)
-                            .padding()
-                    }
-                }
-                .foregroundColor(Color("fontGray"))
-            }
-        }
-    }
-
-    func fontSize(for text: String, isIPad: Bool) -> CGFloat {
-        let baseFontSize: CGFloat = isIPad ? 28 : 24
-        let englishAlphabet = CharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-        let textCharacterSet = CharacterSet(charactersIn: text)
-        if englishAlphabet.isSuperset(of: textCharacterSet) {
-            return baseFontSize
-        } else {
-            if text.count >= 12 {
-                return baseFontSize - 14
-            } else if text.count >= 10 {
-                return baseFontSize - 12
-            } else if text.count >= 8 {
-                return baseFontSize - 10
-            } else if text.count >= 6 {
-                return baseFontSize - 8
-            } else if text.count >= 4 {
-                return baseFontSize
-            } else {
-                return baseFontSize + 4
-            }
+                    if let currentUserRankRank = viewModel.currentUserRankRank { CurrentUserRankBanner(rank: currentUserRankRank, type: "ランク値") }
+                }.padding(.horizontal, 16).padding(.vertical, 12)
+            }.background(Color(red: 0.96, green: 0.96, blue: 0.98))
         }
     }
 }
 
+// MARK: - ストーリーランキングビュー
 struct StoryRankingView: View {
     @ObservedObject var viewModel: RankingViewModel
     @Binding var isReturnFlag: Bool
@@ -483,349 +501,76 @@ struct StoryRankingView: View {
 
     var body: some View {
         ZStack {
-            if viewModel.storyUsers.isEmpty {
-                ActivityIndicator()
-            } else {
-                VStack {
+            Color(red: 0.96, green: 0.96, blue: 0.98).ignoresSafeArea()
+            if viewModel.storyUsers.isEmpty { LoadingView() }
+            else {
+                VStack(spacing: 0) {
                     if isReturnFlag {
-                        HStack{
-                            Button(action: { 
-                        generateHapticFeedback()
-                                self.presentationMode.wrappedValue.dismiss()
-                            }) {
-                                Image(systemName: "chevron.left")
-                                    .foregroundColor(.gray)
-                                
-                                Text("戻る")
-                                    .foregroundColor(Color("fontGray"))
+                        HStack {
+                            Button(action: { generateHapticFeedback(); presentationMode.wrappedValue.dismiss() }) {
+                                HStack(spacing: 4) { Image(systemName: "chevron.left").font(.system(size: 16, weight: .semibold)); Text("戻る").font(.system(size: 16, weight: .medium)) }.foregroundColor(.blue)
                             }
-                            .padding(.top).buttonStyle(.plain)
                             Spacer()
-                            Text("コマ数ランキング")
-                                .font(.system(size: 20))
-                                .padding(.top)
-                                .foregroundColor(Color("fontGray"))
+                            Text("ダンジョンランキング").font(.system(size: 18, weight: .bold)).foregroundColor(Color("fontGray"))
                             Spacer()
-                            Button(action: { 
-                        generateHapticFeedback()
-                                self.presentationMode.wrappedValue.dismiss()
-                            }) {
-                                Image(systemName: "chevron.left")
-                                    .foregroundColor(.gray)
-                                
-                                Text("戻る")
-                                    .foregroundColor(Color("fontGray"))
-                            }
-                            .padding(.top)
-                            .opacity(0)
-                        }
-                        .padding(.leading)
-                        .background(.white)
+                            HStack(spacing: 4) { Image(systemName: "chevron.left"); Text("戻る") }.opacity(0)
+                        }.padding(.horizontal, 16).padding(.vertical, 12).background(Color.white)
                     }
-                ScrollView {
-                        ForEach(Array(viewModel.storyUsers.prefix(10).enumerated()), id: \.element.id) { index, rankedUser in
-                            HStack {
-                                HStack {
-                                    if let rank = rankedUser.rank, rank <= 3 {
-                                        Image("\(rank - 1)")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(height: 50)
-                                    } else if let rank = rankedUser.rank {
-                                        Text("\(rank)位")
-                                            .font(.system(size: 40))
-                                    }
-                                }
-                                .padding(.leading, 10)
-
-                                // アバターとユーザー名の表示（左揃え）
-                                HStack {
-                                    ForEach(rankedUser.user.avatars.indices, id: \.self) { index in
-                                        let avatarData = rankedUser.user.avatars[index]
-                                        if let name = avatarData["name"] as? String,
-                                           let usedFlag = avatarData["usedFlag"] as? Int,
-                                           usedFlag == 1 {
-                                            Image(name)
-                                                .resizable()
-                                                .frame(width: 50, height: 50)
-                                        }
-                                    }
-                                    Text(rankedUser.user.userName)
-                                        .font(.system(size: fontSize1(for: rankedUser.user.userName, isIPad: isIPad())))
-                                }
-                                .frame(maxWidth: .infinity, alignment: .leading)
-
-                                Spacer()
-
-                                // コマ数の表示
-                                HStack {
-                                    Image("足場1")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 23)
-                                    Text("\(rankedUser.position)コマ")
-                                }
-                                .font(.system(size: 16))
+                    ScrollView {
+                        LazyVStack(spacing: 10) {
+                            ForEach(Array(viewModel.storyUsers.prefix(10).enumerated()), id: \.element.id) { index, rankedUser in
+                                RankingCard(rank: rankedUser.rank ?? (index + 1), userName: rankedUser.user.userName, avatarName: rankedUser.user.avatars.first?["name"] as? String ?? "defaultIcon", value: "\(rankedUser.position)コマ", valueIcon: "足場1", isCurrentUser: rankedUser.user.id == viewModel.authManager.currentUserId)
                             }
-                            .padding(.horizontal)
-                            Divider()
-                        }
-
-                        // 現在のユーザーの順位を表示
-                        if let currentStoryUser = viewModel.currentStoryUser {
-                            Text("あなたの順位: \(currentStoryUser)位")
-                                .font(.headline)
-                                .padding()
-                        }
+                            if let currentStoryUser = viewModel.currentStoryUser { CurrentUserRankBanner(rank: currentStoryUser, type: "ダンジョン") }
+                        }.padding(.horizontal, 16).padding(.vertical, 12)
                     }
                 }
             }
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color("Color2"))
-        .foregroundColor(Color("fontGray"))
-        .onAppear {
-            print("viewModel.fetchStorys()")
-            viewModel.fetchStorys()
-        }
-    }
-
-    func fontSize1(for text: String, isIPad: Bool) -> CGFloat {
-        let baseFontSize: CGFloat = isIPad ? 28 : 24 // iPad用のベースフォントサイズを大きくする
-
-        let englishAlphabet = CharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-        let textCharacterSet = CharacterSet(charactersIn: text)
-
-        if englishAlphabet.isSuperset(of: textCharacterSet) {
-            return baseFontSize
-        } else {
-            if text.count >= 12 {
-                return baseFontSize - 14
-            } else if text.count >= 10 {
-                return baseFontSize - 12
-            } else if text.count >= 8 {
-                return baseFontSize - 10
-            } else if text.count >= 6 {
-                return baseFontSize - 8
-            } else if text.count >= 4 {
-                return baseFontSize
-            } else {
-                return baseFontSize + 4
-            }
-        }
-    }
-
-    // デバイスがiPadかどうかを判定
-    func isIPad() -> Bool {
-        return UIDevice.current.userInterfaceIdiom == .pad
+        }.onAppear { viewModel.fetchStorys() }
     }
 }
 
-
+// MARK: - レベルランキングビュー
 struct LevelRankingView: View {
     @ObservedObject var viewModel: RankingViewModel
-    @State private var rankNum: Int = 0
     
     var body: some View {
-        if viewModel.userAnswerDataList.isEmpty {
-            // データがまだ読み込まれていない場合の表示
-            VStack{
-            ActivityIndicator()
-        }
-            .background(Color("Color2"))
-            .frame(maxWidth: .infinity,maxHeight: .infinity)
-        } else {
-            ScrollView{
-                VStack {
+        if viewModel.users.isEmpty { LoadingView() }
+        else {
+            ScrollView {
+                LazyVStack(spacing: 10) {
                     ForEach(Array(viewModel.users.prefix(viewModel.displayedUserCount).enumerated()), id: \.element.id) { index, user in
-                        
-                        HStack {
-                            // ユーザーのランキングを表示
-                            if (index==0||index==1||index==2){
-                                Image("\(index)")
-                                    .resizable()
-                                    .frame(width:50,height:50)
-                                    .padding(.trailing)
-                            }else{
-                                if index != 9{
-                                    Text("\(index + 1)位")
-                                        .font(.system(size:40))
-                                        .padding(.trailing, 5)
-                                }else{
-                                    Text("\(index + 1)位")
-                                        .font(.system(size:30))
-                                        .padding(.trailing, 5)
-                                }
-                            }
-                            ForEach(user.avatars.indices, id: \.self) { index in
-                                let avatarData = user.avatars[index]
-                                //                                // 辞書から値を取り出し、適切にキャストします。
-                                if let name = avatarData["name"] as? String, let usedFlag = avatarData["usedFlag"] as? Int, usedFlag == 1 {
-                                    Image(name)
-                                        .resizable()
-                                        .frame(width:50,height:50)
-                                }
-                            }
-                            Text(user.userName)
-                                .font(.system(size: fontSize1(for: user.userName, isIPad: isIPad())))
-                            Spacer()
-                            VStack{
-                                HStack{
-                                    Image("星")
-                                        .resizable()
-                                        .frame(width:23,height:23)
-                                    Text("\(user.level)レベル")
-                                }
-                            }
-                            .font(.system(size:16))
-                        }
-                        .padding(.horizontal)
-                        Divider()
+                        RankingCard(rank: index + 1, userName: user.userName, avatarName: user.avatars.first?["name"] as? String ?? "defaultIcon", value: "Lv.\(user.level)", valueIcon: "星", isCurrentUser: user.id == viewModel.authManager.currentUserId)
                     }
-                    if let currentUserLevelRank = viewModel.currentUserLevelRank {
-                        Text("あなたの順位: \(currentUserLevelRank)位")
-                            .font(.headline)
-                            .padding()
-                    }
-                }
-            }
-            .background(Color("Color2"))
-            .foregroundColor(Color("fontGray"))
+                    if let currentUserLevelRank = viewModel.currentUserLevelRank { CurrentUserRankBanner(rank: currentUserLevelRank, type: "レベル") }
+                }.padding(.horizontal, 16).padding(.vertical, 12)
+            }.background(Color(red: 0.96, green: 0.96, blue: 0.98))
         }
     }
-    func fontSize(for name: String) -> CGFloat {
-        let baseFontSize: CGFloat = 24 // ベースとなるフォントサイズ
-        let length = name.count // ユーザー名の文字数
-        let fontSize = max(baseFontSize - CGFloat(length - 10) * 0.5, 12) // 文字数が10を超えるごとにフォントサイズを0.5小さくし、最小サイズを12にします
-        return fontSize
-    }
-
-    func fontSize1(for text: String, isIPad: Bool) -> CGFloat {
-        let baseFontSize: CGFloat = isIPad ? 28 : 24 // iPad用のベースフォントサイズを大きくする
-
-        let englishAlphabet = CharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-        let textCharacterSet = CharacterSet(charactersIn: text)
-//print(text)
-//        print(baseFontSize)
-        if englishAlphabet.isSuperset(of: textCharacterSet) {
-            return baseFontSize
-        } else {
-            if text.count >= 12 {
-                return baseFontSize - 14
-            } else if text.count >= 10 {
-                return baseFontSize - 12
-            } else if text.count >= 8 {
-                return baseFontSize - 10
-            } else if text.count >= 6 {
-                return baseFontSize - 8
-            } else if text.count >= 4 {
-                return baseFontSize
-            } else {
-                return baseFontSize + 4
-            }
-        }
-    }
-
 }
 
 struct UserAnswerData {
     let userId: String
     let userName: String
     var answerCount: Int
-    let avatarName: String // アバターの名前を保持するプロパティ
+    let avatarName: String
 }
 
+// MARK: - 月間回答数ランキングビュー
 struct MonthlyAnswersRankingView: View {
     @ObservedObject var viewModel: RankingViewModel
     
-    func isIPad() -> Bool {
-        return UIDevice.current.userInterfaceIdiom == .pad
-    }
-    
     var body: some View {
-
-            if viewModel.userAnswerDataList.isEmpty {
-                // データがまだ読み込まれていない場合の表示
-                VStack{
-                ActivityIndicator()
-            }
-                .frame(maxWidth: .infinity,maxHeight: .infinity)
-            } else {
-                // データが読み込まれた後の表示
-                ScrollView {
-                VStack {
-                    ForEach(0..<viewModel.userAnswerDataList.count, id: \.self) { index in
-                        let userAnswerData = viewModel.userAnswerDataList[index]
-                        HStack {
-                            if (index==0||index==1||index==2){
-                                Image("\(index)")
-                                    .resizable()
-                                    .frame(width:50,height:50)
-                                    .padding(.trailing)
-                            }else{
-                                if index != 9{
-                                    Text("\(index + 1)位")
-                                        .font(.system(size:40))
-                                        .padding(.trailing, 5)
-                                }else{
-                                    Text("\(index + 1)位")
-                                        .font(.system(size:30))
-                                        .padding(.trailing, 5)
-                                }
-                            }
-                            // アバターの表示にはavatarNameを使用
-                            Image(userAnswerData.avatarName)
-                                .resizable()
-                                .frame(width: 50, height: 50)
-                            Text(userAnswerData.userName)
-                                .font(.system(size: fontSize(for: userAnswerData.userName, isIPad: isIPad())))
-                            Spacer()
-                            VStack{
-                                HStack {
-                                    Image(systemName: "checkmark.square")
-                                        .foregroundColor(.blue)
-                                    Text("\(userAnswerData.answerCount)問")
-                                }
-                            }.font(.system(size: 20))
-                        }
-                        .padding(.horizontal)
-                        Divider()
+        if viewModel.userAnswerDataList.isEmpty { LoadingView() }
+        else {
+            ScrollView {
+                LazyVStack(spacing: 10) {
+                    ForEach(Array(viewModel.userAnswerDataList.enumerated()), id: \.element.userId) { index, data in
+                        RankingCard(rank: index + 1, userName: data.userName, avatarName: data.avatarName, value: "\(data.answerCount)問", valueIcon: "checkmark.square", isCurrentUser: data.userId == viewModel.authManager.currentUserId)
                     }
-                    if let rank = viewModel.currentUserRank {
-                       Text("あなたの順位: \(rank)位")
-                           .font(.headline)
-                           .padding()
-                   }
-            }
-                .foregroundColor(Color("fontGray"))
-                }
-        }
-    }
-    
-    // テキストサイズを決定する関数
-    func fontSize(for text: String, isIPad: Bool) -> CGFloat {
-        let baseFontSize: CGFloat = isIPad ? 28 : 24 // iPad用のベースフォントサイズを大きくする
-
-        let englishAlphabet = CharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-        let textCharacterSet = CharacterSet(charactersIn: text)
-//print(text)
-//        print(baseFontSize)
-        if englishAlphabet.isSuperset(of: textCharacterSet) {
-            return baseFontSize
-        } else {
-            if text.count >= 12 {
-                return baseFontSize - 14
-            } else if text.count >= 10 {
-                return baseFontSize - 12
-            } else if text.count >= 8 {
-                return baseFontSize - 10
-            } else if text.count >= 6 {
-                return baseFontSize - 8
-            } else if text.count >= 4 {
-                return baseFontSize
-            } else {
-                return baseFontSize + 4
-            }
+                    if let rank = viewModel.currentUserRank { CurrentUserRankBanner(rank: rank, type: "回答数") }
+                }.padding(.horizontal, 16).padding(.vertical, 12)
+            }.background(Color(red: 0.96, green: 0.96, blue: 0.98))
         }
     }
 }
@@ -837,197 +582,63 @@ struct UserAvatarCount {
     let avatarName: String
 }
 
+// MARK: - アバターランキングビュー
 struct AvatarRankingView: View {
     @ObservedObject var viewModel: RankingViewModel
     
     var body: some View {
-        if viewModel.userAnswerDataList.isEmpty {
-            // データがまだ読み込まれていない場合の表示
-            VStack{
-                ActivityIndicator()
-            }
-            .frame(maxWidth: .infinity,maxHeight: .infinity)
-        } else {
-        ScrollView {
-            ForEach(Array(viewModel.userAvatarCounts.prefix(10).enumerated()), id: \.element.userId) { index, userAvatarCount in
-
-                    HStack {
-                        if (index==0||index==1||index==2){
-                            Image("\(index)")
-                                .resizable()
-                                .frame(width:50,height:50)
-                                .padding(.trailing)
-                        }else{
-                            if index != 9{
-                                Text("\(index + 1)位")
-                                    .font(.system(size:40))
-                                    .padding(.trailing, 5)
-                            }else{
-                                Text("\(index + 1)位")
-                                    .font(.system(size:30))
-                                    .padding(.trailing, 5)
-                            }
-                        }
-                        Image(userAvatarCount.avatarName)
-                            .resizable()
-                            .frame(width: 50, height: 50)
-                        Text(userAvatarCount.userName)
-                            .font(.system(size: fontSize(for: userAvatarCount.userName, isIPad: isIPad())))
-                        Spacer()
-                        VStack{
-                            HStack{
-                                Image("ライム")
-                                    .resizable()
-                                    .frame(width: 30, height: 30)
-                                Text("\(userAvatarCount.avatarCount)体")
-                            }
-                        }
-                            .font(.system(size: 20))
+        if viewModel.userAvatarCounts.isEmpty { LoadingView() }
+        else {
+            ScrollView {
+                LazyVStack(spacing: 10) {
+                    ForEach(Array(viewModel.userAvatarCounts.prefix(10).enumerated()), id: \.element.userId) { index, data in
+                        RankingCard(rank: index + 1, userName: data.userName, avatarName: data.avatarName, value: "\(data.avatarCount)体", valueIcon: "ライム", isCurrentUser: data.userId == viewModel.authManager.currentUserId)
                     }
-                    .padding(.horizontal)
-                    Divider()
-
-                
-                
-                
-                }
-            if let rank = viewModel.currentUserAvatarRank {
-                Text("あなたの順位: \(rank)位")
-                    .font(.headline)
-                    .padding()
-            }
-                }        .foregroundColor(Color("fontGray"))
-                .onAppear {
-                    viewModel.fetchUsersByAvatarCount()
-                }
-
-          
-        }
-    }
-    func fontSize(for text: String, isIPad: Bool) -> CGFloat {
-        let baseFontSize: CGFloat = isIPad ? 28 : 24 // iPad用のベースフォントサイズを大きくする
-
-        let englishAlphabet = CharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-        let textCharacterSet = CharacterSet(charactersIn: text)
-//print(text)
-//        print(baseFontSize)
-        if englishAlphabet.isSuperset(of: textCharacterSet) {
-            return baseFontSize
-        } else {
-            if text.count >= 12 {
-                return baseFontSize - 14
-            } else if text.count >= 10 {
-                return baseFontSize - 12
-            } else if text.count >= 8 {
-                return baseFontSize - 10
-            } else if text.count >= 6 {
-                return baseFontSize - 8
-            } else if text.count >= 4 {
-                return baseFontSize
-            } else {
-                return baseFontSize + 4
-            }
+                    if let rank = viewModel.currentUserAvatarRank { CurrentUserRankBanner(rank: rank, type: "アバター") }
+                }.padding(.horizontal, 16).padding(.vertical, 12)
+            }.background(Color(red: 0.96, green: 0.96, blue: 0.98)).onAppear { viewModel.fetchUsersByAvatarCount() }
         }
     }
 }
 
+// MARK: - 互換性のため
 struct TopTabView: View {
     let list: [String]
     @Binding var selectedTab: Int
-
-    var body: some View {
-        
-        HStack(spacing: 0) {
-            ForEach(0 ..< list.count, id: \.self) { row in
-                Button(action: { 
-                        generateHapticFeedback()
-                    withAnimation {
-                        selectedTab = row
-                    }
-                }, label: {
-                    VStack(spacing: 0) {
-                        HStack {
-                            Text(list[row])
-                                .font(Font.system(size: 18, weight: .semibold))
-                                .foregroundColor(Color("fontGray"))
-                        }
-                        .frame(
-                            width: (UIScreen.main.bounds.width / CGFloat(list.count)),
-                            height: 48 - 3
-                        )
-                        Rectangle()
-                            .fill(selectedTab == row ? Color("loading") : Color.clear)
-                            .frame(height: 3)
-                    }
-                    .fixedSize()
-                })
-            }
-        }
-        .frame(height: 48)
-        .background(Color.white)
-        .compositingGroup()
-        .shadow(color: .primary.opacity(0.2), radius: 3, x: 4, y: 4)
-    }
+    var body: some View { ModernTopTabView(list: list, selectedTab: $selectedTab) }
 }
 
-
+// MARK: - メインランキングビュー
 struct RankingView: View {
     @StateObject var viewModel = RankingViewModel()
     @ObservedObject var audioManager: AudioManager
     @Environment(\.presentationMode) var presentationMode
     @State private var selectedTab: Int = 0
-    @State private var canSwipe: Bool = false
     let list: [String] = ["レベル", "回答数(月間)", "ダンジョン"]
     
     var body: some View {
         NavigationView {
-            VStack {
-                TopTabView(list: list, selectedTab: $selectedTab)
-                
-                TabView(selection: $selectedTab,
-                        content: {
-                            LevelRankingView(viewModel: viewModel)
-                                .padding(.top)
-                                .tag(0)
-                            MonthlyAnswersRankingView(viewModel: viewModel)
-                                .padding(.top)
-                                .tag(1)
-                    StoryRankingView(viewModel: viewModel, isReturnFlag: .constant(false))
-                                .padding(.top)
-                                .tag(2)
-                        })
-                        .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-            }
-            .background(Color("Color2"))
+            VStack(spacing: 0) {
+                ModernTopTabView(list: list, selectedTab: $selectedTab)
+                TabView(selection: $selectedTab) {
+                    LevelRankingView(viewModel: viewModel).tag(0)
+                    MonthlyAnswersRankingView(viewModel: viewModel).tag(1)
+                    StoryRankingView(viewModel: viewModel, isReturnFlag: .constant(false)).tag(2)
+                }.tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+            }.background(Color(red: 0.96, green: 0.96, blue: 0.98))
         }
         .navigationBarBackButtonHidden(true)
-        .navigationBarItems(leading: Button(action: { 
-                        generateHapticFeedback()
-            self.presentationMode.wrappedValue.dismiss()
-            audioManager.playCancelSound()
-        }) {
-            Image(systemName: "chevron.left")
-                .foregroundColor(.gray)
-            Text("戻る")
-                .foregroundColor(Color("fontGray"))
+        .navigationBarItems(leading: Button(action: { generateHapticFeedback(); presentationMode.wrappedValue.dismiss(); audioManager.playCancelSound() }) {
+            HStack(spacing: 4) { Image(systemName: "chevron.left").font(.system(size: 16, weight: .semibold)); Text("戻る").font(.system(size: 16, weight: .medium)) }.foregroundColor(.blue)
         }).buttonStyle(.plain)
         .navigationTitle("ランキング")
         .navigationBarTitleDisplayMode(.inline)
-        .gesture(
-            DragGesture()
-                .onEnded { value in
-                    if value.translation.width > 80 {
-                        presentationMode.wrappedValue.dismiss()
-                    }
-                }
-        )
+        .gesture(DragGesture().onEnded { value in if value.translation.width > 80 { presentationMode.wrappedValue.dismiss() } })
     }
 }
 
-
 struct RankingView_Previews: PreviewProvider {
     static var previews: some View {
-//        RankingView(audioManager: AudioManager())
-        StoryRankingView(viewModel: RankingViewModel(), isReturnFlag: .constant(false))
+        RankingView(audioManager: AudioManager())
     }
 }

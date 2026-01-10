@@ -358,7 +358,7 @@ struct ContentView: View {
                                 .shadow(radius: 3)
                                 VStack{
                                     Group{
-                                        NavigationLink("", destination: ManagerView(audioManager: audioManager,viewModel: RankingViewModel()).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizList)
+                                        NavigationLink("", destination: ManagerListView(isPresenting: $isPresentingQuizList).navigationBarBackButtonHidden(true), isActive: $isPresentingQuizList)
                                         NavigationLink("", destination: StoryView(isReturnActive: .constant(true), isPresented: $isPresentingTraining).navigationBarBackButtonHidden(true), isActive: $isPresentingTraining)
                                         NavigationLink("", destination: GachaManagerView(isPresenting: $isPresentingGachaView), isActive: $isPresentingGachaView)
                                         

@@ -1357,7 +1357,7 @@ struct CoinPurchaseView: View {
                         // コインパッケージ一覧
                         VStack(spacing: 16) {
                             ForEach(packages.indices, id: \.self) { index in
-                                CoinPackageCard(package: packages[index])
+                                CoinPurchasePackageCard(package: packages[index])
                             }
                         }
                         .padding(.horizontal, 20)
@@ -1398,99 +1398,6 @@ struct CoinPurchaseView: View {
                 }
             }
         }
-    }
-}
-
-// MARK: - Coin Package Card
-struct CoinPackageCard: View {
-    let package: CoinPurchaseView.CoinPackage
-    
-    var body: some View {
-        Button(action: {
-            // コイン購入処理
-            print("購入: \(package.coins)コイン")
-        }) {
-            ZStack(alignment: .topTrailing) {
-                // メインカード
-                VStack(spacing: 12) {
-                    HStack {
-                        // コインアイコンと数量
-                        HStack(spacing: 12) {
-                            Image(systemName: "dollarsign.circle.fill")
-                                .font(.system(size: 40))
-                                .foregroundColor(.yellow)
-                            
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("\(package.coins)")
-                                    .font(.system(size: 32, weight: .bold))
-                                    .foregroundColor(.white)
-                                
-                                Text("コイン")
-                                    .font(.system(size: 16, weight: .medium))
-                                    .foregroundColor(.white.opacity(0.9))
-                            }
-                        }
-                        
-                        Spacer()
-                        
-                        // 価格
-                        VStack(alignment: .trailing, spacing: 4) {
-                            Text(package.price)
-                                .font(.system(size: 28, weight: .bold))
-                                .foregroundColor(.white)
-                            
-                            if let bonus = package.bonus {
-                                Text(bonus)
-                                    .font(.system(size: 12, weight: .semibold))
-                                    .foregroundColor(.yellow)
-                                    .padding(.horizontal, 8)
-                                    .padding(.vertical, 4)
-                                    .background(
-                                        Capsule()
-                                            .fill(Color.white.opacity(0.2))
-                                    )
-                            }
-                        }
-                    }
-                }
-                .padding(20)
-                .background(
-                    LinearGradient(
-                        gradient: Gradient(colors: package.gradientColors),
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    )
-                )
-                .cornerRadius(20)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 20)
-                        .stroke(Color.white.opacity(0.3), lineWidth: 2)
-                )
-                .shadow(color: package.gradientColors[0].opacity(0.4), radius: 15, x: 0, y: 8)
-                
-                // 人気バッジ
-                if package.isPopular {
-                    VStack {
-                        Text("人気")
-                            .font(.system(size: 12, weight: .bold))
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 6)
-                            .background(
-                                LinearGradient(
-                                    colors: [Color.red, Color.orange],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
-                            .cornerRadius(12)
-                            .shadow(radius: 5)
-                    }
-                    .offset(x: -10, y: -10)
-                }
-            }
-        }
-        .buttonStyle(ScaleButtonStyle())
     }
 }
 

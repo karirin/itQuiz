@@ -472,18 +472,24 @@ struct StoryQuizView: View {
                  .edgesIgnoringSafeArea(.all)
             VStack {
                 HStack{
-                    Button(action: { 
-                        generateHapticFeedback()
-                        showHomeModal.toggle()
-                        audioManager.playSound()
-                    }) {
-                        Image("設定")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(height: 50)
-                    }
-                    .padding(.leading)
-                    .foregroundColor(.gray)
+                    Button(action: {
+                     generateHapticFeedback()
+                         showHomeModal.toggle()
+                         audioManager.playSound()
+                     }) {
+                         ZStack {
+                             Circle()
+                                 .fill(Color.white)
+                                 .frame(width: 52, height: 52)
+                                 .shadow(color: .black.opacity(0.15), radius: 8, x: 0, y: 4)
+                             
+                             Image(systemName: "gearshape.fill")
+                                 .font(.system(size: 22, weight: .semibold))
+                                 .foregroundColor(Color("fontGray"))
+                         }
+                     }
+                     .padding(.leading)
+                     .foregroundColor(.gray)
                     Spacer()
                     Spacer()
                     // 正解の場合の赤い円
@@ -499,20 +505,12 @@ struct StoryQuizView: View {
                 Spacer()
                 VStack{
                     ZStack {
-                        VStack{
-                            Text(currentQuiz.question)
-                                .font(.headline)
-                                .frame(height: tutorialNum == 0 ? 120 : nil)
-                                .padding(.horizontal)
-                                .foregroundColor(Color("fontGray"))
-                            
-                        }
-                        .frame(maxWidth: .infinity)
-                        .background(Color("Color2"))
-                        .padding(.vertical, 5)
-                        .background(GeometryReader { geometry in
-                            Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
-                        })//
+                        QuestionCardView(
+                            question: currentQuiz.question,
+                            selectedAnswerIndex: selectedAnswerIndex,
+                            correctAnswerIndex: currentQuiz.correctAnswerIndex
+                        )
+                        .padding(.horizontal, 16)
                         
                         // 正解の場合の赤い円
                         if let selected = selectedAnswerIndex, selected == currentQuiz.correctAnswerIndex {

@@ -39,6 +39,9 @@ struct AppliedManagerListView: View {
     @State private var preFlag: Bool = false
     @StateObject private var appState = AppState()
     @State private var isLoading: Bool = true
+    @State private var animateCards: Bool = false
+    @State private var incorrectCount: Int = 0
+    @State private var rewardAnimating = false
 
     init(isPresenting: Binding<Bool>) {
         _isPresenting = isPresenting
@@ -47,398 +50,61 @@ struct AppliedManagerListView: View {
 
 
     var body: some View {
-//        NavigationView{
-            ZStack{
-                    ScrollView{
-                        VStack {
-                            HStack {
-                                Text(" ")
-                                    .frame(width:isIPad() ? 10 : 5,height: isIPad() ? 40 : 15)
-                                    .background(.gray)
-                                Text("不正解した問題だけを解くことができます")
-                                    .font(.system(size: isIPad() ? 40 : 15))
-                                    .foregroundColor(Color("fontGray"))
-                                Spacer()
-                            }
-    //                            .padding(.horizontal,0)
-                            .padding(.leading,30)
-                            .padding(.bottom)
-                            .padding(.top)
-                            Button(action: { 
-                        generateHapticFeedback()
-                                audioManager.playKetteiSound()
-                                if appState.isBannerVisible {
-                                    preFlag = true
-                                } else {
-                                    if !isIncorrectAnswersEmpty {
-                                        self.isPresentingQuizIncorrectAnswer = true
-                                    }
-                                }
-                            }) {
-                                if isLoading {
-                                    ZStack{
-                                        Image("応用情報技術者試験復習ボタン白黒")
-                                            .resizable()
-                                            .frame(height: isIPad() ? 200 : 70)
-                                        ProgressView()
-                                            .scaleEffect(2)
-                                    }
-                                } else {
-                                    ZStack {
-                                        if isIncorrectAnswersEmpty == true {
-                                            Image("応用情報技術者試験復習ボタン白黒")
-                                                .resizable()
-                                                .frame(height: isIPad() ? 200 : 70)
-                                        }else{
-                                            Image("応用情報技術者試験復習ボタン")
-                                                .resizable()
-                                                .frame(height: isIPad() ? 200 : 70)
-                                        }
-                                        if appState.isBannerVisible {
-                                            ZStack{
-                                                Color.black.opacity(0.45)
-                                                    .cornerRadius(30)
-                                                Text("プレミアムプランを登録すると\n復習機能が開放されます")
-                                                    .font(.system(size: isIPad() ? 50 : 20))
-                                                    .foregroundStyle(.white)
-                                                    .bold()
-                                                    .multilineTextAlignment(.center)
-                                            }
-                                            .onTapGesture {
-                                                preFlag = true
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding(.horizontal)
-                            .padding(.bottom)
-                            .shadow(radius: 3)
-                            .fullScreenCover(isPresented: $isPresentingQuizIncorrectAnswer) {
-                                QuizAppliedIncorrectAnswerListView(isPresenting: $isPresentingQuizIncorrectAnswer)
-                                        }
-                            .onChange(of: isPresentingQuizBeginner) { isPresenting in
-                                    fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
-                                }
-                            }
-                            .onChange(of: isPresentingQuizIncorrectAnswer) { isPresenting in
-                                    fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
-                                }
-                            }
-                            .onChange(of: isPresentingQuizIntermediate) { isPresenting in
-                                    fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
-                                }
-                            }
-                            .onChange(of: isPresentingQuizAdvanced) { isPresenting in
-                                    fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
-                                }
-                            }
-                            .onChange(of: isPresentingQuizGod) { isPresenting in
-                                    fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
-                                }
-                            }
-                            .onChange(of: isPresentingQuizNetwork) { isPresenting in
-                                    fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
-                                }
-                            }
-                            .onChange(of: isPresentingQuizSecurity) { isPresenting in
-                                    fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
-                                }
-                            }
-                            .onChange(of: isPresentingQuizDatabase) { isPresenting in
-                                    fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
-                                }
-                            }
-                        
-                            HStack {
-                                Text(" ")
-                                    .frame(width:isIPad() ? 10 : 5,height: isIPad() ? 40 : 15)
-                                    .background(.gray)
-                                Text("問題の種類を選ぶことができます")
-                                    .font(.system(size: isIPad() ? 40 : 16))
-                                    .foregroundColor(Color("fontGray"))
-                                Spacer()
-                            }
-                            .padding(.horizontal)
-                            .padding(.bottom)
-                            .padding(.leading,15)
-                                Button(action: { 
-                        generateHapticFeedback()
-                                    audioManager.playKetteiSound()
-                                    // 画面遷移のトリガーをオンにする
-                                    self.isPresentingQuizDatabase = true
-                                }) {
-                                    //                        Image("IT基礎知識の問題の初級")
-                                    Image("応用情報技術者試験基礎理解ボタン")
-                                        .resizable()
-                                        .frame(height: isIPad() ? 200 : 70)
-                                }
-                                .frame(maxWidth: .infinity)
-                                .padding(.horizontal)
-                                .padding(.bottom)
-                                .shadow(radius: 3)
-                                .fullScreenCover(isPresented: $isPresentingQuizDatabase) {
-                                    QuizAppliedBasicListView(isPresenting: $isPresentingQuizDatabase)
-                                            }
-                            .background(GeometryReader { geometry in
-                                Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
-                            })
-                            Button(action: { 
-                        generateHapticFeedback()
-                                audioManager.playKetteiSound()
-                                self.isPresentingQuizIntermediate = true
-                            }) {
-                                //                    Image("IT基礎知識の問題の中級")
-                                Image("応用情報技術者ストラテジボタン")
-                                    .resizable()
-                                    .frame(height: isIPad() ? 200 : 70)
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding(.horizontal)
-                            .padding(.bottom)
-                            .shadow(radius: 3)
-                            .fullScreenCover(isPresented: $isPresentingQuizIntermediate) {
-                                QuizAppliedStrategyListView(isPresenting: $isPresentingQuizIntermediate)
-                                        }
-                            
-                            Button(action: { 
-                        generateHapticFeedback()
-                                audioManager.playKetteiSound()
-                                self.isPresentingQuizAdvanced = true
-                            }) {
-                                //                    Image("IT基礎知識の問題の上級")
-                                Image("応用情報技術者マネジメントボタン")
-                                    .resizable()
-                                    .frame(height: isIPad() ? 200 : 70)
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding(.horizontal)
-                            .padding(.bottom)
-                            .shadow(radius: 3)
-                            .fullScreenCover(isPresented: $isPresentingQuizAdvanced) {
-                                QuizAppliedManagementListView(isPresenting: $isPresentingQuizAdvanced)
-                                        }
-                            Button(action: { 
-                        generateHapticFeedback()
-                                audioManager.playKetteiSound()
-                                self.isPresentingQuizGod = true
-                            }) {
-                                //                    Image("データベース系の問題")
-                                Image("応用情報技術者テクノロジボタン")
-                                    .resizable()
-                                    .frame(height: isIPad() ? 200 : 70)
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding(.horizontal)
-                            .padding(.bottom)
-                            .shadow(radius: 3)
-                            .fullScreenCover(isPresented: $isPresentingQuizGod) {
-                                QuizAppliedTechnologyListView(isPresenting: $isPresentingQuizGod)
-                                        }
-                            .padding(.bottom,130)
-                        }
+        ZStack {
+            backgroundView
+
+            VStack(spacing: 0) {
+                navigationBar(title: "応用情報技術者試験")
+
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 24) {
+                        reviewSection
+                        categorySection
                     }
-                    .overlay(
-                        ZStack {
-                            Spacer()
-                            HStack {
-                                Spacer()
-                                VStack{
-                                    Spacer()
-                                    HStack {
-                                        Button(action: { 
-                        generateHapticFeedback()
-                                           reward.ExAndMoReward()
-                                       }, label: {
-                                           if reward.rewardLoaded{
-                                               Image("倍ボタン")
-                                                   .resizable()
-                                                   .frame(width: 110, height: 110)
-                                           }else{
-                                               Image("倍ボタン白黒")
-                                                   .resizable()
-                                                   .frame(width: 110, height: 110)
-                                           }
-                                       })
-                                           .shadow(radius: 5)
-                                           .disabled(!reward.rewardLoaded)
-                                           .onChange(of: reward.rewardEarned) { rewardEarned in
-                                               showAlert = rewardEarned
-                                               print("onchange reward.rewardEarned:\(showAlert)")
-                                           }
-                                           .alert(isPresented: $showAlert) {
-                                               Alert(
-                                                   title: Text("報酬獲得！"),
-                                                   message: Text("1時間だけ獲得した経験値とコインが2倍"),
-                                                   dismissButton: .default(Text("OK"), action: {
-                                                       showAlert = false
-                                                       reward.rewardEarned = false
-                                                   })
-                                               )
-                                           }
-                                            .background(GeometryReader { geometry in
-                                                Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
-                                            })
-                                            .padding(.bottom)
-                                        
-                                            Spacer()
-                                    }
-                                }
-                            }
-                        }
-                    )
-                .onPreferenceChange(ViewPositionKey.self) { positions in
-                    self.buttonRect = positions.first ?? .zero
-                }
-                if showLoginModal {
-                    ZStack {
-                        Color.black.opacity(0.7)
-                            .edgesIgnoringSafeArea(.all)
-                        RewardTimesModal(audioManager: audioManager, isPresented: $showLoginModal)
-                    }
-                }
-                if tutorialNum == 2 {
-                    GeometryReader { geometry in
-                        Color.black.opacity(0.5)
-                        // スポットライトの領域をカットアウ
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                                    .frame(width: buttonRect.width - 20, height: buttonRect.height)
-                                    .position(x: buttonRect.midX, y: isSmallDevice() ? buttonRect.midY-120 : buttonRect.midY-155)
-                                    .blendMode(.destinationOut)
-                            )
-                            .ignoresSafeArea()
-                            .compositingGroup()
-                            .background(.clear)
-                    }
-                    VStack {
-                        Spacer()
-                            .frame(height:isSmallDevice() ? buttonRect.minY + bubbleHeight-50 : buttonRect.minY + bubbleHeight-90)
-                        VStack(alignment: .trailing, spacing: .zero) {
-                            Text("「IT基礎知識の問題（初級）」をクリックしてください。")
-                                .font(.callout)
-                                .padding(5)
-                                .font(.system(size: 24.0))
-                                .padding(.all, 16.0)
-                                .background(Color("Color2"))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 20)
-                                        .stroke(Color.gray, lineWidth: 15)
-                                )
-                                .cornerRadius(20)
-                                .padding(.horizontal, 16)
-                                .foregroundColor(Color("fontGray"))
-                                .shadow(radius: 10)
-                        }
-                        .background(GeometryReader { geometry in
-                            Path { _ in
-                                DispatchQueue.main.async {
-                                    self.bubbleHeight = geometry.size.height - 40
-                                }
-                            }
-                        })
-                        Spacer()
-                    }
-                    .ignoresSafeArea()
-                    VStack{
-                        HStack{
-                            Button(action: { 
-                        generateHapticFeedback()
-                                tutorialNum = 0 // タップでチュートリアルを終了
-                                authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { success in
-                                }
-                            }) {
-                                Image("スキップ")
-                                    .resizable()
-                                    .frame(width:200,height:60)
-                                    .padding(.leading)
-                            }
-                            Spacer()
-                        }
-                        Spacer()
-                    }
-                }
-                    
-            }
-            
-            .onTapGesture {
-                if tutorialNum == 2 {
-                        audioManager.playSound()
-                    tutorialNum = 0
-                    authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 3) { success in
-                        // データベースのアップデートが成功したかどうかをハンドリング
-                    }
+                    .padding(.top, 16)
+                    .padding(.bottom, 120)
                 }
             }
-            .frame(maxWidth:.infinity,maxHeight: .infinity)
-            .background(Color("Color2"))
-            .onAppear {
-                reward.LoadReward()
-                fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                        isLoading = false
-                    }
-                }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { // 1秒後に
-                    self.isButtonClickable = true // ボタンをクリック可能に設定
-                }
-                authManager.fetchUserInfo { (name, avatar, money, hp, attack, tutorialNum) in
-                    if let fetchedTutorialNum = tutorialNum {
-                        self.tutorialNum = fetchedTutorialNum
-                    }
-                }
-                if let userId = authManager.currentUserId {
-                    authManager.fetchLastClickedDate(userId: userId) { date in
-                        if let unwrappedDate = date {
-                            lastClickedDate = unwrappedDate
-                            let calendar = Calendar.current
-                            if calendar.isDateInToday(unwrappedDate) {
-                                isButtonEnabled = false
-                            }
-                        } else {
-                            print("lastClickedDate is nil")
-                        }
-                    }
-                }
-                isIntermediateQuizActive = authManager.level >= 10
-                if let soundURL = Bundle.main.url(forResource: "soundKettei", withExtension: "mp3") {
-                    do {
-                        audioPlayerKettei = try AVAudioPlayer(contentsOf: soundURL)
-                    } catch {
-                        print("Failed to initialize audio player: \(error)")
-                    }
-                }
-                if audioManager.isMuted {
-                    audioPlayerKettei?.volume = 0
-                } else {
-                    audioPlayerKettei?.volume = 1.0
-                }
+
+            floatingRewardButton
+
+            if tutorialNum == 2 {
+                tutorialOverlay
             }
-            .gesture(
-                DragGesture()
-                    .onEnded { value in
-                        if value.translation.width > 80 {
-                            presentationMode.wrappedValue.dismiss()
-                        }
-                    }
-            )
-            .fullScreenCover(isPresented: $preFlag) {
-                PreView(audioManager: audioManager)
-            }
-                .navigationBarBackButtonHidden(true)
-                .navigationBarItems(leading: Button(action: { 
-                        generateHapticFeedback()
-                    self.presentationMode.wrappedValue.dismiss()
-                    audioManager.playCancelSound()
-                }) {
-                    Image(systemName: "chevron.left")
-                        .foregroundColor(Color("fontGray"))
-                    Text("戻る")
-                        .foregroundColor(Color("fontGray")).buttonStyle(.plain)
-                }.padding(.top))
-        .navigationViewStyle(StackNavigationViewStyle())
         }
+        .onAppear(perform: setupView)
+        .gesture(swipeBackGesture)
+        .fullScreenCover(isPresented: $preFlag) {
+            PreView(audioManager: audioManager)
+        }
+        .fullScreenCover(isPresented: $isPresentingQuizIncorrectAnswer) {
+            QuizAppliedIncorrectAnswerListView(isPresenting: $isPresentingQuizIncorrectAnswer)
+        }
+        .fullScreenCover(isPresented: $isPresentingQuizDatabase) {
+            QuizAppliedBasicListView(isPresenting: $isPresentingQuizDatabase)
+        }
+        .fullScreenCover(isPresented: $isPresentingQuizIntermediate) {
+            QuizAppliedStrategyListView(isPresenting: $isPresentingQuizIntermediate)
+        }
+        .fullScreenCover(isPresented: $isPresentingQuizAdvanced) {
+            QuizAppliedManagementListView(isPresenting: $isPresentingQuizAdvanced)
+        }
+        .fullScreenCover(isPresented: $isPresentingQuizGod) {
+            QuizAppliedTechnologyListView(isPresenting: $isPresentingQuizGod)
+        }
+        .alert(isPresented: $showAlert) {
+            Alert(
+                title: Text("報酬獲得！"),
+                message: Text("1時間だけ獲得した経験値とコインが2倍"),
+                dismissButton: .default(Text("OK")) {
+                    showAlert = false
+                    reward.rewardEarned = false
+                }
+            )
+        }
+        .navigationBarHidden(true)
+    }
+
     func isIPad() -> Bool {
         return UIDevice.current.userInterfaceIdiom == .pad
     }
@@ -456,6 +122,456 @@ struct AppliedManagerListView: View {
     func isSmallDevice() -> Bool {
         return UIScreen.main.bounds.width < 390
     }
+    
+    private var backgroundView: some View {
+        LinearGradient(
+            colors: [Color(hex: "f8fafc"), Color(hex: "e2e8f0")],
+            startPoint: .top,
+            endPoint: .bottom
+        )
+        .ignoresSafeArea()
+    }
+
+    private func navigationBar(title: String) -> some View {
+        HStack {
+            Button(action: {
+                generateHapticFeedback()
+                audioManager.playCancelSound()
+                presentationMode.wrappedValue.dismiss()
+            }) {
+                HStack(spacing: 6) {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 16, weight: .semibold))
+                    Text("戻る")
+                        .font(.system(size: 16, weight: .medium))
+                }
+                .foregroundColor(Color(hex: "11998e"))
+            }
+            .buttonStyle(.plain)
+
+            Spacer()
+
+            Text(title)
+                .font(.system(size: 18, weight: .bold))
+                .foregroundColor(.primary)
+
+            Spacer()
+
+            HStack(spacing: 6) { Image(systemName: "chevron.left"); Text("戻る") }
+                .opacity(0)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .background(.ultraThinMaterial)
+    }
+
+    private var reviewSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 10) {
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(LinearGradient(
+                        colors: [Color(hex: "f093fb"), Color(hex: "f5576c")],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    ))
+                    .frame(width: 4, height: 20)
+
+                Image(systemName: "arrow.counterclockwise")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(Color(hex: "f093fb"))
+
+                Text("不正解した問題を復習")
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundColor(.secondary)
+
+                Spacer()
+            }
+            .padding(.horizontal, 20)
+
+            reviewButton
+                .padding(.horizontal, 16)
+                .opacity(animateCards ? 1 : 0)
+                .offset(y: animateCards ? 0 : 20)
+                .animation(.spring(response: 0.5, dampingFraction: 0.8).delay(0.1), value: animateCards)
+        }
+    }
+
+    private var reviewButton: some View {
+        Button(action: {
+            generateHapticFeedback()
+            audioManager.playKetteiSound()
+            if appState.isBannerVisible {
+                preFlag = true
+            } else if !isIncorrectAnswersEmpty {
+                isPresentingQuizIncorrectAnswer = true
+            }
+        }) {
+            HStack(spacing: 16) {
+                ZStack {
+                    Circle().fill(.white.opacity(0.2)).frame(width: 50, height: 50)
+                    if isLoading {
+                        ProgressView().progressViewStyle(CircularProgressViewStyle(tint: .white))
+                    } else {
+                        Image(systemName: "arrow.counterclockwise")
+                            .font(.system(size: 24, weight: .semibold))
+                            .foregroundColor(.white)
+                    }
+                }
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("復習問題")
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundColor(.white)
+
+                    if !isLoading {
+                        Text(!isIncorrectAnswersEmpty ? "\(incorrectCount)問の復習問題" : "復習問題なし")
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(.white.opacity(0.8))
+                    }
+                }
+
+                Spacer()
+
+                if appState.isBannerVisible {
+                    VStack(spacing: 2) {
+                        Image(systemName: "crown.fill")
+                            .font(.system(size: 16))
+                            .foregroundColor(.yellow)
+                        Text("Premium")
+                            .font(.system(size: 8, weight: .bold))
+                            .foregroundColor(.white.opacity(0.9))
+                    }
+                } else if !isIncorrectAnswersEmpty {
+                    Text("\(incorrectCount)")
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(.white.opacity(0.2))
+                        .clipShape(Capsule())
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 18)
+            .background(
+                ZStack {
+                    LinearGradient(
+                        colors: [Color(hex: "f093fb"), Color(hex: "f5576c")],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                    if isIncorrectAnswersEmpty && !appState.isBannerVisible && !isLoading { Color.black.opacity(0.4) }
+                    if appState.isBannerVisible { Color.black.opacity(0.2) }
+                }
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .shadow(color: Color(hex: "f093fb").opacity(0.3), radius: 8, x: 0, y: 4)
+        }
+        .buttonStyle(.plain)
+        .disabled(isIncorrectAnswersEmpty && !appState.isBannerVisible)
+    }
+
+    private var categorySection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 10) {
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(LinearGradient(
+                        colors: [Color(hex: "11998e"), Color(hex: "38ef7d")],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    ))
+                    .frame(width: 4, height: 20)
+
+                Image(systemName: "folder.fill")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(Color(hex: "11998e"))
+
+                Text("問題カテゴリを選択")
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundColor(.secondary)
+
+                Spacer()
+            }
+            .padding(.horizontal, 20)
+
+            VStack(spacing: 12) {
+                categoryButton(
+                    title: "基礎理解",
+                    subtitle: "応用・アルゴリズム基礎",
+                    icon: "book.fill",
+                    gradient: LinearGradient(
+                        colors: [Color(hex: "11998e"), Color(hex: "38ef7d")],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    delay: 0.15
+                ) { isPresentingQuizDatabase = true }
+                .background(GeometryReader { g in
+                    Color.clear.preference(key: ViewPositionKey.self, value: [g.frame(in: .global)])
+                })
+
+                categoryButton(
+                    title: "ストラテジ",
+                    subtitle: "経営戦略・業務分析",
+                    icon: "chart.line.uptrend.xyaxis",
+                    gradient: LinearGradient(
+                        colors: [Color(hex: "4facfe"), Color(hex: "00f2fe")],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    delay: 0.2
+                ) { isPresentingQuizIntermediate = true }
+
+                categoryButton(
+                    title: "マネジメント",
+                    subtitle: "プロジェクト・サービス管理",
+                    icon: "person.3.fill",
+                    gradient: LinearGradient(
+                        colors: [Color(hex: "fa709a"), Color(hex: "fee140")],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    delay: 0.25
+                ) { isPresentingQuizAdvanced = true }
+
+                categoryButton(
+                    title: "テクノロジ",
+                    subtitle: "開発技術・ネットワーク・DB",
+                    icon: "cpu.fill",
+                    gradient: LinearGradient(
+                        colors: [Color(hex: "667eea"), Color(hex: "764ba2")],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    delay: 0.3
+                ) { isPresentingQuizGod = true }
+            }
+            .padding(.horizontal, 16)
+        }
+    }
+
+    private func categoryButton(
+        title: String,
+        subtitle: String,
+        icon: String,
+        gradient: LinearGradient,
+        delay: Double,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: {
+            generateHapticFeedback()
+            audioManager.playKetteiSound()
+            action()
+        }) {
+            HStack(spacing: 16) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(title)
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundColor(.white)
+
+                    Text(subtitle)
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundColor(.white.opacity(0.8))
+                        .lineLimit(1)
+                }
+
+                Spacer()
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundColor(.white.opacity(0.8))
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 18)
+            .background(gradient)
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .shadow(color: .black.opacity(0.15), radius: 8, x: 0, y: 4)
+        }
+        .buttonStyle(.plain)
+        .opacity(animateCards ? 1 : 0)
+        .offset(y: animateCards ? 0 : 20)
+        .animation(.spring(response: 0.5, dampingFraction: 0.8).delay(delay), value: animateCards)
+    }
+
+    private var floatingRewardButton: some View {
+        VStack {
+            Spacer()
+            HStack {
+                rewardButton
+                    .padding(.leading, 16)
+                    .padding(.bottom, 30)
+                Spacer()
+            }
+        }
+    }
+
+    private var rewardButton: some View {
+        Button(action: {
+            generateHapticFeedback()
+            reward.ExAndMoReward()
+        }) {
+            ZStack {
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            colors: [
+                                Color(hex: "ffd700").opacity(0.4),
+                                Color(hex: "ffd700").opacity(0)
+                            ],
+                            center: .center,
+                            startRadius: 30,
+                            endRadius: 60
+                        )
+                    )
+                    .frame(width: 100, height: 100)
+                    .scaleEffect(rewardAnimating ? 1.2 : 1.0)
+                    .opacity(reward.rewardLoaded ? 1 : 0)
+
+                ZStack {
+                    Circle()
+                        .fill(
+                            reward.rewardLoaded ?
+                            LinearGradient(
+                                colors: [Color(hex: "ffd700"), Color(hex: "ff8c00")],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ) :
+                            LinearGradient(
+                                colors: [Color.gray.opacity(0.5), Color.gray.opacity(0.3)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .frame(width: 70, height: 70)
+
+                    VStack(spacing: 2) {
+                        Text("×2")
+                            .font(.system(size: 22, weight: .black))
+                            .foregroundColor(.white)
+                        Text("報酬")
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundColor(.white.opacity(0.9))
+                    }
+                }
+            }
+        }
+        .buttonStyle(.plain)
+        .disabled(!reward.rewardLoaded)
+        .onChange(of: reward.rewardEarned) { earned in
+            showAlert = earned
+        }
+        .onAppear {
+            if reward.rewardLoaded {
+                withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
+                    rewardAnimating = true
+                }
+            }
+        }
+        .onChange(of: reward.rewardLoaded) { loaded in
+            if loaded {
+                withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
+                    rewardAnimating = true
+                }
+            }
+        }
+    }
+
+    private var tutorialOverlay: some View {
+        ZStack {
+            GeometryReader { _ in
+                Color.black.opacity(0.6)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 20, style: .continuous)
+                            .frame(width: buttonRect.width - 20, height: buttonRect.height)
+                            .position(x: buttonRect.midX, y: buttonRect.midY)
+                            .blendMode(.destinationOut)
+                    )
+                    .ignoresSafeArea()
+                    .compositingGroup()
+            }
+
+            VStack {
+                Spacer().frame(height: buttonRect.minY + bubbleHeight)
+
+                Text("「基礎理解」をタップしてください")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(.primary)
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 16)
+                    .background(.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .shadow(color: .black.opacity(0.15), radius: 10)
+                    .background(GeometryReader { g in
+                        Color.clear.onAppear { bubbleHeight = g.size.height }
+                    })
+
+                Spacer()
+            }
+            .padding(.horizontal, 20)
+
+            VStack {
+                HStack {
+                    Button(action: {
+                        generateHapticFeedback()
+                        tutorialNum = 0
+                        authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { _ in }
+                    }) {
+                        Text("スキップ")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 20)
+                            .padding(.vertical, 10)
+                            .background(Color.white.opacity(0.2))
+                            .clipShape(Capsule())
+                    }
+                    .padding(.leading, 20)
+                    .padding(.top, 60)
+
+                    Spacer()
+                }
+                Spacer()
+            }
+        }
+        .onTapGesture {
+            audioManager.playSound()
+            tutorialNum = 0
+            authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 3) { _ in }
+        }
+    }
+
+    private var swipeBackGesture: some Gesture {
+        DragGesture()
+            .onEnded { value in
+                if value.translation.width > 80 {
+                    presentationMode.wrappedValue.dismiss()
+                }
+            }
+    }
+
+    private func setupView() {
+        reward.LoadReward()
+
+        if let uid = authManager.currentUserId {
+            fetchNumberOfIncorrectAnswers(userId: uid) { count in
+                DispatchQueue.main.async {
+                    self.incorrectCount = count
+                    self.isIncorrectAnswersEmpty = (count == 0)
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                    self.isLoading = false
+                }
+            }
+        }
+
+        authManager.fetchUserInfo { (_, _, _, _, _, tutorialNum) in
+            if let t = tutorialNum { self.tutorialNum = t }
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            animateCards = true
+        }
+    }
+
 }
 
 #Preview {

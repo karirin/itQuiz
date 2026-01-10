@@ -80,7 +80,6 @@
 		182FF4FC2ED18CA0001DE74F /* InterstitialStory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182FF4AD2ED18CA0001DE74F /* InterstitialStory.swift */; };
 		182FF4FD2ED18CA0001DE74F /* MekaGachaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182FF4972ED18CA0001DE74F /* MekaGachaView.swift */; };
 		182FF4FF2ED18CA0001DE74F /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182FF4862ED18CA0001DE74F /* RootView.swift */; };
-		182FF5022ED192E6001DE74F /* ManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182FF5012ED192E6001DE74F /* ManagerView.swift */; };
 		18B9E1FA2E0FC355000F4B57 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 18B9E1F92E0FC355000F4B57 /* FirebaseFirestore */; };
 		18B9E2072E0FE1F8000F4B57 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 18B9E2062E0FE1F8000F4B57 /* FirebaseAuth */; };
 		18F6F22F2EF1833800488BCA /* Mission.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18F6F22E2EF1833400488BCA /* Mission.swift */; };
@@ -164,7 +163,6 @@
 		182FF4B72ED18CA0001DE74F /* AvatarList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarList.swift; sourceTree = "<group>"; };
 		182FF4B82ED18CA0001DE74F /* CheckUsersListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckUsersListView.swift; sourceTree = "<group>"; };
 		182FF4B92ED18CA0001DE74F /* UsersListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsersListView.swift; sourceTree = "<group>"; };
-		182FF5012ED192E6001DE74F /* ManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagerView.swift; sourceTree = "<group>"; };
 		186C39A82B70B3B7007F625E /* StoreKit.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = StoreKit.storekit; sourceTree = "<group>"; };
 		186C39AD2B71D2B3007F625E /* it.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = it.entitlements; sourceTree = "<group>"; };
 		18F6F22E2EF1833400488BCA /* Mission.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mission.swift; sourceTree = "<group>"; };
@@ -257,7 +255,6 @@
 		182FF4A12ED18CA0001DE74F /* Managers */ = {
 			isa = PBXGroup;
 			children = (
-				182FF5012ED192E6001DE74F /* ManagerView.swift */,
 				182FF49A2ED18CA0001DE74F /* AudioManager.swift */,
 				182FF49B2ED18CA0001DE74F /* AuthManager.swift */,
 				182FF49C2ED18CA0001DE74F /* ManagerListTabView.swift */,
@@ -551,7 +548,6 @@
 				182FF4CA2ED18CA0001DE74F /* PentagonItShape.swift in Sources */,
 				182FF4CB2ED18CA0001DE74F /* ReviewView.swift in Sources */,
 				182FF4CC2ED18CA0001DE74F /* itApp.swift in Sources */,
-				182FF5022ED192E6001DE74F /* ManagerView.swift in Sources */,
 				182FF4CF2ED18CA0001DE74F /* PentagonInfoShape.swift in Sources */,
 				182FF4D02ED18CA0001DE74F /* RareGachaView.swift in Sources */,
 				182FF4D32ED18CA0001DE74F /* ProgressExpBar.swift in Sources */,

@@ -30,7 +30,7 @@ struct ManagerView: View {
                         Image(systemName: "chevron.left")
                             .foregroundColor(.gray)
                         
-                        Text("戻る")
+                        Text("戻")
                             .foregroundColor(Color("fontGray"))
                     }
                     .padding(.top).buttonStyle(.plain)
