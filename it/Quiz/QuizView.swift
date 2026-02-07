@@ -2091,11 +2091,13 @@ struct QuestionCardView: View {
                 Text(question)
                     .font(.system(size: isSmallDevice() ? 15 : 17, weight: .semibold))
                     .foregroundColor(Color("fontGray"))
-                    .multilineTextAlignment(.center)
                     .lineSpacing(4)
                     .padding(.horizontal, 20)
                     .padding(.vertical, 16)
-                    .frame(minHeight: 100)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .lineLimit(nil)
+                    .minimumScaleFactor(0.75)
             }
             
             // 正解/不正解マーク

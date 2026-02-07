@@ -393,6 +393,7 @@ struct ESManagerListView: View {
             reward.ExAndMoReward()
         }) {
             ZStack {
+                // Outer glow
                 Circle()
                     .fill(
                         RadialGradient(
@@ -405,10 +406,11 @@ struct ESManagerListView: View {
                             endRadius: 60
                         )
                     )
-                    .frame(width: 100, height: 100)
+                    .frame(width: 120, height: 120)
                     .scaleEffect(rewardAnimating ? 1.2 : 1.0)
                     .opacity(reward.rewardLoaded ? 1 : 0)
-
+                
+                // Main button
                 ZStack {
                     Circle()
                         .fill(
@@ -424,20 +426,25 @@ struct ESManagerListView: View {
                                 endPoint: .bottomTrailing
                             )
                         )
-                        .frame(width: 70, height: 70)
-
+                        .frame(width: 90, height: 90)
+                        .shadow(color: reward.rewardLoaded ? Color(hex: "ffd700").opacity(0.5) : .clear, radius: 10)
+                    
                     VStack(spacing: 2) {
-                        Text("×2")
-                            .font(.system(size: 22, weight: .black))
-                            .foregroundColor(.white)
-                        Text("報酬")
+                        Text("動画視聴で")
                             .font(.system(size: 10, weight: .bold))
+                            .foregroundColor(.white.opacity(0.9))
+                        
+                        Text("経験値とコインが")
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundColor(.white.opacity(0.9))
+                        Text("2倍に")
+                            .font(.system(size: 14, weight: .bold))
                             .foregroundColor(.white.opacity(0.9))
                     }
                 }
             }
         }
-        .buttonStyle(.plain)
+        .buttonStyle(PlainButtonStyle())
         .disabled(!reward.rewardLoaded)
         .onChange(of: reward.rewardEarned) { earned in
             showAlert = earned

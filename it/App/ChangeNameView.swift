@@ -48,7 +48,6 @@ struct ChangeNameView: View {
                 ZStack {
                     // 背景グラデーション
                     primaryGradient
-                        .frame(height: 100)
                     
                     VStack(spacing: 8) {
                         // アイコン
@@ -227,6 +226,7 @@ struct ChangeNameView: View {
                 .padding(24)
                 .background(Color.white)
             }
+            .frame(height:400)
             .clipShape(RoundedRectangle(cornerRadius: 24))
             .shadow(color: Color.black.opacity(0.2), radius: 30, x: 0, y: 15)
             .padding(.horizontal, 28)

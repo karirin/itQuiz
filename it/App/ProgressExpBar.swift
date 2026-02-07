@@ -8,31 +8,58 @@
 import SwiftUI
 
 struct ProgressExpBar: View {
-    var level: Int
-    var experience: Int
-
+    let level: Int
+    let experience: Int
+    
+    private var maxExperience: Int { max(level, 1) * 100 }
+    
+    private var progress: CGFloat {
+        let maxExp = maxExperience
+        guard maxExp > 0 else { return 0 }
+        return min(max(CGFloat(experience) / CGFloat(maxExp), 0), 1)
+    }
+    
     var body: some View {
-        HStack(spacing: -10){
-            Text("経験値")
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Text("経験値")
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundColor(.secondary)
+                Spacer()
+                Text("\(experience) / \(maxExperience)")
+                    .font(.system(size: 11, weight: .semibold, design: .rounded))
+                    .foregroundColor(Color("fontGray"))
+            }
             GeometryReader { geometry in
                 ZStack(alignment: .leading) {
-                    Rectangle()
+                    RoundedRectangle(cornerRadius: 10)
                         .fill(Color.gray.opacity(0.3))
-                        .frame(width: geometry.size.width , height: geometry.size.height)
                     
-                    Rectangle()
+                    RoundedRectangle(cornerRadius: 10)
                         .fill(
                             LinearGradient(
-                                gradient: Gradient(colors: [Color.mint, Color.green, Color.mint]),
+                                colors: [Color.blue, Color.purple],
                                 startPoint: .leading,
                                 endPoint: .trailing
                             )
                         )
-                        .frame(width: CGFloat(experience) / CGFloat(level * 100) * geometry.size.width, height: geometry.size.height)
+                        .frame(width: geometry.size.width * progress)
+                        .animation(.spring(response: 0.5, dampingFraction: 0.8), value: progress)
+                    
+                    // シャイン効果
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(
+                            LinearGradient(
+                                colors: [.white.opacity(0.4), .clear],
+                                startPoint: .top,
+                                endPoint: .center
+                            )
+                        )
+                        .frame(width: geometry.size.width * progress)
                 }
-            }.frame(height:20).cornerRadius(45.0).padding(.horizontal)
-            Text("\(experience) / \(level * 100)")
-        }.padding(.leading,5).fontWeight(.bold)
+                .frame(height: 12)
+            }
+        }
     }
 }
 
