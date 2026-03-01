@@ -92,6 +92,110 @@ class AuthManager: ObservableObject {
         return Auth.auth().currentUser?.uid
     }
     
+    func checkAndGrantLoginBonus500(completion: @escaping (Bool) -> Void) {
+        fetchLastLoginDate { lastLoginDate in
+            let now = Date()
+            
+            if let lastLogin = lastLoginDate {
+                let days = self.daysBetween(lastLogin, now)
+                
+                if days == 0 {
+                    // 同日 → ボーナスなし
+                    completion(false)
+                    return
+                }
+                
+                // 前回のloginCountを取得
+                self.fetchLoginCount500 { currentCount in
+                    var newCount: Int
+                    
+                    if days == 1 {
+                        // 連続ログイン → カウント+1（最大500）
+                        newCount = min(currentCount + 1, LoginBonusConfig.maxDay)
+                    } else {
+                        // 連続途切れ → リセット
+                        newCount = 1
+                    }
+                    
+                    let bonus = LoginBonusConfig.coinAmount(for: newCount)
+                    
+                    DispatchQueue.main.async {
+                        self.loginCount = newCount
+                        self.loginBonus = bonus
+                    }
+                    
+                    // ボーナス付与 → ログイン日時保存 → loginCount更新
+                    self.grantLoginBonus(amount: bonus) { success in
+                        guard success else { completion(false); return }
+                        
+                        self.saveLastLoginDate { saveSuccess in
+                            guard saveSuccess else { completion(false); return }
+                            
+                            self.updateLoginCount500(to: newCount) { updateSuccess in
+                                completion(updateSuccess)
+                            }
+                        }
+                    }
+                }
+                
+            } else {
+                // 初回ログイン
+                let newCount = 1
+                let bonus = LoginBonusConfig.coinAmount(for: newCount)
+                
+                DispatchQueue.main.async {
+                    self.loginCount = newCount
+                    self.loginBonus = bonus
+                }
+                
+                self.grantLoginBonus(amount: bonus) { success in
+                    guard success else { completion(false); return }
+                    
+                    self.saveLastLoginDate { saveSuccess in
+                        guard saveSuccess else { completion(false); return }
+                        
+                        self.updateLoginCount500(to: newCount) { updateSuccess in
+                            completion(updateSuccess)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /// 500日対応: loginCountを取得（上限500）
+    func fetchLoginCount500(completion: @escaping (Int) -> Void) {
+        guard let userId = currentUserId else {
+            completion(0)
+            return
+        }
+        
+        let ref = Database.database().reference().child("users").child(userId).child("loginCount")
+        ref.observeSingleEvent(of: .value) { snapshot in
+            let count = snapshot.value as? Int ?? 0
+            completion(count)
+        }
+    }
+
+    /// 500日対応: loginCountを更新
+    func updateLoginCount500(to newCount: Int, completion: @escaping (Bool) -> Void) {
+        guard let userId = currentUserId else {
+            completion(false)
+            return
+        }
+        
+        let userRef = Database.database().reference().child("users").child(userId)
+        userRef.updateChildValues(["loginCount": newCount]) { error, _ in
+            if let error = error {
+                print("loginCount の更新に失敗: \(error.localizedDescription)")
+                completion(false)
+            } else {
+                print("loginCount を \(newCount) に更新しました。")
+                completion(true)
+            }
+        }
+    }
+    
     func addAvatarToUser(avatar: Avatar, completion: @escaping (Bool) -> Void) {
         guard let userId = user?.uid else {
             completion(false) // user IDがnilの場合、失敗としてfalseを返す

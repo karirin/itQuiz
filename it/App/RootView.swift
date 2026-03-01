@@ -25,7 +25,7 @@ struct RootView: View {
             } else if isUserExists == false || isUserExists == nil {
                 TopView()
             } else {
-                TopView()        
+                TopView()
                 .sheet(isPresented: $isShowingOtherAppsSheet) {
                     OtherAppsPromotionView()
                         .presentationDetents([.large,
@@ -45,18 +45,35 @@ struct RootView: View {
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                 withAnimation {
                     self.isActive = true
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                        isShowingOtherAppsSheet = true
-                    }
+                    // ログインボーナス表示チェック後にOtherAppsを出す
+                    checkLoginBonusThenShowOtherApps()
                 }
             }
         }
     }
+    
+    /// ログインボーナスが必要か確認し、不要ならOtherAppsを表示
+    /// 必要ならログインボーナス終了後に表示されるよう遅延させる
+    private func checkLoginBonusThenShowOtherApps() {
+        authManager.shouldShowLoginBonus { shouldShow in
+            if shouldShow {
+                // ログインボーナスが表示される → 3秒後に表示（ボーナス画面が閉じる頃）
+                DispatchQueue.main.asyncAfter(deadline: .now() + 10.0) {
+                    isShowingOtherAppsSheet = true
+                }
+            } else {
+                // ログインボーナスなし → すぐ表示
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                    isShowingOtherAppsSheet = true
+                }
+            }
+        }
+    }
+    
     func isiPhone12Or13() -> Bool {
         let screenSize = UIScreen.main.bounds.size
         let width = min(screenSize.width, screenSize.height)
         let height = max(screenSize.width, screenSize.height)
-        // iPhone 12,13 の画面サイズは約幅390ポイント、高さ844ポイント
         return abs(width - 390) < 1 && abs(height - 844) < 1
     }
 }

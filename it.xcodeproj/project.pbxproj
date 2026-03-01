@@ -23,6 +23,9 @@
 		181B01582F1150180075C9BE /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = 181B01572F1150180075C9BE /* GoogleMobileAds */; };
 		181BFFA02F10F8ED0075C9BE /* UIComponentsUpdated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181BFF9F2F10F8EB0075C9BE /* UIComponentsUpdated.swift */; };
 		181BFFA22F10FB1F0075C9BE /* QuizDesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181BFFA12F10FB180075C9BE /* QuizDesignSystem.swift */; };
+		181E65542F3758A8007ECEC9 /* LoginBonusModernView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181E65532F3758A6007ECEC9 /* LoginBonusModernView.swift */; };
+		181E65562F375F65007ECEC9 /* LoginBonusConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181E65552F375F5F007ECEC9 /* LoginBonusConfig.swift */; };
+		181E655B2F375FD0007ECEC9 /* LoginBonusListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181E655A2F375FC9007ECEC9 /* LoginBonusListView.swift */; };
 		182FF4BD2ED18CA0001DE74F /* ProgressStoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182FF4AE2ED18CA0001DE74F /* ProgressStoryView.swift */; };
 		182FF4BE2ED18CA0001DE74F /* PentagonManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182FF49F2ED18CA0001DE74F /* PentagonManagerView.swift */; };
 		182FF4BF2ED18CA0001DE74F /* ChangeNameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182FF4722ED18CA0001DE74F /* ChangeNameView.swift */; };
@@ -108,6 +111,9 @@
 		1801FFD42D4482F6007625A2 /* おとも切り替え.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "おとも切り替え.mp3"; sourceTree = "<group>"; };
 		181BFF9F2F10F8EB0075C9BE /* UIComponentsUpdated.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIComponentsUpdated.swift; sourceTree = "<group>"; };
 		181BFFA12F10FB180075C9BE /* QuizDesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizDesignSystem.swift; sourceTree = "<group>"; };
+		181E65532F3758A6007ECEC9 /* LoginBonusModernView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginBonusModernView.swift; sourceTree = "<group>"; };
+		181E65552F375F5F007ECEC9 /* LoginBonusConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginBonusConfig.swift; sourceTree = "<group>"; };
+		181E655A2F375FC9007ECEC9 /* LoginBonusListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginBonusListView.swift; sourceTree = "<group>"; };
 		182FF4702ED18CA0001DE74F /* AnswerSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnswerSelectionView.swift; sourceTree = "<group>"; };
 		182FF4712ED18CA0001DE74F /* Banner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Banner.swift; sourceTree = "<group>"; };
 		182FF4722ED18CA0001DE74F /* ChangeNameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeNameView.swift; sourceTree = "<group>"; };
@@ -210,6 +216,9 @@
 				182FF4702ED18CA0001DE74F /* AnswerSelectionView.swift */,
 				182FF4712ED18CA0001DE74F /* Banner.swift */,
 				182FF4722ED18CA0001DE74F /* ChangeNameView.swift */,
+				181E65532F3758A6007ECEC9 /* LoginBonusModernView.swift */,
+				181E655A2F375FC9007ECEC9 /* LoginBonusListView.swift */,
+				181E65552F375F5F007ECEC9 /* LoginBonusConfig.swift */,
 				182FF4732ED18CA0001DE74F /* ContentView.swift */,
 				182FF4762ED18CA0001DE74F /* IllustratedView.swift */,
 				182FF4772ED18CA0001DE74F /* Interstitial.swift */,
@@ -528,6 +537,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				182FF4BD2ED18CA0001DE74F /* ProgressStoryView.swift in Sources */,
+				181E65542F3758A8007ECEC9 /* LoginBonusModernView.swift in Sources */,
 				182FF4BE2ED18CA0001DE74F /* PentagonManagerView.swift in Sources */,
 				182FF4BF2ED18CA0001DE74F /* ChangeNameView.swift in Sources */,
 				182FF4C12ED18CA0001DE74F /* PentagonShape.swift in Sources */,
@@ -537,6 +547,7 @@
 				182FF4C42ED18CA0001DE74F /* ContentView.swift in Sources */,
 				182FF4C62ED18CA0001DE74F /* TopView.swift in Sources */,
 				182FF4C72ED18CA0001DE74F /* SettingView.swift in Sources */,
+				181E65562F375F65007ECEC9 /* LoginBonusConfig.swift in Sources */,
 				182FF4C82ED18CA0001DE74F /* AnswerSelectionView.swift in Sources */,
 				182FF4C92ED18CA0001DE74F /* AvatarList.swift in Sources */,
 				182FF4CA2ED18CA0001DE74F /* PentagonItShape.swift in Sources */,
@@ -547,6 +558,7 @@
 				182FF4D32ED18CA0001DE74F /* ProgressExpBar.swift in Sources */,
 				182FF4D42ED18CA0001DE74F /* TittlesView.swift in Sources */,
 				182FF4D52ED18CA0001DE74F /* LoadingView.swift in Sources */,
+				181E655B2F375FD0007ECEC9 /* LoginBonusListView.swift in Sources */,
 				182FF4D72ED18CA0001DE74F /* Banner.swift in Sources */,
 				182FF4D82ED18CA0001DE74F /* ProgressBar3.swift in Sources */,
 				182FF4DA2ED18CA0001DE74F /* SubscriptionView.swift in Sources */,

@@ -480,6 +480,7 @@ struct ContentView: View {
     @State private var isSignUpFlag: Bool = true
     @State private var updateNameFlag: Bool = false
     @State private var isPresentingMissionView: Bool = false
+    @State private var showLoginBonusModern: Bool = false
     
     // 経験値の最大値（レベルに応じて変更可能）
     private var maxExperience: Int {
@@ -715,6 +716,23 @@ struct ContentView: View {
                         }
                 }
                 
+                if showLoginBonusModern {
+                    LoginBonusModernView(
+                        isPresented: $showLoginBonusModern,
+                        loginCount: loginCount,
+                        currentBonus: currentBonus,
+                        authManager: authManager,
+                        onCollected: {
+                            // コイン表示を更新
+                            authManager.getUserMoney { money in
+                                self.userMoney = money
+                            }
+                        }
+                    )
+                    .transition(.opacity)
+                    .zIndex(100)
+                }
+                
                 if customerFlag {
                     ReviewView(isPresented: $customerFlag, helpFlag: $helpFlag)
                 }
@@ -888,6 +906,19 @@ struct ContentView: View {
                             }
                         }
                         authManager.fetchUserExperienceAndLevel()
+                        authManager.shouldShowLoginBonus { shouldShow in
+                            if shouldShow {
+                                authManager.checkAndGrantLoginBonus500 { success in
+                                    if success {
+                                        DispatchQueue.main.async {
+                                            self.loginCount = authManager.loginCount
+                                            self.currentBonus = authManager.loginBonus
+                                            self.showLoginBonusModern = true
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
