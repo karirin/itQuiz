@@ -26,6 +26,7 @@
 		181E65542F3758A8007ECEC9 /* LoginBonusModernView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181E65532F3758A6007ECEC9 /* LoginBonusModernView.swift */; };
 		181E65562F375F65007ECEC9 /* LoginBonusConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181E65552F375F5F007ECEC9 /* LoginBonusConfig.swift */; };
 		181E655B2F375FD0007ECEC9 /* LoginBonusListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181E655A2F375FC9007ECEC9 /* LoginBonusListView.swift */; };
+		181E68322F548A36007ECEC9 /* GodGachaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181E68312F548A2D007ECEC9 /* GodGachaView.swift */; };
 		182FF4BD2ED18CA0001DE74F /* ProgressStoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182FF4AE2ED18CA0001DE74F /* ProgressStoryView.swift */; };
 		182FF4BE2ED18CA0001DE74F /* PentagonManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182FF49F2ED18CA0001DE74F /* PentagonManagerView.swift */; };
 		182FF4BF2ED18CA0001DE74F /* ChangeNameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182FF4722ED18CA0001DE74F /* ChangeNameView.swift */; };
@@ -114,6 +115,7 @@
 		181E65532F3758A6007ECEC9 /* LoginBonusModernView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginBonusModernView.swift; sourceTree = "<group>"; };
 		181E65552F375F5F007ECEC9 /* LoginBonusConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginBonusConfig.swift; sourceTree = "<group>"; };
 		181E655A2F375FC9007ECEC9 /* LoginBonusListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginBonusListView.swift; sourceTree = "<group>"; };
+		181E68312F548A2D007ECEC9 /* GodGachaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GodGachaView.swift; sourceTree = "<group>"; };
 		182FF4702ED18CA0001DE74F /* AnswerSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnswerSelectionView.swift; sourceTree = "<group>"; };
 		182FF4712ED18CA0001DE74F /* Banner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Banner.swift; sourceTree = "<group>"; };
 		182FF4722ED18CA0001DE74F /* ChangeNameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeNameView.swift; sourceTree = "<group>"; };
@@ -186,7 +188,6 @@
 		180BE92C2E0FF72B00F92223 /* Quiz */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Quiz; sourceTree = "<group>"; };
 		180BE92E2E0FF82100F92223 /* Modal */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Modal; sourceTree = "<group>"; };
 		180BE92F2E0FF92200F92223 /* ManagerList */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = ManagerList; sourceTree = "<group>"; };
-		180BEDB92E10DD6900F92223 /* old */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = old; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -253,6 +254,7 @@
 				182FF4962ED18CA0001DE74F /* GachaView.swift */,
 				182FF4972ED18CA0001DE74F /* MekaGachaView.swift */,
 				182FF4982ED18CA0001DE74F /* RareGachaView.swift */,
+				181E68312F548A2D007ECEC9 /* GodGachaView.swift */,
 			);
 			path = Gacha;
 			sourceTree = "<group>";
@@ -357,7 +359,6 @@
 				267E708A2AD5ACDF00EA7AA2 /* Info.plist */,
 				180BE92F2E0FF92200F92223 /* ManagerList */,
 				180BE92C2E0FF72B00F92223 /* Quiz */,
-				180BEDB92E10DD6900F92223 /* old */,
 				180BE92E2E0FF82100F92223 /* Modal */,
 				1801FFD42D4482F6007625A2 /* おとも切り替え.mp3 */,
 				1801FFCE2D4482F5007625A2 /* カウントダウン.mp3 */,
@@ -428,7 +429,6 @@
 				180BE92C2E0FF72B00F92223 /* Quiz */,
 				180BE92E2E0FF82100F92223 /* Modal */,
 				180BE92F2E0FF92200F92223 /* ManagerList */,
-				180BEDB92E10DD6900F92223 /* old */,
 			);
 			name = it;
 			packageProductDependencies = (
@@ -584,6 +584,7 @@
 				182FF4EB2ED18CA0001DE74F /* ManagerListTabView.swift in Sources */,
 				182FF4ED2ED18CA0001DE74F /* PentagonAppliedShape.swift in Sources */,
 				182FF4EE2ED18CA0001DE74F /* OtherAppsPromotionView.swift in Sources */,
+				181E68322F548A36007ECEC9 /* GodGachaView.swift in Sources */,
 				182FF4EF2ED18CA0001DE74F /* StoryITListView.swift in Sources */,
 				182FF4F12ED18CA0001DE74F /* AudioManager.swift in Sources */,
 				182FF4F22ED18CA0001DE74F /* SplashScreenView.swift in Sources */,
@@ -724,7 +725,7 @@
 				CODE_SIGN_ENTITLEMENTS = it/it.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 9.3;
+				CURRENT_PROJECT_VERSION = 9.4;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"it/Preview Content\"";
 				DEVELOPMENT_TEAM = F3XS565TSX;
@@ -742,7 +743,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 9.3;
+				MARKETING_VERSION = 9.4;
 				PRODUCT_BUNDLE_IDENTIFIER = "Swift-Beginners-app.it";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -760,7 +761,7 @@
 				CODE_SIGN_ENTITLEMENTS = it/it.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 9.3;
+				CURRENT_PROJECT_VERSION = 9.4;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"it/Preview Content\"";
 				DEVELOPMENT_TEAM = F3XS565TSX;
@@ -778,7 +779,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 9.3;
+				MARKETING_VERSION = 9.4;
 				PRODUCT_BUNDLE_IDENTIFIER = "Swift-Beginners-app.it";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

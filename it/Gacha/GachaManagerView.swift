@@ -44,7 +44,8 @@ struct GachaManagerView: View {
     let gachaItems: [(image: String, cost: Int, rarity: String, gradient: [Color])] = [
         ("レギュラーガチャ", 300, "基本のガチャ！毎日挑戦しよう", [Color(hex: "4ECDC4"), Color(hex: "44A08D")]),
         ("幸福ガチャ", 600, "幸運のキャラが手に入るかも？", [Color(hex: "FF6B6B"), Color(hex: "C94B4B")]),
-        ("メカガチャ", 600, "最新メカキャラが登場！", [Color(hex: "667eea"), Color(hex: "764ba2")])
+        ("メカガチャ", 600, "最新メカキャラが登場！", [Color(hex: "667eea"), Color(hex: "764ba2")]),
+        ("神ガチャ", 1000, "最強の神キャラが降臨！", [Color(hex: "FFD700"), Color(hex: "FF6347")])
     ]
 
     var body: some View {
@@ -102,6 +103,7 @@ struct GachaManagerView: View {
                                     case 0: isPresentingQuizBeginner = true
                                     case 1: isPresentingQuizIntermediate = true
                                     case 2: isPresentingQuizAdvanced = true
+                                    case 3: isPresentingQuizGod = true
                                     default: break
                                     }
                                 }
@@ -125,6 +127,7 @@ struct GachaManagerView: View {
             NavigationLink("", destination: GachaView().navigationBarBackButtonHidden(true), isActive: $isPresentingQuizBeginner)
             NavigationLink("", destination: RareGachaView().navigationBarBackButtonHidden(true), isActive: $isPresentingQuizIntermediate)
             NavigationLink("", destination: MekaGachaView().navigationBarBackButtonHidden(true), isActive: $isPresentingQuizAdvanced)
+            NavigationLink("", destination: GodGachaView().navigationBarBackButtonHidden(true), isActive: $isPresentingQuizGod)
         }
         .onAppear {
             setupOnAppear()
@@ -143,6 +146,9 @@ struct GachaManagerView: View {
             if !newValue { selectedGacha = nil }
         }
         .onChange(of: isPresentingQuizAdvanced) { newValue in
+            if !newValue { selectedGacha = nil }
+        }
+        .onChange(of: isPresentingQuizGod) { newValue in
             if !newValue { selectedGacha = nil }
         }
         .gesture(

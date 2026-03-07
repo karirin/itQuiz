@@ -16,19 +16,27 @@ enum GachaRarity: String, Codable {
     case mekaUltraRare
     case legendRare
     case mekaLegendRare
+    case godRare          // 神レア
+    case godSuperRare     // 神スーパーレア
+    case godUltraRare     // 神ウルトラレア
+    case godLegendRare    // 神レジェンドレア
+    case godMythicRare    // 神話レア（レジェンドの上、最高レアリティ）
+    
     
     var displayString: String {
         switch self {
         case .normal:
             return "ノーマル"
-        case .rare, .Rrare, .mekaRare:
+        case .rare, .Rrare, .mekaRare,.godRare:
             return "レア"
-        case .superRare, .RsuperRare, .mekaSuperRare:
+        case .superRare, .RsuperRare, .mekaSuperRare,.godSuperRare:
             return "スーパーレア"
-        case .ultraRare, .RultraRare, .mekaUltraRare:
+        case .ultraRare, .RultraRare, .mekaUltraRare,.godUltraRare:
             return "ウルトラレア"
-        case .legendRare, .mekaLegendRare:
+        case .legendRare, .mekaLegendRare,.godLegendRare:
             return "レジェンドレア"
+        case .godMythicRare:
+            return "神レア"
         }
     }
     
@@ -48,6 +56,17 @@ enum GachaRarity: String, Codable {
             return [Color.orange.opacity(0.6), Color.yellow.opacity(0.3)]
         case .legendRare, .mekaLegendRare:
             return [Color.red.opacity(0.6), Color.orange.opacity(0.4)]
+        case .godRare:
+            return [Color(red: 0.8, green: 0.6, blue: 0.2).opacity(0.7), Color(red: 0.9, green: 0.7, blue: 0.3).opacity(0.4)]
+        case .godSuperRare:
+            return [Color(red: 0.9, green: 0.3, blue: 0.5).opacity(0.7), Color(red: 1.0, green: 0.5, blue: 0.3).opacity(0.4)]
+        case .godUltraRare:
+            return [Color(red: 0.9, green: 0.1, blue: 0.1).opacity(0.8), Color(red: 1.0, green: 0.4, blue: 0.0).opacity(0.5)]
+        case .godLegendRare:
+            return [Color(red: 0.9, green: 0.8, blue: 0.0).opacity(0.8), Color(red: 1.0, green: 0.6, blue: 0.0).opacity(0.5)]
+        case .godMythicRare:
+            return [Color(red: 1.0, green: 0.9, blue: 0.3).opacity(0.9), Color(red: 1.0, green: 1.0, blue: 0.8).opacity(0.6)]
+
         }
     }
 }
@@ -56,6 +75,7 @@ enum GachaMode {
     case normal
     case rare
     case meka
+    case god
 }
 
 class GachaManager {
@@ -81,6 +101,8 @@ class GachaManager {
             return 300
         case .rare, .meka:
             return 600
+        case .god:        // ← 追加
+            return 1000
         }
     }
     
@@ -133,6 +155,30 @@ class GachaManager {
                 Item(name: "悪意ロボ ルーク",   attack: 70, health: 450, probability: 3, rarity: .mekaUltraRare),
                 Item(name: "究極完全体バーグ",   attack: 200, health: 400, probability: 3, rarity: .mekaLegendRare)
             ]
+        case .god:
+             items = [
+                 // 神レア (確率高め、基本キャラ)
+                 Item(name: "天狗丸",         attack: 40, health: 300, probability: 20, rarity: .godRare),
+                 Item(name: "神龍子",         attack: 45, health: 310, probability: 20, rarity: .godRare),
+                 Item(name: "雷神太郎",       attack: 50, health: 320, probability: 20, rarity: .godRare),
+                 Item(name: "風神次郎",       attack: 55, health: 330, probability: 15, rarity: .godRare),
+                 
+                 // 神スーパーレア (中確率)
+                 Item(name: "阿修羅王",       attack: 80, health: 400, probability: 10, rarity: .godSuperRare),
+                 Item(name: "不動明王",       attack: 85, health: 420, probability: 8,  rarity: .godSuperRare),
+                 Item(name: "毘沙門天",       attack: 90, health: 400, probability: 8,  rarity: .godSuperRare),
+                 
+                 // 神ウルトラレア (低確率)
+                 Item(name: "天照大神",       attack: 120, health: 350, probability: 5, rarity: .godUltraRare),
+                 Item(name: "月読命",         attack: 130, health: 300, probability: 4, rarity: .godUltraRare),
+                 
+                 // 神レジェンドレア (かなり低確率)
+                 Item(name: "須佐之男命",     attack: 300, health: 400, probability: 3, rarity: .godLegendRare),
+                 Item(name: "大国主命",       attack: 400, health: 350, probability: 2, rarity: .godLegendRare),
+                 
+                 // 神話レア (最高レアリティ、1%!!!)
+                 Item(name: "創世神イザナギ",  attack: 500, health: 800, probability: 1, rarity: .godMythicRare)
+             ]
         }
     }
     

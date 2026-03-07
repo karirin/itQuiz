@@ -1420,6 +1420,46 @@ class AuthManager: ObservableObject {
         var totalAnswers: Int
     }
     
+    func decreaseUserMoneyBy(amount: Int, completion: @escaping (Bool) -> Void) {
+        guard let userId = currentUserId else {
+            completion(false)
+            return
+        }
+        let userRef = Database.database().reference().child("users").child(userId).child("money")
+        userRef.runTransactionBlock({ currentData in
+            if var money = currentData.value as? Int {
+                if money >= amount {
+                    money -= amount
+                    currentData.value = money
+                    return TransactionResult.success(withValue: currentData)
+                }
+            }
+            return TransactionResult.abort()
+        }) { error, committed, snapshot in
+            completion(committed)
+        }
+    }
+    
+    func decreaseGodUserMoney(completion: @escaping (Bool) -> Void) {
+        guard let userId = currentUserId else {
+            completion(false)
+            return
+        }
+        let userRef = Database.database().reference().child("users").child(userId).child("money")
+        userRef.runTransactionBlock({ currentData in
+            if var money = currentData.value as? Int {
+                if money >= 1000 {
+                    money -= 1000
+                    currentData.value = money
+                    return TransactionResult.success(withValue: currentData)
+                }
+            }
+            return TransactionResult.abort()
+        }) { error, committed, snapshot in
+            completion(committed)
+        }
+    }
+    
     func fetchTotalAnswersData(userId: String, completion: @escaping ([QuizLevel: QuizTotal], Int) -> Void) {
         let answersRef = Database.database().reference().child("answers").child(userId)
 
