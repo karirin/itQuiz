@@ -11,7 +11,7 @@ struct StorySutaminaModalView: View {
     @StateObject var reward = Reward()
     @State private var showAlert: Bool = false
     @Binding var isPresented: Bool
-    @ObservedObject var audioManager = AudioManager()
+    @ObservedObject var audioManager = AudioManager.shared
     
     var body: some View {
         ZStack{

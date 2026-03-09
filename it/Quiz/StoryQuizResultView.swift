@@ -34,7 +34,7 @@ struct StoryQuizResultView: View {
     @State private var answer100flag: Bool = false
     @State private var rankUpFlag: Bool = false
     @State private var rankDownFlag: Bool = false
-    @StateObject private var appState = AppState()
+    @EnvironmentObject var appState: AppState
     @Binding var isPresenting: Bool
     @Binding var navigateToQuizResultView: Bool
     @State private var isHidden = false

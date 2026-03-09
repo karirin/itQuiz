@@ -13,7 +13,7 @@ struct QuizAppliedIncorrectAnswerListView: View {
     @State var shuffledQuizList: [QuizQuestion] = []
     @State var isDataLoaded = false // データロード状態の追跡
 
-    private var authManager = AuthManager()
+    private var authManager = AuthManager.shared
     private var audioManager = AudioManager.shared
     @StateObject var sharedInterstitial = Interstitial()
     

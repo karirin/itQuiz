@@ -45,11 +45,11 @@ struct BannerAdView: UIViewRepresentable {
             self.parent = parent
         }
         
-        func bannerViewDidReceiveAd(_ bannerView: BannerAdView) {
+        func bannerViewDidReceiveAd(_ bannerView: BannerView) {
             print("広告の読み込み成功")
         }
         
-        func bannerView(_ bannerView: BannerAdView, didFailToReceiveAdWithError error: Error) {
+        func bannerView(_ bannerView: BannerView, didFailToReceiveAdWithError error: Error) {
             print("広告の読み込み失敗: \(error.localizedDescription)")
         }
     }
@@ -96,11 +96,11 @@ struct BannerStortyView: UIViewRepresentable {
             self.parent = parent
         }
         
-        func bannerViewDidReceiveAd(_ bannerView: BannerStortyView) {
+        func bannerViewDidReceiveAd(_ bannerView: BannerView) {
             print("広告の読み込み成功")
         }
         
-        func bannerView(_ bannerView: BannerStortyView, didFailToReceiveAdWithError error: Error) {
+        func bannerView(_ bannerView: BannerView, didFailToReceiveAdWithError error: Error) {
             print("広告の読み込み失敗: \(error.localizedDescription)")
         }
     }

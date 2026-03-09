@@ -847,7 +847,7 @@ class QuizBeginnerStoryViewModel: ObservableObject {
 
 struct QuizBeginnerStory1List: View {
     @ObservedObject var viewModel: QuizBeginnerStoryViewModel
-    var authManager = AuthManager()
+    var authManager = AuthManager.shared
     var audioManager = AudioManager.shared
     @Binding var isPresenting: Bool
     
@@ -864,7 +864,7 @@ struct QuizBeginnerStory1List: View {
 
 struct QuizBeginnerStory2List: View {
     @ObservedObject var viewModel: QuizBeginnerStoryViewModel
-    private var authManager = AuthManager()
+    private var authManager = AuthManager.shared
     private var audioManager = AudioManager.shared
     @Binding var isPresenting: Bool
     
@@ -881,7 +881,7 @@ struct QuizBeginnerStory2List: View {
 
 struct QuizBeginnerStory3List: View {
     @ObservedObject var viewModel: QuizBeginnerStoryViewModel
-    private var authManager = AuthManager()
+    private var authManager = AuthManager.shared
     private var audioManager = AudioManager.shared
     @Binding var isPresenting: Bool
     

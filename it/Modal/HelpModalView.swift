@@ -10,7 +10,7 @@ import SwiftUI
 import Foundation
 
 struct HelpModalView: View {
-    @ObservedObject var authManager = AuthManager()
+    @ObservedObject var authManager = AuthManager.shared
     @Environment(\.colorScheme) var colorScheme
     @Binding var isPresented: Bool
     @State var toggle = false

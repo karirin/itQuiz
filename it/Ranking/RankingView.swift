@@ -8,6 +8,7 @@
 import SwiftUI
 import Firebase
 import FirebaseAuth
+import UIKit
 
 struct RankedUser: Identifiable {
     let id: String
@@ -24,6 +25,7 @@ struct RankedUser: Identifiable {
 
 class RankingViewModel: ObservableObject {
     @Published var users = [User]()
+    @Published var streakUsers = [User]()
     @Published var rankMatchUsers = [User]()
     @Published var displayedUserCount = 10
     @State private var rankNum: Int = 0
@@ -37,12 +39,23 @@ class RankingViewModel: ObservableObject {
     @Published var currentUserAvatarRank: Int?
     @Published var rankedUsers = [User]()
     @Published var currentUserRankRank: Int?
+    @Published var currentUserStreakRank: Int?
+    private var hasFetchedUsers = false
+    private var hasFetchedMonthlyAnswers = false
+    private var storysHandle: DatabaseHandle?
 
-    init() {
-        fetchUsers()
+    deinit {
+        if let storysHandle {
+            Database.database().reference().child("storys").removeObserver(withHandle: storysHandle)
+        }
     }
     
-    func fetchUsers() {
+    func fetchUsers(completion: (() -> Void)? = nil) {
+        guard !hasFetchedUsers else {
+            completion?()
+            return
+        }
+
         let usersRef = Database.database().reference().child("users")
         usersRef.observeSingleEvent(of: .value, with: { (snapshot) in
             var users: [User] = []
@@ -59,6 +72,7 @@ class RankingViewModel: ObservableObject {
 
                     let rankMatchPoint = data["rankMatchPoint"] as? Int ?? 100
                     let rank = data["rank"] as? Int ?? 1
+                    let loginCount = data["loginCount"] as? Int ?? 0
 
                     var filteredAvatars: [[String: Any]] = []
                     if let avatarsData = data["avatars"] as? [String: [String: Any]] {
@@ -69,19 +83,31 @@ class RankingViewModel: ObservableObject {
                         }
                     }
 
-                    let user = User(id: userId, userName: userName, level: level, experience: experience, avatars: filteredAvatars, userMoney: userMoney, userHp: userHp, userAttack: userAttack, userFlag: 1, adminFlag: 0, rankMatchPoint: rankMatchPoint, rank: rank)
+                    let user = User(id: userId, userName: userName, level: level, experience: experience, avatars: filteredAvatars, userMoney: userMoney, userHp: userHp, userAttack: userAttack, userFlag: 1, adminFlag: 0, rankMatchPoint: rankMatchPoint, rank: rank, loginCount: loginCount)
                     users.append(user)
                 }
             }
 
             self.users = users.sorted { $0.level > $1.level }
+            self.streakUsers = users.sorted {
+                if $0.loginCount == $1.loginCount {
+                    if $0.level == $1.level {
+                        return $0.id < $1.id
+                    }
+                    return $0.level > $1.level
+                }
+                return $0.loginCount > $1.loginCount
+            }
             self.rankedUsers = users.sorted { $0.rankMatchPoint > $1.rankMatchPoint }
+            self.hasFetchedUsers = true
             
             DispatchQueue.main.async {
                 self.calculateLevelRankings()
                 self.calculateRankRankings()
+                self.calculateStreakRankings()
             }
-            self.fetchMonthlyAnswers()
+            self.fetchMonthlyAnswersIfNeeded()
+            completion?()
         }) { (error) in }
     }
     
@@ -93,9 +119,22 @@ class RankingViewModel: ObservableObject {
         let position: Int
         let stamina: Int
     }
+
+    func loadBaseRankingsIfNeeded() {
+        fetchUsers()
+    }
+
+    func loadStoryRankingsIfNeeded() {
+        fetchUsers { [weak self] in
+            self?.fetchStorys()
+        }
+    }
     
     func fetchStorys() {
-        Database.database().reference().child("storys").observe(.value) { [weak self] snapshot in
+        guard storysHandle == nil else { return }
+
+        let ref = Database.database().reference().child("storys")
+        storysHandle = ref.observe(.value) { [weak self] snapshot in
             var tempStorys: [String: Story] = [:]
             for child in snapshot.children {
                 if let childSnapshot = child as? DataSnapshot,
@@ -168,6 +207,12 @@ class RankingViewModel: ObservableObject {
             self.currentUserRankRank = currentUserIndex + 1
         }
     }
+
+    private func calculateStreakRankings() {
+        if let currentUserIndex = streakUsers.firstIndex(where: { $0.id == self.authManager.currentUserId }) {
+            self.currentUserStreakRank = currentUserIndex + 1
+        }
+    }
     
     func rankMatchFetchUsers() {
         let usersRef = Database.database().reference().child("users")
@@ -197,6 +242,7 @@ class RankingViewModel: ObservableObject {
                        let experience = data["experience"] as? Int {
                         let rankMatchPoint = data["rankMatchPoint"] as? Int ?? 100
                         let rank = data["rank"] as? Int ?? 1
+                        let loginCount = data["loginCount"] as? Int ?? 0
                         
                         var filteredAvatars: [[String: Any]] = []
                         if let avatarsData = data["avatars"] as? [String: [String: Any]] {
@@ -207,7 +253,7 @@ class RankingViewModel: ObservableObject {
                             }
                         }
                         
-                        let user = User(id: userId, userName: userName, level: level, experience: experience, avatars: filteredAvatars, userMoney: userMoney, userHp: userHp, userAttack: userAttack, userFlag: 1, adminFlag: 0, rankMatchPoint: rankMatchPoint, rank: rank)
+                        let user = User(id: userId, userName: userName, level: level, experience: experience, avatars: filteredAvatars, userMoney: userMoney, userHp: userHp, userAttack: userAttack, userFlag: 1, adminFlag: 0, rankMatchPoint: rankMatchPoint, rank: rank, loginCount: loginCount)
                         users.append(user)
                     }
                 }
@@ -231,7 +277,13 @@ class RankingViewModel: ObservableObject {
         }
     }
     
-    func fetchMonthlyAnswers() {
+    func fetchMonthlyAnswersIfNeeded() {
+        guard !hasFetchedMonthlyAnswers else { return }
+        hasFetchedMonthlyAnswers = true
+        fetchMonthlyAnswers()
+    }
+
+    private func fetchMonthlyAnswers() {
         let answersRef = Database.database().reference().child("answers")
         let now = Date()
         let formatter = DateFormatter()
@@ -326,6 +378,9 @@ struct ModernTopTabView: View {
                         Text(list[index])
                             .font(.system(size: 14, weight: selectedTab == index ? .bold : .medium))
                             .foregroundColor(selectedTab == index ? .blue : Color("fontGray").opacity(0.6))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.7)
+                            .frame(maxWidth: .infinity)
                         
                         RoundedRectangle(cornerRadius: 2)
                             .fill(selectedTab == index
@@ -401,20 +456,31 @@ struct RankingCard: View {
                 .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
             
             VStack(alignment: .leading, spacing: 2) {
-                Text(userName).font(.system(size: 15, weight: .semibold)).foregroundColor(Color("fontGray")).lineLimit(1)
+                Text(userName)
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundColor(Color("fontGray"))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
                 if isCurrentUser { Text("あなた").font(.system(size: 11, weight: .medium)).foregroundColor(.blue) }
             }
+            .layoutPriority(1)
             
             Spacer()
             
             HStack(spacing: 6) {
-                if valueIcon.hasPrefix("checkmark") {
+                if UIImage(systemName: valueIcon) != nil {
                     Image(systemName: valueIcon).font(.system(size: 16, weight: .semibold)).foregroundColor(.blue)
                 } else {
                     Image(valueIcon).resizable().scaledToFit().frame(width: 22, height: 22)
                 }
-                Text(value).font(.system(size: 16, weight: .bold, design: .rounded)).foregroundColor(Color("fontGray"))
+                Text(value)
+                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                    .foregroundColor(Color("fontGray"))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
+                    .monospacedDigit()
             }
+            .fixedSize(horizontal: true, vertical: false)
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
             .background(Capsule().fill(Color(.systemGray6)))
@@ -526,7 +592,7 @@ struct StoryRankingView: View {
                     }
                 }
             }
-        }.onAppear { viewModel.fetchStorys() }
+        }.onAppear { viewModel.loadStoryRankingsIfNeeded() }
     }
 }
 
@@ -575,6 +641,25 @@ struct MonthlyAnswersRankingView: View {
     }
 }
 
+// MARK: - 連続ログインランキングビュー
+struct StreakRankingView: View {
+    @ObservedObject var viewModel: RankingViewModel
+
+    var body: some View {
+        if viewModel.streakUsers.isEmpty { LoadingView() }
+        else {
+            ScrollView {
+                LazyVStack(spacing: 10) {
+                    ForEach(Array(viewModel.streakUsers.prefix(viewModel.displayedUserCount).enumerated()), id: \.element.id) { index, user in
+                        RankingCard(rank: index + 1, userName: user.userName, avatarName: user.avatars.first?["name"] as? String ?? "defaultIcon", value: "\(user.loginCount)日", valueIcon: "flame.fill", isCurrentUser: user.id == viewModel.authManager.currentUserId)
+                    }
+                    if let rank = viewModel.currentUserStreakRank { CurrentUserRankBanner(rank: rank, type: "連続ログイン") }
+                }.padding(.horizontal, 16).padding(.vertical, 12)
+            }.background(Color(red: 0.96, green: 0.96, blue: 0.98))
+        }
+    }
+}
+
 struct UserAvatarCount {
     let userId: String
     let userName: String
@@ -614,7 +699,7 @@ struct RankingView: View {
     @ObservedObject var audioManager: AudioManager
     @Environment(\.presentationMode) var presentationMode
     @State private var selectedTab: Int = 0
-    let list: [String] = ["レベル", "回答数(月間)", "ダンジョン"]
+    let list: [String] = ["レベル", "回答数(月間)", "連続ログイン", "ダンジョン"]
     
     var body: some View {
         NavigationView {
@@ -623,7 +708,8 @@ struct RankingView: View {
                 TabView(selection: $selectedTab) {
                     LevelRankingView(viewModel: viewModel).tag(0)
                     MonthlyAnswersRankingView(viewModel: viewModel).tag(1)
-                    StoryRankingView(viewModel: viewModel, isReturnFlag: .constant(false)).tag(2)
+                    StreakRankingView(viewModel: viewModel).tag(2)
+                    StoryRankingView(viewModel: viewModel, isReturnFlag: .constant(false)).tag(3)
                 }.tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
             }.background(Color(red: 0.96, green: 0.96, blue: 0.98))
         }
@@ -634,11 +720,12 @@ struct RankingView: View {
         .navigationTitle("ランキング")
         .navigationBarTitleDisplayMode(.inline)
         .gesture(DragGesture().onEnded { value in if value.translation.width > 80 { presentationMode.wrappedValue.dismiss() } })
+        .onAppear { viewModel.loadBaseRankingsIfNeeded() }
     }
 }
 
 struct RankingView_Previews: PreviewProvider {
     static var previews: some View {
-        RankingView(audioManager: AudioManager())
+        RankingView(audioManager: AudioManager.shared)
     }
 }

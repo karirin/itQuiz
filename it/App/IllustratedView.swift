@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Firebase
+import UIKit
 
 // MARK: - Illustrated View Updated
 struct IllustratedView: View {
@@ -23,7 +24,7 @@ struct IllustratedView: View {
     
     // MARK: - Rarity Enum
     enum Rarity: CaseIterable {
-        case normal, rare, superRare, ultraRare, legendRare
+        case normal, rare, superRare, ultraRare, legendRare, mythic
         
         var displayString: String {
             switch self {
@@ -32,6 +33,7 @@ struct IllustratedView: View {
             case .superRare: return "スーパーレア"
             case .ultraRare: return "ウルトラレア"
             case .legendRare: return "レジェンド"
+            case .mythic: return "ゴットレア"
             }
         }
         
@@ -42,6 +44,7 @@ struct IllustratedView: View {
             case .superRare: return Color(red: 0.6, green: 0.3, blue: 0.9)
             case .ultraRare: return Color(red: 0.95, green: 0.6, blue: 0.2)
             case .legendRare: return Color(red: 0.95, green: 0.8, blue: 0.2)
+            case .mythic: return Color(red: 0.95, green: 0.95, blue: 0.95)
             }
         }
         
@@ -74,6 +77,12 @@ struct IllustratedView: View {
             case .legendRare:
                 return LinearGradient(
                     colors: [Color(red: 1, green: 0.9, blue: 0.3), Color(red: 0.95, green: 0.7, blue: 0.1)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            case .mythic:
+                return LinearGradient(
+                    colors: [Color.white, Color(red: 1, green: 0.92, blue: 0.55), Color(red: 0.9, green: 0.75, blue: 0.2)],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
@@ -112,49 +121,18 @@ struct IllustratedView: View {
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
+            case .mythic:
+                return LinearGradient(
+                    colors: [Color(red: 0.28, green: 0.28, blue: 0.32), Color(red: 0.16, green: 0.14, blue: 0.08)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
             }
         }
     }
     
     // MARK: - Data
-    let allItems: [Item] = [
-        Item(name: "ネッキー", attack: 10, probability: 25, health: 20, rarity: .normal),
-        Item(name: "ピョン吉", attack: 15, probability: 25, health: 15, rarity: .normal),
-        Item(name: "ルイーカ", attack: 20, probability: 25, health: 10, rarity: .normal),
-        Item(name: "もりこう", attack: 20, probability: 25, health: 100, rarity: .normal),
-        Item(name: "うっさん", attack: 25, probability: 25, health: 150, rarity: .normal),
-        Item(name: "キリキリン", attack: 30, probability: 25, health: 200, rarity: .normal),
-        Item(name: "カゲロウ", attack: 35, probability: 10, health: 220, rarity: .rare),
-        Item(name: "ライム", attack: 40, probability: 10, health: 240, rarity: .rare),
-        Item(name: "ラオン", attack: 45, probability: 10, health: 260, rarity: .rare),
-        Item(name: "ぴょこん", attack: 20, probability: 25, health: 220, rarity: .rare),
-        Item(name: "忍太", attack: 20, probability: 25, health: 210, rarity: .rare),
-        Item(name: "かみ蔵", attack: 20, probability: 25, health: 220, rarity: .rare),
-        Item(name: "キャット夫人", attack: 25, probability: 25, health: 225, rarity: .rare),
-        Item(name: "ミッチー", attack: 30, probability: 25, health: 240, rarity: .rare),
-        Item(name: "ライム兄", attack: 40, probability: 10, health: 250, rarity: .rare),
-        Item(name: "幸福のパンダ", attack: 47, probability: 5, health: 260, rarity: .rare),
-        Item(name: "メカマウス", attack: 20, probability: 25, health: 210, rarity: .rare),
-        Item(name: "メカドック", attack: 20, probability: 25, health: 215, rarity: .rare),
-        Item(name: "メカベアー", attack: 20, probability: 25, health: 220, rarity: .rare),
-        Item(name: "ロボン", attack: 25, probability: 25, health: 225, rarity: .rare),
-        Item(name: "ロボノコ", attack: 30, probability: 25, health: 240, rarity: .rare),
-        Item(name: "ロボカー", attack: 40, probability: 10, health: 250, rarity: .rare),
-        Item(name: "バースト", attack: 47, probability: 5, health: 260, rarity: .rare),
-        Item(name: "レッドドラゴン", attack: 47, probability: 5, health: 280, rarity: .superRare),
-        Item(name: "ブルードラゴン", attack: 48, probability: 5, health: 285, rarity: .superRare),
-        Item(name: "英雄デル", attack: 50, probability: 10, health: 300, rarity: .superRare),
-        Item(name: "覚醒 ライム", attack: 56, probability: 10, health: 300, rarity: .superRare),
-        Item(name: "古代ロボ マーク", attack: 30, probability: 10, health: 600, rarity: .superRare),
-        Item(name: "メカライオネル", attack: 70, probability: 10, health: 200, rarity: .superRare),
-        Item(name: "レインボードラゴン", attack: 50, probability: 3, health: 300, rarity: .ultraRare),
-        Item(name: "七福神 玉", attack: 72, probability: 5, health: 350, rarity: .ultraRare),
-        Item(name: "七福神 福天丸", attack: 75, probability: 3, health: 380, rarity: .ultraRare),
-        Item(name: "ロボ長 バーグ", attack: 60, probability: 5, health: 400, rarity: .ultraRare),
-        Item(name: "悪意ロボ ルーク", attack: 70, probability: 3, health: 450, rarity: .ultraRare),
-        Item(name: "七福神 金満徳", attack: 100, probability: 3, health: 500, rarity: .legendRare),
-        Item(name: "究極完全体バーグ", attack: 200, probability: 3, health: 400, rarity: .legendRare)
-    ]
+    let allItems: [Item] = IllustratedView.buildAllItems()
     
     // MARK: - State
     @State private var selectedItem: Item?
@@ -173,6 +151,33 @@ struct IllustratedView: View {
     
     init(isPresenting: Binding<Bool>) {
         _isPresenting = isPresenting
+    }
+    
+    private static func buildAllItems() -> [Item] {
+        let managers = [
+            GachaManager(mode: .normal),
+            GachaManager(mode: .rare),
+            GachaManager(mode: .meka),
+            GachaManager(mode: .god)
+        ]
+        
+        var seenNames = Set<String>()
+        
+        return managers
+            .flatMap(\.catalogItems)
+            .compactMap { item in
+                guard seenNames.insert(item.name).inserted else {
+                    return nil
+                }
+                
+                return Item(
+                    name: item.name,
+                    attack: item.attack,
+                    probability: item.probability,
+                    health: item.health,
+                    rarity: Rarity(gachaRarity: item.rarity)
+                )
+            }
     }
     
     var filteredItems: [Item] {
@@ -353,6 +358,50 @@ struct IllustratedView: View {
     }
 }
 
+private extension IllustratedView.Rarity {
+    init(gachaRarity: GachaRarity) {
+        switch gachaRarity {
+        case .normal:
+            self = .normal
+        case .rare, .Rrare, .mekaRare, .godRare:
+            self = .rare
+        case .superRare, .RsuperRare, .mekaSuperRare, .godSuperRare:
+            self = .superRare
+        case .ultraRare, .RultraRare, .mekaUltraRare, .godUltraRare:
+            self = .ultraRare
+        case .legendRare, .mekaLegendRare, .godLegendRare:
+            self = .legendRare
+        case .godMythicRare:
+            self = .mythic
+        }
+    }
+}
+
+private extension IllustratedView.Item {
+    var imageName: String {
+        AvatarAssetResolver.imageName(for: name, owned: true)
+    }
+    
+    var silhouetteImageName: String {
+        AvatarAssetResolver.imageName(for: name, owned: false)
+    }
+}
+
+private enum AvatarAssetResolver {
+    static func imageName(for name: String, owned: Bool) -> String {
+        let primaryName = owned ? name : "\(name)_シルエット"
+        if UIImage(named: primaryName) != nil {
+            return primaryName
+        }
+        
+        if let fallback = UIImage(named: name) != nil ? name : nil {
+            return fallback
+        }
+        
+        return "questionmark.circle.fill"
+    }
+}
+
 // MARK: - Filter Chip
 struct FilterChip: View {
     let title: String
@@ -414,7 +463,7 @@ struct ItemCardView: View {
                 VStack(spacing: 8) {
                     // Character image
                     ZStack {
-                        if isOwned && item.rarity == .legendRare {
+                        if isOwned && (item.rarity == .legendRare || item.rarity == .mythic) {
                             // Shimmer effect for legend
                             Circle()
                                 .fill(
@@ -428,11 +477,7 @@ struct ItemCardView: View {
                                 .rotationEffect(.degrees(shimmer ? 360 : 0))
                         }
                         
-                        Image(isOwned ? item.name : "\(item.name)_シルエット")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 70, height: 70)
-                            .opacity(isOwned ? 1 : 0.4)
+                        avatarImage(width: 70, height: 70)
                     }
                     
                     // Rarity indicator
@@ -457,7 +502,7 @@ struct ItemCardView: View {
         .scaleEffect(isSelected ? 1.05 : 1)
         .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isSelected)
         .onAppear {
-            if isOwned && item.rarity == .legendRare {
+            if isOwned && (item.rarity == .legendRare || item.rarity == .mythic) {
                 withAnimation(.linear(duration: 3).repeatForever(autoreverses: false)) {
                     shimmer = true
                 }
@@ -472,6 +517,26 @@ struct ItemCardView: View {
         case .superRare: return 3
         case .ultraRare: return 4
         case .legendRare: return 5
+        case .mythic: return 6
+        }
+    }
+    
+    @ViewBuilder
+    private func avatarImage(width: CGFloat, height: CGFloat) -> some View {
+        let imageName = isOwned ? item.imageName : item.silhouetteImageName
+        
+        if imageName == "questionmark.circle.fill" {
+            Image(systemName: imageName)
+                .resizable()
+                .scaledToFit()
+                .frame(width: width, height: height)
+                .foregroundColor(.white.opacity(isOwned ? 0.9 : 0.35))
+        } else {
+            Image(imageName)
+                .resizable()
+                .scaledToFit()
+                .frame(width: width, height: height)
+                .opacity(isOwned ? 1 : 0.4)
         }
     }
 }
@@ -537,13 +602,9 @@ struct DetailOverlayView: View {
                             .scaleEffect(glowAnimation ? 1.1 : 0.9)
                     }
                     
-                    Image(isOwned ? item.name : "\(item.name)_シルエット")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 180, height: 180)
+                    avatarImage(width: 180, height: 180)
                         .shadow(color: item.rarity.color.opacity(0.5), radius: 20, x: 0, y: 10)
                         .offset(y: floatAnimation ? -10 : 10)
-                        .opacity(isOwned ? 1 : 0.5)
                 }
                 
                 // Name
@@ -602,6 +663,25 @@ struct DetailOverlayView: View {
             withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
                 glowAnimation = true
             }
+        }
+    }
+    
+    @ViewBuilder
+    private func avatarImage(width: CGFloat, height: CGFloat) -> some View {
+        let imageName = isOwned ? item.imageName : item.silhouetteImageName
+        
+        if imageName == "questionmark.circle.fill" {
+            Image(systemName: imageName)
+                .resizable()
+                .scaledToFit()
+                .frame(width: width, height: height)
+                .foregroundColor(.white.opacity(isOwned ? 0.9 : 0.4))
+        } else {
+            Image(imageName)
+                .resizable()
+                .scaledToFit()
+                .frame(width: width, height: height)
+                .opacity(isOwned ? 1 : 0.5)
         }
     }
 }

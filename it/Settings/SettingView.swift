@@ -29,7 +29,7 @@ struct SettingView: View {
     @ObservedObject var audioManager = AudioManager.shared
     @Environment(\.presentationMode) var presentationMode
     @State private var isSoundOn: Bool = true
-    @ObservedObject var authManager = AuthManager()
+    @ObservedObject var authManager = AuthManager.shared
     @State private var showingDeleteAlert = false
     @Environment(\.colorScheme) private var colorScheme
     var backgroundColor: Color { colorScheme == .dark ? Color(.systemBackground) : Color(.white) }

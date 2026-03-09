@@ -8,11 +8,10 @@
 import SwiftUI
 
 struct StoryUserModalView: View {
-    @ObservedObject var authManager = AuthManager()
+    @ObservedObject var authManager = AuthManager.shared
     @ObservedObject var viewModel: PositionViewModel
 //    @Binding var monster: Int
     @Binding var isPresented: Bool
-    @Binding var showQuizList: Bool
     @State var toggle = false
     @State private var text: String = ""
     @State private var coinImage: String = ""
@@ -28,6 +27,7 @@ struct StoryUserModalView: View {
     @State private var opacity: Double = 0
     @State private var avatarScale: CGFloat = 0.8
     var user: User
+    let onStartBattle: () -> Void
 
     var body: some View {
         ZStack {
@@ -162,9 +162,15 @@ struct StoryUserModalView: View {
 
     private func startBattle() {
         generateHapticFeedback()
-        isPresented = false
-        showQuizList = true
         audioManager.playKetteiSound()
+        withAnimation(.easeOut(duration: 0.2)) {
+            scale = 0.85
+            opacity = 0
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            isPresented = false
+            onStartBattle()
+        }
     }
 
     // 追加（閉じる処理は「元の処理」を維持している）
@@ -214,9 +220,9 @@ struct StoryView_Previews: PreviewProvider {
         
         StoryUserModalView(
             viewModel: PositionViewModel.shared, isPresented: .constant(true),
-            showQuizList: .constant(false),
-            audioManager: AudioManager(),
-            user: selectedUser
+            audioManager: AudioManager.shared,
+            user: selectedUser,
+            onStartBattle: {}
         )
     }
 }

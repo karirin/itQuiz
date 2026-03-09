@@ -1698,7 +1698,7 @@ struct StoryUserQuizListView: View {
     ]
         
     @State private var shuffledQuizList: [QuizQuestion]
-    private var authManager = AuthManager()
+    private var authManager = AuthManager.shared
     private var audioManager = AudioManager.shared
     var user: User  //ここでユーザー情報全体を受け取る
     let backgroundName: String
@@ -1725,5 +1725,4 @@ struct StoryUserQuizListView_Previews: PreviewProvider {
         StoryUserQuizListView(isPresenting: .constant(false), viewModel: PositionViewModel.shared, user: selectedUser, backgroundName: "ダンジョン背景1")
     }
 }
-
 

@@ -31,7 +31,6 @@ class PositionViewModel: ObservableObject {
     @Published var showUserStoryAlert: Bool = false
     @Published var showUserStoryQuiz: Bool = false
     @Published var isPositionFetched: Bool = false
-    @Published var isStoryRankingModal: Bool = false
     @Published var showMonsterQuizList = false
     @Published var avatarName: String = ""
     private let authManager = AuthManager.shared
@@ -610,20 +609,9 @@ class PositionViewModel: ObservableObject {
     func updateCurrentUserRank() {
         // ここで現在のユーザーIDを取得します。例えば、Firebase Authenticationを使用している場合：
         guard let currentUserID = Auth.auth().currentUser?.uid else { return }
-        if let index = storyUsers.firstIndex(where: { $0.user.id == currentUserID }) {
+        if storyUsers.firstIndex(where: { $0.user.id == currentUserID }) != nil {
 //            currentUserLevelRank = index + 1
         }
-    }
-}
-
-// Viewの中心に近いPlatformViewを特定するためのPreferenceKey
-struct ViewOffsetKey: PreferenceKey {
-    typealias Value = [Int: CGFloat]
-    
-    static var defaultValue: [Int: CGFloat] = [:]
-    
-    static func reduce(value: inout [Int: CGFloat], nextValue: () -> [Int: CGFloat]) {
-        value.merge(nextValue(), uniquingKeysWith: { $1 })
     }
 }
 
@@ -638,37 +626,37 @@ struct DownArrowPositionKey: PreferenceKey {
     }
 }
 
-struct ScrollOffsetKey: PreferenceKey {
-    typealias Value = CGFloat
+struct StoryBoundaryOffsetKey: PreferenceKey {
+    typealias Value = [Int: CGFloat]
 
-    static var defaultValue: CGFloat = 0
+    static var defaultValue: [Int: CGFloat] = [:]
 
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = nextValue()
+    static func reduce(value: inout [Int: CGFloat], nextValue: () -> [Int: CGFloat]) {
+        value.merge(nextValue(), uniquingKeysWith: { $1 })
     }
 }
 
 // TestView の定義
 struct StoryView: View {
     @StateObject var viewModel = PositionViewModel.shared
-    @StateObject var rankingViewModel = RankingViewModel()
-    @ObservedObject var audioManager = AudioManager()
-    @ObservedObject var authManager = AuthManager()
+    @ObservedObject var audioManager = AudioManager.shared
+    @ObservedObject var authManager = AuthManager.shared
     @Namespace private var animationNamespace
     @State private var initialScrollDone = false
     @State private var isStorySutaminaModal = false
-    @State private var isStoryRankingModal = false
     @State private var isLoading = true
     @State private var position: Int = 1
     @State private var index: Int = 1
     @State private var currentVisiblePosition: Int = 1
     @State private var isSoundOn: Bool = true
     @Environment(\.scenePhase) var scenePhase
-    @StateObject private var appState = AppState()
+    @EnvironmentObject var appState: AppState
     @State private var isStoryFlag: Bool = false
     @State private var isTutorialStart: Bool = false
     @State private var csFlag: Bool = false
     @State private var downArrowPosition: CGPoint? = nil
+    @State private var shouldPresentMonsterQuizAfterDismiss = false
+    @State private var shouldPresentUserQuizAfterDismiss = false
     @Binding var isReturnActive: Bool
     @Binding var isPresented: Bool
     @State private var hasAppeared = false
@@ -760,21 +748,6 @@ struct StoryView: View {
                             ProgressStoryView(progress: .constant((Float(viewModel.stamina) / 100)))
                                 .progressViewStyle(LinearProgressViewStyle(tint: .green))
                                 .padding(.bottom, 10)
-                            HStack{
-                                Spacer()
-                                Button(action: { 
-                        generateHapticFeedback()
-                                    audioManager.toggleSound()
-                                    audioManager.playSound()
-                                    isStoryRankingModal = true
-                                }) {
-                                    Image("ランキングストーリーボタン")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(height:45)
-                                }
-                                
-                            }
                         }
                         .padding(.horizontal, 50)
                         // スクロールビュー
@@ -782,17 +755,10 @@ struct StoryView: View {
                             VStack {
                                 PlatformsContainer(viewModel: viewModel, namespace: animationNamespace)
                             }
-                            
-                            NavigationLink("", destination: StoryRankingView(viewModel: rankingViewModel, isReturnFlag: .constant(true)).navigationBarBackButtonHidden(true), isActive: $isStoryRankingModal)
+                            EmptyView()
                         }
-                        .background(
-                            GeometryReader { geometry in
-                                Color.clear
-                                    .preference(key: ScrollOffsetKey.self, value: geometry.frame(in: .global).minY)
-                            }
-                        )
-                        .onPreferenceChange(ScrollOffsetKey.self) { offset in
-                            updateBackgroundImageBasedOnScroll(offset: offset)
+                        .onPreferenceChange(StoryBoundaryOffsetKey.self) { offsets in
+                            updateBackgroundImage(using: offsets)
                         }
                         
                     }
@@ -806,11 +772,27 @@ struct StoryView: View {
                     }
                     
                     if viewModel.showMonsterAlert {
-                        StoryMonsterModalView(monster: $viewModel.monster, isPresented: $viewModel.showMonsterAlert, showQuizList: $viewModel.showMonsterQuizList, audioManager: audioManager, viewModel: viewModel)
+                        StoryMonsterModalView(
+                            monster: $viewModel.monster,
+                            isPresented: $viewModel.showMonsterAlert,
+                            audioManager: audioManager,
+                            viewModel: viewModel,
+                            onStartBattle: {
+                                shouldPresentMonsterQuizAfterDismiss = true
+                            }
+                        )
                     }
                     
                     if viewModel.showUserStoryAlert {
-                        StoryUserModalView(viewModel: viewModel, isPresented: $viewModel.showUserStoryAlert, showQuizList: $viewModel.showUserStoryQuiz, audioManager: audioManager, user: viewModel.selectedUser!)
+                        StoryUserModalView(
+                            viewModel: viewModel,
+                            isPresented: $viewModel.showUserStoryAlert,
+                            audioManager: audioManager,
+                            user: viewModel.selectedUser!,
+                            onStartBattle: {
+                                shouldPresentUserQuizAfterDismiss = true
+                            }
+                        )
                     }
                     
                     if isStoryFlag {
@@ -875,9 +857,65 @@ struct StoryView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
                 }
+                .fullScreenCover(isPresented: $viewModel.showUserStoryQuiz) {
+                    VStack {
+                        if let user = viewModel.selectedUser {
+                            StoryUserQuizListView(
+                                isPresenting: $viewModel.showUserStoryQuiz,
+                                viewModel: viewModel,
+                                user: user,
+                                backgroundName: currentStoryBackgroundName
+                            )
+                        }
+                    }
+                }
+                .fullScreenCover(isPresented: $viewModel.showMonsterQuizList) {
+                    switch viewModel.userPosition {
+                    case 1...51:
+                        StoryITListView(
+                            isPresenting: $viewModel.showMonsterQuizList,
+                            monsterName: viewModel.monsterName,
+                            backgroundName: "ダンジョン背景1",
+                            viewModel: viewModel
+                        )
+                    case 52...100:
+                        StoryInfoListView(
+                            isPresenting: $viewModel.showMonsterQuizList,
+                            monsterName: viewModel.monsterName,
+                            backgroundName: "ダンジョン背景2",
+                            viewModel: viewModel
+                        )
+                    case 101...150:
+                        StoryAppliedListView(
+                            isPresenting: $viewModel.showMonsterQuizList,
+                            monsterName: viewModel.monsterName,
+                            backgroundName: "ダンジョン背景3",
+                            viewModel: viewModel
+                        )
+                    default:
+                        StoryInfoListView(
+                            isPresenting: $viewModel.showMonsterQuizList,
+                            monsterName: viewModel.monsterName,
+                            backgroundName: "ダンジョン背景1",
+                            viewModel: viewModel
+                        )
+                    }
+                }
                 .coordinateSpace(name: "StoryViewCoordinateSpace") // 名前付き座標空間を設定
                 .onPreferenceChange(DownArrowPositionKey.self) { position in
                     self.downArrowPosition = position
+                }
+                .onChange(of: viewModel.showMonsterAlert) { isPresented in
+                    if !isPresented && shouldPresentMonsterQuizAfterDismiss {
+                        shouldPresentMonsterQuizAfterDismiss = false
+                        viewModel.showMonsterQuizList = true
+                    }
+                }
+                .onChange(of: viewModel.showUserStoryAlert) { isPresented in
+                    if !isPresented && shouldPresentUserQuizAfterDismiss {
+                        shouldPresentUserQuizAfterDismiss = false
+                        viewModel.showUserStoryQuiz = true
+                    }
                 }
                 .onAppear {
                     // 初回のみ実行
@@ -942,25 +980,12 @@ struct StoryView: View {
                 }
                 // userPosition が変更されたときにスクロール
                 .onChange(of: viewModel.userPosition) { newPosition in
+                    currentVisiblePosition = newPosition
                     if let userId = AuthManager.shared.currentUserId {
                         viewModel.fetchUserStamina(for: userId)
                     }
                     if initialScrollDone {
                         scrollToPosition(proxy: proxy)
-                    }
-                }
-                .onPreferenceChange(ViewOffsetKey.self) { offsets in
-                    // 現在のスクリーン中央のY座標
-                    let screenHeight = UIScreen.main.bounds.height
-                    let centerY = screenHeight / 2
-
-                    // 各PlatformViewのmidYとスクリーン中央との距離を計算
-                    let closest = offsets.min { abs($0.value - centerY) < abs($1.value - centerY) }
-
-                    if let closestPosition = closest?.key {
-                        if currentVisiblePosition != closestPosition {
-                            currentVisiblePosition = closestPosition
-                        }
                     }
                 }
             }
@@ -1000,6 +1025,19 @@ struct StoryView: View {
             }
         }
     }
+
+    private var currentStoryBackgroundName: String {
+        switch viewModel.userPosition {
+        case 1...51:
+            return "ダンジョン背景1"
+        case 52...100:
+            return "ダンジョン背景2"
+        case 101...150:
+            return "ダンジョン背景3"
+        default:
+            return "ダンジョン背景1"
+        }
+    }
     func executeProcessEveryfifTimes() {
         // UserDefaultsからカウンターを取得
         let count = UserDefaults.standard.integer(forKey: "launchStoryCSCount") + 1
@@ -1013,23 +1051,25 @@ struct StoryView: View {
         }
     }
     
-    private func updateBackgroundImageBasedOnScroll(offset: CGFloat) {
-        if offset < -300 {
-            currentVisiblePosition = 21
-        } else if offset < -200 {
-            currentVisiblePosition = 11
-        } else {
+    private func updateBackgroundImage(using offsets: [Int: CGFloat]) {
+        let switchLine = UIScreen.main.bounds.height * 0.45
+
+        if let section51Y = offsets[51], section51Y <= switchLine {
             currentVisiblePosition = 1
+        } else if let section101Y = offsets[101], section101Y <= switchLine {
+            currentVisiblePosition = 51
+        } else {
+            currentVisiblePosition = 101
         }
     }
     
     func backgroundImageName(for position: Int) -> String {
         switch position {
-        case 1...58:
+        case 1...50:
             return "背景1ダンジョン"
-        case 59...103:
+        case 51...100:
             return "背景2ダンジョン"
-        case 104...150:
+        case 101...150:
             return "背景3ダンジョン"
         default:
             return "背景1ダンジョン"
@@ -2429,9 +2469,15 @@ struct PlatformView: View {
                 .frame(width: position == 52 ? 400 : position == 101 ? 400 :  position == 150 ? 400 : 80)
                 .padding(padding)
                 .background(
-                    GeometryReader { geometry in
-                        Color.clear
-                            .preference(key: ViewOffsetKey.self, value: [position: geometry.frame(in: .global).midY])
+                    Group {
+                        if [51, 101].contains(position) {
+                            GeometryReader { geometry in
+                                Color.clear.preference(
+                                    key: StoryBoundaryOffsetKey.self,
+                                    value: [position: geometry.frame(in: .global).midY]
+                                )
+                            }
+                        }
                     }
                 )
             
@@ -2524,52 +2570,6 @@ struct PlatformView: View {
 //            Text("\(position)")
 //                .font(.system(size: 50))
         }
-        .fullScreenCover(isPresented: $viewModel.showUserStoryQuiz) {
-            VStack {
-                if let user = viewModel.selectedUser {
-                    StoryUserQuizListView(isPresenting: $viewModel.showUserStoryQuiz, viewModel: viewModel, user: user, backgroundName: backgroundName)
-                }
-            }
-        }
-        .fullScreenCover(isPresented: $viewModel.showMonsterQuizList) {
-            switch viewModel.userPosition {
-            case 1...51:
-                StoryITListView(
-                    isPresenting: $viewModel.showMonsterQuizList,
-                    monsterName: viewModel.monsterName,
-                    backgroundName: "ダンジョン背景1",
-                    viewModel: viewModel
-                )
-                .onAppear{
-                    print("StoryITListView")
-                }
-            case 52...100:
-                StoryInfoListView(
-                    isPresenting: $viewModel.showMonsterQuizList,
-                    monsterName: viewModel.monsterName,
-                    backgroundName: "ダンジョン背景2",
-                    viewModel: viewModel
-                )
-                .onAppear{
-                    print("StoryInfoListView")
-                }
-            case 101...150:
-                StoryAppliedListView(
-                    isPresenting: $viewModel.showMonsterQuizList,
-                    monsterName: viewModel.monsterName,
-                    backgroundName: "ダンジョン背景3",
-                    viewModel: viewModel
-                )
-            default:
-                // デフォルトのビュー、またはエラーハンドリング
-                StoryInfoListView(
-                    isPresenting: $viewModel.showMonsterQuizList,
-                    monsterName: viewModel.monsterName,
-                    backgroundName: "ダンジョン背景1",
-                    viewModel: viewModel
-                )
-            }
-        }
     }
     
     func paddingTop(for boss: Int) -> CGFloat {
@@ -2611,7 +2611,6 @@ struct PlatformView: View {
     func handleMonsterTap(monster: Int) {
         if viewModel.stamina >= 10 {
             if position == userPosition + 1 {
-                let data = QuizStoryData(monsterName: "モンスター\(monster)", backgroundName: backgroundName)
                 viewModel.monsterName = "モンスター\(monster)"
                 viewModel.monster = monster
                 viewModel.showMonsterAlert = true
@@ -2625,7 +2624,6 @@ struct PlatformView: View {
     func handleBossTap(boss: Int) {
         if viewModel.stamina >= 10 {
             if position == userPosition + 1 {
-                let data = QuizStoryData(monsterName: "ボス\(boss)", backgroundName: backgroundName)
                 viewModel.monsterName = "ボス\(boss)"
                 viewModel.monster = boss
                 viewModel.showMonsterAlert = true
@@ -2646,19 +2644,17 @@ struct PlatformView: View {
             }
             if let boss = boss, boss != 0 {
                 audioManager.playSound()
-                let data = QuizStoryData(monsterName: "ボス\(boss)", backgroundName: backgroundName)
                 viewModel.monsterName = "ボス\(boss)"
                 viewModel.monster = boss
                 viewModel.showMonsterAlert = true
             }
             if let monster = monster, monster != 0 {
                 audioManager.playSound()
-                let data = QuizStoryData(monsterName: "モンスター\(monster)", backgroundName: backgroundName)
                 viewModel.monsterName = "モンスター\(monster)"
                 viewModel.monster = monster
                 viewModel.showMonsterAlert = true
             }
-            print("monster      :\(monster)")
+            print("monster      :\(String(describing: monster))")
             if let otherUser = otherUser, treasure == 0, boss == 0, monster == 0 {
                 viewModel.showUserStoryAlert = true
                 viewModel.selectedUser = otherUser.user

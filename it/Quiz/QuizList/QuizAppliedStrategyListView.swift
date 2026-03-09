@@ -869,7 +869,7 @@ struct QuizAppliedStrategyListView: View {
     ]
         
     @State private var shuffledQuizList: [QuizQuestion]
-    private var authManager = AuthManager()
+    private var authManager = AuthManager.shared
     private var audioManager = AudioManager.shared
 
     init(isPresenting: Binding<Bool>) {

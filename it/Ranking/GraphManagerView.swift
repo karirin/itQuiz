@@ -32,7 +32,7 @@ struct GraphManagerView: View {
     let list: [String] = ["回答数(月間)","正答率"]
     @State private var selectedTab: Int = 0
     @State private var preFlag: Bool = false
-    @StateObject private var appState = AppState()
+    @EnvironmentObject var appState: AppState
     @State private var isLoading: Bool = true
 
     var body: some View {
@@ -131,5 +131,4 @@ struct GraphManagerView_Previews: PreviewProvider {
         GraphManagerView()
     }
 }
-
 

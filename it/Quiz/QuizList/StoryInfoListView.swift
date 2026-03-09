@@ -2461,7 +2461,7 @@ struct StoryInfoListView: View {
     ]
     @ObservedObject var viewModel: PositionViewModel
     @State private var shuffledQuizList: [QuizQuestion]
-    private var authManager = AuthManager()
+    private var authManager = AuthManager.shared
     private var audioManager = AudioManager.shared
     let monsterName: String
     let backgroundName: String

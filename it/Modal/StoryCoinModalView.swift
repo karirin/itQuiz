@@ -15,8 +15,8 @@ struct Treasure: Codable {
 }
 
 struct StoryCoinModalView: View {
-    @ObservedObject var authManager = AuthManager()
-    @ObservedObject var audioManager = AudioManager()
+    @ObservedObject var authManager = AuthManager.shared
+    @ObservedObject var audioManager = AudioManager.shared
     let coin: Int
     @Binding var isPresented: Bool
     @State var toggle = false

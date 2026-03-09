@@ -60,41 +60,7 @@ struct GodGachaView: View {
                     },
                     onPlayAgain: {
                         obtainedItem = nil
-                        
-                        if userMoney >= 1000 {
-                            // コイン減少（1000コイン = 300 × 3回 + 100）
-                            let decreaseCount = 3
-                            var completed = 0
-                            
-                            for _ in 0..<decreaseCount {
-                                authManager.decreaseUserMoney { success in
-                                    if success {
-                                        completed += 1
-                                        if completed == decreaseCount {
-                                            // 残り100コイン分の減少
-                                            authManager.decreaseUserMoneyBy(amount: 100) { success in
-                                                if success {
-                                                    fetchUserMoney()
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            
-                            gachaManager.shuffleItems()
-                            if let item = gachaManager.drawGacha() {
-                                obtainedRareItem = item
-                                
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                    showAnimation = true
-                                }
-                            }
-                            
-                            checkAvatarCount()
-                        } else {
-                            showUnCoinModal = true
-                        }
+                        startGacha(resetResult: false)
                     }
                 )
             }
@@ -141,6 +107,7 @@ struct GodGachaView: View {
                     obtainedItem = obtainedRareItem
                     showResult = true
                     fetchUserMoney()
+                    checkAvatarCount()
                 }
             }
         }
@@ -242,7 +209,7 @@ struct GodGachaView: View {
                 .padding(-60)
             
             // ガチャボタン
-            Button(action: startGacha) {
+            Button(action: { startGacha() }) {
                 HStack(spacing: 15) {
                     Image(systemName: "sparkles")
                         .font(.system(size: 24, weight: .bold))
@@ -400,42 +367,54 @@ struct GodGachaView: View {
         }
     }
     
-    private func startGacha() {
-        if userMoney >= 1000 {
-            // コイン減少（1000コイン）
-            authManager.decreaseGodUserMoney { success in
-                if success {
-                    print("User money decreased successfully.")
-                    fetchUserMoney()
-                } else {
-                    print("Failed to decrease user money.")
-                }
-            }
-            
-            gachaManager.shuffleItems()
-            if let item = gachaManager.drawGacha() {
-                obtainedRareItem = item
+    private func startGacha(resetResult: Bool = true) {
+        let cost = gachaManager.gachaCost
+        
+        authManager.getUserMoney { latestMoney in
+            DispatchQueue.main.async {
+                userMoney = latestMoney
+                isGachaButtonDisabled = latestMoney >= cost
                 
-                showResult = false
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                guard latestMoney >= cost else {
+                    showUnCoinModal = true
+                    return
+                }
+                
+                gachaManager.shuffleItems()
+                guard let item = gachaManager.drawGacha() else { return }
+                
+                obtainedRareItem = item
+                userMoney -= cost
+                
+                if resetResult {
+                    showResult = false
+                }
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                     showAnimation = true
                 }
+                
+                authManager.decreaseGodUserMoney { success in
+                    DispatchQueue.main.async {
+                        if success {
+                            fetchUserMoney()
+                        } else {
+                            userMoney += cost
+                            showAnimation = false
+                            obtainedRareItem = nil
+                            fetchUserMoney()
+                            showUnCoinModal = true
+                        }
+                    }
+                }
             }
-            
-            checkAvatarCount()
-        } else {
-            showUnCoinModal = true
         }
     }
     
     private func fetchUserMoney() {
         authManager.getUserMoney { money in
             self.userMoney = money
-            if money < 1000 {
-                isGachaButtonDisabled = false
-            } else {
-                isGachaButtonDisabled = true
-            }
+            isGachaButtonDisabled = money >= gachaManager.gachaCost
         }
     }
     

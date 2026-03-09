@@ -779,7 +779,7 @@ struct QuizITBasicList: View {
     ]
         
     @State private var shuffledQuizList: [QuizQuestion]
-    private var authManager = AuthManager()
+    private var authManager = AuthManager.shared
     private var audioManager = AudioManager.shared
 
     init(isPresenting: Binding<Bool>) {
@@ -797,4 +797,3 @@ struct QuizITBasicList_Previews: PreviewProvider {
         QuizITBasicList(isPresenting: .constant(false))
     }
 }
-

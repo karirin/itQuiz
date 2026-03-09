@@ -3090,7 +3090,7 @@ struct StoryAppliedListView: View {
     ]
     @ObservedObject var viewModel: PositionViewModel
     @State private var shuffledQuizList: [QuizQuestion]
-    private var authManager = AuthManager()
+    private var authManager = AuthManager.shared
     private var audioManager = AudioManager.shared
     let monsterName: String
     let backgroundName: String
@@ -3116,6 +3116,5 @@ struct StoryAppliedListView_Previews: PreviewProvider {
         StoryAppliedListView(isPresenting: .constant(false), monsterName: "モンスター1", backgroundName: "背景1", viewModel: PositionViewModel.shared)
     }
 }
-
 
 

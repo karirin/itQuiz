@@ -115,7 +115,7 @@ struct StoryQuizView: View {
     @State private var userHp: Int = 100
     @State private var userMaxHp: Int = 100
     @State private var userFlag: Int = 0
-    @StateObject private var appState = AppState()
+    @EnvironmentObject var appState: AppState
     @State private var avatarHp: Int = 100
     @State private var userAttack: Int = 30
     @State private var tutorialNum: Int = 0
@@ -156,313 +156,7 @@ struct StoryQuizView: View {
     var currentQuiz: QuizQuestion {
         quizzes[currentQuizIndex]
     }
-    
-    func pauseTimer() {
-        timer?.invalidate()
-    }
-    
-    func resumeTimer() {
-        // 現在のタイマーを止める
-        self.timer?.invalidate()
-        
-        // ここではremainingSecondsをリセットしない
-        self.timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
-            if self.remainingSeconds > 0 {
-                self.remainingSeconds -= 1
-            } else {
-                timer.invalidate()
-                playerHP -= monsterAttack
-                self.moveToNextQuiz()
-            }
-        }
-    }
-    
-    func startCountdown() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
-                if countdownValue > 1 {
-                    countdownValue -= 1
-                } else {
-                    timer.invalidate()
-                    showCountdown = false
-                    if tutorialNum != 3 {
-                        startTimer()
-                    }
-                }
-            }
-        }
-    }
-    
-    
-    func fetchNumberOfIncorrectAnswers(userId: String, completion: @escaping (Int) -> Void) {
-    let ref = Database.database().reference().child("IncorrectAnswers").child(userId)
-    ref.observeSingleEvent(of: .value) { snapshot in
-    let count = snapshot.childrenCount // 子ノードの数を取得
-    completion(Int(count))
-    }
-    }
-    func fetchNumberOfIncorrectITAnswers(userId: String, completion: @escaping (Int) -> Void) {
-    let ref = Database.database().reference().child("IncorrectITAnswers").child(userId)
-    ref.observeSingleEvent(of: .value) { snapshot in
-    let count = snapshot.childrenCount // 子ノードの数を取得
-    completion(Int(count))
-    }
-    }
-    func fetchNumberOfIncorrectInfoAnswers(userId: String, completion: @escaping (Int) -> Void) {
-    let ref = Database.database().reference().child("IncorrectInfoAnswers").child(userId)
-    ref.observeSingleEvent(of: .value) { snapshot in
-    let count = snapshot.childrenCount // 子ノードの数を取得
-    completion(Int(count))
-    }
-    }
-    func fetchNumberOfIncorrectAppliedAnswers(userId: String, completion: @escaping (Int) -> Void) {
-    let ref = Database.database().reference().child("IncorrectAppliedAnswers").child(userId)
-    ref.observeSingleEvent(of: .value) { snapshot in
-    let count = snapshot.childrenCount // 子ノードの数を取得
-    completion(Int(count))
-    }
-    }
 
-    func startTimer() {
-        // 現在のタイマーを止める
-        self.timer?.invalidate()
-        
-        // 3秒後に以下のコードブロックを実行
-        self.remainingSeconds = 30
-        self.timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
-            if self.remainingSeconds > 0 {
-                self.remainingSeconds -= 1
-            } else {
-                timer.invalidate()
-                playerHP -= monsterAttack
-                self.moveToNextQuiz()
-            }
-        }
-    }
-    
-    // 次の問題へ移る処理
-    func moveToNextQuiz() {
-        if monsterHP <= 0 {
-            showCompletionMessage = true
-            timer?.invalidate()
-            RateManager.shared.updateQuizData(userId: authManager.currentUserId!, quizType: quizLevel, newCorrectAnswers: correctAnswerCount, newTotalAnswers: answerCount)
-            RateManager.shared.updateAnswerData(userId: authManager.currentUserId!, quizType: quizLevel,  newTotalAnswers: answerCount)
-            navigateToQuizResultView = true //ここで結果画面への遷移フラグをtrueに
-            print("moveToNextQuiz")
-        } else if playerHP <= 0 {
-            showCompletionMessage = true
-            timer?.invalidate()
-            playerExperience = 5
-            playerMoney = 5
-            navigateToQuizResultView = true  //ここで結果画面への遷移フラグをtrueに
-            RateManager.shared.updateQuizData(userId: authManager.currentUserId!, quizType: quizLevel, newCorrectAnswers: correctAnswerCount, newTotalAnswers: answerCount)
-            RateManager.shared.updateAnswerData(userId: authManager.currentUserId!, quizType: quizLevel, newTotalAnswers: answerCount)
-        } else if self.remainingSeconds == 0 {
-            currentQuizIndex += 1
-           selectedAnswerIndex = nil
-           startTimer()
-           hasAnswered = false
-        } else if currentQuizIndex + 1 < quizzes.count {
-            if userFlag == 0 {
-                showExplanationModal = true
-            } else {
-                currentQuizIndex += 1
-               selectedAnswerIndex = nil
-                startTimer()
-            }
-            hasAnswered = false
-        } else {
-            // すべての問題が終了した場合、結果画面へ遷移
-            showCompletionMessage = true
-            timer?.invalidate()
-            navigateToQuizResultView = true  // ここで結果画面への遷移フラグをtrueに
-        }
-    }
-    
-    func answerSelectionAction(index: Int) {
-        if !hasAnswered {
-//                print("index:\(index)")
-            self.selectedAnswerIndex = index
-            self.timer?.invalidate() // 回答を選択したらタイマーを止める
-            
-            let isAnswerCorrect = (selectedAnswerIndex == currentQuiz.correctAnswerIndex)
-            if isAnswerCorrect {
-                audioManager.playCorrectSound()
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    audioManager.playAttackSound()
-                    
-                    self.showAttackImage = true
-                    //                                        }
-                    correctAnswerCount += 1 // 正解の場合、正解数をインクリメント
-                    incorrectCount -= 1
-                    answerCount += 1
-                    if quizLevel != .incorrectAnswer && quizLevel != .incorrectITAnswer && quizLevel != .incorrectInfoAnswer && quizLevel != .incorrectAppliedAnswer {
-                        monsterHP -= userAttack
-                    }
-                    if monsterHP <= 0 {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                            audioManager.playDownSound()
-                            self.showMonsterDownImage = true
-                        }
-                        // モンスターのHPが0以下になった場合の処理
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                            self.showMonsterDownImage = false
-                            monsterType += 1
-                        }
-                    } else if playerHP <= 0 {
-                        // プレイヤーのHPが0以下になった場合の処理
-                        showCompletionMessage = true
-                        timer?.invalidate()
-                    }
-                }
-                if quizLevel == .incorrectITAnswer{
-                    removeCorrectITAnswer(for: authManager.currentUserId!, questionId: currentQuiz.id!)
-                }else if quizLevel == .incorrectInfoAnswer {
-                    removeCorrectInfoAnswer(for: authManager.currentUserId!, questionId: currentQuiz.id!)
-                }else if quizLevel == .incorrectAppliedAnswer {
-                removeCorrectAppliedAnswer(for: authManager.currentUserId!, questionId: currentQuiz.id!)
-                }else if quizLevel == .incorrectAnswer {
-                    removeCorrectAnswer(for: authManager.currentUserId!, questionId: currentQuiz.id!)
-                    }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                    moveToNextQuiz()
-                }
-            } else {
-                let incorrectAnswer = IncorrectAnswer(
-                userId: authManager.currentUserId!,
-                quizQuestion: currentQuiz.question,
-                choices: currentQuiz.choices,
-                correctAnswerIndex: currentQuiz.correctAnswerIndex, explanation: currentQuiz.explanation
-                )
-                // incorrectAnswer以外のクイズなら不正解の問題をincorrectAnswerテーブルに保存する
-                if !appState.isBannerVisible {
-                    if quizLevel != .incorrectAnswer && quizLevel != .incorrectITAnswer && quizLevel != .incorrectInfoAnswer && quizLevel != .incorrectAppliedAnswer {
-                        switch quizLevel {
-                        case .itBasic,.itStrategy,.itTechnology,.itManagement:
-                            saveIncorrectITAnswer(incorrectAnswer)
-                            break
-                        case .itBasic,.itStrategy,.itTechnology,.itManagement:
-                            saveIncorrectITAnswer(incorrectAnswer)
-                            break
-                            
-                        case .infoBasic,.infoStrategy,.infoTechnology,.infoManagement:
-                            saveIncorrectInfoAnswer(incorrectAnswer)
-                            break
-                            
-                        case .appliedBasic,.appliedStrategy,.appliedTechnology,.appliedManagement:
-                            saveIncorrectAppliedAnswer(incorrectAnswer)
-                            break
-                        default:
-                            saveIncorrectAnswer(incorrectAnswer)
-                            break
-                        }
-                    }
-                }
-                answerCount += 1
-                audioManager.playUnCorrectSound()
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    audioManager.playMonsterAttackSound()
-                    playerHP -= monsterAttack
-                    self.showAttackImage = true
-                }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                    moveToNextQuiz()
-                }
-            }
-            let result = QuizResult(
-                question: currentQuiz.question,
-                userAnswer: currentQuiz.choices[index],
-                correctAnswer: currentQuiz.choices[currentQuiz.correctAnswerIndex],
-                explanation: currentQuiz.explanation,
-                isCorrect: isAnswerCorrect
-            )
-            quizResults.append(result)
-            self.showAttackImage = false
-            hasAnswered = true
-        }
-    }
-    func saveIncorrectAnswer(_ answer: IncorrectAnswer) {
-    // ユーザーIDを親ノードとして設定
-    let ref = Database.database().reference().child("IncorrectAnswers").child(answer.userId).childByAutoId()
-    ref.setValue([
-    "quizQuestion": answer.quizQuestion,
-    "choices": answer.choices,
-    "correctAnswerIndex": answer.correctAnswerIndex,
-    "explanation": answer.explanation
-    ])
-    }
-        func saveIncorrectITAnswer(_ answer: IncorrectAnswer) {
-        // ユーザーIDを親ノードとして設定
-        let ref = Database.database().reference().child("IncorrectITAnswers").child(answer.userId).childByAutoId()
-        ref.setValue([
-        "quizQuestion": answer.quizQuestion,
-        "choices": answer.choices,
-        "correctAnswerIndex": answer.correctAnswerIndex,
-        "explanation": answer.explanation
-        ])
-        }
-        func saveIncorrectInfoAnswer(_ answer: IncorrectAnswer) {
-        // ユーザーIDを親ノードとして設定
-        let ref = Database.database().reference().child("IncorrectInfoAnswers").child(answer.userId).childByAutoId()
-        ref.setValue([
-        "quizQuestion": answer.quizQuestion,
-        "choices": answer.choices,
-        "correctAnswerIndex": answer.correctAnswerIndex,
-        "explanation": answer.explanation
-        ])
-        }
-        func saveIncorrectAppliedAnswer(_ answer: IncorrectAnswer) {
-        // ユーザーIDを親ノードとして設定
-        let ref = Database.database().reference().child("IncorrectAppliedAnswers").child(answer.userId).childByAutoId()
-        ref.setValue([
-        "quizQuestion": answer.quizQuestion,
-        "choices": answer.choices,
-        "correctAnswerIndex": answer.correctAnswerIndex,
-        "explanation": answer.explanation
-        ])
-        }
-    
-    func removeCorrectAnswer(for userId: String, questionId: String) {
-        let ref = Database.database().reference().child("IncorrectAnswers").child(userId).child(questionId)
-        ref.removeValue { error, _ in
-            if let error = error {
-                print("Error removing correct answer: \(error.localizedDescription)")
-            } else {
-                print("Correct answer removed successfully.")
-            }
-        }
-    }
-    func removeCorrectITAnswer(for userId: String, questionId: String) {
-        let ref = Database.database().reference().child("IncorrectITAnswers").child(userId).child(questionId)
-        ref.removeValue { error, _ in
-            if let error = error {
-                print("Error removing correct answer: \(error.localizedDescription)")
-            } else {
-                print("Correct answer removed successfully.")
-            }
-        }
-    }
-    func removeCorrectInfoAnswer(for userId: String, questionId: String) {
-        let ref = Database.database().reference().child("IncorrectInfoAnswers").child(userId).child(questionId)
-        ref.removeValue { error, _ in
-            if let error = error {
-                print("Error removing correct answer: \(error.localizedDescription)")
-            } else {
-                print("Correct answer removed successfully.")
-            }
-        }
-    }
-    func removeCorrectAppliedAnswer(for userId: String, questionId: String) {
-        let ref = Database.database().reference().child("IncorrectAppliedAnswers").child(userId).child(questionId)
-        ref.removeValue { error, _ in
-            if let error = error {
-                print("Error removing correct answer: \(error.localizedDescription)")
-            } else {
-                print("Correct answer removed successfully.")
-            }
-        }
-    }
-    
     var body: some View {
         NavigationView{
         ZStack{
@@ -781,36 +475,30 @@ struct StoryQuizView: View {
             self.startTime = Date()
             authManager.fetchUserRewardFlag()
             
-            if quizLevel == .incorrectITAnswer{
-                fetchNumberOfIncorrectITAnswers(userId: authManager.currentUserId!) { count in
-                    self.incorrectAnswerCount = count
-                    incorrectCount = count
-                }
+            if let userId = authManager.currentUserId {
                 if quizLevel == .incorrectITAnswer {
+                    fetchNumberOfIncorrectITAnswers(userId: userId) { count in
+                        self.incorrectAnswerCount = count
+                        incorrectCount = count
+                    }
                     userAttack = 0
-                }
-            }else if quizLevel == .incorrectInfoAnswer {
-                fetchNumberOfIncorrectInfoAnswers(userId: authManager.currentUserId!) { count in
-                    self.incorrectAnswerCount = count
-                    incorrectCount = count
-                }
-                if quizLevel == .incorrectInfoAnswer {
+                } else if quizLevel == .incorrectInfoAnswer {
+                    fetchNumberOfIncorrectInfoAnswers(userId: userId) { count in
+                        self.incorrectAnswerCount = count
+                        incorrectCount = count
+                    }
                     userAttack = 0
-                }
-            }else if quizLevel == .incorrectAppliedAnswer {
-                fetchNumberOfIncorrectAppliedAnswers(userId: authManager.currentUserId!) { count in
-                    self.incorrectAnswerCount = count
-                    incorrectCount = count
-                }
-                if quizLevel == .incorrectAppliedAnswer {
+                } else if quizLevel == .incorrectAppliedAnswer {
+                    fetchNumberOfIncorrectAppliedAnswers(userId: userId) { count in
+                        self.incorrectAnswerCount = count
+                        incorrectCount = count
+                    }
                     userAttack = 0
-                }
-            }else if quizLevel == .incorrectAnswer {
-                fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
-                    self.incorrectAnswerCount = count
-                    incorrectCount = count
-                }
-                if quizLevel == .incorrectAnswer {
+                } else if quizLevel == .incorrectAnswer {
+                    fetchNumberOfIncorrectAnswers(userId: userId) { count in
+                        self.incorrectAnswerCount = count
+                        incorrectCount = count
+                    }
                     userAttack = 0
                 }
             }
@@ -858,14 +546,16 @@ struct StoryQuizView: View {
             // 味方のHPが０以下のとき
             if newValue && playerHP <= 0 {
                 victoryFlag = false
-                authManager.addRankMatchPoints(for: authManager.currentUserId!, points: 10, onSuccess: {
-                    print("@@@@@@@@@@@@@@@@@@@@@@@1")
-                }, onFailure: { error in
-                })
-                authManager.subtractRankMatchPoints(for: authManager.currentUserId!, points: 10, onSuccess: {
-                    print("@@@@@@@@@@@@@@@@@@@@@@@2")
+                if let userId = authManager.currentUserId {
+                    authManager.addRankMatchPoints(for: userId, points: 10, onSuccess: {
+                        print("@@@@@@@@@@@@@@@@@@@@@@@1")
                     }, onFailure: { error in
                     })
+                    authManager.subtractRankMatchPoints(for: userId, points: 10, onSuccess: {
+                        print("@@@@@@@@@@@@@@@@@@@@@@@2")
+                    }, onFailure: { error in
+                    })
+                }
                 DispatchQueue.global(qos: .background).async {
                     authManager.addExperience(points: 5, onSuccess: {
                         // 成功した時の処理をここに書きます
@@ -880,13 +570,14 @@ struct StoryQuizView: View {
             } else {
                 victoryFlag = true
                 DispatchQueue.global(qos: .background).async {
-                    authManager.addRankMatchPoints(for: authManager.currentUserId!, points: 10, onSuccess: {
-                    }, onFailure: { error in
-                       
-                    })
-                authManager.subtractRankMatchPoints(for: authManager.currentUserId!, points: 10, onSuccess: {
-                    }, onFailure: { error in
-                    })
+                    if let userId = authManager.currentUserId {
+                        authManager.addRankMatchPoints(for: userId, points: 10, onSuccess: {
+                        }, onFailure: { error in
+                        })
+                        authManager.subtractRankMatchPoints(for: userId, points: 10, onSuccess: {
+                        }, onFailure: { error in
+                        })
+                    }
                     authManager.addExperience(points: playerExperience * authManager.rewardFlag, onSuccess: {
 //                            print("addExperience \(authManager.rewardFlag)")
                     }, onFailure: { error in
@@ -930,5 +621,279 @@ struct StoryListView_Previews: PreviewProvider {
         ], userMoney: 1000, userHp: 100, userAttack: 20, userFlag: 0, adminFlag: 0, rankMatchPoint: 100, rank: 1)
 
         StoryITListView(isPresenting: .constant(false), monsterName: "モンスター1", backgroundName: "ダンジョン背景1", viewModel: PositionViewModel.shared)
+    }
+}
+
+extension StoryQuizView {
+    func pauseTimer() {
+        timer?.invalidate()
+    }
+
+    func resumeTimer() {
+        timer?.invalidate()
+        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
+            if remainingSeconds > 0 {
+                remainingSeconds -= 1
+            } else {
+                timer.invalidate()
+                playerHP -= monsterAttack
+                moveToNextQuiz()
+            }
+        }
+    }
+
+    func startCountdown() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
+                if countdownValue > 1 {
+                    countdownValue -= 1
+                } else {
+                    timer.invalidate()
+                    showCountdown = false
+                    if tutorialNum != 3 {
+                        startTimer()
+                    }
+                }
+            }
+        }
+    }
+
+    func fetchNumberOfIncorrectAnswers(userId: String, completion: @escaping (Int) -> Void) {
+        fetchIncorrectAnswerCount(path: "IncorrectAnswers", userId: userId, completion: completion)
+    }
+
+    func fetchNumberOfIncorrectITAnswers(userId: String, completion: @escaping (Int) -> Void) {
+        fetchIncorrectAnswerCount(path: "IncorrectITAnswers", userId: userId, completion: completion)
+    }
+
+    func fetchNumberOfIncorrectInfoAnswers(userId: String, completion: @escaping (Int) -> Void) {
+        fetchIncorrectAnswerCount(path: "IncorrectInfoAnswers", userId: userId, completion: completion)
+    }
+
+    func fetchNumberOfIncorrectAppliedAnswers(userId: String, completion: @escaping (Int) -> Void) {
+        fetchIncorrectAnswerCount(path: "IncorrectAppliedAnswers", userId: userId, completion: completion)
+    }
+
+    func startTimer() {
+        timer?.invalidate()
+        remainingSeconds = 30
+        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
+            if remainingSeconds > 0 {
+                remainingSeconds -= 1
+            } else {
+                timer.invalidate()
+                playerHP -= monsterAttack
+                moveToNextQuiz()
+            }
+        }
+    }
+
+    func moveToNextQuiz() {
+        if monsterHP <= 0 {
+            showCompletionMessage = true
+            timer?.invalidate()
+            persistQuizStatsIfPossible()
+            navigateToQuizResultView = true
+        } else if playerHP <= 0 {
+            showCompletionMessage = true
+            timer?.invalidate()
+            playerExperience = 5
+            playerMoney = 5
+            persistQuizStatsIfPossible()
+            navigateToQuizResultView = true
+        } else if remainingSeconds == 0 {
+            currentQuizIndex += 1
+            selectedAnswerIndex = nil
+            startTimer()
+            hasAnswered = false
+        } else if currentQuizIndex + 1 < quizzes.count {
+            if userFlag == 0 {
+                showExplanationModal = true
+            } else {
+                currentQuizIndex += 1
+                selectedAnswerIndex = nil
+                startTimer()
+            }
+            hasAnswered = false
+        } else {
+            showCompletionMessage = true
+            timer?.invalidate()
+            navigateToQuizResultView = true
+        }
+    }
+
+    func answerSelectionAction(index: Int) {
+        guard !hasAnswered else { return }
+
+        selectedAnswerIndex = index
+        timer?.invalidate()
+
+        let isAnswerCorrect = selectedAnswerIndex == currentQuiz.correctAnswerIndex
+        if isAnswerCorrect {
+            audioManager.playCorrectSound()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                audioManager.playAttackSound()
+                showAttackImage = true
+                correctAnswerCount += 1
+                incorrectCount -= 1
+                answerCount += 1
+                if quizLevel != .incorrectAnswer && quizLevel != .incorrectITAnswer && quizLevel != .incorrectInfoAnswer && quizLevel != .incorrectAppliedAnswer {
+                    monsterHP -= userAttack
+                }
+                if monsterHP <= 0 {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        audioManager.playDownSound()
+                        showMonsterDownImage = true
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                        showMonsterDownImage = false
+                        monsterType += 1
+                    }
+                } else if playerHP <= 0 {
+                    showCompletionMessage = true
+                    timer?.invalidate()
+                }
+            }
+
+            if let userId = authManager.currentUserId, let questionId = currentQuiz.id {
+                switch quizLevel {
+                case .incorrectITAnswer:
+                    removeCorrectITAnswer(for: userId, questionId: questionId)
+                case .incorrectInfoAnswer:
+                    removeCorrectInfoAnswer(for: userId, questionId: questionId)
+                case .incorrectAppliedAnswer:
+                    removeCorrectAppliedAnswer(for: userId, questionId: questionId)
+                case .incorrectAnswer:
+                    removeCorrectAnswer(for: userId, questionId: questionId)
+                default:
+                    break
+                }
+            }
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                moveToNextQuiz()
+            }
+        } else {
+            if let userId = authManager.currentUserId {
+                let incorrectAnswer = IncorrectAnswer(
+                    userId: userId,
+                    quizQuestion: currentQuiz.question,
+                    choices: currentQuiz.choices,
+                    correctAnswerIndex: currentQuiz.correctAnswerIndex,
+                    explanation: currentQuiz.explanation
+                )
+                if !appState.isBannerVisible {
+                    saveIncorrectAnswerIfNeeded(incorrectAnswer)
+                }
+            }
+
+            answerCount += 1
+            audioManager.playUnCorrectSound()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                audioManager.playMonsterAttackSound()
+                playerHP -= monsterAttack
+                showAttackImage = true
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                moveToNextQuiz()
+            }
+        }
+
+        let result = QuizResult(
+            question: currentQuiz.question,
+            userAnswer: currentQuiz.choices[index],
+            correctAnswer: currentQuiz.choices[currentQuiz.correctAnswerIndex],
+            explanation: currentQuiz.explanation,
+            isCorrect: isAnswerCorrect
+        )
+        quizResults.append(result)
+        showAttackImage = false
+        hasAnswered = true
+    }
+
+    func saveIncorrectAnswer(_ answer: IncorrectAnswer) {
+        saveIncorrectAnswer(answer, at: "IncorrectAnswers")
+    }
+
+    func saveIncorrectITAnswer(_ answer: IncorrectAnswer) {
+        saveIncorrectAnswer(answer, at: "IncorrectITAnswers")
+    }
+
+    func saveIncorrectInfoAnswer(_ answer: IncorrectAnswer) {
+        saveIncorrectAnswer(answer, at: "IncorrectInfoAnswers")
+    }
+
+    func saveIncorrectAppliedAnswer(_ answer: IncorrectAnswer) {
+        saveIncorrectAnswer(answer, at: "IncorrectAppliedAnswers")
+    }
+
+    func removeCorrectAnswer(for userId: String, questionId: String) {
+        removeCorrectAnswer(at: "IncorrectAnswers", userId: userId, questionId: questionId)
+    }
+
+    func removeCorrectITAnswer(for userId: String, questionId: String) {
+        removeCorrectAnswer(at: "IncorrectITAnswers", userId: userId, questionId: questionId)
+    }
+
+    func removeCorrectInfoAnswer(for userId: String, questionId: String) {
+        removeCorrectAnswer(at: "IncorrectInfoAnswers", userId: userId, questionId: questionId)
+    }
+
+    func removeCorrectAppliedAnswer(for userId: String, questionId: String) {
+        removeCorrectAnswer(at: "IncorrectAppliedAnswers", userId: userId, questionId: questionId)
+    }
+
+    private func fetchIncorrectAnswerCount(path: String, userId: String, completion: @escaping (Int) -> Void) {
+        let ref = Database.database().reference().child(path).child(userId)
+        ref.observeSingleEvent(of: .value) { snapshot in
+            completion(Int(snapshot.childrenCount))
+        }
+    }
+
+    private func persistQuizStatsIfPossible() {
+        guard let userId = authManager.currentUserId else { return }
+        RateManager.shared.updateQuizData(userId: userId, quizType: quizLevel, newCorrectAnswers: correctAnswerCount, newTotalAnswers: answerCount)
+        RateManager.shared.updateAnswerData(userId: userId, quizType: quizLevel, newTotalAnswers: answerCount)
+    }
+
+    private func saveIncorrectAnswerIfNeeded(_ answer: IncorrectAnswer) {
+        guard quizLevel != .incorrectAnswer,
+              quizLevel != .incorrectITAnswer,
+              quizLevel != .incorrectInfoAnswer,
+              quizLevel != .incorrectAppliedAnswer else {
+            return
+        }
+
+        switch quizLevel {
+        case .itBasic, .itStrategy, .itTechnology, .itManagement:
+            saveIncorrectITAnswer(answer)
+        case .infoBasic, .infoStrategy, .infoTechnology, .infoManagement:
+            saveIncorrectInfoAnswer(answer)
+        case .appliedBasic, .appliedStrategy, .appliedTechnology, .appliedManagement:
+            saveIncorrectAppliedAnswer(answer)
+        default:
+            saveIncorrectAnswer(answer)
+        }
+    }
+
+    private func saveIncorrectAnswer(_ answer: IncorrectAnswer, at path: String) {
+        let ref = Database.database().reference().child(path).child(answer.userId).childByAutoId()
+        ref.setValue([
+            "quizQuestion": answer.quizQuestion,
+            "choices": answer.choices,
+            "correctAnswerIndex": answer.correctAnswerIndex,
+            "explanation": answer.explanation,
+        ])
+    }
+
+    private func removeCorrectAnswer(at path: String, userId: String, questionId: String) {
+        let ref = Database.database().reference().child(path).child(userId).child(questionId)
+        ref.removeValue { error, _ in
+            if let error = error {
+                print("Error removing correct answer: \(error.localizedDescription)")
+            } else {
+                print("Correct answer removed successfully.")
+            }
+        }
     }
 }

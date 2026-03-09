@@ -50,7 +50,7 @@ struct QuizResultView: View {
     @State private var goburinflag: Bool = false
     @State private var kaijyuflag: Bool = false
     @State private var shinjyuflag: Bool = false
-    @StateObject private var appState = AppState()
+    @EnvironmentObject var appState: AppState
     @Binding var isPresenting: Bool
     @Binding var navigateToQuizResultView: Bool
     @State private var isHidden = false

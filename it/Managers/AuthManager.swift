@@ -30,8 +30,9 @@ class User: Identifiable {
     var adminFlag: Int
     var rankMatchPoint: Int
     var rank: Int
+    var loginCount: Int
 
-    init(id: String, userName: String, level: Int, experience: Int, avatars: [[String: Any]], userMoney: Int, userHp: Int, userAttack: Int, userFlag: Int, adminFlag: Int,rankMatchPoint: Int,rank: Int) {
+    init(id: String, userName: String, level: Int, experience: Int, avatars: [[String: Any]], userMoney: Int, userHp: Int, userAttack: Int, userFlag: Int, adminFlag: Int,rankMatchPoint: Int,rank: Int, loginCount: Int = 0) {
         self.id = id
         self.userName = userName
         self.level = level
@@ -44,6 +45,7 @@ class User: Identifiable {
         self.adminFlag = adminFlag
         self.rankMatchPoint = rankMatchPoint
         self.rank = rank
+        self.loginCount = loginCount
     }
 }
 
@@ -65,7 +67,7 @@ class AuthManager: ObservableObject {
     @Published var userAvatars: [Avatar] = []
     @Published var rewardFlag: Int = 1
     @Published var story: Int = 0
-    @State private var selectedAvatar: Avatar?
+    private var selectedAvatar: Avatar?
     @Published var loginCount: Int = 0 // 追加: ログイン回数を保持
     @Published var loginBonus: Int = 0  // 追加: 現在のボーナス額を保持
     @Published var usedAvatars: [Avatar] = []
@@ -92,175 +94,6 @@ class AuthManager: ObservableObject {
         return Auth.auth().currentUser?.uid
     }
     
-    func checkAndGrantLoginBonus500(completion: @escaping (Bool) -> Void) {
-        fetchLastLoginDate { lastLoginDate in
-            let now = Date()
-            
-            if let lastLogin = lastLoginDate {
-                let days = self.daysBetween(lastLogin, now)
-                
-                if days == 0 {
-                    // 同日 → ボーナスなし
-                    completion(false)
-                    return
-                }
-                
-                // 前回のloginCountを取得
-                self.fetchLoginCount500 { currentCount in
-                    var newCount: Int
-                    
-                    if days == 1 {
-                        // 連続ログイン → カウント+1（最大500）
-                        newCount = min(currentCount + 1, LoginBonusConfig.maxDay)
-                    } else {
-                        // 連続途切れ → リセット
-                        newCount = 1
-                    }
-                    
-                    let bonus = LoginBonusConfig.coinAmount(for: newCount)
-                    
-                    DispatchQueue.main.async {
-                        self.loginCount = newCount
-                        self.loginBonus = bonus
-                    }
-                    
-                    // ボーナス付与 → ログイン日時保存 → loginCount更新
-                    self.grantLoginBonus(amount: bonus) { success in
-                        guard success else { completion(false); return }
-                        
-                        self.saveLastLoginDate { saveSuccess in
-                            guard saveSuccess else { completion(false); return }
-                            
-                            self.updateLoginCount500(to: newCount) { updateSuccess in
-                                completion(updateSuccess)
-                            }
-                        }
-                    }
-                }
-                
-            } else {
-                // 初回ログイン
-                let newCount = 1
-                let bonus = LoginBonusConfig.coinAmount(for: newCount)
-                
-                DispatchQueue.main.async {
-                    self.loginCount = newCount
-                    self.loginBonus = bonus
-                }
-                
-                self.grantLoginBonus(amount: bonus) { success in
-                    guard success else { completion(false); return }
-                    
-                    self.saveLastLoginDate { saveSuccess in
-                        guard saveSuccess else { completion(false); return }
-                        
-                        self.updateLoginCount500(to: newCount) { updateSuccess in
-                            completion(updateSuccess)
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    /// 500日対応: loginCountを取得（上限500）
-    func fetchLoginCount500(completion: @escaping (Int) -> Void) {
-        guard let userId = currentUserId else {
-            completion(0)
-            return
-        }
-        
-        let ref = Database.database().reference().child("users").child(userId).child("loginCount")
-        ref.observeSingleEvent(of: .value) { snapshot in
-            let count = snapshot.value as? Int ?? 0
-            completion(count)
-        }
-    }
-
-    /// 500日対応: loginCountを更新
-    func updateLoginCount500(to newCount: Int, completion: @escaping (Bool) -> Void) {
-        guard let userId = currentUserId else {
-            completion(false)
-            return
-        }
-        
-        let userRef = Database.database().reference().child("users").child(userId)
-        userRef.updateChildValues(["loginCount": newCount]) { error, _ in
-            if let error = error {
-                print("loginCount の更新に失敗: \(error.localizedDescription)")
-                completion(false)
-            } else {
-                print("loginCount を \(newCount) に更新しました。")
-                completion(true)
-            }
-        }
-    }
-    
-    func addAvatarToUser(avatar: Avatar, completion: @escaping (Bool) -> Void) {
-        guard let userId = user?.uid else {
-            completion(false) // user IDがnilの場合、失敗としてfalseを返す
-            return
-        }
-
-        // ユーザーのアバターデータの参照を作成
-        let avatarsRef = Database.database().reference()
-            .child("users")
-            .child(userId)
-            .child("avatars")
-
-        // すべてのアバターを取得
-        avatarsRef.observeSingleEvent(of: .value) { (snapshot, error) in
-            if let error = error {
-                print("Error fetching avatars: \(error)")
-                completion(false) // エラーが発生した場合、falseを返す
-                return
-            }
-            
-            var avatarExists = false
-            var existingRef: DatabaseReference?
-
-            // 各アバターをループして、新しいアバターが既存のものと一致するか確認
-            for child in snapshot.children {
-                if let childSnapshot = child as? DataSnapshot,
-                   let avatarData = childSnapshot.value as? [String: Any],
-                   let name = avatarData["name"] as? String,
-                   name == avatar.name {
-                    avatarExists = true
-                    existingRef = childSnapshot.ref
-                    break
-                }
-            }
-
-            if avatarExists, let existingRef = existingRef {
-                existingRef.child("count").runTransactionBlock { currentData in
-                    var count = currentData.value as? Int ?? 0
-                    count += 1
-                    currentData.value = count
-                    return TransactionResult.success(withValue: currentData)
-                }
-                completion(true) // トランザクションが完了した場合、trueを返す
-            } else {
-                // 新しいアバターをデータベースに追加
-                let avatarRef = avatarsRef.childByAutoId()
-                let avatarData: [String: Any] = [
-                    "name": avatar.name,
-                    "attack": avatar.attack,
-                    "health": avatar.health,
-                    "usedFlag": avatar.usedFlag,
-                    "count": 1  // 初期カウント値を設定
-                ]
-                avatarRef.setValue(avatarData) { (error, ref) in
-                    if let error = error {
-                        print("Failed to add avatar to database:", error.localizedDescription)
-                        completion(false) // 保存に失敗した場合、falseを返す
-                        return
-                    }
-                    print("Successfully added avatar to database.")
-                    completion(true) // 保存に成功した場合、trueを返す
-                }
-            }
-        }
-    }
     
     func saveLastActiveTimeToFirebase(completion: @escaping (Bool) -> Void) {
         guard let userId = currentUserId else {
@@ -305,18 +138,6 @@ class AuthManager: ObservableObject {
             } else {
                 print("FirebaseからlastActiveTimeの取得に失敗しました。デフォルト値を使用します。")
                 completion(nil)
-            }
-        }
-    }
-    
-    func anonymousSignIn(completion: @escaping () -> Void) {
-        Auth.auth().signInAnonymously { result, error in
-            if let error = error {
-                print("Error: \(error.localizedDescription)")
-            } else if let result = result {
-                print("Signed in anonymously with user ID: \(result.user.uid)")
-                self.user = result.user
-                self.onLoginCompleted?()
             }
         }
     }
@@ -386,7 +207,8 @@ class AuthManager: ObservableObject {
             "userHp": 100,
             "userAttack": 20,
             "tutorialNum": 0,
-            "userFlag": 0
+            "userFlag": 0,
+            "loginCount": 0
         ]
 
         // ユーザーデータを保存
@@ -801,32 +623,6 @@ class AuthManager: ObservableObject {
         }
     }
     
-    func checkTitles(userId: String, title: String, completion: @escaping (Bool) -> Void) {
-        let titlesRef = Database.database().reference().child("titles").child(userId)
-
-        titlesRef.observeSingleEvent(of: .value, with: { snapshot in
-            if let titlesData = snapshot.value as? [String: Bool] {
-                // 指定された称号が存在するかチェックし、その結果を返す
-                completion(titlesData[title] ?? false)
-            } else {
-                // `titles` データが存在しない場合は false を返す
-                completion(false)
-            }
-        })
-    }
-
-    
-    func saveTitleForUser(userId: String, title: String) {
-        let titleRef = Database.database().reference().child("titles").child(userId)
-        // 辞書形式でデータを追加する
-        let titleData = [title: true] // または任意の値
-        titleRef.updateChildValues(titleData) { error, ref in
-            if let error = error {
-                print("Error saving title: \(error)")
-            }
-        }
-    }
-    
     func calculateLevel(experience: Int) -> Int {
         return experience / 100 + 1
     }
@@ -997,70 +793,6 @@ class AuthManager: ObservableObject {
         }
     }
 
-    /// ユーザーの最後のログイン日時を取得する
-    func fetchLastLoginDate(completion: @escaping (Date?) -> Void) {
-        guard let userId = currentUserId else {
-            completion(nil)
-            return
-        }
-
-        let ref = Database.database().reference().child("users").child(userId).child("lastLoginDate")
-        ref.observeSingleEvent(of: .value) { snapshot in
-            if let timestamp = snapshot.value as? TimeInterval {
-                let date = Date(timeIntervalSince1970: timestamp)
-                completion(date)
-            } else {
-                completion(nil)
-            }
-        }
-    }
-    
-    func daysBetween(_ from: Date, _ to: Date) -> Int {
-        let calendar = Calendar.current
-        let fromDate = calendar.startOfDay(for: from)
-        let toDate = calendar.startOfDay(for: to)
-        let components = calendar.dateComponents([.day], from: fromDate, to: toDate)
-        return components.day ?? 0
-    }
-    
-    /// ログインボーナスを表示すべきかどうかを判断する
-    func shouldShowLoginBonus(completion: @escaping (Bool) -> Void) {
-        fetchLastLoginDate { lastLoginDate in
-            let calendar = Calendar.current
-            let now = Date()
-            if let lastLogin = lastLoginDate {
-                if !calendar.isDate(lastLogin, inSameDayAs: now) {
-                    // 前回のログインが異なる日に行われている
-                    completion(true)
-                } else {
-                    // 前回のログインが同じ日
-                    completion(false)
-                }
-            } else {
-                // 最後のログイン日時が記録されていない場合（初回ログイン）
-                completion(true)
-            }
-        }
-    }
-
-    /// ログインボーナスをユーザーに付与する
-    func grantLoginBonus(amount: Int, completion: @escaping (Bool) -> Void) {
-        addLoginMoney(amount: amount) { success in
-            if success {
-                print("ログインボーナスを付与: +\(amount) コイン")
-                self.saveLastLoginDate { saveSuccess in
-                    if saveSuccess {
-                        completion(true)
-                    } else {
-                        completion(false)
-                    }
-                }
-            } else {
-                completion(false)
-            }
-        }
-    }
-    
     func addLoginMoney(amount: Int, completion: @escaping (Bool) -> Void) {
         guard let userId = user?.uid else {
             completion(false)
@@ -1285,19 +1017,16 @@ class AuthManager: ObservableObject {
                 print("loginCount の更新に失敗: \(error.localizedDescription)")
                 completion(false)
             } else {
+                DispatchQueue.main.async {
+                    self.loginCount = newCount
+                }
+                self.awardLoginStreakTitles(for: userId, streakCount: newCount)
                 print("loginCount を \(newCount) に更新しました。")
                 completion(true)
             }
         }
     }
 
-    func checkIfUserIdExists(userId: String, completion: @escaping (Bool) -> Void) {
-        let userRef = Database.database().reference().child("users").child(userId)
-        userRef.observeSingleEvent(of: .value) { (snapshot) in
-            completion(snapshot.exists())
-        }
-    }
-    
     func decreaseUserMoney(by amount: Int = 300, completion: @escaping (Bool) -> Void) {
         guard let userId = user?.uid else { return }
         
@@ -1364,7 +1093,14 @@ class AuthManager: ObservableObject {
         
         userRef.observeSingleEvent(of: .value) { (snapshot) in
             if let data = snapshot.value as? [String: Any] {
-                let currentMoney = data["userMoney"] as? Int ?? 0
+                let currentMoney: Int
+                if let intValue = data["userMoney"] as? Int {
+                    currentMoney = intValue
+                } else if let numberValue = data["userMoney"] as? NSNumber {
+                    currentMoney = numberValue.intValue
+                } else {
+                    currentMoney = 0
+                }
                 completion(currentMoney)
             }
         }
@@ -1425,39 +1161,41 @@ class AuthManager: ObservableObject {
             completion(false)
             return
         }
-        let userRef = Database.database().reference().child("users").child(userId).child("money")
-        userRef.runTransactionBlock({ currentData in
-            if var money = currentData.value as? Int {
-                if money >= amount {
-                    money -= amount
-                    currentData.value = money
-                    return TransactionResult.success(withValue: currentData)
-                }
+        
+        let userRef = Database.database().reference().child("users").child(userId)
+        userRef.observeSingleEvent(of: .value) { snapshot in
+            guard let data = snapshot.value as? [String: Any] else {
+                completion(false)
+                return
             }
-            return TransactionResult.abort()
-        }) { error, committed, snapshot in
-            completion(committed)
+            
+            let currentMoney: Int
+            if let intValue = data["userMoney"] as? Int {
+                currentMoney = intValue
+            } else if let numberValue = data["userMoney"] as? NSNumber {
+                currentMoney = numberValue.intValue
+            } else if let doubleValue = data["userMoney"] as? Double {
+                currentMoney = Int(doubleValue)
+            } else if let stringValue = data["userMoney"] as? String, let intValue = Int(stringValue) {
+                currentMoney = intValue
+            } else {
+                completion(false)
+                return
+            }
+            
+            guard currentMoney >= amount else {
+                completion(false)
+                return
+            }
+            
+            userRef.updateChildValues(["userMoney": currentMoney - amount]) { error, _ in
+                completion(error == nil)
+            }
         }
     }
     
     func decreaseGodUserMoney(completion: @escaping (Bool) -> Void) {
-        guard let userId = currentUserId else {
-            completion(false)
-            return
-        }
-        let userRef = Database.database().reference().child("users").child(userId).child("money")
-        userRef.runTransactionBlock({ currentData in
-            if var money = currentData.value as? Int {
-                if money >= 1000 {
-                    money -= 1000
-                    currentData.value = money
-                    return TransactionResult.success(withValue: currentData)
-                }
-            }
-            return TransactionResult.abort()
-        }) { error, committed, snapshot in
-            completion(committed)
-        }
+        decreaseUserMoneyBy(amount: 1000, completion: completion)
     }
     
     func fetchTotalAnswersData(userId: String, completion: @escaping ([QuizLevel: QuizTotal], Int) -> Void) {
@@ -1522,3 +1260,265 @@ struct AuthManager_Previews: PreviewProvider {
     }
 }
 
+extension AuthManager {
+    func anonymousSignIn(completion: @escaping () -> Void) {
+        Auth.auth().signInAnonymously { result, error in
+            if let error = error {
+                print("Error: \(error.localizedDescription)")
+            } else if let result = result {
+                print("Signed in anonymously with user ID: \(result.user.uid)")
+                self.user = result.user
+                self.onLoginCompleted?()
+                completion()
+            }
+        }
+    }
+
+    func checkAndGrantLoginBonus500(completion: @escaping (Bool) -> Void) {
+        fetchLastLoginDate { lastLoginDate in
+            let now = Date()
+
+            if let lastLogin = lastLoginDate {
+                let days = self.daysBetween(lastLogin, now)
+                guard days != 0 else {
+                    completion(false)
+                    return
+                }
+
+                self.fetchLoginCount500 { currentCount in
+                    let newCount = days == 1 ? min(currentCount + 1, LoginBonusConfig.maxDay) : 1
+                    let bonus = LoginBonusConfig.coinAmount(for: newCount)
+
+                    DispatchQueue.main.async {
+                        self.loginCount = newCount
+                        self.loginBonus = bonus
+                    }
+
+                    self.grantLoginBonus(amount: bonus) { success in
+                        guard success else {
+                            completion(false)
+                            return
+                        }
+
+                        self.saveLastLoginDate { saveSuccess in
+                            guard saveSuccess else {
+                                completion(false)
+                                return
+                            }
+
+                            self.updateLoginCount500(to: newCount, completion: completion)
+                        }
+                    }
+                }
+            } else {
+                let newCount = 1
+                let bonus = LoginBonusConfig.coinAmount(for: newCount)
+
+                DispatchQueue.main.async {
+                    self.loginCount = newCount
+                    self.loginBonus = bonus
+                }
+
+                self.grantLoginBonus(amount: bonus) { success in
+                    guard success else {
+                        completion(false)
+                        return
+                    }
+
+                    self.saveLastLoginDate { saveSuccess in
+                        guard saveSuccess else {
+                            completion(false)
+                            return
+                        }
+
+                        self.updateLoginCount500(to: newCount, completion: completion)
+                    }
+                }
+            }
+        }
+    }
+
+    func fetchLoginCount500(completion: @escaping (Int) -> Void) {
+        guard let userId = currentUserId else {
+            completion(0)
+            return
+        }
+
+        let ref = Database.database().reference().child("users").child(userId).child("loginCount")
+        ref.observeSingleEvent(of: .value) { snapshot in
+            let count = snapshot.value as? Int ?? 0
+            DispatchQueue.main.async {
+                self.loginCount = count
+            }
+            self.awardLoginStreakTitles(for: userId, streakCount: count)
+            completion(count)
+        }
+    }
+
+    func updateLoginCount500(to newCount: Int, completion: @escaping (Bool) -> Void) {
+        guard let userId = currentUserId else {
+            completion(false)
+            return
+        }
+
+        let userRef = Database.database().reference().child("users").child(userId)
+        userRef.updateChildValues(["loginCount": newCount]) { error, _ in
+            if let error = error {
+                print("loginCount の更新に失敗: \(error.localizedDescription)")
+                completion(false)
+            } else {
+                DispatchQueue.main.async {
+                    self.loginCount = newCount
+                }
+                self.awardLoginStreakTitles(for: userId, streakCount: newCount)
+                print("loginCount を \(newCount) に更新しました。")
+                completion(true)
+            }
+        }
+    }
+
+    func fetchCurrentLoginStreak(completion: @escaping (Int) -> Void) {
+        fetchLoginCount500(completion: completion)
+    }
+
+    func awardLoginStreakTitles(for userId: String, streakCount: Int) {
+        let thresholds: [(Int, String)] = [
+            (7, "連続ログイン7日"),
+            (30, "連続ログイン30日"),
+            (100, "連続ログイン100日"),
+        ]
+
+        for (threshold, title) in thresholds where streakCount >= threshold {
+            saveTitleForUser(userId: userId, title: title)
+        }
+    }
+
+    func addAvatarToUser(avatar: Avatar, completion: @escaping (Bool) -> Void) {
+        guard let userId = user?.uid else {
+            completion(false)
+            return
+        }
+
+        let avatarsRef = Database.database().reference()
+            .child("users")
+            .child(userId)
+            .child("avatars")
+
+        avatarsRef.observeSingleEvent(of: .value) { snapshot in
+            var avatarExists = false
+            var existingRef: DatabaseReference?
+
+            for child in snapshot.children {
+                if let childSnapshot = child as? DataSnapshot,
+                   let avatarData = childSnapshot.value as? [String: Any],
+                   let name = avatarData["name"] as? String,
+                   name == avatar.name {
+                    avatarExists = true
+                    existingRef = childSnapshot.ref
+                    break
+                }
+            }
+
+            if avatarExists, let existingRef {
+                existingRef.child("count").runTransactionBlock { currentData in
+                    let count = (currentData.value as? Int ?? 0) + 1
+                    currentData.value = count
+                    return TransactionResult.success(withValue: currentData)
+                }
+                completion(true)
+            } else {
+                let avatarRef = avatarsRef.childByAutoId()
+                let avatarData: [String: Any] = [
+                    "name": avatar.name,
+                    "attack": avatar.attack,
+                    "health": avatar.health,
+                    "usedFlag": avatar.usedFlag,
+                    "count": 1,
+                ]
+                avatarRef.setValue(avatarData) { error, _ in
+                    if let error = error {
+                        print("Failed to add avatar to database: \(error.localizedDescription)")
+                        completion(false)
+                    } else {
+                        print("Successfully added avatar to database.")
+                        completion(true)
+                    }
+                }
+            }
+        }
+    }
+
+    func checkTitles(userId: String, title: String, completion: @escaping (Bool) -> Void) {
+        let titlesRef = Database.database().reference().child("titles").child(userId)
+        titlesRef.observeSingleEvent(of: .value) { snapshot in
+            if let titlesData = snapshot.value as? [String: Bool] {
+                completion(titlesData[title] ?? false)
+            } else {
+                completion(false)
+            }
+        }
+    }
+
+    func saveTitleForUser(userId: String, title: String) {
+        let titleRef = Database.database().reference().child("titles").child(userId)
+        titleRef.updateChildValues([title: true]) { error, _ in
+            if let error = error {
+                print("Error saving title: \(error)")
+            }
+        }
+    }
+
+    func fetchLastLoginDate(completion: @escaping (Date?) -> Void) {
+        guard let userId = currentUserId else {
+            completion(nil)
+            return
+        }
+
+        let ref = Database.database().reference().child("users").child(userId).child("lastLoginDate")
+        ref.observeSingleEvent(of: .value) { snapshot in
+            if let timestamp = snapshot.value as? TimeInterval {
+                completion(Date(timeIntervalSince1970: timestamp))
+            } else {
+                completion(nil)
+            }
+        }
+    }
+
+    func daysBetween(_ from: Date, _ to: Date) -> Int {
+        let calendar = Calendar.current
+        let fromDate = calendar.startOfDay(for: from)
+        let toDate = calendar.startOfDay(for: to)
+        return calendar.dateComponents([.day], from: fromDate, to: toDate).day ?? 0
+    }
+
+    func shouldShowLoginBonus(completion: @escaping (Bool) -> Void) {
+        fetchLastLoginDate { lastLoginDate in
+            let calendar = Calendar.current
+            let now = Date()
+            if let lastLogin = lastLoginDate {
+                completion(!calendar.isDate(lastLogin, inSameDayAs: now))
+            } else {
+                completion(true)
+            }
+        }
+    }
+
+    func grantLoginBonus(amount: Int, completion: @escaping (Bool) -> Void) {
+        addLoginMoney(amount: amount) { success in
+            guard success else {
+                completion(false)
+                return
+            }
+
+            print("ログインボーナスを付与: +\(amount) コイン")
+            self.saveLastLoginDate(completion: completion)
+        }
+    }
+
+    func checkIfUserIdExists(userId: String, completion: @escaping (Bool) -> Void) {
+        let userRef = Database.database().reference().child("users").child(userId)
+        userRef.observeSingleEvent(of: .value) { snapshot in
+            completion(snapshot.exists())
+        }
+    }
+}

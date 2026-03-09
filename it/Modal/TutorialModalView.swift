@@ -9,7 +9,7 @@
 import SwiftUI
 
 struct TutorialModalView: View {
-    @ObservedObject var authManager = AuthManager()
+    @ObservedObject var authManager = AuthManager.shared
     @Binding var isPresented: Bool
     @Binding var isFlag: Bool
     @State var toggle = false

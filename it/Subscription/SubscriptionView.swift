@@ -8,55 +8,52 @@
 import SwiftUI
 import StoreKit
 
-class AppState: ObservableObject {
+@MainActor
+final class AppState: ObservableObject {
+    static let shared = AppState()
+
     @Published var isBannerVisible = true
     @Published var isSubscribed: Bool = false
+    private var transactionListenerTask: Task<Void, Never>?
 
     init() {
-        DispatchQueue.main.async {
-            self.checkSubscription()
-        }
-        
+        transactionListenerTask = observeTransactionUpdates()
         Task {
-            await checkCurrentSubscription()
+            await refreshSubscriptionState()
         }
     }
 
-     func checkCurrentSubscription() async {
-         for await result in Transaction.currentEntitlements {
-             switch result {
-             case .verified(let transaction):
-                 // サブスクリプションが有効であれば、必要なプロパティを更新
-                 DispatchQueue.main.async {
-                     // UI関連の更新はメインスレッドで行う
-                     self.updateSubscriptionState(transaction: transaction)
-                 }
-             case .unverified:
-                 // サブスクリプションが確認できない場合の処理
-                 break
-             }
-         }
-     }
+    deinit {
+        transactionListenerTask?.cancel()
+    }
+
+    func refreshSubscriptionState() async {
+        do {
+            let subscribed = try await isSubscribed()
+            isSubscribed = subscribed
+            isBannerVisible = !subscribed
+        } catch {
+            print("サブスクリプションの確認中にエラー: \(error)")
+        }
+    }
+
+    func checkCurrentSubscription() async {
+        await refreshSubscriptionState()
+    }
     
     // サブスクリプションの状態に基づいてAppStateを更新するメソッド
     func updateSubscriptionState(transaction: StoreKit.Transaction) {
-        // ここにサブスクリプションの状態に基づいたロジックを実装
-        // 例: self.isBannerVisible = !transaction.isSubscribed
-        print("test44")
+        let isActiveSubscription = transaction.productType == .autoRenewable
+            && transaction.revocationDate == nil
+            && (transaction.expirationDate ?? .distantFuture) > Date()
+
+        isSubscribed = isActiveSubscription
+        isBannerVisible = !isActiveSubscription
     }
     
     func checkSubscription() {
         Task {
-            do {
-                let subscribed = try await self.isSubscribed()
-//                print("subscribed:\(subscribed)")
-                DispatchQueue.main.async {
-                    self.isSubscribed = subscribed        // 端末のサブスク状態
-                    self.isBannerVisible = !subscribed    // バナー表示はその逆
-                }
-            } catch {
-                print("サブスクリプションの確認中にエラー: \(error)")
-            }
+            await refreshSubscriptionState()
         }
     }
 
@@ -78,6 +75,8 @@ class AppState: ObservableObject {
         else {
           continue
         }
+        _ = renewalInfo
+        _ = transaction
         results.append(status.state)
       }
       return results
@@ -85,14 +84,9 @@ class AppState: ObservableObject {
       
     func isSubscribed() async throws -> Bool {
         var subscriptionGroupIds: [String] = []
-        print("isSubscribed_1")
-//        print("Transaction.currentEntitlements:\(Transaction.currentEntitlements)")
         for await result in Transaction.currentEntitlements {
-            print("isSubscribed_2")
             let transaction = try self.checkVerified(result)
-//            print("transaction:\(transaction)")
             guard let groupId = transaction.subscriptionGroupID else { continue }
-//            print("groupId:\(groupId)")
             subscriptionGroupIds.append(groupId)
         }
 
@@ -102,10 +96,8 @@ class AppState: ObservableObject {
             for state in renewalStates {
                 switch state {
                 case .subscribed, .inGracePeriod:
-                    print("case subscribed inGracePeriod")
                     return true
                 default:
-                    print("default")
                     break
                 }
             }
@@ -128,7 +120,6 @@ class SubscriptionViewModel: ObservableObject {
     @Published var products: [Product] = []
     @Published var isPrivilegeEnabled: Bool = false
     @ObservedObject var authManager = AuthManager.shared
-    @EnvironmentObject var appState: AppState
 
     let productIdList = [
         "it_premium_weekly_480",
@@ -166,15 +157,10 @@ class SubscriptionViewModel: ObservableObject {
     }
     
     func purchaseProduct(_ product: Product, showAlert: Binding<Bool>) async throws {
-        do {
-            let transaction = try await purchase(product: product)
-            DispatchQueue.main.async {
-                showAlert.wrappedValue = true
-            }
-            print("購入が完了しました: \(transaction)")
-        } catch {
-            print("購入中にエラーが発生しました: \(error)")
-        }
+        let transaction = try await purchase(product: product)
+        await AppState.shared.refreshSubscriptionState()
+        showAlert.wrappedValue = true
+        print("購入が完了しました: \(transaction)")
     }
 }
 
@@ -193,8 +179,8 @@ private func getErrorMessage(error: Error) -> String {
         print("OSの支払い機能が無効化されています")
         return "OSの支払い機能が無効化されています"
     case SubscribeError.failedVerification:
-        return "トランザクションデータの署名が不正です"
         print("トランザクションデータの署名が不正です")
+        return "トランザクションデータの署名が不正です"
     default:
         print("不明なエラーが発生しました")
         return "不明なエラーが発生しました"
@@ -224,14 +210,10 @@ class ProductCell: UITableViewCell {
 }
 
 func updateSubscriptionStatus() async {
-    var validSubscription: StoreKit.Transaction?
-    print("updateSubscriptionStatus1")
     for await verificationResult in Transaction.currentEntitlements {
-        print("updateSubscriptionStatus2")
         if case .verified(let transaction) = verificationResult,
            transaction.productType == .autoRenewable && !transaction.isUpgraded {
-            print("updateSubscriptionStatus3")
-            validSubscription = transaction
+            print("updateSubscriptionStatus3: \(transaction.productID)")
         }
     }
 }
@@ -283,17 +265,14 @@ func purchase(product: Product) async throws -> StoreKit.Transaction  {
     }
 }
 
-func observeTransactionUpdates() {
-    print("observeTransactionUpdates1")
+func observeTransactionUpdates() -> Task<Void, Never> {
     Task(priority: .background) {
-        print("observeTransactionUpdates2")
         for await verificationResult in Transaction.updates {
-            print("observeTransactionUpdates3")
             guard case .verified(let transaction) = verificationResult else {
-                print("observeTransactionUpdates4")
                 continue
             }
 
+            await AppState.shared.refreshSubscriptionState()
             await transaction.finish()
         }
     }
@@ -301,7 +280,7 @@ func observeTransactionUpdates() {
 
 struct SubscriptionView: View {
     @StateObject private var viewModel = SubscriptionViewModel()
-    @StateObject var appState = AppState()
+    @EnvironmentObject var appState: AppState
     @Environment(\.presentationMode) var presentationMode
     @ObservedObject var audioManager:AudioManager
     @State private var showAlert = false
@@ -370,7 +349,6 @@ struct SubscriptionView: View {
                                         do {
                                             try await AppStore.sync()
                                             try await viewModel.purchaseProduct(product, showAlert: $showAlert)
-                                            appState.isBannerVisible = false
                                         } catch {
                                             print("購入処理中にエラーが発生しました: \(error)")
                                         }
@@ -390,6 +368,7 @@ struct SubscriptionView: View {
                 Task {
                     do {
                         try await AppStore.sync()
+                        await appState.refreshSubscriptionState()
                     } catch {
                         print("購入処理中にエラーが発生しました: \(error)")
                     }

@@ -14,14 +14,11 @@ import GoogleMobileAds
 import AVFoundation
 
 class AppDelegate: NSObject, UIApplicationDelegate {
-    var appState: AppState!
-    
     func application(
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil
     ) -> Bool {
         MobileAds.shared.start(completionHandler: nil)
-        self.appState = AppState()
         Messaging.messaging().delegate = self
 
         UNUserNotificationCenter.current().delegate = self
@@ -103,7 +100,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
 struct itApp: App {
     @ObservedObject var authManager: AuthManager
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-    @StateObject var appState = AppState()
+    @StateObject private var appState = AppState.shared
     
     init() {
         FirebaseApp.configure()
@@ -115,8 +112,7 @@ struct itApp: App {
             RootView(authManager: authManager)
                 .environmentObject(appState)
                 .onAppear{
-                    if let userId = authManager.currentUserId {
-                    } else {
+                    if authManager.currentUserId == nil {
                         authManager.anonymousSignIn(){}
                     }
                 }

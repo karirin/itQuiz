@@ -9,10 +9,9 @@
 import SwiftUI
 
 struct StoryMonsterModalView: View {
-    @ObservedObject var authManager = AuthManager()
+    @ObservedObject var authManager = AuthManager.shared
     @Binding var monster: Int
     @Binding var isPresented: Bool
-    @Binding var showQuizList: Bool
     @State var toggle = false
     @State private var monsterName: String = ""
     @State private var monsterHP: Int = 100
@@ -20,6 +19,7 @@ struct StoryMonsterModalView: View {
     @State private var quizTitle: String = ""
     @ObservedObject var audioManager: AudioManager
     @ObservedObject var viewModel: PositionViewModel
+    let onStartBattle: () -> Void
     
     @State private var scale: CGFloat = 0.85
     @State private var opacity: Double = 0
@@ -221,8 +221,14 @@ struct StoryMonsterModalView: View {
     private func startBattle() {
         generateHapticFeedback()
         audioManager.playKetteiSound()
-        isPresented = false
-        showQuizList = true
+        withAnimation(.easeOut(duration: 0.2)) {
+            scale = 0.85
+            opacity = 0
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            isPresented = false
+            onStartBattle()
+        }
     }
     
     private func dismissModal() {
@@ -264,5 +270,5 @@ struct StatBadge: View {
 }
 
 #Preview {
-    StoryMonsterModalView(monster: .constant(1), isPresented: .constant(true), showQuizList: .constant(false), audioManager: AudioManager(), viewModel: PositionViewModel.shared)
+    StoryMonsterModalView(monster: .constant(1), isPresented: .constant(true), audioManager: AudioManager.shared, viewModel: PositionViewModel.shared, onStartBattle: {})
 }

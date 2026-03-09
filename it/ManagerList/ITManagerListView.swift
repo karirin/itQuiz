@@ -37,7 +37,7 @@ struct ITManagerListView: View {
     
     // Reward
     @StateObject var reward = Reward()
-    @StateObject private var appState = AppState()
+    @EnvironmentObject var appState: AppState
     
     // Animation
     @State private var animateCards: Bool = false

@@ -9,7 +9,7 @@ import SwiftUI
 import StoreKit
 
 struct ReviewView: View {
-    @ObservedObject var authManager = AuthManager()
+    @ObservedObject var authManager = AuthManager.shared
     @Binding var isPresented: Bool
     @Binding var helpFlag: Bool
     @State var toggle = false

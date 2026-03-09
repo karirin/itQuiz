@@ -1896,7 +1896,7 @@ struct QuizSystemSekkeiListView: View {
     ]
         
     @State private var shuffledQuizList: [QuizQuestion]
-    private var authManager = AuthManager()
+    private var authManager = AuthManager.shared
     private var audioManager = AudioManager.shared
 
     init(isPresenting: Binding<Bool>) {
@@ -1914,4 +1914,3 @@ struct QuizSystemSekkeiListView_Previews: PreviewProvider {
         QuizSystemSekkeiListView(isPresenting: .constant(false))
     }
 }
-

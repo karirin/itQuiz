@@ -37,7 +37,7 @@ struct ESManagerListView: View {
     @State private var isButtonClickable: Bool = false
     @State private var showAlert: Bool = false
     @State private var preFlag: Bool = false
-    @StateObject private var appState = AppState()
+    @EnvironmentObject var appState: AppState
     @State private var isLoading: Bool = true
     @State private var animateCards: Bool = false
     @State private var incorrectCount: Int = 0

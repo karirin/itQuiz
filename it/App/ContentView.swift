@@ -14,55 +14,90 @@ import AVFoundation
 /// モダンなユーザー名表示
 struct ModernUserNameBar: View {
     let userName: String
+    let streakCount: Int
+    let badgeLabels: [String]
     let onTapRegister: () -> Void
     
     var body: some View {
-        HStack(spacing: 8) {
-            // ユーザーアイコン
-            Circle()
-                .fill(
-                    LinearGradient(
-                        colors: [Color.blue.opacity(0.6), Color.purple.opacity(0.6)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .frame(width: 32, height: 32)
-                .overlay(
-                    Image(systemName: "person.fill")
-                        .foregroundColor(.white)
-                        .font(.system(size: 14, weight: .semibold))
-                )
-            
-            if userName.isEmpty {
-                Button(action: onTapRegister) {
-                    HStack(spacing: 4) {
-                        Text("名前を登録")
-                            .font(.system(size: 14, weight: .bold))
-                            .foregroundColor(.white)
-                        Image(systemName: "pencil.circle.fill")
-                            .foregroundColor(.white.opacity(0.8))
-                    }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 8) {
+                Circle()
+                    .fill(
                         LinearGradient(
-                            colors: [Color.orange, Color.red.opacity(0.8)],
-                            startPoint: .leading,
-                            endPoint: .trailing
+                            colors: [Color.blue.opacity(0.6), Color.purple.opacity(0.6)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
                         )
                     )
-                    .cornerRadius(16)
+                    .frame(width: 32, height: 32)
+                    .overlay(
+                        Image(systemName: "person.fill")
+                            .foregroundColor(.white)
+                            .font(.system(size: 14, weight: .semibold))
+                    )
+
+                if userName.isEmpty {
+                    Button(action: onTapRegister) {
+                        HStack(spacing: 4) {
+                            Text("名前を登録")
+                                .font(.system(size: 14, weight: .bold))
+                                .foregroundColor(.white)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.8)
+                            Image(systemName: "pencil.circle.fill")
+                                .foregroundColor(.white.opacity(0.8))
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(
+                            LinearGradient(
+                                colors: [Color.orange, Color.red.opacity(0.8)],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .cornerRadius(16)
+                    }
+                } else {
+                    Text(userName)
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundColor(Color("fontGray"))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                        .layoutPriority(1)
                 }
-            } else {
-                Text(userName)
-                    .font(.system(size: 15, weight: .semibold))
+            }
+
+            HStack(spacing: 6) {
+                Image(systemName: "flame.fill")
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundColor(.orange)
+                Text("\(streakCount)日連続ログイン")
+                    .font(.system(size: 12, weight: .bold, design: .rounded))
                     .foregroundColor(Color("fontGray"))
-                    .lineLimit(1)
+            }
+
+            if !badgeLabels.isEmpty {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 6) {
+                        ForEach(badgeLabels, id: \.self) { badge in
+                            Text(badge)
+                                .font(.system(size: 10, weight: .bold))
+                                .foregroundColor(.orange)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(
+                                    Capsule()
+                                        .fill(Color.orange.opacity(0.12))
+                                )
+                        }
+                    }
+                }
             }
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
+        .frame(maxWidth: 220, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: 20)
                 .fill(.ultraThinMaterial)
@@ -101,6 +136,9 @@ struct ModernCoinBar: View {
                 .font(.system(size: 15, weight: .bold, design: .rounded))
                 .foregroundColor(Color("fontGray"))
                 .contentTransition(.numericText())
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
+                .monospacedDigit()
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 6)
@@ -256,6 +294,8 @@ struct ModernStatusCard: View {
                                 Text("\(baseHp as? Int ?? 0)")
                                     .multilineTextAlignment(.leading)
                                     .font(.system(size: 20))
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.7)
                                     .padding(.leading,45)
                                     .padding(.top,10)
                             }
@@ -269,6 +309,9 @@ struct ModernStatusCard: View {
                                         Text("＋\(bonusHp as? Int ?? 0)")
                                             .padding(.top,3)
                                             .font(.system(size: 18))
+                                            .lineLimit(1)
+                                            .minimumScaleFactor(0.7)
+                                            .fixedSize(horizontal: true, vertical: false)
                                         Image(avatarName.isEmpty ? "defaultIcon" : (avatarName as? String) ?? "")
                                             .resizable()
                                             .scaledToFit()
@@ -276,6 +319,7 @@ struct ModernStatusCard: View {
                                             .padding(.top,8)
                                     }
                                     .padding(.leading,40)
+                                    .frame(minWidth: isSmallDevice() ? 92 : 108, alignment: .leading)
                                 }.padding(.leading,40)
                             }
                         }
@@ -290,6 +334,8 @@ struct ModernStatusCard: View {
                                     .padding(.leading,45)
                                     .padding(.top,8)
                                     .font(.system(size: 20))
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.7)
                             }
                             HStack(spacing:3){
                                 ZStack{
@@ -301,6 +347,9 @@ struct ModernStatusCard: View {
                                         Text("＋\(bonusAttack as? Int ?? 0)")
                                             .padding(.top,3)
                                             .font(.system(size:18))
+                                            .lineLimit(1)
+                                            .minimumScaleFactor(0.7)
+                                            .fixedSize(horizontal: true, vertical: false)
                                         Image(avatarName.isEmpty ? "defaultIcon" : (avatarName as? String) ?? "")
                                             .resizable()
                                             .scaledToFit()
@@ -308,6 +357,7 @@ struct ModernStatusCard: View {
                                             .padding(.top,8)
                                     }
                                     .padding(.leading,40)
+                                    .frame(minWidth: isSmallDevice() ? 92 : 108, alignment: .leading)
                                 }.padding(.leading,40)
                             }
                         }
@@ -498,6 +548,20 @@ struct ContentView: View {
     private var avatarBonusAttack: Int {
         return avatar.first?["attack"] as? Int ?? 0
     }
+
+    private var streakBadgeLabels: [String] {
+        var badges: [String] = []
+        if loginCount >= 100 {
+            badges.append("100日")
+        }
+        if loginCount >= 30 {
+            badges.append("30日")
+        }
+        if loginCount >= 7 {
+            badges.append("7日")
+        }
+        return badges
+    }
     
     var body: some View {
         NavigationView {
@@ -531,6 +595,8 @@ struct ContentView: View {
                                         HStack {
                                             ModernUserNameBar(
                                                 userName: userName,
+                                                streakCount: loginCount,
+                                                badgeLabels: streakBadgeLabels,
                                                 onTapRegister: {
                                                     updateNameFlag = true
                                                 }
@@ -900,6 +966,9 @@ struct ContentView: View {
                             self.tutorialNum = tutorialNum ?? 0
                             self.isLoading = false
                         }
+                        authManager.fetchCurrentLoginStreak { streakCount in
+                            self.loginCount = streakCount
+                        }
                         authManager.fetchAvatars {
                             self.avatar = authManager.avatars.map { avatar in
                                 return ["name": avatar.name]
@@ -959,6 +1028,9 @@ struct ContentView: View {
                 self.userHp = hp ?? 100
                 self.userAttack = attack ?? 20
                 self.tutorialNum = tutorialNum ?? 0
+            }
+            authManager.fetchCurrentLoginStreak { streakCount in
+                self.loginCount = streakCount
             }
         }
     }

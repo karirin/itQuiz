@@ -95,6 +95,10 @@ class GachaManager {
         setupItems()
     }
     
+    var catalogItems: [Item] {
+        items
+    }
+    
     var gachaCost: Int {
         switch mode {
         case .normal:

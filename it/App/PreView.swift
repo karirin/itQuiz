@@ -241,7 +241,7 @@ struct PreView: View {
     @State private var selectedProduct: Product? = nil
     @State private var hasSetDefaultProduct = false
     @StateObject private var viewModel = SubscriptionViewModel()
-    @StateObject var appState = AppState()
+    @EnvironmentObject var appState: AppState
     @Environment(\.presentationMode) var presentationMode
     @ObservedObject var audioManager: AudioManager
     @State private var showAlert = false
@@ -399,10 +399,9 @@ struct PreView: View {
                                 Button(action: {
                                     guard let product = selectedProduct else { return }
                                     Task {
-                                        do {
-                                            try await AppStore.sync()
-                                            try await viewModel.purchaseProduct(product, showAlert: $showAlert)
-                                            appState.isBannerVisible = false
+                                                do {
+                                                    try await AppStore.sync()
+                                                    try await viewModel.purchaseProduct(product, showAlert: $showAlert)
                                             alertMessage = "広告非表示の反映に少しお時間がかかる場合がございます。\nご了承ください"
                                         } catch StoreKitError.userCancelled {
                                             print("StoreKitError.userCancelled")
@@ -456,6 +455,7 @@ struct PreView: View {
                                             Task {
                                                 do {
                                                     try await AppStore.sync()
+                                                    await appState.refreshSubscriptionState()
                                                 } catch {
                                                     print("購入処理中にエラーが発生しました: \(error)")
                                                 }

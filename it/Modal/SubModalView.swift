@@ -22,7 +22,7 @@ struct SubModalView: View {
     var resumeTimer: () -> Void
     @Binding var userFlag: Int
     @StateObject private var viewModel = SubscriptionViewModel()
-    @StateObject var appState = AppState()
+    @EnvironmentObject var appState: AppState
     @Environment(\.presentationMode) var presentationMode
     @State private var showAlert = false
     
@@ -91,7 +91,6 @@ struct SubModalView: View {
                                             do {
                                                 try await AppStore.sync()
                                                 try await viewModel.purchaseProduct(product, showAlert: $showAlert)
-                                                appState.isBannerVisible = false
                                             } catch {
                                                 print("購入処理中にエラーが発生しました: \(error)")
                                             }
@@ -110,6 +109,7 @@ struct SubModalView: View {
                     Task {
                         do {
                             try await AppStore.sync()
+                            await appState.refreshSubscriptionState()
                         } catch {
                             print("購入処理中にエラーが発生しました: \(error)")
                         }
@@ -187,4 +187,3 @@ struct SubModalView: View {
 ////ModalView()
 //    }
 //}
-
