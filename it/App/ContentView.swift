@@ -68,32 +68,6 @@ struct ModernUserNameBar: View {
                 }
             }
 
-            HStack(spacing: 6) {
-                Image(systemName: "flame.fill")
-                    .font(.system(size: 12, weight: .bold))
-                    .foregroundColor(.orange)
-                Text("\(streakCount)日連続ログイン")
-                    .font(.system(size: 12, weight: .bold, design: .rounded))
-                    .foregroundColor(Color("fontGray"))
-            }
-
-            if !badgeLabels.isEmpty {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 6) {
-                        ForEach(badgeLabels, id: \.self) { badge in
-                            Text(badge)
-                                .font(.system(size: 10, weight: .bold))
-                                .foregroundColor(.orange)
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 4)
-                                .background(
-                                    Capsule()
-                                        .fill(Color.orange.opacity(0.12))
-                                )
-                        }
-                    }
-                }
-            }
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
@@ -505,6 +479,7 @@ struct ContentView: View {
     @State private var showTutorial = true
     @State private var buttonRect: CGRect = .zero
     @State private var bubbleHeight: CGFloat = 0.0
+    @State private var tutorialPulse: Bool = false
     @State private var isSoundOn: Bool = true
     @State private var isLoading: Bool = true
     @State private var isShowingLoginBonus = false
@@ -741,6 +716,7 @@ struct ContentView: View {
                                                     }
                                                     .shadow(radius: 3)
                                                 }
+
                                             }
                                         }
                                     }
@@ -825,38 +801,86 @@ struct ContentView: View {
                 
                 // チュートリアルオーバーレイ
                 if tutorialNum == 1 {
+                    // Dark overlay with cutout
                     GeometryReader { geometry in
-                        Color.black.opacity(0.5)
+                        let origin = geometry.frame(in: .global).origin
+                        let localX = buttonRect.midX - origin.x
+                        let localY = buttonRect.midY - origin.y
+                        let cutoutWidth = max(buttonRect.width, 0)
+                        let cutoutHeight = max(buttonRect.height, 0)
+
+                        Color.black.opacity(0.6)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 30, style: .continuous)
-                                    .padding(.leading)
-                                    .frame(width: buttonRect.width, height: buttonRect.height)
-                                    .position(x: buttonRect.midX, y: buttonRect.midY)
+                                    .frame(width: cutoutWidth, height: cutoutHeight)
+                                    .position(x: localX, y: localY)
                                     .blendMode(.destinationOut)
                             )
-                            .ignoresSafeArea()
                             .compositingGroup()
-                            .background(.clear)
                     }
+                    .ignoresSafeArea()
+
+                    // スポットライト枠のパルスアニメーション
+                    GeometryReader { geometry in
+                        let origin = geometry.frame(in: .global).origin
+                        let localX = buttonRect.midX - origin.x
+                        let localY = buttonRect.midY - origin.y
+                        let cutoutWidth = max(buttonRect.width, 0)
+                        let cutoutHeight = max(buttonRect.height, 0)
+
+                        RoundedRectangle(cornerRadius: 30, style: .continuous)
+                            .stroke(Color(hex: "667eea"), lineWidth: 3)
+                            .frame(width: cutoutWidth, height: cutoutHeight)
+                            .position(x: localX, y: localY)
+                            .scaleEffect(tutorialPulse ? 1.05 : 1.0)
+                            .opacity(tutorialPulse ? 0.6 : 1.0)
+                    }
+                    .ignoresSafeArea()
+
+                    // Tutorial Message
                     VStack {
                         Spacer()
                             .frame(height: buttonRect.minY - bubbleHeight)
-                        VStack(alignment: .trailing, spacing: .zero) {
-                            Text("「学習モード」をクリックしてください。")
-                                .font(.callout)
-                                .padding(5)
-                                .font(.system(size: 24.0))
-                                .padding(.all, 16.0)
-                                .background(Color("Color2"))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 20)
-                                        .stroke(Color.gray, lineWidth: 15)
+                        VStack(spacing: 10) {
+                            HStack(spacing: 4) {
+                                Text("STEP 1")
+                                    .font(.system(size: 11, weight: .bold, design: .rounded))
+                                    .foregroundColor(.white)
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 4)
+                                    .background(
+                                        LinearGradient(
+                                            colors: [Color(hex: "667eea"), Color(hex: "764ba2")],
+                                            startPoint: .leading,
+                                            endPoint: .trailing
+                                        )
+                                    )
+                                    .clipShape(Capsule())
+                            }
+
+                            Image(systemName: "hand.tap.fill")
+                                .font(.system(size: 28))
+                                .foregroundStyle(
+                                    LinearGradient(
+                                        colors: [Color(hex: "667eea"), Color(hex: "764ba2")],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
                                 )
-                                .cornerRadius(20)
-                                .padding(.horizontal, 16)
+
+                            Text("「学習モード」をタップ")
+                                .font(.system(size: 17, weight: .bold))
                                 .foregroundColor(Color("fontGray"))
-                                .shadow(radius: 10)
+
+                            Text("クイズに挑戦してみましょう")
+                                .font(.system(size: 13))
+                                .foregroundColor(.secondary)
                         }
+                        .padding(.horizontal, 28)
+                        .padding(.vertical, 22)
+                        .background(Color("Color2"))
+                        .clipShape(RoundedRectangle(cornerRadius: 20))
+                        .shadow(color: .black.opacity(0.2), radius: 15, y: 8)
                         .background(GeometryReader { geometry in
                             Path { _ in
                                 DispatchQueue.main.async {
@@ -867,22 +891,32 @@ struct ContentView: View {
                         Spacer()
                     }
                     .ignoresSafeArea()
+
+                    // Skip Button
                     VStack {
                         HStack {
                             Button(action: {
                                 generateHapticFeedback()
                                 tutorialNum = 0
-                                authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { success in
+                                authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { _ in
                                 }
                             }) {
-                                Image("スキップ")
-                                    .resizable()
-                                    .frame(width: 200, height: 60)
-                                    .padding(.top, 20)
+                                HStack(spacing: 6) {
+                                    Image(systemName: "forward.fill")
+                                        .font(.system(size: 12))
+                                    Text("スキップ")
+                                        .font(.system(size: 14, weight: .semibold))
+                                }
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 20)
+                                .padding(.vertical, 12)
+                                .background(Color.white.opacity(0.2))
+                                .clipShape(Capsule())
                             }
+                            .padding(.leading, 20)
+                            .padding(.top, 60)
                             Spacer()
                         }
-                        .padding(.leading)
                         Spacer()
                     }
                 }
@@ -916,7 +950,12 @@ struct ContentView: View {
             )
         }
         .onAppear {
+
             let userDefaults = UserDefaults.standard
+            if !userDefaults.bool(forKey: "hasSeenTutorial") {
+                startFlag = true
+                userDefaults.set(true, forKey: "hasSeenTutorial")
+            }
             if !userDefaults.bool(forKey: "hasLaunchedBeforeOnappear") {
                 isSignUpFlag = false
                 isFlag = true
@@ -1017,6 +1056,15 @@ struct ContentView: View {
         }
         .background(Color("purple2").opacity(0.6))
         .edgesIgnoringSafeArea(.all)
+        .onChange(of: tutorialNum) { num in
+            if num == 1 {
+                withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) {
+                    tutorialPulse = true
+                }
+            } else {
+                tutorialPulse = false
+            }
+        }
     }
     
     private func fetchUserInfoIfNeeded(isPresenting: Bool) {

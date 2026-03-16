@@ -17,6 +17,13 @@ var correctAnswerIndex: Int
 var explanation: String
 }
 
+struct ViewPositionKey0: PreferenceKey {
+    static var defaultValue: [CGRect] = []
+    static func reduce(value: inout [CGRect], nextValue: () -> [CGRect]) {
+        value.append(contentsOf: nextValue())
+    }
+}
+
 struct ViewPositionKey1: PreferenceKey {
     static var defaultValue: [CGRect] = []
     static func reduce(value: inout [CGRect], nextValue: () -> [CGRect]) {
@@ -107,6 +114,7 @@ struct QuizView: View {
     @State private var buttonRect1: CGRect = .zero
     @State private var buttonRect2: CGRect = .zero
     @State private var buttonRect3: CGRect = .zero
+    @State private var tutorialPulse: Bool = false
     @State private var bubbleHeight: CGFloat = 0.0
     @State private var startTime = Date()
     @State private var endTime: Date?
@@ -114,6 +122,12 @@ struct QuizView: View {
     @State private var navigateToQuizResult = false
     @ObservedObject var interstitial: Interstitial
     @State private var rewardFlag: Int = 0
+    @State private var comboCount: Int = 0
+    @State private var comboPulse: Bool = false
+    @State private var comboBurstTitle: String = ""
+    @State private var comboBurstSubtitle: String = ""
+    @State private var comboBurstColors: [Color] = [Color.blue, Color.cyan]
+    @State private var showComboBurst: Bool = false
     
     
     var currentQuiz: QuizQuestion {
@@ -127,9 +141,9 @@ struct QuizView: View {
                      .resizable()
                      .edgesIgnoringSafeArea(.all)
                 VStack {
-                    HStack{
-                        Button(action: { 
-                        generateHapticFeedback()
+                    HStack {
+                        Button(action: {
+                            generateHapticFeedback()
                             showHomeModal.toggle()
                             audioManager.playSound()
                         }) {
@@ -138,7 +152,7 @@ struct QuizView: View {
                                     .fill(Color.white)
                                     .frame(width: 52, height: 52)
                                     .shadow(color: .black.opacity(0.15), radius: 8, x: 0, y: 4)
-                                
+
                                 Image(systemName: "gearshape.fill")
                                     .font(.system(size: 22, weight: .semibold))
                                     .foregroundColor(Color("fontGray"))
@@ -147,10 +161,6 @@ struct QuizView: View {
                         .padding(.leading)
                         .foregroundColor(.gray)
                         Spacer()
-                        Spacer()
-                        // 正解の場合の赤い円
-                        if let selected = selectedAnswerIndex, selected == currentQuiz.correctAnswerIndex {
-                        }
                         TimerView(remainingSeconds: $remainingSeconds)
                             .background(GeometryReader { geometry in
                                 Color.clear.preference(key: ViewPositionKey3.self, value: [geometry.frame(in: .global)])
@@ -165,34 +175,52 @@ struct QuizView: View {
                             selectedAnswerIndex: selectedAnswerIndex,
                             correctAnswerIndex: currentQuiz.correctAnswerIndex
                         )
+                        .background(GeometryReader { geometry in
+                            Color.clear.preference(key: ViewPositionKey0.self, value: [geometry.frame(in: .global)])
+                        })
                         .padding(.horizontal, 16)
-                        ZStack{
-                                        Image("\(quizLevel)Monster\(monsterType)")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .shadow(radius: 10)
-                                            .frame(width: isSmallDevice() ? 100 : 160)
-                            
-                        
-                        // 問題に正解して敵キャラにダメージ
-                        if let selected = selectedAnswerIndex {
-                            if selected == currentQuiz.correctAnswerIndex {
-                                if showAttackImage {
-                                    Image("attack1")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(height:isSmallDevice() ? 80 : 130)
-                                }
-                            }
-                        }
-                                        // 敵キャラを倒した
-                                        if showMonsterDownImage && monsterHP <= 0 {
-                                            Image("倒す")
+                        ZStack {
+                            ZStack{
+                                Image("\(quizLevel)Monster\(monsterType)")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .shadow(radius: 10)
+                                    .scaleEffect(comboPulse ? 1.04 : 1.0)
+                                    .animation(.spring(response: 0.32, dampingFraction: 0.55), value: comboPulse)
+                                    .frame(width: isSmallDevice() ? 100 : 160)
+
+                                // 問題に正解して敵キャラにダメージ
+                                if let selected = selectedAnswerIndex {
+                                    if selected == currentQuiz.correctAnswerIndex {
+                                        if showAttackImage {
+                                            Image("attack1")
                                                 .resizable()
                                                 .scaledToFit()
-                                                .frame(height:80)
+                                                .frame(height:isSmallDevice() ? 80 : 130)
                                         }
-                                
+                                    }
+                                }
+                                // 敵キャラを倒した
+                                if showMonsterDownImage && monsterHP <= 0 {
+                                    Image("倒す")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(height:80)
+                                }
+
+                            }
+
+                            // コンボバッジをモンスターの右に表示（ZStackで重ねて表示位置がずれない）
+                            if comboCount >= 2 {
+                                MonsterComboBadgeView(
+                                    comboCount: comboCount,
+                                    multiplier: MonsterComboSystem.multiplier(for: comboCount),
+                                    isPulsing: comboPulse
+                                )
+                                .offset(x: isSmallDevice() ? 90 : 120, y: 40)
+                                .transition(.scale.combined(with: .opacity))
+                                .animation(.spring(response: 0.3, dampingFraction: 0.6), value: comboCount)
+                            }
                         }
                         if quizLevel != .incorrectAnswer && quizLevel != .incorrectITAnswer && quizLevel != .incorrectInfoAnswer && quizLevel != .incorrectAppliedAnswer && quizLevel != .incorrectESAnswer && quizLevel != .incorrectITStrategyAnswer {
                             ZStack{
@@ -290,7 +318,7 @@ struct QuizView: View {
                         ExperienceModalView(showModal: $showModal, addedExperience: 10, addedMoney: 10, authManager: authManager)
                     }
                 }.background(showIncorrectBackground ? Color(.red).opacity(0.1) : Color(.white).opacity(0))
-                    .onPreferenceChange(ViewPositionKey.self) { positions in
+                    .onPreferenceChange(ViewPositionKey0.self) { positions in
                         self.buttonRect = positions.first ?? .zero
                     }
                     .onPreferenceChange(ViewPositionKey1.self) { positions in
@@ -333,283 +361,54 @@ struct QuizView: View {
                         SubModalView(isSoundOn: $isSoundOn, isPresented: $showSubFlag, isPresenting: $isPresenting, audioManager: audioManager, showHomeModal: $showHomeModal,pauseTimer:pauseTimer,resumeTimer: resumeTimer, userFlag: $userFlag)
                     }
                 }
+// MARK: - Quiz Tutorial Overlays
                 if tutorialNum == 4 && showTutorial == true {
-                    GeometryReader { geometry in
-                        Color.black.opacity(0.5)
-                        // スポットライトの領域をカットアウ
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 0, style: .continuous)
-                                    .frame(width: buttonRect.width, height: buttonRect.height)
-                                    .position(x: buttonRect.midX, y: buttonRect.midY)
-                                    .blendMode(.destinationOut)
-                            )
-                            .ignoresSafeArea()
-                            .compositingGroup()
-                            .background(.clear)
-                    }
-                    VStack {
-                        Spacer()
-                            .frame(height: buttonRect.minY - bubbleHeight)
-                        VStack(alignment: .trailing, spacing: .zero) {
-                            Text("問題が出題されます。")
-                                .font(.callout)
-                                .padding(5)
-                                .font(.system(size: 24.0))
-                                .padding(.all, 16.0)
-                                .background(Color("Color2"))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 20)
-                                        .stroke(Color.gray, lineWidth: 15)
-                                )
-                                .cornerRadius(20)
-                                .padding(.horizontal, 16)
-                                .foregroundColor(Color("fontGray"))
-                                .shadow(radius: 10)
-                        }
-                        .background(GeometryReader { geometry in
-                            Path { _ in
-                                DispatchQueue.main.async {
-                                    //                                        print(currentQuiz.question.count)
-                                    if currentQuiz.question.count <= 19{
-                                        self.bubbleHeight = geometry.size.height - 130
-                                    }else if currentQuiz.question.count <= 38{
-                                        self.bubbleHeight = geometry.size.height - 150
-                                    }else{
-                                        self.bubbleHeight = geometry.size.height - 170
-                                    }
-                                }
-                            }
-                        })
-                        Spacer()
-                    }
-                    .ignoresSafeArea()
-                    VStack{
-                        Spacer()
-                        HStack{
-                            Button(action: { 
-                        generateHapticFeedback()
-                                tutorialNum = 0 // タップでチュートリアルを終了
-                                authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { success in
-                                    // データベースのアップデートが成功したかどうかをハンドリング
-                                }
-                            }) {
-                                Image("スキップ")
-                                    .resizable()
-                                    .frame(width:200,height:60)
-                            }
-                            Spacer()
-                        }
-                        .padding()
-                    }
+                    quizTutorialOverlay(
+                        spotlightRect: buttonRect,
+                        cornerRadius: 16,
+                        stepNumber: 4,
+                        icon: "doc.text.fill",
+                        title: "問題が出題されます",
+                        description: "ここに問題文が表示されます",
+                        accentColors: [Color(hex: "667eea"), Color(hex: "764ba2")],
+                        messagePlacement: .below
+                    )
                 }
-                if tutorialNum == 5 && showTutorial == true{
-                    GeometryReader { geometry in
-                        Color.black.opacity(0.5)
-                            .ignoresSafeArea()
-                        // スポットライトの領域をカットアウ
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                                    .frame(width: buttonRect1.width, height: buttonRect1.height-20)
-                                    .position(x: buttonRect1.midX, y: buttonRect1.midY+5)
-                                    .blendMode(.destinationOut)
-                            )
-                            .ignoresSafeArea()
-                            .compositingGroup()
-                            .background(.clear)
-                    }
-                    VStack {
-                        Spacer()
-                            .frame(height: isSmallDevice() ? buttonRect.minY - bubbleHeight - 30 : buttonRect.minY - bubbleHeight + 30)
-                        VStack(alignment: .trailing, spacing: .zero) {
-                            Text("選択肢の中から正解と思うものをクリックしてください。")
-                                .font(.callout)
-                                .padding(5)
-                                .font(.system(size: 24.0))
-                                .padding(.all, 16.0)
-                                .background(Color("Color2"))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 20)
-                                        .stroke(Color.gray, lineWidth: 15)
-                                )
-                                .cornerRadius(20)
-                                .padding(.horizontal, 16)
-                                .foregroundColor(Color("fontGray"))
-                                .shadow(radius: 10)
-                        }
-                        .background(GeometryReader { geometry in
-                            Path { _ in
-                                DispatchQueue.main.async {
-                                    if currentQuiz.question.count <= 19{
-                                        self.bubbleHeight = geometry.size.height - 240
-                                    }else if currentQuiz.question.count <= 38{
-                                        self.bubbleHeight = geometry.size.height - 260
-                                    }else{
-                                        self.bubbleHeight = geometry.size.height - 290
-                                    }
-                                }
-                            }
-                        })
-                        Spacer()
-                    }
-                    .ignoresSafeArea()
-                    VStack{
-                        HStack{
-                            Button(action: { 
-                        generateHapticFeedback()
-                                tutorialNum = 0 // タップでチュートリアルを終了
-                                authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { success in
-                                    // データベースのアップデートが成功したかどうかをハンドリング
-                                }
-                            }) {
-                                Image("スキップ")
-                                    .resizable()
-                                    .frame(width:200,height:60)
-                                    .padding(.top,20)
-                            }
-                            Spacer()
-                        }
-                        .padding(.leading)
-                        Spacer()
-                    }
+                if tutorialNum == 5 && showTutorial == true {
+                    quizTutorialOverlay(
+                        spotlightRect: buttonRect1,
+                        cornerRadius: 20,
+                        stepNumber: 5,
+                        icon: "hand.tap.fill",
+                        title: "選択肢をタップ",
+                        description: "正解と思うものを選んでください",
+                        accentColors: [Color(hex: "11998e"), Color(hex: "38ef7d")],
+                        messagePlacement: .above
+                    )
                 }
-                if tutorialNum == 6 && showTutorial == true{
-                    GeometryReader { geometry in
-                        Color.black.opacity(0.5)
-                        // スポットライトの領域をカットアウ
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                                    .frame(width: buttonRect2.width, height: buttonRect2.height+10)
-                                    .position(x: buttonRect2.midX, y: buttonRect2.midY)
-                                    .blendMode(.destinationOut)
-                            )
-                            .ignoresSafeArea()
-                            .compositingGroup()
-                            .background(.clear)
-                    }
-                    VStack {
-                        Spacer()
-                            .frame(height: isSmallDevice() ? buttonRect.minY + 20 : buttonRect.minY + 80)
-                        VStack(alignment: .trailing, spacing: .zero) {
-                            Text("正解すると相手モンスターにダメージ\n不正解だと自分がダメージを受けます\n相手のHPが０になれば次の相手に\n自分のHPが０になればゲームオーバーです")
-                                .font(.callout)
-                                .padding(5)
-                                .font(.system(size: 24.0))
-                                .padding(.all, 16.0)
-                                .background(Color("Color2"))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 20)
-                                        .stroke(Color.gray, lineWidth: 15)
-                                )
-                                .cornerRadius(20)
-                                .foregroundColor(Color("fontGray"))
-                                .shadow(radius: 10)
-                            //                        Image("下矢印")
-                            //                            .resizable()
-                            //                            .frame(width: 20, height: 20)
-                            //                            .padding(.trailing, 236.0)
-                        }  .background(GeometryReader { geometry in
-                            Path { _ in
-                                DispatchQueue.main.async {
-                                    if currentQuiz.question.count <= 19{
-                                        self.bubbleHeight = geometry.size.height - 150
-                                    }else if currentQuiz.question.count <= 38{
-                                        self.bubbleHeight = geometry.size.height - 180
-                                    }else{
-                                        self.bubbleHeight = geometry.size.height - 190
-                                    }
-                                }
-                            }
-                        })
-                        Spacer()
-                    }
-                    .ignoresSafeArea()
-                    VStack{
-                        Spacer()
-                        HStack{
-                            Button(action: { 
-                        generateHapticFeedback()
-                                tutorialNum = 0 // タップでチュートリアルを終了
-                                authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { success in
-                                    // データベースのアップデートが成功したかどうかをハンドリング
-                                }
-                            }) {
-                                Image("スキップ")
-                                    .resizable()
-                                    .frame(width:200,height:60)
-                                    .padding(.top,20)
-                            }
-                            Spacer()
-                        }
-                        .padding()
-                    }
+                if tutorialNum == 6 && showTutorial == true {
+                    quizTutorialOverlay(
+                        spotlightRect: buttonRect2,
+                        cornerRadius: 16,
+                        stepNumber: 6,
+                        icon: "heart.fill",
+                        title: "バトルのルール",
+                        description: "正解で敵にダメージ、不正解で自分がダメージ\nHPが0になるとゲームオーバーです",
+                        accentColors: [Color(hex: "fa709a"), Color(hex: "fee140")],
+                        messagePlacement: .below
+                    )
                 }
-                if tutorialNum == 7 && showTutorial == true{
-                    GeometryReader { geometry in
-                        Color.black.opacity(0.5)
-                        // スポットライトの領域をカットアウ
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                                    .frame(width: buttonRect3.width, height: buttonRect3.height+20)
-                                    .frame(
-                                        width: currentQuiz.question.count <= 19 ? buttonRect3.width : buttonRect3.width,
-                                        //                                        height: currentQuiz.question.count <= 19 ? buttonRect3.height + 20 : buttonRect3.height+20
-                                        height: currentQuiz.question.count <= 19 ? buttonRect3.height + 20 :
-                                            (currentQuiz.question.count <= 29 ? buttonRect3.height - 20 : buttonRect3.height + 40)
-                                    )
-                                    .position(x: buttonRect3.midX+8, y: buttonRect3.midY+1)
-                                    .blendMode(.destinationOut)
-                            )
-                            .ignoresSafeArea()
-                            .compositingGroup()
-                            .background(.clear)
-                    }
-                    VStack {
-                        Spacer()
-                            .frame(height: buttonRect.minY - bubbleHeight - 30)
-                        VStack(alignment: .trailing, spacing: .zero) {
-                            Text("30秒経つと自分がダメージを受けることになります。")
-                                .font(.callout)
-                                .padding(5)
-                                .font(.system(size: 24.0))
-                                .padding(.all, 16.0)
-                                .background(Color("Color2"))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 20)
-                                        .stroke(Color.gray, lineWidth: 15)
-                                )
-                                .cornerRadius(20)
-                                .padding(.horizontal, 16)
-                                .foregroundColor(Color("fontGray"))
-                                .shadow(radius: 10)
-                        } .background(GeometryReader { geometry in
-                            Path { _ in
-                                DispatchQueue.main.async {
-                                    self.bubbleHeight = geometry.size.height - 130
-                                }
-                            }
-                        })
-                        Spacer()
-                    }
-                    .ignoresSafeArea()
-                    VStack{
-                        Spacer()
-                        HStack{
-                            Button(action: { 
-                        generateHapticFeedback()
-                                tutorialNum = 0 // タップでチュートリアルを終了
-                                authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { success in
-                                    // データベースのアップデートが成功したかどうかをハンドリング
-                                }
-                            }) {
-                                Image("スキップ")
-                                    .resizable()
-                                    .frame(width:200,height:60)
-                                
-                            }
-                            Spacer()
-                        }
-                        .padding()
-                    }
+                if tutorialNum == 7 && showTutorial == true {
+                    quizTutorialOverlay(
+                        spotlightRect: buttonRect3,
+                        cornerRadius: 30,
+                        stepNumber: 7,
+                        icon: "timer",
+                        title: "制限時間に注意",
+                        description: "30秒経つと自分がダメージを受けます",
+                        accentColors: [Color(hex: "f093fb"), Color(hex: "f5576c")],
+                        messagePlacement: .below
+                    )
                 }
                 if showCountdown {
                     ZStack {
@@ -649,6 +448,9 @@ struct QuizView: View {
                 }
             }
             .onAppear {
+                withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) {
+                    tutorialPulse = true
+                }
                 startCountdown()
                 self.monsterType = 1 // すぐに1に戻す
                 authManager.fetchUserInfo { (name, avatar, money, hp, attack, tutorialNum) in
@@ -1781,7 +1583,7 @@ extension QuizView {
                 } else {
                     timer.invalidate()
                     showCountdown = false
-                    if tutorialNum != 3 {
+                    if tutorialNum != 3 && tutorialNum < 4 {
                         startTimer()
                     }
                 }
@@ -1821,6 +1623,7 @@ extension QuizView {
                 remainingSeconds -= 1
             } else {
                 timer.invalidate()
+                applyTimeoutComboPenalty()
                 playerHP -= monsterAttack
                 moveToNextQuiz()
             }
@@ -1841,10 +1644,16 @@ extension QuizView {
             persistQuizStatsIfPossible()
             navigateToQuizResultView = true
         } else if remainingSeconds == 0 {
-            currentQuizIndex += 1
-            selectedAnswerIndex = nil
-            startTimer()
-            hasAnswered = false
+            if currentQuizIndex + 1 < quizzes.count {
+                currentQuizIndex += 1
+                selectedAnswerIndex = nil
+                startTimer()
+                hasAnswered = false
+            } else {
+                showCompletionMessage = true
+                timer?.invalidate()
+                navigateToQuizResultView = true
+            }
         } else if currentQuizIndex + 1 < quizzes.count {
             if userFlag == 0 {
                 showExplanationModal = true
@@ -1861,6 +1670,122 @@ extension QuizView {
         }
     }
 
+    // MARK: - Quiz Tutorial Overlay Builder
+    enum TutorialMessagePlacement {
+        case above, below
+    }
+
+    @ViewBuilder
+    private func quizTutorialOverlay(
+        spotlightRect: CGRect,
+        cornerRadius: CGFloat,
+        stepNumber: Int,
+        icon: String,
+        title: String,
+        description: String,
+        accentColors: [Color],
+        messagePlacement: TutorialMessagePlacement
+    ) -> some View {
+        let cutoutWidth = max(spotlightRect.width, 0)
+        let cutoutHeight = max(spotlightRect.height, 0)
+
+        // Single GeometryReader for all overlay elements to share the same coordinate origin
+        GeometryReader { geometry in
+            let origin = geometry.frame(in: .global).origin
+            let localMidX = spotlightRect.midX - origin.x
+            let localMidY = spotlightRect.midY - origin.y
+            let cardY = messagePlacement == .below
+                ? (spotlightRect.maxY - origin.y) + 100
+                : (spotlightRect.minY - origin.y) - 100
+
+            ZStack {
+                // Dark overlay with cutout + stroke (both in same coordinate space)
+                Color.black.opacity(0.6)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                            .frame(width: cutoutWidth, height: cutoutHeight)
+                            .position(x: localMidX, y: localMidY)
+                            .blendMode(.destinationOut)
+                    )
+                    .compositingGroup()
+
+                // Message card
+                VStack(spacing: 10) {
+                    HStack(spacing: 4) {
+                        Text("STEP \(stepNumber - 3)")
+                            .font(.system(size: 11, weight: .bold, design: .rounded))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 4)
+                            .background(
+                                LinearGradient(
+                                    colors: accentColors,
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                            .clipShape(Capsule())
+                    }
+
+                    Image(systemName: icon)
+                        .font(.system(size: 28))
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: accentColors,
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+
+                    Text(title)
+                        .font(.system(size: 17, weight: .bold))
+                        .foregroundColor(Color("fontGray"))
+
+                    Text(description)
+                        .font(.system(size: 13))
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                }
+                .padding(.horizontal, 28)
+                .padding(.vertical, 22)
+                .background(Color("Color2"))
+                .clipShape(RoundedRectangle(cornerRadius: 20))
+                .shadow(color: .black.opacity(0.2), radius: 15, y: 8)
+                .frame(maxWidth: .infinity)
+                .position(x: geometry.size.width / 2, y: cardY)
+
+                // Skip button
+                VStack {
+                    Spacer()
+                    HStack {
+                        Button(action: {
+                            generateHapticFeedback()
+                            tutorialNum = 0
+                            authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { _ in }
+                        }) {
+                            HStack(spacing: 6) {
+                                Image(systemName: "forward.fill")
+                                    .font(.system(size: 12))
+                                Text("スキップ")
+                                    .font(.system(size: 14, weight: .semibold))
+                            }
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 20)
+                            .padding(.vertical, 12)
+                            .background(Color.white.opacity(0.2))
+                            .clipShape(Capsule())
+                        }
+                        .padding(.leading, 20)
+                        .padding(.bottom, 40)
+
+                        Spacer()
+                    }
+                }
+            }
+        }
+        .ignoresSafeArea()
+    }
+
     func answerSelectionAction(index: Int) {
         guard !hasAnswered else { return }
 
@@ -1869,15 +1794,17 @@ extension QuizView {
 
         let isAnswerCorrect = selectedAnswerIndex == currentQuiz.correctAnswerIndex
         if isAnswerCorrect {
+            let damage = comboAdjustedDamage()
             audioManager.playCorrectSound()
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 audioManager.playAttackSound()
                 showAttackImage = true
+                registerSuccessfulCombo()
                 correctAnswerCount += 1
                 incorrectCount -= 1
                 answerCount += 1
                 if quizLevel != .incorrectAnswer && quizLevel != .incorrectITAnswer && quizLevel != .incorrectInfoAnswer && quizLevel != .incorrectAppliedAnswer && quizLevel != .incorrectESAnswer && quizLevel != .incorrectITStrategyAnswer {
-                    monsterHP -= userAttack
+                    monsterHP -= damage
                 }
                 if monsterHP <= 0 {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -1917,6 +1844,7 @@ extension QuizView {
                 moveToNextQuiz()
             }
         } else {
+            resetCombo(withTitle: "COMBO BREAK", subtitle: "倍率リセット", colors: [Color.gray, Color.black.opacity(0.8)])
             if let userId = authManager.currentUserId {
                 let incorrectAnswer = IncorrectAnswer(
                     userId: userId,
@@ -1952,6 +1880,70 @@ extension QuizView {
         quizResults.append(result)
         showAttackImage = false
         hasAnswered = true
+    }
+
+    private func comboAdjustedDamage() -> Int {
+        let multiplier = MonsterComboSystem.multiplier(for: comboCount + 1)
+        return max(Int((Double(userAttack) * multiplier).rounded()), userAttack)
+    }
+
+    private func registerSuccessfulCombo() {
+        let previousTier = MonsterComboSystem.tier(for: comboCount)
+        comboCount += 1
+        triggerComboPulse()
+
+        guard let currentTier = MonsterComboSystem.tier(for: comboCount) else { return }
+        // ティアが変わった時だけバーストを表示
+        guard previousTier?.requiredStreak != currentTier.requiredStreak else { return }
+        let subtitle = "\(comboCount) COMBO  ATK x\(String(format: "%.1f", currentTier.multiplier))"
+        presentComboBurst(title: currentTier.title, subtitle: subtitle, colors: currentTier.colors)
+    }
+
+    private func applyTimeoutComboPenalty() {
+        guard comboCount > 0 else { return }
+        let reducedCombo = MonsterComboSystem.reducedComboCountAfterTimeout(from: comboCount)
+        comboCount = reducedCombo
+        comboPulse = false
+
+        if reducedCombo >= 3, let tier = MonsterComboSystem.tier(for: reducedCombo) {
+            presentComboBurst(
+                title: "TIME OUT",
+                subtitle: "\(reducedCombo) COMBO まで減少",
+                colors: tier.colors
+            )
+        } else {
+            comboCount = 0
+            presentComboBurst(
+                title: "TIME OUT",
+                subtitle: "コンボ消失",
+                colors: [Color.gray, Color.black.opacity(0.8)]
+            )
+        }
+    }
+
+    private func resetCombo(withTitle title: String, subtitle: String, colors: [Color]) {
+        guard comboCount > 0 else { return }
+        comboCount = 0
+        comboPulse = false
+        presentComboBurst(title: title, subtitle: subtitle, colors: colors)
+    }
+
+    private func triggerComboPulse() {
+        comboPulse = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.28) {
+            comboPulse = false
+        }
+    }
+
+    private func presentComboBurst(title: String, subtitle: String, colors: [Color]) {
+        comboBurstTitle = title
+        comboBurstSubtitle = subtitle
+        comboBurstColors = colors
+        showComboBurst = true
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.95) {
+            showComboBurst = false
+        }
     }
 
     func saveIncorrectAnswer(_ answer: IncorrectAnswer) {

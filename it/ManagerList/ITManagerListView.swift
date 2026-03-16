@@ -10,6 +10,14 @@ import SwiftUI
 import AVFoundation
 import Firebase
 
+// ITManagerListView専用のPreferenceKey
+struct ITManagerListPositionKey: PreferenceKey {
+    static var defaultValue: CGRect = .zero
+    static func reduce(value: inout CGRect, nextValue: () -> CGRect) {
+        value = nextValue()
+    }
+}
+
 struct ITManagerListView: View {
     // MARK: - Properties
     @ObservedObject var authManager = AuthManager.shared
@@ -327,9 +335,17 @@ struct ITManagerListView: View {
                 ) {
                     isPresentingQuizBasic = true
                 }
-                .background(GeometryReader { geometry in
-                    Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
-                })
+                .overlay(
+                    GeometryReader { geometry in
+                        Color.clear
+                            .onAppear {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                    self.buttonRect = geometry.frame(in: .global)
+                                }
+                            }
+                    }
+                    .allowsHitTesting(false)
+                )
                 
                 categoryButton(
                     title: "ストラテジ",
@@ -527,47 +543,103 @@ struct ITManagerListView: View {
     }
     
     // MARK: - Tutorial Overlay
+    @State private var tutorialPulse: Bool = false
+
     private var tutorialOverlay: some View {
         ZStack {
             // Dark overlay with cutout
             GeometryReader { geometry in
+                let origin = geometry.frame(in: .global).origin
+                let localX = buttonRect.midX - origin.x
+                let localY = buttonRect.midY - origin.y
+                let cutoutWidth = max(buttonRect.width, 0)
+                let cutoutHeight = max(buttonRect.height, 0)
+
                 Color.black.opacity(0.6)
                     .overlay(
                         RoundedRectangle(cornerRadius: 20, style: .continuous)
-                            .frame(width: buttonRect.width - 20, height: buttonRect.height)
-                            .position(x: buttonRect.midX, y: buttonRect.midY)
+                            .frame(width: cutoutWidth, height: cutoutHeight)
+                            .position(x: localX, y: localY)
                             .blendMode(.destinationOut)
                     )
-                    .ignoresSafeArea()
                     .compositingGroup()
             }
-            
+            .ignoresSafeArea()
+
+            // スポットライト枠のパルスアニメーション
+            GeometryReader { geometry in
+                let origin = geometry.frame(in: .global).origin
+                let localX = buttonRect.midX - origin.x
+                let localY = buttonRect.midY - origin.y
+                let cutoutWidth = max(buttonRect.width, 0)
+                let cutoutHeight = max(buttonRect.height, 0)
+
+                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    .stroke(Color(hex: "11998e"), lineWidth: 3)
+                    .frame(width: cutoutWidth, height: cutoutHeight)
+                    .position(x: localX, y: localY)
+                    .scaleEffect(tutorialPulse ? 1.05 : 1.0)
+                    .opacity(tutorialPulse ? 0.6 : 1.0)
+            }
+            .ignoresSafeArea()
+
             // Tutorial Message
             VStack {
                 Spacer()
-                    .frame(height: buttonRect.minY + bubbleHeight)
-                
-                VStack(spacing: 12) {
-                    Text("「基礎理解」をタップしてください")
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundColor(.primary)
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 16)
-                        .background(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 16))
-                        .shadow(color: .black.opacity(0.15), radius: 10)
+                    .frame(height: buttonRect.maxY + 16)
+
+                VStack(spacing: 10) {
+                    // ステップ表示
+                    HStack(spacing: 4) {
+                        Text("STEP 3")
+                            .font(.system(size: 11, weight: .bold, design: .rounded))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 4)
+                            .background(
+                                LinearGradient(
+                                    colors: [Color(hex: "11998e"), Color(hex: "38ef7d")],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                            .clipShape(Capsule())
+                    }
+
+                    Image(systemName: "hand.tap.fill")
+                        .font(.system(size: 28))
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [Color(hex: "11998e"), Color(hex: "38ef7d")],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+
+                    Text("「基礎理解」をタップ")
+                        .font(.system(size: 17, weight: .bold))
+                        .foregroundColor(Color("fontGray"))
+
+                    Text("まずは基礎から始めてみましょう")
+                        .font(.system(size: 13))
+                        .foregroundColor(.secondary)
                 }
+                .padding(.horizontal, 28)
+                .padding(.vertical, 22)
+                .background(Color("Color2"))
+                .clipShape(RoundedRectangle(cornerRadius: 20))
+                .shadow(color: .black.opacity(0.2), radius: 15, y: 8)
                 .background(GeometryReader { geometry in
                     Color.clear
                         .onAppear {
                             bubbleHeight = geometry.size.height
                         }
                 })
-                
+
                 Spacer()
             }
             .padding(.horizontal, 20)
-            
+
             // Skip Button
             VStack {
                 HStack {
@@ -576,20 +648,29 @@ struct ITManagerListView: View {
                         tutorialNum = 0
                         authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { _ in }
                     }) {
-                        Text("スキップ")
-                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 20)
-                            .padding(.vertical, 10)
-                            .background(Color.white.opacity(0.2))
-                            .clipShape(Capsule())
+                        HStack(spacing: 6) {
+                            Image(systemName: "forward.fill")
+                                .font(.system(size: 12))
+                            Text("スキップ")
+                                .font(.system(size: 14, weight: .semibold))
+                        }
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 12)
+                        .background(Color.white.opacity(0.2))
+                        .clipShape(Capsule())
                     }
                     .padding(.leading, 20)
                     .padding(.top, 60)
-                    
+
                     Spacer()
                 }
                 Spacer()
+            }
+        }
+        .onAppear {
+            withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) {
+                tutorialPulse = true
             }
         }
         .onTapGesture {

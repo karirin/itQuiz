@@ -10,6 +10,14 @@ import SwiftUI
 import AVFoundation
 import Firebase
 
+// ManagerListView専用のPreferenceKey
+struct ManagerListPositionKey: PreferenceKey {
+    static var defaultValue: CGRect = .zero
+    static func reduce(value: inout CGRect, nextValue: () -> CGRect) {
+        value = nextValue()
+    }
+}
+
 struct ManagerListView: View {
     // MARK: - Properties
     @ObservedObject var authManager = AuthManager.shared
@@ -32,6 +40,12 @@ struct ManagerListView: View {
     
     // Reward
     @StateObject var reward = Reward()
+
+    // Raid
+    @StateObject private var raidManager = RaidManager()
+    @State private var isPresentingRaid = false
+    @State private var showRaidButton: Bool = false
+    private let raidClickedKey = "raidButtonClickedExpiresAt"
     
     // Animation
     @State private var animateCards: Bool = false
@@ -60,6 +74,10 @@ struct ManagerListView: View {
 
             floatingRewardButton
 
+            if showRaidButton {
+                floatingRaidButton
+            }
+
             if tutorialNum == 2 {
                 tutorialOverlay
             }
@@ -68,6 +86,9 @@ struct ManagerListView: View {
             navigationLinks
         }
         .onAppear(perform: setupView)
+        .onChange(of: raidManager.status) { _ in
+            updateRaidButtonVisibility()
+        }
 
         .alert(isPresented: $showAlert) {
             Alert(
@@ -173,9 +194,17 @@ struct ManagerListView: View {
             ) {
                 isPresentingITView = true
             }
-            .background(GeometryReader { geometry in
-                Color.clear.preference(key: ViewPositionKey.self, value: [geometry.frame(in: .global)])
-            })
+            .overlay(
+                GeometryReader { geometry in
+                    Color.clear
+                        .onAppear {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                self.buttonRect = geometry.frame(in: .global)
+                            }
+                        }
+                }
+                .allowsHitTesting(false)
+            )
             
             // Basic Information Technology Engineer
             certificationCard(
@@ -363,6 +392,7 @@ struct ManagerListView: View {
                 }
             }
         }
+        .frame(height: 90)
         .buttonStyle(PlainButtonStyle())
         .disabled(!reward.rewardLoaded)
         .onChange(of: reward.rewardEarned) { earned in
@@ -384,53 +414,152 @@ struct ManagerListView: View {
         }
     }
     
+    // MARK: - Floating Raid Button
+    private var floatingRaidButton: some View {
+        VStack {
+            Spacer()
+            HStack {
+                Spacer()
+                Button(action: {
+                    generateHapticFeedback()
+                    audioManager.playSound()
+                    UserDefaults.standard.set(raidManager.expiresAt, forKey: raidClickedKey)
+                    isPresentingRaid = true
+                }) {
+                    HStack(spacing: 8) {
+                        Image(raidManager.bossImageName)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 44, height: 44)
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            HStack(spacing: 4) {
+                                Image(systemName: "bolt.fill")
+                                    .font(.system(size: 10, weight: .bold))
+                                Text("ゲリラボス出現中")
+                                    .font(.system(size: 11, weight: .bold))
+                            }
+                            Text(raidManager.bossName)
+                                .font(.system(size: 13, weight: .bold))
+                        }
+                        .foregroundColor(.white)
+                    }
+                    .frame(height: 90)
+                    .padding(.horizontal, 14)
+                    .background(
+                        LinearGradient(
+                            colors: [Color.orange, Color.red],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .shadow(color: .orange.opacity(0.6), radius: 8, y: 4)
+                }
+                .padding(.trailing, 20)
+                .padding(.bottom, 30)
+            }
+        }
+    }
+
     // MARK: - Tutorial Overlay
+    @State private var tutorialPulse: Bool = false
+
     private var tutorialOverlay: some View {
         ZStack {
             // Dark overlay with cutout
             GeometryReader { geometry in
+                let origin = geometry.frame(in: .global).origin
+                let localX = buttonRect.midX - origin.x
+                let localY = buttonRect.midY - origin.y
+                let cutoutWidth = max(buttonRect.width, 0)
+                let cutoutHeight = max(buttonRect.height, 0)
+
                 Color.black.opacity(0.6)
                     .overlay(
                         RoundedRectangle(cornerRadius: 20, style: .continuous)
-                            .frame(width: buttonRect.width - 20, height: buttonRect.height)
-                            .position(x: buttonRect.midX, y: isSmallDevice() ? buttonRect.midY - 80 : buttonRect.midY - 115)
+                            .frame(width: cutoutWidth, height: cutoutHeight)
+                            .position(x: localX, y: localY)
                             .blendMode(.destinationOut)
                     )
-                    .ignoresSafeArea()
                     .compositingGroup()
             }
-            
+            .ignoresSafeArea()
+
+            // スポットライト枠のパルスアニメーション
+            GeometryReader { geometry in
+                let origin = geometry.frame(in: .global).origin
+                let localX = buttonRect.midX - origin.x
+                let localY = buttonRect.midY - origin.y
+                let cutoutWidth = max(buttonRect.width, 0)
+                let cutoutHeight = max(buttonRect.height, 0)
+
+                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    .stroke(Color(hex: "11998e"), lineWidth: 3)
+                    .frame(width: cutoutWidth, height: cutoutHeight)
+                    .position(x: localX, y: localY)
+                    .scaleEffect(tutorialPulse ? 1.05 : 1.0)
+                    .opacity(tutorialPulse ? 0.6 : 1.0)
+            }
+            .ignoresSafeArea()
+
             // Tutorial Message
             VStack {
                 Spacer()
-                    .frame(height: isSmallDevice() ? buttonRect.minY + bubbleHeight - 20 : buttonRect.minY + bubbleHeight - 50)
-                
-                VStack(spacing: 12) {
+                    .frame(height: buttonRect.maxY + 16)
+
+                VStack(spacing: 10) {
+                    // ステップ表示
+                    HStack(spacing: 4) {
+                        Text("STEP 2")
+                            .font(.system(size: 11, weight: .bold, design: .rounded))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 4)
+                            .background(
+                                LinearGradient(
+                                    colors: [Color(hex: "11998e"), Color(hex: "38ef7d")],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                            .clipShape(Capsule())
+                    }
+
                     Image(systemName: "hand.tap.fill")
-                        .font(.system(size: 24))
-                        .foregroundColor(Color(hex: "667eea"))
-                    
-                    Text("「ITパスポート」をタップしてください")
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundColor(.primary)
-                        .multilineTextAlignment(.center)
+                        .font(.system(size: 28))
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [Color(hex: "11998e"), Color(hex: "38ef7d")],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+
+                    Text("「ITパスポート」をタップ")
+                        .font(.system(size: 17, weight: .bold))
+                        .foregroundColor(Color("fontGray"))
+
+                    Text("学習したい資格を選択しましょう")
+                        .font(.system(size: 13))
+                        .foregroundColor(.secondary)
                 }
-                .padding(.horizontal, 24)
-                .padding(.vertical, 20)
-                .background(.white)
-                .clipShape(RoundedRectangle(cornerRadius: 16))
-                .shadow(color: .black.opacity(0.15), radius: 10)
+                .padding(.horizontal, 28)
+                .padding(.vertical, 22)
+                .background(Color("Color2"))
+                .clipShape(RoundedRectangle(cornerRadius: 20))
+                .shadow(color: .black.opacity(0.2), radius: 15, y: 8)
                 .background(GeometryReader { geometry in
                     Color.clear
                         .onAppear {
                             bubbleHeight = geometry.size.height - 40
                         }
                 })
-                
+
                 Spacer()
             }
             .padding(.horizontal, 20)
-            
+
             // Skip Button
             VStack {
                 Spacer()
@@ -454,9 +583,14 @@ struct ManagerListView: View {
                     }
                     .padding(.leading, 20)
                     .padding(.bottom, 40)
-                    
+
                     Spacer()
                 }
+            }
+        }
+        .onAppear {
+            withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) {
+                tutorialPulse = true
             }
         }
         .onTapGesture {
@@ -492,16 +626,40 @@ struct ManagerListView: View {
                 destination: ITStoratagyManagerListView(isPresenting: $isPresentingStrategyView).navigationBarBackButtonHidden(true),
                 isActive: $isPresentingStrategyView
             ) { EmptyView() }
+
+            NavigationLink(
+                destination: RaidLobbyView(authManager: authManager, audioManager: audioManager, isPresenting: $isPresentingRaid).navigationBarBackButtonHidden(true),
+                isActive: $isPresentingRaid
+            ) { EmptyView() }
         }
         .hidden()
         .frame(width: 0, height: 0)
     }
 
     
+    // MARK: - Raid Button Visibility
+    private func updateRaidButtonVisibility() {
+        guard raidManager.status == "active" else {
+            showRaidButton = false
+            UserDefaults.standard.removeObject(forKey: raidClickedKey)
+            return
+        }
+
+        let clickedExpiresAt = UserDefaults.standard.double(forKey: raidClickedKey)
+        if clickedExpiresAt > 0 && clickedExpiresAt == raidManager.expiresAt {
+            showRaidButton = true
+            return
+        }
+
+        // 30% random chance
+        showRaidButton = Int.random(in: 1...10) <= 3
+    }
+
     // MARK: - Setup
     private func setupView() {
         reward.LoadReward()
-        
+        raidManager.observeActiveRaid()
+
         authManager.fetchUserInfo { _, _, _, _, _, tutorial in
             if let tutorial = tutorial {
                 tutorialNum = tutorial

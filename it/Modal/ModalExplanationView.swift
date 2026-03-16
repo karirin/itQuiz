@@ -32,14 +32,16 @@ struct ModalExplanationView: View {
                               Spacer()
                               VStack{
                                   
-                                  Button(action: { 
+                                  Button(action: {
                         generateHapticFeedback()
                                       currentQuizIndex += 1
-      //                                selectedAnswerIndex = nil
-    //                                  startTimer()
+                                      selectedAnswerIndex = nil
+                                      startTimer()
                                       audioManager.playCancelSound()
                                       userFlag = 1
-                                      authManager.updateUserFlag(userId: authManager.currentUserId!, userFlag: 1)
+                                      if let userId = authManager.currentUserId {
+                                          authManager.updateUserFlag(userId: userId, userFlag: 1)
+                                      }
                                       showAlert = true
                                       isPresented = false
                                   }) {

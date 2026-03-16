@@ -147,6 +147,12 @@ struct StoryQuizView: View {
     @State private var victoryFlag = false
     @ObservedObject var interstitial: Interstitial
     @State private var rewardFlag: Int = 0
+    @State private var comboCount: Int = 0
+    @State private var comboPulse: Bool = false
+    @State private var comboBurstTitle: String = ""
+    @State private var comboBurstSubtitle: String = ""
+    @State private var comboBurstColors: [Color] = [Color.blue, Color.cyan]
+    @State private var showComboBurst: Bool = false
     @Environment(\.presentationMode) var presentationMode
 //    var user: User // ここでユーザー情報全体を受け取る
 //    var userName2: String
@@ -165,30 +171,26 @@ struct StoryQuizView: View {
                  .resizable()
                  .edgesIgnoringSafeArea(.all)
             VStack {
-                HStack{
+                HStack {
                     Button(action: {
-                     generateHapticFeedback()
-                         showHomeModal.toggle()
-                         audioManager.playSound()
-                     }) {
-                         ZStack {
-                             Circle()
-                                 .fill(Color.white)
-                                 .frame(width: 52, height: 52)
-                                 .shadow(color: .black.opacity(0.15), radius: 8, x: 0, y: 4)
-                             
-                             Image(systemName: "gearshape.fill")
-                                 .font(.system(size: 22, weight: .semibold))
-                                 .foregroundColor(Color("fontGray"))
-                         }
-                     }
-                     .padding(.leading)
-                     .foregroundColor(.gray)
-                    Spacer()
-                    Spacer()
-                    // 正解の場合の赤い円
-                    if let selected = selectedAnswerIndex, selected == currentQuiz.correctAnswerIndex {
+                        generateHapticFeedback()
+                        showHomeModal.toggle()
+                        audioManager.playSound()
+                    }) {
+                        ZStack {
+                            Circle()
+                                .fill(Color.white)
+                                .frame(width: 52, height: 52)
+                                .shadow(color: .black.opacity(0.15), radius: 8, x: 0, y: 4)
+
+                            Image(systemName: "gearshape.fill")
+                                .font(.system(size: 22, weight: .semibold))
+                                .foregroundColor(Color("fontGray"))
+                        }
                     }
+                    .padding(.leading)
+                    .foregroundColor(.gray)
+                    Spacer()
                     TimerView(remainingSeconds: $remainingSeconds)
                         .background(GeometryReader { geometry in
                             Color.clear.preference(key: ViewPositionKey3.self, value: [geometry.frame(in: .global)])
@@ -223,13 +225,16 @@ struct StoryQuizView: View {
                                 .frame(width: 70,height:70)
                         }
                     }
-                    ZStack{
-                                Image("\(monsterName)")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .shadow(radius: 10)
-                                    .frame(width: isSmallDevice() ? 100 : 160)
-                            
+                    ZStack {
+                        ZStack{
+                            Image("\(monsterName)")
+                                .resizable()
+                                .scaledToFit()
+                                .shadow(radius: 10)
+                                .scaleEffect(comboPulse ? 1.04 : 1.0)
+                                .animation(.spring(response: 0.32, dampingFraction: 0.55), value: comboPulse)
+                                .frame(width: isSmallDevice() ? 100 : 160)
+
                             // 問題に正解して敵キャラにダメージ
                             if let selected = selectedAnswerIndex {
                                 if selected == currentQuiz.correctAnswerIndex {
@@ -241,13 +246,27 @@ struct StoryQuizView: View {
                                     }
                                 }
                             }
-                        
-                          if showMonsterDownImage && monsterHP <= 0 {
-                            Image("倒す")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(height:80)
-                          }
+
+                            if showMonsterDownImage && monsterHP <= 0 {
+                                Image("倒す")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(height:80)
+                            }
+
+                        }
+
+                        // コンボバッジをモンスターの右に表示（ZStackで重ねて表示位置がずれない）
+                        if comboCount >= 2 {
+                            MonsterComboBadgeView(
+                                comboCount: comboCount,
+                                multiplier: MonsterComboSystem.multiplier(for: comboCount),
+                                isPulsing: comboPulse
+                            )
+                            .offset(x: isSmallDevice() ? 90 : 120, y: 40)
+                            .transition(.scale.combined(with: .opacity))
+                            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: comboCount)
+                        }
                     }
                     
                     if quizLevel != .incorrectAnswer && quizLevel != .incorrectITAnswer && quizLevel != .incorrectInfoAnswer && quizLevel != .incorrectAppliedAnswer {
@@ -636,6 +655,7 @@ extension StoryQuizView {
                 remainingSeconds -= 1
             } else {
                 timer.invalidate()
+                applyTimeoutComboPenalty()
                 playerHP -= monsterAttack
                 moveToNextQuiz()
             }
@@ -682,6 +702,7 @@ extension StoryQuizView {
                 remainingSeconds -= 1
             } else {
                 timer.invalidate()
+                applyTimeoutComboPenalty()
                 playerHP -= monsterAttack
                 moveToNextQuiz()
             }
@@ -702,10 +723,16 @@ extension StoryQuizView {
             persistQuizStatsIfPossible()
             navigateToQuizResultView = true
         } else if remainingSeconds == 0 {
-            currentQuizIndex += 1
-            selectedAnswerIndex = nil
-            startTimer()
-            hasAnswered = false
+            if currentQuizIndex + 1 < quizzes.count {
+                currentQuizIndex += 1
+                selectedAnswerIndex = nil
+                startTimer()
+                hasAnswered = false
+            } else {
+                showCompletionMessage = true
+                timer?.invalidate()
+                navigateToQuizResultView = true
+            }
         } else if currentQuizIndex + 1 < quizzes.count {
             if userFlag == 0 {
                 showExplanationModal = true
@@ -730,15 +757,17 @@ extension StoryQuizView {
 
         let isAnswerCorrect = selectedAnswerIndex == currentQuiz.correctAnswerIndex
         if isAnswerCorrect {
+            let damage = comboAdjustedDamage()
             audioManager.playCorrectSound()
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 audioManager.playAttackSound()
                 showAttackImage = true
+                registerSuccessfulCombo()
                 correctAnswerCount += 1
                 incorrectCount -= 1
                 answerCount += 1
                 if quizLevel != .incorrectAnswer && quizLevel != .incorrectITAnswer && quizLevel != .incorrectInfoAnswer && quizLevel != .incorrectAppliedAnswer {
-                    monsterHP -= userAttack
+                    monsterHP -= damage
                 }
                 if monsterHP <= 0 {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -774,6 +803,7 @@ extension StoryQuizView {
                 moveToNextQuiz()
             }
         } else {
+            resetCombo(withTitle: "COMBO BREAK", subtitle: "倍率リセット", colors: [Color.gray, Color.black.opacity(0.8)])
             if let userId = authManager.currentUserId {
                 let incorrectAnswer = IncorrectAnswer(
                     userId: userId,
@@ -809,6 +839,70 @@ extension StoryQuizView {
         quizResults.append(result)
         showAttackImage = false
         hasAnswered = true
+    }
+
+    private func comboAdjustedDamage() -> Int {
+        let multiplier = MonsterComboSystem.multiplier(for: comboCount + 1)
+        return max(Int((Double(userAttack) * multiplier).rounded()), userAttack)
+    }
+
+    private func registerSuccessfulCombo() {
+        let previousTier = MonsterComboSystem.tier(for: comboCount)
+        comboCount += 1
+        triggerComboPulse()
+
+        guard let currentTier = MonsterComboSystem.tier(for: comboCount) else { return }
+        // ティアが変わった時だけバーストを表示
+        guard previousTier?.requiredStreak != currentTier.requiredStreak else { return }
+        let subtitle = "\(comboCount) COMBO  ATK x\(String(format: "%.1f", currentTier.multiplier))"
+        presentComboBurst(title: currentTier.title, subtitle: subtitle, colors: currentTier.colors)
+    }
+
+    private func applyTimeoutComboPenalty() {
+        guard comboCount > 0 else { return }
+        let reducedCombo = MonsterComboSystem.reducedComboCountAfterTimeout(from: comboCount)
+        comboCount = reducedCombo
+        comboPulse = false
+
+        if reducedCombo >= 3, let tier = MonsterComboSystem.tier(for: reducedCombo) {
+            presentComboBurst(
+                title: "TIME OUT",
+                subtitle: "\(reducedCombo) COMBO まで減少",
+                colors: tier.colors
+            )
+        } else {
+            comboCount = 0
+            presentComboBurst(
+                title: "TIME OUT",
+                subtitle: "コンボ消失",
+                colors: [Color.gray, Color.black.opacity(0.8)]
+            )
+        }
+    }
+
+    private func resetCombo(withTitle title: String, subtitle: String, colors: [Color]) {
+        guard comboCount > 0 else { return }
+        comboCount = 0
+        comboPulse = false
+        presentComboBurst(title: title, subtitle: subtitle, colors: colors)
+    }
+
+    private func triggerComboPulse() {
+        comboPulse = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.28) {
+            comboPulse = false
+        }
+    }
+
+    private func presentComboBurst(title: String, subtitle: String, colors: [Color]) {
+        comboBurstTitle = title
+        comboBurstSubtitle = subtitle
+        comboBurstColors = colors
+        showComboBurst = true
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.95) {
+            showComboBurst = false
+        }
     }
 
     func saveIncorrectAnswer(_ answer: IncorrectAnswer) {
