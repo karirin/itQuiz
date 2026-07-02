@@ -17,29 +17,26 @@ struct RewardTimesModal: View {
             VStack(spacing: 10) {
                 Image("獲得ボーナス")
                     .resizable()
-                    .frame(width:330,height:170)
+                    .frame(width: 330, height: 170)
             }
-//            .padding(50)
             .background(Color.white)
-            .cornerRadius(20)
-            .shadow(radius: 10)
+            .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+            .shadow(color: .black.opacity(0.25), radius: 20, y: 10)
             .overlay(
-                // 「×」ボタンを右上に配置
-                Button(action: { 
-                        generateHapticFeedback()
+                // 閉じるボタン
+                Button(action: {
+                    generateHapticFeedback()
                     audioManager.playCancelSound()
                     isPresented = false
                 }) {
                     Image(systemName: "xmark.circle.fill")
-                        .resizable()
-                        .frame(width: 50, height: 50)
-                        .foregroundColor(.gray)
-                        .background(.white)
-                        .cornerRadius(30)
-                        .padding()
+                        .font(.system(size: 34))
+                        .foregroundStyle(.white, Color.black.opacity(0.35))
+                        .shadow(color: .black.opacity(0.2), radius: 4, y: 2)
                 }
-                .offset(x: 35, y: -35), // この値を調整してボタンを正しい位置に移動させます
-                alignment: .topTrailing // 枠の右上を基準に位置を調整します
+                .buttonStyle(PlainButtonStyle())
+                .offset(x: 8, y: -8),
+                alignment: .topTrailing
             )
         }
         .onAppear {

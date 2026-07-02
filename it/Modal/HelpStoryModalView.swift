@@ -8,14 +8,14 @@
 import SwiftUI
 
 struct HelpStoryModalView: View {
-    @ObservedObject var audioManager:AudioManager
+    @ObservedObject var audioManager: AudioManager
     @ObservedObject var authManager = AuthManager.shared
     @Binding var isPresented: Bool
     @StateObject var store: Store = Store()
     @State var toggle = false
     @State private var text: String = ""
     @State private var showAlert = false
-    
+
     var body: some View {
         ZStack {
             Color.black.opacity(0.4)
@@ -27,61 +27,89 @@ struct HelpStoryModalView: View {
                         }
                     }
                 }
-            VStack(spacing: -25) {
-                VStack(alignment: .center){
-                    Text("ダンジョンモードで遊んでいただきありがとうございます！\n\n今後のアップデートのため\n改善点のご意見いただけると\n励みになります")
-                        .font(.system(size: isSmallDevice() ? 17 : 18))
-                        .multilineTextAlignment(.center)
-                        .padding(.top)
-                        TextField(
-                            "例）メッセージが送信されない",
-                            text: $text,
-                            axis: .vertical
-                        )
-                        .padding()
-                        .background(.white)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color.gray, lineWidth: 1)
-                        )
-                    Button(action: { 
-                        generateHapticFeedback()
-                        if toggle == true {
-                            authManager.updateUserStoryCsFlag(userId: authManager.currentUserId!, userCsFlag: 1) { success in
-                            }
-                        }
-                        authManager.updateContact(userId: authManager.currentUserId!, newContact: text){ success in
-                            if success {
-                                self.showAlert = true
-                                print("Heart added successfully.")
-                            } else {
-                                print("Failed to add heart.")
-                            }
-                        }
-                    }, label: {
-                        Text("送信")
-                            .fontWeight(.semibold)
-                            .frame(width: 130, height:40)
-                            .foregroundColor(Color.white)
-                            .background(Color.gray)
-                            .cornerRadius(24)
-                    })
-                    .opacity(text.isEmpty ? 0.5 : 1)
-                    .disabled(text.isEmpty)
-                    .shadow(radius: 3)
-                    .padding(.top,10)
 
-                    HStack{
-                        Spacer()
-                        Toggle("今後は表示しない", isOn: $toggle)
-                            .frame(width:200)
-                            .toggleStyle(SwitchToggleStyle())
-                            .padding(.horizontal)
-                            .padding(.top)
-                    }
+            VStack(spacing: 16) {
+                // ヘッダー
+                ZStack {
+                    Circle()
+                        .fill(Color(hex: "667eea").opacity(0.12))
+                        .frame(width: 56, height: 56)
+
+                    Image(systemName: "bubble.left.and.bubble.right.fill")
+                        .font(.system(size: 24))
+                        .foregroundColor(Color(hex: "667eea"))
                 }
+
+                Text("ダンジョンモードで遊んでいただき\nありがとうございます！")
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundColor(Color("fontGray"))
+                    .multilineTextAlignment(.center)
+
+                Text("今後のアップデートのため\n改善点のご意見をいただけると励みになります")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+
+                TextField(
+                    "例）メッセージが送信されない",
+                    text: $text,
+                    axis: .vertical
+                )
+                .font(.system(size: 15))
+                .padding(14)
+                .background(Color(hex: "f5f7fa"))
+                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .stroke(Color(hex: "667eea").opacity(0.3), lineWidth: 1.5)
+                )
+
+                Button(action: {
+                    generateHapticFeedback()
+                    if toggle == true {
+                        authManager.updateUserStoryCsFlag(userId: authManager.currentUserId!, userCsFlag: 1) { success in
+                        }
+                    }
+                    authManager.updateContact(userId: authManager.currentUserId!, newContact: text) { success in
+                        if success {
+                            self.showAlert = true
+                            print("Heart added successfully.")
+                        } else {
+                            print("Failed to add heart.")
+                        }
+                    }
+                }, label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "paperplane.fill")
+                            .font(.system(size: 14, weight: .bold))
+                        Text("送信")
+                            .font(.system(size: 16, weight: .bold))
+                    }
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 48)
+                    .background(
+                        LinearGradient(
+                            colors: [Color(hex: "667eea"), Color(hex: "764ba2")],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    .shadow(color: Color(hex: "667eea").opacity(0.35), radius: 8, y: 4)
+                })
+                .buttonStyle(PlainButtonStyle())
+                .opacity(text.isEmpty ? 0.5 : 1)
+                .disabled(text.isEmpty)
+
+                Toggle(isOn: $toggle) {
+                    Text("今後は表示しない")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundColor(.secondary)
+                }
+                .toggleStyle(SwitchToggleStyle())
+                .tint(Color(hex: "667eea"))
             }
-            .fontWeight(.bold)
             .alert(isPresented: $showAlert) { // アラートを表示する
                 Alert(
                     title: Text("送信されました"),
@@ -91,52 +119,38 @@ struct HelpStoryModalView: View {
                     }
                 )
             }
-            .frame(width: isSmallDevice() ? 290: 320)
-            .foregroundColor(Color("fontGray"))
-            .padding()
-        .background(Color("Color2"))
-//        .overlay(
-//            RoundedRectangle(cornerRadius: 20)
-//                .stroke(Color.gray, lineWidth: 15)
-//        )
-        .cornerRadius(20)
-        .shadow(radius: 10)
-        .overlay(
-            // 「×」ボタンを右上に配置
-            Button(action: { 
-                        generateHapticFeedback()
-                audioManager.playCancelSound()
-//                print(toggle)
-                if toggle == true {
-                    authManager.updateUserStoryCsFlag(userId: authManager.currentUserId!, userCsFlag: 1) { success in
+            .padding(24)
+            .frame(width: isSmallDevice() ? 300 : 330)
+            .background(Color.white)
+            .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+            .shadow(color: .black.opacity(0.25), radius: 20, y: 10)
+            .overlay(
+                // 閉じるボタン
+                Button(action: {
+                    generateHapticFeedback()
+                    audioManager.playCancelSound()
+                    if toggle == true {
+                        authManager.updateUserStoryCsFlag(userId: authManager.currentUserId!, userCsFlag: 1) { success in
+                        }
                     }
+                    isPresented = false
+                }) {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.system(size: 34))
+                        .foregroundStyle(.white, Color.black.opacity(0.35))
+                        .shadow(color: .black.opacity(0.2), radius: 4, y: 2)
                 }
-                isPresented = false
-            }) {
-                Image(systemName: "xmark.circle.fill")
-                    .resizable()
-                    .frame(width: 50, height: 50)
-                    .foregroundColor(.gray)
-                    .background(.white)
-                    .cornerRadius(30)
-                    .padding()
+                .buttonStyle(PlainButtonStyle())
+                .offset(x: 8, y: -8),
+                alignment: .topTrailing
+            )
+            .onAppear {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                }
             }
-                .offset(x: 35, y: -35), // この値を調整してボタンを正しい位置に移動させます
-            alignment: .topTrailing // 枠の右上を基準に位置を調整します
-        )
-        .padding(25)
-                }
-//            }
-                .onAppear{
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-//                        print(store.productList)
-                    }
-                }
-            //            .padding(50)
-          
         }
-//    }
-    
+    }
+
     func isSmallDevice() -> Bool {
         return UIScreen.main.bounds.width < 390
     }
@@ -145,5 +159,3 @@ struct HelpStoryModalView: View {
 #Preview {
     HelpStoryModalView(audioManager: AudioManager(), isPresented: .constant(true))
 }
-
-

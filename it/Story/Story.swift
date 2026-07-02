@@ -168,126 +168,111 @@ struct Story: View {
                     ZStack{
                         Color.black.opacity(0.7)
                             .edgesIgnoringSafeArea(.all)
-                        VStack{
-                            VStack{
-                                Text("ストーリーへようこそ！")
-                                    .font(.system(size:24))
-                                Image("ストーリーモード")
-                                    .resizable()
-                                    .frame(width:200,height: 200)
-                                HStack{
-                                    Text("ダンジョンをクリアして物語を進めよう！")
-                                        .font(.system(size: isSmallDevice() ? 17 : 18))
-                                }
-                            }
-                            .frame(width: isSmallDevice() ? 330: 340, height:360)
-                                .background(Color("Color2"))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 20)
-                                        .stroke(Color.gray, lineWidth: 15)
-                                )
-                                .cornerRadius(20)
-                                .shadow(radius: 10)
-                            HStack{
-                                Spacer()
-                                Button(action: { 
-                        generateHapticFeedback()
-                                    audioManager.playKetteiSound()
-                                    showModal1 = false
-                                    authManager.updateStory(story: 1) { success in
-                                        if success {
-                                            print("ストーリーが正常に更新されました。")
-                                        } else {
-                                            print("ストーリーの更新に失敗しました。")
-                                        }
+                        VStack(spacing: 18) {
+                            Text("ストーリーへようこそ！")
+                                .font(.system(size: 22, weight: .heavy, design: .rounded))
+                                .foregroundColor(Color("fontGray"))
+
+                            Image("ストーリーモード")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 180, height: 180)
+
+                            Text("ダンジョンをクリアして物語を進めよう！")
+                                .font(.system(size: 15, weight: .medium))
+                                .foregroundColor(.secondary)
+                                .multilineTextAlignment(.center)
+
+                            Button(action: {
+                                generateHapticFeedback()
+                                audioManager.playKetteiSound()
+                                showModal1 = false
+                                authManager.updateStory(story: 1) { success in
+                                    if success {
+                                        print("ストーリーが正常に更新されました。")
+                                    } else {
+                                        print("ストーリーの更新に失敗しました。")
                                     }
-                                }) {
-                                    HStack{
-                                       
-                                        //                    Image("セキュリティ系の問題")
-                                        Text("ストーリーモードを始める")
-                                        //                                      .fixedSize(horizontal: false, vertical: true)
-                                        //                                .lineLimit(nil)
-                                        Image(systemName: "chevron.right.2")
-                                    }.padding(20)
-                                        .background(Color("Color2"))
-                                        .foregroundColor(Color("fontGray"))
-                                    //                                .cornerRadius(5)
-                                    //                                .padding(.trailing)
-                                    //                                .shadow(radius: 3)
                                 }
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 20)
-                                        .stroke(Color.gray, lineWidth: 15)
+                            }) {
+                                HStack(spacing: 8) {
+                                    Text("ストーリーモードを始める")
+                                        .font(.system(size: 16, weight: .bold))
+                                    Image(systemName: "chevron.right.2")
+                                        .font(.system(size: 14, weight: .bold))
+                                }
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 52)
+                                .background(
+                                    LinearGradient(
+                                        colors: [Color(hex: "667eea"), Color(hex: "764ba2")],
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
                                 )
-                                .cornerRadius(20)
-                                .shadow(radius: 10)
-                                .padding(.trailing,20)
+                                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                                .shadow(color: Color(hex: "667eea").opacity(0.4), radius: 8, y: 4)
                             }
+                            .buttonStyle(PlainButtonStyle())
                         }
-                        
+                        .padding(26)
+                        .background(Color.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                        .shadow(color: .black.opacity(0.25), radius: 20, y: 10)
+                        .padding(.horizontal, 32)
                     }
-                    
                 }
             if showModal2 {
                 ZStack{
                     Color.black.opacity(0.7)
                         .edgesIgnoringSafeArea(.all)
-                    VStack{
-                        VStack{
-                            Text("ストーリモードクリア！！")
-                                .font(.system(size:24))
-                            Image("ストーリーモード")
-                                .resizable()
-                                .frame(width:200,height: 200)
-                            HStack{
-                                
-                            Text("今後のアップデートでストーリーが追加されるのでご期待ください!!!")
-                                .font(.system(size: isSmallDevice() ? 17 : 18))
-                                
-                            }.padding()
-                            
-                        }
-                        .frame(width: isSmallDevice() ? 330: 340, height:360)
-                        .background(Color("Color2"))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 20)
-                                .stroke(Color.gray, lineWidth: 15)
-                        )
-                        
-                        .cornerRadius(20)
-                        .shadow(radius: 10)
-                        HStack{
-                            Spacer()
-                            Button(action: { 
-                        generateHapticFeedback()
-                                audioManager.playKetteiSound()
-                                showModal2 = false
-                            }) {
-                                HStack{
-                                    
-                                    //                    Image("セキュリティ系の問題")
-                                    Text("閉じる")
-                                    //                                      .fixedSize(horizontal: false, vertical: true)
-                                    //                                .lineLimit(nil)
-                                    Image(systemName: "chevron.right.2")
-                                }.padding(20)
-                                    .background(Color("Color2"))
-                                    .foregroundColor(Color("fontGray"))
-                                //                                .cornerRadius(5)
-                                //                                .padding(.trailing)
-                                //                                .shadow(radius: 3)
+                    VStack(spacing: 18) {
+                        Text("ストーリーモードクリア！！")
+                            .font(.system(size: 22, weight: .heavy, design: .rounded))
+                            .foregroundColor(Color("fontGray"))
+
+                        Image("ストーリーモード")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 180, height: 180)
+
+                        Text("今後のアップデートでストーリーが追加されるのでご期待ください!!!")
+                            .font(.system(size: 15, weight: .medium))
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+
+                        Button(action: {
+                            generateHapticFeedback()
+                            audioManager.playKetteiSound()
+                            showModal2 = false
+                        }) {
+                            HStack(spacing: 8) {
+                                Text("閉じる")
+                                    .font(.system(size: 16, weight: .bold))
+                                Image(systemName: "chevron.right.2")
+                                    .font(.system(size: 14, weight: .bold))
                             }
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 20)
-                                    .stroke(Color.gray, lineWidth: 15)
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 52)
+                            .background(
+                                LinearGradient(
+                                    colors: [Color(hex: "667eea"), Color(hex: "764ba2")],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
                             )
-                            .cornerRadius(20)
-                            .shadow(radius: 10)
-                            .padding(.trailing,20)
+                            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                            .shadow(color: Color(hex: "667eea").opacity(0.4), radius: 8, y: 4)
                         }
+                        .buttonStyle(PlainButtonStyle())
                     }
-                    .foregroundColor(Color("fontGray"))
+                    .padding(26)
+                    .background(Color.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                    .shadow(color: .black.opacity(0.25), radius: 20, y: 10)
+                    .padding(.horizontal, 32)
                 }
             }
             if showAnimation1 {

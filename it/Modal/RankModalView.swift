@@ -11,7 +11,7 @@ struct RankModalView: View {
     @Binding var isSoundOn: Bool
     @Binding var isPresented: Bool
     @Binding var isPresenting: Bool
-    @ObservedObject var audioManager:AudioManager
+    @ObservedObject var audioManager: AudioManager
     @ObservedObject var authManager = AuthManager.shared
     @Binding var showHomeModal: Bool
     @Binding var tutorialNum: Int
@@ -21,80 +21,74 @@ struct RankModalView: View {
     var resumeTimer: () -> Void
     @Binding var userFlag: Int
     @Environment(\.presentationMode) var presentationMode
-    
+
     var body: some View {
         ZStack {
-            VStack(spacing: 10) {
-                Button(action: { 
-                        generateHapticFeedback()
+            VStack(spacing: 16) {
+                Text("メニュー")
+                    .font(.system(size: 20, weight: .heavy, design: .rounded))
+                    .foregroundColor(Color("fontGray"))
+                    .padding(.top, 4)
+
+                // 解説画面 表示/非表示
+                Button(action: {
+                    generateHapticFeedback()
                     isSoundOn.toggle()
                     audioManager.playSound()
                     if userFlag == 0 {
                         userFlag = 1
                         authManager.updateUserFlag(userId: authManager.currentUserId!, userFlag: 1)
-                    }else{
+                    } else {
                         userFlag = 0
                         authManager.updateUserFlag(userId: authManager.currentUserId!, userFlag: 0)
                     }
                 }) {
-                    HStack {
-                        if isSoundOn {
-                            Image(systemName: "eye.slash")
-                            Text("解説画面非表示")
-                        } else {
-                            Image(systemName: "eye")
-                            Text("解説画面表示　")
-                        }
-                    }
-                        .padding(20)
-                        .foregroundColor(.black)
-                        .background(Color.white)
-                        .cornerRadius(8)
-                        .shadow(radius: 1)
+                    menuRow(
+                        icon: isSoundOn ? "eye.slash.fill" : "eye.fill",
+                        iconColor: Color(hex: "667eea"),
+                        title: isSoundOn ? "解説画面を非表示にする" : "解説画面を表示する"
+                    )
                 }
-                
-                Button(action: { 
-                        generateHapticFeedback()
+                .buttonStyle(PlainButtonStyle())
+
+                // ヘルプ
+                Button(action: {
+                    generateHapticFeedback()
                     showHomeModal = false
                     tutorialNum = 3
                     authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 3) { success in
                     }
                     audioManager.playSound()
                 }) {
-                    HStack {
-                        Image(systemName: "questionmark.circle")
-                        Text("ヘルプ 　　　　")
-                    }
-                        .padding(20)
-                        .foregroundColor(.black)
-                        .background(Color.white)
-                        .cornerRadius(8)
-                        .shadow(radius: 1)
-                        .padding(.top,20)
+                    menuRow(
+                        icon: "questionmark.circle.fill",
+                        iconColor: Color(hex: "11998e"),
+                        title: "ヘルプ"
+                    )
                 }
+                .buttonStyle(PlainButtonStyle())
             }
-            .padding(50)
+            .padding(24)
+            .frame(maxWidth: 320)
             .background(Color.white)
-            .cornerRadius(20)
-            .shadow(radius: 10)
+            .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+            .shadow(color: .black.opacity(0.25), radius: 20, y: 10)
             .overlay(
-                // 「×」ボタンを右上に配置
-                Button(action: { 
-                        generateHapticFeedback()
+                // 閉じるボタン
+                Button(action: {
+                    generateHapticFeedback()
                     isPresented = false
                     resumeTimer()
                     audioManager.playCancelSound()
                 }) {
                     Image(systemName: "xmark.circle.fill")
-                        .resizable()
-                        .frame(width: 50, height: 50)
-                        .foregroundColor(.gray)
-                        .background(.white)
-                        .cornerRadius(30)
-                        .padding()
+                        .font(.system(size: 34))
+                        .foregroundStyle(.white, Color.black.opacity(0.35))
+                        .shadow(color: .black.opacity(0.2), radius: 4, y: 2)
                 }
-                .offset(x: 35, y: -35), // この値を調整してボタンを正しい位置に移動させます
-                alignment: .topTrailing // 枠の右上を基準に位置を調整します
+                .buttonStyle(PlainButtonStyle())
+                .offset(x: 8, y: -8),
+                alignment: .topTrailing
             )
         }
         .onAppear {
@@ -106,12 +100,31 @@ struct RankModalView: View {
             }
         }
     }
-}
 
-//struct ModalView1_Previews: PreviewProvider {
-//    @State static private var isPresenting = true
-//    static var previews: some View {
-//        ModalView(isSoundOn: .constant(true), isPresented: .constant(true), isPresenting: $isPresenting, audioManager: AudioManager.shared)
-////ModalView()
-//    }
-//}
+    private func menuRow(icon: String, iconColor: Color, title: String) -> some View {
+        HStack(spacing: 12) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .fill(iconColor.opacity(0.12))
+                    .frame(width: 40, height: 40)
+
+                Image(systemName: icon)
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundColor(iconColor)
+            }
+
+            Text(title)
+                .font(.system(size: 15, weight: .bold))
+                .foregroundColor(Color("fontGray"))
+
+            Spacer()
+
+            Image(systemName: "chevron.right")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundColor(Color(.tertiaryLabel))
+        }
+        .padding(12)
+        .background(Color(hex: "f5f7fa"))
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+    }
+}

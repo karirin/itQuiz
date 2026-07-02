@@ -70,6 +70,40 @@ enum AppTheme {
     }
 }
 
+// MARK: - コイン不足カード
+/// ガチャ等でコインが足りないときに表示する共通カード
+struct InsufficientCoinsCard: View {
+    var body: some View {
+        HStack(spacing: 14) {
+            Image("コインが無い")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 64, height: 64)
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text("コインが足りません")
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundColor(Color("fontGray"))
+
+                Text("ご購入することもできます")
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(.secondary)
+            }
+
+            Spacer()
+        }
+        .padding(18)
+        .frame(maxWidth: 340)
+        .background(Color.white)
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .stroke(AppTheme.warning.opacity(0.5), lineWidth: 2)
+        )
+        .shadow(color: .black.opacity(0.15), radius: 12, y: 6)
+    }
+}
+
 // MARK: - カラーテーマ
 struct QuizColors {
     // メインカラー

@@ -455,28 +455,50 @@ struct GuerrillaHomeModalView: View {
 
     var body: some View {
         ZStack {
-            VStack(spacing: 10) {
+            VStack(spacing: 16) {
+                Text("メニュー")
+                    .font(.system(size: 20, weight: .heavy, design: .rounded))
+                    .foregroundColor(Color("fontGray"))
+                    .padding(.top, 4)
+
                 Button(action: {
                     generateHapticFeedback()
                     audioManager.playCancelSound()
                     isPresented = false
                     isPresenting = false
                 }) {
-                    HStack {
-                        Image(systemName: "house")
-                        Text("ホームに戻る　")
+                    HStack(spacing: 12) {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                .fill(Color(hex: "667eea").opacity(0.12))
+                                .frame(width: 40, height: 40)
+
+                            Image(systemName: "house.fill")
+                                .font(.system(size: 18, weight: .semibold))
+                                .foregroundColor(Color(hex: "667eea"))
+                        }
+
+                        Text("ホームに戻る")
+                            .font(.system(size: 15, weight: .bold))
+                            .foregroundColor(Color("fontGray"))
+
+                        Spacer()
+
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundColor(Color(.tertiaryLabel))
                     }
-                    .padding(20)
-                    .foregroundColor(.black)
-                    .background(Color.white)
-                    .cornerRadius(8)
-                    .shadow(radius: 1)
+                    .padding(12)
+                    .background(Color(hex: "f5f7fa"))
+                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                 }
+                .buttonStyle(PlainButtonStyle())
             }
-            .padding(50)
+            .padding(24)
+            .frame(maxWidth: 320)
             .background(Color.white)
-            .cornerRadius(20)
-            .shadow(radius: 10)
+            .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+            .shadow(color: .black.opacity(0.25), radius: 20, y: 10)
             .overlay(
                 Button(action: {
                     generateHapticFeedback()
@@ -484,14 +506,12 @@ struct GuerrillaHomeModalView: View {
                     audioManager.playCancelSound()
                 }) {
                     Image(systemName: "xmark.circle.fill")
-                        .resizable()
-                        .frame(width: 50, height: 50)
-                        .foregroundColor(.gray)
-                        .background(.white)
-                        .cornerRadius(30)
-                        .padding()
+                        .font(.system(size: 34))
+                        .foregroundStyle(.white, Color.black.opacity(0.35))
+                        .shadow(color: .black.opacity(0.2), radius: 4, y: 2)
                 }
-                .offset(x: 35, y: -35),
+                .buttonStyle(PlainButtonStyle())
+                .offset(x: 8, y: -8),
                 alignment: .topTrailing
             )
         }

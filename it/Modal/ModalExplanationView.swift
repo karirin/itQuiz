@@ -9,210 +9,194 @@ import SwiftUI
 import Firebase
 
 struct ModalExplanationView: View {
-        @Binding var isPresented: Bool
-        @Binding var selectedAnswerIndex: Int?
-        @ObservedObject var authManager = AuthManager.shared
-        @State private var isContentView: Bool = false
-        @State private var isDaily: Bool = false
+    @Binding var isPresented: Bool
+    @Binding var selectedAnswerIndex: Int?
+    @ObservedObject var authManager = AuthManager.shared
+    @State private var isContentView: Bool = false
+    @State private var isDaily: Bool = false
     @Binding var showAlert: Bool
-    @ObservedObject var audioManager:AudioManager
-        var question: String
-        var userAnswer: String
-        var correctAnswer: String
-        var explanation: String
-        @Binding var currentQuizIndex: Int
-        @Binding var userFlag: Int
-        var pauseTimer: () -> Void
-        var startTimer: () -> Void
-        
-        var body: some View {
-            ZStack {
-                    VStack(spacing: 15) {
-                            HStack{
-                              Spacer()
-                              VStack{
-                                  
-                                  Button(action: {
-                        generateHapticFeedback()
-                                      currentQuizIndex += 1
-                                      selectedAnswerIndex = nil
-                                      startTimer()
-                                      audioManager.playCancelSound()
-                                      userFlag = 1
-                                      if let userId = authManager.currentUserId {
-                                          authManager.updateUserFlag(userId: userId, userFlag: 1)
-                                      }
-                                      showAlert = true
-                                      isPresented = false
-                                  }) {
-                                      HStack{
-                                          Image(systemName: "eye.slash")
-                                              .foregroundColor(.black)
-                                          Text("解説画面を非表示にする")
-                                              .foregroundColor(.black)
-                                      }
-                                  }
-                              }
-                              .padding(15)
-                              .background(Color.white)
-                              .cornerRadius(20)
-                              .shadow(radius: 10)
-                              .padding(.trailing,15)
-      //                        .padding(5)
-                          }
-                      VStack{
-                        HStack{
-                            if userAnswer == correctAnswer {
-                                Circle()
-                                    .stroke(style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round))
-                                    .opacity(0.7)
-                                    .foregroundColor(.red)
-                                    .frame(width: 25)
-                                Text("正解")
-                                    .font(.system(size:26))
-                                    .foregroundColor(Color("fontGray"))
-                            } else {
-                                Image(systemName: "xmark")
-                                    .resizable()
-                                    .opacity(0.7)
-                                    .foregroundColor(.blue)
-                                    .frame(width: 25,height:25)
-                                Text("不正解")
-                                    .font(.system(size:26))
-                                    .foregroundColor(Color("fontGray"))
-                            }
+    @ObservedObject var audioManager: AudioManager
+    var question: String
+    var userAnswer: String
+    var correctAnswer: String
+    var explanation: String
+    @Binding var currentQuizIndex: Int
+    @Binding var userFlag: Int
+    var pauseTimer: () -> Void
+    var startTimer: () -> Void
+
+    private var isCorrect: Bool {
+        userAnswer == correctAnswer
+    }
+
+    private var resultGradient: LinearGradient {
+        LinearGradient(
+            colors: isCorrect
+                ? [Color(hex: "11998e"), Color(hex: "38ef7d")]
+                : [Color(hex: "eb3349"), Color(hex: "f45c43")],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+
+    var body: some View {
+        VStack(spacing: 12) {
+            // 非表示ボタン
+            HStack {
+                Spacer()
+                Button(action: {
+                    generateHapticFeedback()
+                    currentQuizIndex += 1
+                    selectedAnswerIndex = nil
+                    startTimer()
+                    audioManager.playCancelSound()
+                    userFlag = 1
+                    if let userId = authManager.currentUserId {
+                        authManager.updateUserFlag(userId: userId, userFlag: 1)
+                    }
+                    showAlert = true
+                    isPresented = false
+                }) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "eye.slash.fill")
+                            .font(.system(size: 12, weight: .semibold))
+                        Text("解説画面を非表示にする")
+                            .font(.system(size: 13, weight: .semibold))
+                    }
+                    .foregroundColor(.secondary)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 9)
+                    .background(.ultraThinMaterial)
+                    .clipShape(Capsule())
+                    .shadow(color: .black.opacity(0.1), radius: 4, y: 2)
+                }
+                .buttonStyle(PlainButtonStyle())
+            }
+            .padding(.horizontal, 4)
+
+            // メインカード
+            VStack(spacing: 0) {
+                // 結果ヘッダー
+                HStack(spacing: 10) {
+                    Image(systemName: isCorrect ? "checkmark.circle.fill" : "xmark.circle.fill")
+                        .font(.system(size: 28, weight: .bold))
+                        .foregroundColor(.white)
+
+                    Text(isCorrect ? "正解！" : "不正解")
+                        .font(.system(size: 24, weight: .heavy, design: .rounded))
+                        .foregroundColor(.white)
+
+                    Spacer()
+                }
+                .padding(.horizontal, 20)
+                .padding(.vertical, 16)
+                .background(resultGradient)
+
+                // 内容
+                ScrollView(showsIndicators: false) {
+                    VStack(alignment: .leading, spacing: 18) {
+                        explanationSection(label: "問題内容", icon: "doc.text.fill", text: question)
+
+                        HStack(alignment: .top, spacing: 12) {
+                            answerCard(
+                                label: "あなたの回答",
+                                text: userAnswer,
+                                color: isCorrect ? Color(hex: "11998e") : Color(hex: "eb3349")
+                            )
+                            answerCard(
+                                label: "正解",
+                                text: correctAnswer,
+                                color: Color(hex: "11998e")
+                            )
                         }
-                        HStack{
-                            Text(" ")
-                                .background(.gray)
-                                .frame(width:10,height: 20)
-                            Text("問題内容")
-                                .foregroundColor(Color("fontGray"))
-                            Spacer()
-                        }
-                        HStack {
-                            Text(question)
-                                .foregroundColor(Color("fontGray"))
-                            Spacer()
-                        }
-                        Spacer()
-                            .frame(height:10)
-                        HStack{
-                            Text(" ")
-                                .background(.gray)
-                                .frame(width:10,height: 20)
-                            Text("あなたの回答")
-                                .foregroundColor(Color("fontGray"))
-                            Spacer()
-                        }
-                        HStack {
-                            Text("\(userAnswer)")
-                                .foregroundColor(Color("fontGray"))
-                            Spacer()
-                        }
-                        HStack{
-                            Text(" ")
-                                .background(.gray)
-                                .frame(width:10,height: 20)
-                            Text("正解")
-                                .foregroundColor(Color("fontGray"))
-                            Spacer()
-                        }
-                        HStack {
-                            Text("\(correctAnswer)")
-                                .foregroundColor(Color("fontGray"))
-                            Spacer()
-                        }
-                        HStack{
-                            Text(" ")
-                                .background(.gray)
-                                .frame(width:10,height: 20)
-                            Text("解説")
-                                .foregroundColor(Color("fontGray"))
-                            Spacer()
-                        }
-                        HStack {
-                            ScrollView{
-                                Text("\(explanation)")
-                                    .foregroundColor(Color("fontGray"))
-                            }
-                            Spacer()
-                        }
-                        
-                        HStack{
-                            Spacer()
-                            Button(action: { 
-                        generateHapticFeedback()
-                                currentQuizIndex += 1
-                                isPresented = false
-                                selectedAnswerIndex = nil
-                                startTimer()
-                                audioManager.playCancelSound()
-                            }) {
-                                HStack{
-                                    Text("次の問題へ")
-                                    
-                                }
-                                .padding()
-                                .foregroundColor(.black)
-                                .background(Color.white)
-                                .cornerRadius(8)
-                                .shadow(radius: 5)
-                            }
-                        }
-                        //                    NavigationLink("", destination: QuizManagerView(isPresenting: .constant(false)).navigationBarBackButtonHidden(true), isActive: $isContentView)
-                        
-                        //                    Button(action: { 
-//                        generateHapticFeedback()
-                        //                        authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 3) { success in
-                        //                        }
-                        //                    }) {
-                        //                        HStack {
-                        //                            Image(systemName: "questionmark.circle")
-                        //                            Text("　ヘルプ　　")
-                        //                        }
-                        //                            .padding(20)
-                        //                            .foregroundColor(.black)
-                        //                            .background(Color.white)
-                        //                            .cornerRadius(8)
-                        //                            .shadow(radius: 1)
-                        //                    }
+
+                        explanationSection(label: "解説", icon: "lightbulb.fill", text: explanation)
                     }
                     .padding(20)
-                    .background(Color.white)
-                    .cornerRadius(20)
-                    .shadow(radius: 10)
-                    .padding()
-                    //                .overlay(
-                    //                    // 「×」ボタンを右上に配置
-                    //                    Button(action: { 
-//                        generateHapticFeedback()
-                    //                        isPresented = false
-                    //                    }) {
-                    //                        Image(systemName: "xmark.circle.fill")
-                    //                            .resizable()
-                    //                            .frame(width: 50, height: 50)
-                    //                            .foregroundColor(.gray)
-                    //                            .background(.white)
-                    //                            .cornerRadius(30)
-                    //                            .padding()
-                    //                    }
-                    //                    .offset(x: 35, y: -35), // この値を調整してボタンを正しい位置に移動させます
-                    //                    alignment: .topTrailing // 枠の右上を基準に位置を調整します
-                    //                )
+                }
+
+                // 次の問題へボタン
+                Button(action: {
+                    generateHapticFeedback()
+                    currentQuizIndex += 1
+                    isPresented = false
+                    selectedAnswerIndex = nil
+                    startTimer()
+                    audioManager.playCancelSound()
+                }) {
+                    HStack(spacing: 8) {
+                        Text("次の問題へ")
+                            .font(.system(size: 17, weight: .bold))
+                        Image(systemName: "arrow.right")
+                            .font(.system(size: 15, weight: .bold))
                     }
-                                    .padding()
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 52)
+                    .background(
+                        LinearGradient(
+                            colors: [Color(hex: "667eea"), Color(hex: "764ba2")],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    .shadow(color: Color(hex: "667eea").opacity(0.4), radius: 8, y: 4)
+                }
+                .buttonStyle(PlainButtonStyle())
+                .padding(.horizontal, 20)
+                .padding(.bottom, 20)
             }
-            .onAppear {
-                pauseTimer()  // モーダルが表示されたときにタイマーを一時停止
-            }
+            .background(Color.white)
+            .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+            .shadow(color: .black.opacity(0.2), radius: 20, y: 10)
+        }
+        .padding(16)
+        .onAppear {
+            pauseTimer()  // モーダルが表示されたときにタイマーを一時停止
         }
     }
 
-//#Preview {
-////    func pauseTimer() {
-////        timer?.invalidate()
-////    }
-//
-//    ModalExplanationView(isPresented: .constant(false), selectedAnswerIndex: .constant(0), question: "ああああああああああああああああああああああああああああああああああああああああああああ", userAnswer: "ああああああああああああああああああああああああああああああああああああああああああああ", correctAnswer: "ああああああああああああああああああああああああああああああああああああああああああああ", explanation: "ああああああああああああああああああああああああああああああああああああああああああああ", currentQuizIndex: .constant(0))
-//}
+    // MARK: - Components
+
+    private func explanationSection(label: String, icon: String, text: String) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 6) {
+                Image(systemName: icon)
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundColor(Color(hex: "667eea"))
+                Text(label)
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(.secondary)
+            }
+
+            Text(text)
+                .font(.system(size: 15))
+                .foregroundColor(Color("fontGray"))
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
+    private func answerCard(label: String, text: String, color: Color) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(label)
+                .font(.system(size: 11, weight: .bold))
+                .foregroundColor(color)
+
+            Text(text)
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundColor(Color("fontGray"))
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(color.opacity(0.08))
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(color.opacity(0.25), lineWidth: 1)
+        )
+    }
+}

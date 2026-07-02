@@ -69,30 +69,8 @@ struct GodGachaView: View {
             VStack{
                 if showCoinModal {
                     if showUnCoinModal {
-                        VStack{
-                            HStack{
-                                Image("コインが無い")
-                                    .resizable()
-                                    .frame(width:70,height: 70)
-                                VStack(alignment: .leading, spacing:15){
-                                    HStack{
-                                        Text("コインが足りません")
-                                        Spacer()
-                                    }
-                                    Text("ご購入することもできます")
-                                        .font(.system(size: isSmallDevice() ? 17 : 18))
-                                }
-                                
-                            }.padding()
-                        }.frame(width: isSmallDevice() ? 330: 340, height:120)
-                            .background(Color("Color2"))
-                            .font(.system(size: 20))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 20)
-                                    .stroke(Color.gray, lineWidth: 15)
-                            )
-                            .cornerRadius(20)
-                            .shadow(radius: 10)
+                        InsufficientCoinsCard()
+                            .padding(.horizontal, 24)
                     }
                     CoinModalView(audioManager: audioManager, isPresented: $showCoinModal)
                 }
