@@ -716,6 +716,457 @@ struct QuizITTechnologyListView: View {
             correctAnswerIndex: 1,
             explanation: "ランサムウェアはファイルを暗号化し、復号のための金銭を要求するマルウェアです。"
         ),
+        QuizQuestion(
+            question: "主記憶の空き容量が不足したとき, 補助記憶装置の一部を主記憶のように見せかけて使用する方式はどれか。",
+            choices: [
+                "キャッシュメモリ",
+                "仮想記憶",
+                "フラッシュメモリ",
+                "メモリインタリーブ"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "仮想記憶は補助記憶装置の一部を主記憶のように利用する方式で、主記憶容量を見かけ上拡張できます。"
+        ),
+        QuizQuestion(
+            question: "DNS サーバの主な役割として, 適切なものはどれか。",
+            choices: [
+                "ドメイン名と IP アドレスを対応付ける。",
+                "IP アドレスを自動的に割り当てる。",
+                "通信内容を暗号化する。",
+                "Web ページをキャッシュする。"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "DNSはドメイン名とIPアドレスを対応付ける仕組みであり、利用者が名前でサーバを指定できるようにします。"
+        ),
+        QuizQuestion(
+            question: "RAID1 の特徴として, 最も適切なものはどれか。",
+            choices: [
+                "複数台のディスクに同じデータを書き込み, 耐障害性を高める。",
+                "パリティ情報を用いて実効容量を増やす。",
+                "データを細かく分割して複数台に分散し, 実効容量を半分にする。",
+                "光ディスクを利用してバックアップを自動化する。"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "RAID1はミラーリング方式で、同じデータを複数台のディスクに書き込むことで耐障害性を高めます。"
+        ),
+        QuizQuestion(
+            question: "Web アプリケーションの入力欄などを悪用して, データベースに不正な SQL 文を実行させようとする攻撃はどれか。",
+            choices: [
+                "SQL インジェクション",
+                "総当たり攻撃",
+                "DoS 攻撃",
+                "ゼロデイ攻撃"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "SQLインジェクションは入力欄に不正なSQL文を埋め込み、データベースを不正操作しようとする攻撃です。"
+        ),
+        QuizQuestion(
+            question: "公開鍵暗号方式に関する説明として, 適切なものはどれか。",
+            choices: [
+                "暗号化と復号に同じ鍵を用いる方式である。",
+                "公開鍵で暗号化したデータは, 対応する秘密鍵で復号する。",
+                "秘密鍵は通信相手全員に公開する必要がある。",
+                "共通鍵暗号方式よりも鍵管理が複雑にならない。"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "公開鍵暗号方式では、公開鍵で暗号化したデータを対応する秘密鍵で復号します。"
+        ),
+        QuizQuestion(
+            question: "LAN 内の端末に IP アドレスなどの設定情報を自動配布するプロトコルはどれか。",
+            choices: [
+                "DNS",
+                "DHCP",
+                "SNMP",
+                "NTP"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "DHCPはIPアドレス、サブネットマスク、デフォルトゲートウェイなどの設定情報を自動配布するプロトコルです。"
+        ),
+        QuizQuestion(
+            question: "CPU と主記憶の速度差を埋めるために用いられる, 高速で小容量の記憶装置はどれか。",
+            choices: [
+                "キャッシュメモリ",
+                "SSD",
+                "磁気テープ",
+                "光学ドライブ"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "キャッシュメモリはCPUの近くに配置される高速な記憶装置で、主記憶との速度差を緩和します。"
+        ),
+        QuizQuestion(
+            question: "ソフトウェアや Web サービスが外部プログラムから機能やデータを利用できるようにするための仕組みはどれか。",
+            choices: [
+                "API",
+                "GUI",
+                "UPS",
+                "RAID"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "APIはアプリケーション同士が機能やデータを連携利用するためのインタフェースです。"
+        ),
+        QuizQuestion(
+            question: "複数の処理が互いに必要な資源の解放を待ち続け, どの処理も先に進めなくなる状態はどれか。",
+            choices: [
+                "スラッシング",
+                "デッドロック",
+                "スプーリング",
+                "フラグメンテーション"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "デッドロックは複数の処理が互いに資源待ちとなり、処理が停止したような状態になることです。"
+        ),
+        QuizQuestion(
+            question: "表計算ソフトで管理している顧客データを関係データベースで管理する目的として, 最も適切なものはどれか。",
+            choices: [
+                "データの重複を減らし, 整合性を保ちやすくする。",
+                "必ずファイルサイズを小さくできるようにする。",
+                "全ての検索処理を手作業に切り替える。",
+                "ネットワーク接続なしで複数人が同時更新できるようにする。"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "関係データベースでは表を整理して管理できるため、データの重複を減らし整合性を保ちやすくなります。"
+        ),
+        QuizQuestion(
+            question: "1台の物理サーバ上で複数の仮想マシンを動作させるために用いられるソフトウェアはどれか。",
+            choices: [
+                "ハイパーバイザ",
+                "コンパイラ",
+                "デバイスドライバ",
+                "ファイアウォール"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "ハイパーバイザは1台の物理サーバ上で複数の仮想マシンを管理し、動作させるためのソフトウェアです。"
+        ),
+        QuizQuestion(
+            question: "IPv4 において, IP アドレスのうちネットワーク部とホスト部を区別するために用いられるものはどれか。",
+            choices: [
+                "デフォルトゲートウェイ",
+                "MAC アドレス",
+                "サブネットマスク",
+                "ポート番号"
+            ],
+            correctAnswerIndex: 2,
+            explanation: "サブネットマスクはIPアドレスのどこまでがネットワーク部で、どこからがホスト部かを判別するために使われます。"
+        ),
+        QuizQuestion(
+            question: "LAN 内で MAC アドレスを基にフレームの転送先を判断する機器はどれか。",
+            choices: [
+                "リピータ",
+                "スイッチングハブ",
+                "ルータ",
+                "モデム"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "スイッチングハブはMACアドレスを基に、LAN内の適切な宛先ポートへフレームを転送します。"
+        ),
+        QuizQuestion(
+            question: "異なるネットワーク同士を接続し, IP アドレスを基にパケットを中継する機器はどれか。",
+            choices: [
+                "ルータ",
+                "アクセスポイント",
+                "ハブ",
+                "NIC"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "ルータは異なるネットワーク間でIPアドレスを基にパケットを中継する機器です。"
+        ),
+        QuizQuestion(
+            question: "Web コンテンツを利用者に近い場所に分散配置し, 配信を高速化する仕組みはどれか。",
+            choices: [
+                "CDN",
+                "DHCP",
+                "VPN",
+                "RAID"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "CDNはコンテンツを複数拠点に分散して配置し、利用者に近い場所から配信することで応答を高速化します。"
+        ),
+        QuizQuestion(
+            question: "パスワードをそのまま保存せず, 元の値へ戻すことが困難な固定長の値に変換して保存するときに用いられる技術はどれか。",
+            choices: [
+                "圧縮",
+                "ハッシュ化",
+                "多重化",
+                "正規化"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "ハッシュ化は元の値へ戻すことが困難な値に変換する技術で、パスワード保存に広く用いられます。"
+        ),
+        QuizQuestion(
+            question: "Web ページに悪意のあるスクリプトを埋め込み, そのページを閲覧した利用者のブラウザ上で実行させる攻撃はどれか。",
+            choices: [
+                "クロスサイトスクリプティング",
+                "SQL インジェクション",
+                "ARP スプーフィング",
+                "総当たり攻撃"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "クロスサイトスクリプティングは、悪意のあるスクリプトをWebページに埋め込み、閲覧者のブラウザ上で実行させる攻撃です。"
+        ),
+        QuizQuestion(
+            question: "組織内の複数端末が, 一つのグローバル IP アドレスを共有してインターネットへ接続できるように, ポート番号も利用してアドレス変換する技術はどれか。",
+            choices: [
+                "NAPT",
+                "MIME",
+                "RAID",
+                "SSID"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "NAPTはIPアドレスに加えてポート番号も変換することで、複数端末が一つのグローバルIPアドレスを共有できます。"
+        ),
+        QuizQuestion(
+            question: "関係データベースで検索を高速化するために, 特定の列に対して作成するものはどれか。",
+            choices: [
+                "ビュー",
+                "インデックス",
+                "トリガ",
+                "ロールバック"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "インデックスはテーブルの特定列に作成され、検索や並べ替えの高速化に役立ちます。"
+        ),
+        QuizQuestion(
+            question: "コンテナ型仮想化の特徴として, 適切なものはどれか。",
+            choices: [
+                "各コンテナがそれぞれ完全なゲスト OS を持つ。",
+                "ホスト OS のカーネルを共有して動作する。",
+                "物理サーバを使わずに動作する。",
+                "ネットワーク機能を利用できない。"
+            ],
+            correctAnswerIndex: 1,
+            explanation: "コンテナ型仮想化はホストOSのカーネルを共有して動作するため、軽量で高速に起動しやすい特徴があります。"
+        ),
+        QuizQuestion(
+            question: "稼働中のシステムに障害が発生したとき, 待機系へ自動的に処理を切り替えて継続運用する仕組みはどれか。",
+            choices: [
+                "フェールオーバー",
+                "スワップアウト",
+                "スラッシング",
+                "フラグメンテーション"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "フェールオーバーは障害発生時に待機系へ自動切替して、サービス継続性を高める仕組みです。"
+        ),
+        QuizQuestion(
+            question: "複数のサーバへ処理を振り分け, 一台当たりの負荷を軽減するために用いられる装置や仕組みはどれか。",
+            choices: [
+                "ロードバランサ",
+                "UPS",
+                "リピータ",
+                "プロキシ ARP"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "ロードバランサは複数サーバに処理を分散し、性能向上や可用性向上に利用されます。"
+        ),
+        QuizQuestion(
+            question: "数cm程度の近距離で通信し, 交通系 IC カードやスマートフォン決済などにも利用される無線通信技術はどれか。",
+            choices: [
+                "NFC",
+                "LTE",
+                "ADSL",
+                "GPS"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "NFCはごく近距離で通信する無線技術で、非接触決済やICカードに利用されています。"
+        ),
+        QuizQuestion(
+            question: "通信回線や装置の性能指標のうち, 単位時間当たりに実際に処理できるデータ量を表すものはどれか。",
+            choices: [
+                "スループット",
+                "レイテンシ",
+                "ジッタ",
+                "可用性"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "スループットは単位時間当たりに実際に処理・転送できたデータ量を表す性能指標です。"
+        ),
+        QuizQuestion(
+            question: "バックアップ運用で, 毎日変更されたファイルだけを別媒体へ保存し, 週末に全体をまとめて保存する方法の主な目的はどれか。",
+            choices: [
+                "バックアップに必要な時間や容量を抑える。",
+                "データを暗号化しなくてよくする。",
+                "障害を完全に防止する。",
+                "ネットワーク設定を自動化する。"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "日次で差分のみを保存し、定期的に全体を保存することで、バックアップ時間や必要容量を抑えやすくなります。"
+        ),
+        QuizQuestion(
+            question: "ハードウェアに組み込まれ, 装置の基本的な制御を行うソフトウェアはどれか。",
+            choices: [
+                "ファームウェア",
+                "ミドルウェア",
+                "スプレッドシート",
+                "デバッグツール"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "ファームウェアは機器に組み込まれ、装置の基本制御を担当するソフトウェアです。"
+        ),
+        QuizQuestion(
+            question: "インターネットなどの公衆回線を利用しながら, 拠点間を安全に接続する仕組みはどれか。",
+            choices: [
+                "VPN",
+                "VLAN",
+                "NAS",
+                "RAID"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "VPNは公衆回線上に仮想的な専用線を構成し、安全に拠点間通信を行う仕組みです。"
+        ),
+        QuizQuestion(
+            question: "一つの物理 LAN を, 論理的に複数のネットワークへ分割する技術はどれか。",
+            choices: [
+                "VLAN",
+                "VPN",
+                "DNS",
+                "NTP"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "VLANは一つの物理LANを論理的に分割し、部門ごとなどにネットワークを分けて管理できます。"
+        ),
+        QuizQuestion(
+            question: "ネットワーク疎通確認で使われる `ping` コマンドが主に利用するプロトコルはどれか。",
+            choices: [
+                "ICMP",
+                "SMTP",
+                "FTP",
+                "POP3"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "pingはICMPを用いて相手先との疎通確認や応答時間の確認を行います。"
+        ),
+        QuizQuestion(
+            question: "メールサーバ上にあるメールを, フォルダ構成を保ったまま複数端末で参照しやすい受信プロトコルはどれか。",
+            choices: [
+                "IMAP",
+                "SMTP",
+                "SNMP",
+                "Telnet"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "IMAPはメールをサーバ上で管理しながら複数端末で参照しやすい受信プロトコルです。"
+        ),
+        QuizQuestion(
+            question: "公開鍵暗号方式を利用して, 文書の作成者確認や改ざん検知を行う仕組みはどれか。",
+            choices: [
+                "デジタル署名",
+                "デフラグ",
+                "キャッシュ",
+                "スプーリング"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "デジタル署名は文書の作成者確認と改ざん検知に利用されます。"
+        ),
+        QuizQuestion(
+            question: "通信データやファイルの誤りを検出するために付加される, 検査用の値はどれか。",
+            choices: [
+                "チェックサム",
+                "サブネットマスク",
+                "セマフォ",
+                "ハンドシェイク"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "チェックサムはデータから計算した検査値で、転送中や保存中の誤り検出に用いられます。"
+        ),
+        QuizQuestion(
+            question: "LAN に接続して利用する, ファイル共有向けの専用ストレージ装置はどれか。",
+            choices: [
+                "NAS",
+                "GPU",
+                "UPS",
+                "WAF"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "NASはネットワーク経由でファイル共有に利用する専用ストレージ装置です。"
+        ),
+        QuizQuestion(
+            question: "SSD の記憶素子として主に用いられているものはどれか。",
+            choices: [
+                "フラッシュメモリ",
+                "磁気ディスク",
+                "光学ディスク",
+                "紙テープ"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "SSDは主にフラッシュメモリを利用してデータを保存する記憶装置です。"
+        ),
+        QuizQuestion(
+            question: "RAID0 の特徴として, 適切なものはどれか。",
+            choices: [
+                "複数台のディスクに分散書込みして高速化を図るが, 冗長性はない。",
+                "同じデータを二重に書き込んで耐障害性を高める。",
+                "1台分の容量を常にパリティ専用にする。",
+                "障害発生時に自動的に待機系へ切り替える。"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "RAID0はデータを複数ディスクへ分散書込みして高速化しますが、冗長性はありません。"
+        ),
+        QuizQuestion(
+            question: "社内 PC がインターネット上の Web サーバへアクセスするとき, 代理でアクセスして通信内容の制御や記録を行うサーバはどれか。",
+            choices: [
+                "プロキシサーバ",
+                "DNS サーバ",
+                "メールサーバ",
+                "認証局"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "プロキシサーバは利用者の代理として外部サーバへアクセスし、制御や記録を行えます。"
+        ),
+        QuizQuestion(
+            question: "データを小さな単位に分割し, 通信回線を複数の利用者で効率的に共有しながら送る方式はどれか。",
+            choices: [
+                "パケット交換方式",
+                "回線交換方式",
+                "バッチ処理方式",
+                "ミラーリング方式"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "パケット交換方式はデータを小さな単位に分割して送るため、回線を効率よく共有できます。"
+        ),
+        QuizQuestion(
+            question: "画像処理や AI の並列演算などで活用される, 多数の演算器を備えた装置はどれか。",
+            choices: [
+                "GPU",
+                "UPS",
+                "NIC",
+                "HUB"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "GPUは多数の演算器を備えており、画像処理や並列演算に適しています。"
+        ),
+        QuizQuestion(
+            question: "データベースのトランザクション処理で, 処理途中の更新を取り消して開始前の状態へ戻すことはどれか。",
+            choices: [
+                "ロールバック",
+                "コミット",
+                "インデックス",
+                "ジョイン"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "ロールバックは処理途中の更新を取り消し、トランザクション開始前の状態へ戻す操作です。"
+        ),
+        QuizQuestion(
+            question: "自社専用のクラウド環境と, 外部事業者が提供するクラウド環境を組み合わせて利用する形態はどれか。",
+            choices: [
+                "ハイブリッドクラウド",
+                "プライベートクラウド",
+                "コミュニティクラウド",
+                "オンプレミス"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "ハイブリッドクラウドは自社専用環境と外部クラウドを組み合わせて利用する形態です。"
+        ),
+        QuizQuestion(
+            question: "サーバの性能向上策のうち, 既存の1台のサーバに CPU やメモリを増強して能力を高める方法はどれか。",
+            choices: [
+                "スケールアップ",
+                "スケールアウト",
+                "フェールオーバー",
+                "シャーディング"
+            ],
+            correctAnswerIndex: 0,
+            explanation: "スケールアップは既存サーバのCPUやメモリを強化して性能を高める方法です。"
+        ),
     ]
         
     @State private var shuffledQuizList: [QuizQuestion]

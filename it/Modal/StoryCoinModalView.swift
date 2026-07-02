@@ -24,6 +24,8 @@ struct StoryCoinModalView: View {
     @State private var coinImage: String = ""
     @State private var coinTitle: String = ""
     @State private var rewardAmount: Int = 0
+    @State private var itemRewards: [InventoryReward] = []
+    @State private var dungeonBoostRewards: [DungeonBoost] = []
     
     @State private var scale: CGFloat = 0.85
     @State private var opacity: Double = 0
@@ -63,6 +65,14 @@ struct StoryCoinModalView: View {
         29: Treasure(coinImage: "宝箱29", coinTitle: "1500コインゲット！！", reward: 1500),
         30: Treasure(coinImage: "宝箱30", coinTitle: "2000コインゲット！！", reward: 2000),
     ]
+
+    private var primaryItemReward: InventoryReward? {
+        itemRewards.first
+    }
+
+    private var isItemTreasure: Bool {
+        !itemRewards.isEmpty
+    }
     
     var body: some View {
         ZStack {
@@ -99,13 +109,24 @@ struct StoryCoinModalView: View {
                             )
                         )
                         .frame(width: 280, height: 280)
-                    
-                    Image(coinImage)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(height: 180)
+
+                    if let primaryItemReward {
+                        InventoryItemArtworkView(
+                            type: primaryItemReward.type,
+                            width: 180,
+                            height: 180,
+                            cornerRadius: 28
+                        )
                         .scaleEffect(coinScale)
                         .modifier(FloatingAnimation(amplitude: 8, duration: 2.0))
+                    } else {
+                        Image(coinImage)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 180)
+                            .scaleEffect(coinScale)
+                            .modifier(FloatingAnimation(amplitude: 8, duration: 2.0))
+                    }
                 }
                 
                 // 報酬テキスト
@@ -114,50 +135,151 @@ struct StoryCoinModalView: View {
                     Text("🎉 おめでとう！ 🎉")
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundColor(.white.opacity(0.8))
+
+                    Text(coinTitle)
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundColor(.white.opacity(0.92))
+                        .multilineTextAlignment(.center)
                     
                     // メインタイトル
-                    HStack(spacing: 8) {
-                        Image(systemName: "dollarsign.circle.fill")
-                            .font(.system(size: 32))
-                            .foregroundStyle(
-                                LinearGradient(
-                                    colors: [Color(hex: "ffd200"), Color(hex: "f7971e")],
-                                    startPoint: .top,
-                                    endPoint: .bottom
+                    if let primaryItemReward {
+                        HStack(spacing: 12) {
+                            Text(primaryItemReward.type.displayName)
+                                .font(.system(size: 22, weight: .bold))
+                                .foregroundColor(.white)
+
+                            Text("x\(primaryItemReward.amount)")
+                                .font(.system(size: 34, weight: .bold))
+                                .foregroundColor(primaryItemReward.type.accentColor)
+                        }
+                        .padding(.horizontal, 24)
+                        .padding(.vertical, 14)
+                        .background(
+                            Capsule()
+                                .fill(primaryItemReward.type.accentColor.opacity(0.18))
+                                .overlay(
+                                    Capsule()
+                                        .stroke(primaryItemReward.type.accentColor.opacity(0.6), lineWidth: 2)
                                 )
-                            )
-                        
-                        Text("\(rewardAmount)")
-                            .font(.system(size: 40, weight: .bold))
-                            .foregroundColor(.white)
-                        
-                        Text("コイン")
-                            .font(.system(size: 24, weight: .bold))
-                            .foregroundColor(.white.opacity(0.9))
-                    }
-                    .padding(.horizontal, 24)
-                    .padding(.vertical, 12)
-                    .background(
-                        Capsule()
-                            .fill(
-                                LinearGradient(
-                                    colors: [Color(hex: "f7971e").opacity(0.3), Color(hex: "ffd200").opacity(0.2)],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
-                            .overlay(
-                                Capsule()
-                                    .stroke(
-                                        LinearGradient(
-                                            colors: [Color(hex: "ffd200"), Color(hex: "f7971e")],
-                                            startPoint: .leading,
-                                            endPoint: .trailing
-                                        ),
-                                        lineWidth: 2
+                        )
+                    } else {
+                        HStack(spacing: 8) {
+                            Image(systemName: "dollarsign.circle.fill")
+                                .font(.system(size: 32))
+                                .foregroundStyle(
+                                    LinearGradient(
+                                        colors: [Color(hex: "ffd200"), Color(hex: "f7971e")],
+                                        startPoint: .top,
+                                        endPoint: .bottom
                                     )
-                            )
-                    )
+                                )
+
+                            Text("\(rewardAmount)")
+                                .font(.system(size: 40, weight: .bold))
+                                .foregroundColor(.white)
+
+                            Text("コイン")
+                                .font(.system(size: 24, weight: .bold))
+                                .foregroundColor(.white.opacity(0.9))
+                        }
+                        .padding(.horizontal, 24)
+                        .padding(.vertical, 12)
+                        .background(
+                            Capsule()
+                                .fill(
+                                    LinearGradient(
+                                        colors: [Color(hex: "f7971e").opacity(0.3), Color(hex: "ffd200").opacity(0.2)],
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
+                                )
+                                .overlay(
+                                    Capsule()
+                                        .stroke(
+                                            LinearGradient(
+                                                colors: [Color(hex: "ffd200"), Color(hex: "f7971e")],
+                                                startPoint: .leading,
+                                                endPoint: .trailing
+                                            ),
+                                            lineWidth: 2
+                                        )
+                                )
+                        )
+                    }
+
+                    if itemRewards.count > 1 {
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("獲得アイテム")
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundColor(.white.opacity(0.75))
+
+                            ForEach(Array(itemRewards.enumerated()), id: \.offset) { entry in
+                                let reward = entry.element
+                                HStack(spacing: 10) {
+                                    InventoryItemArtworkView(type: reward.type, width: 38, height: 38, cornerRadius: 10)
+
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(reward.type.displayName)
+                                            .font(.system(size: 14, weight: .semibold))
+                                            .foregroundColor(.white)
+                                        Text("x\(reward.amount)")
+                                            .font(.system(size: 13, weight: .medium))
+                                            .foregroundColor(.white.opacity(0.7))
+                                    }
+
+                                    Spacer()
+                                }
+                            }
+                        }
+                        .padding(14)
+                        .background(
+                            RoundedRectangle(cornerRadius: 18)
+                                .fill(Color.white.opacity(0.08))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 18)
+                                        .stroke(Color.white.opacity(0.12), lineWidth: 1)
+                                )
+                        )
+                    }
+
+                    if !dungeonBoostRewards.isEmpty {
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("追加効果")
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundColor(.white.opacity(0.75))
+
+                            ForEach(dungeonBoostRewards) { boost in
+                                HStack(spacing: 10) {
+                                    Image(systemName: boost.type.symbolName)
+                                        .font(.system(size: 18, weight: .bold))
+                                        .foregroundColor(.white)
+                                        .frame(width: 30, height: 30)
+                                        .background(boost.type.accentColors.first?.opacity(0.32) ?? .clear)
+                                        .clipShape(Circle())
+
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(boost.type.title)
+                                            .font(.system(size: 14, weight: .semibold))
+                                            .foregroundColor(.white)
+                                        Text("\(boost.type.description) / x\(boost.charges)")
+                                            .font(.system(size: 13, weight: .medium))
+                                            .foregroundColor(.white.opacity(0.72))
+                                    }
+
+                                    Spacer()
+                                }
+                            }
+                        }
+                        .padding(14)
+                        .background(
+                            RoundedRectangle(cornerRadius: 18)
+                                .fill(Color.white.opacity(0.08))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 18)
+                                        .stroke(Color.white.opacity(0.12), lineWidth: 1)
+                                )
+                        )
+                    }
                 }
                 
                 Spacer()
@@ -206,12 +328,55 @@ struct StoryCoinModalView: View {
     
     private func setTreasureParameters(coin: Int) {
         if let treasure = treasures[coin] {
+            let plannedItemRewards = DungeonRewardPlanner.treasureRewards(for: coin)
+            let plannedBoostRewards = treasureBoostRewards(for: coin)
             coinImage = treasure.coinImage
-            coinTitle = treasure.coinTitle
-            rewardAmount = treasure.reward
-            AuthManager.shared.addMoney(amount: treasure.reward)
+            itemRewards = plannedItemRewards
+            dungeonBoostRewards = plannedBoostRewards
+            let finalCoinReward = plannedItemRewards.isEmpty
+                ? PositionViewModel.shared.applyCoinTreasureBonus(to: treasure.reward)
+                : 0
+            rewardAmount = finalCoinReward
+            coinTitle = plannedItemRewards.isEmpty
+                ? treasure.coinTitle
+                : itemTreasureTitle(for: plannedItemRewards)
+
+            if plannedItemRewards.isEmpty {
+                AuthManager.shared.addMoney(amount: finalCoinReward)
+            } else {
+                AuthManager.shared.addItems(plannedItemRewards)
+            }
+
+            for boost in plannedBoostRewards {
+                PositionViewModel.shared.addDungeonBoost(type: boost.type, charges: boost.charges, magnitude: boost.magnitude)
+            }
         } else {
             print("未知の宝物")
+        }
+    }
+
+    private func itemTreasureTitle(for rewards: [InventoryReward]) -> String {
+        guard let firstReward = rewards.first, rewards.count == 1 else {
+            return "アイテムゲット！！"
+        }
+        return "\(firstReward.type.displayName)ゲット！！"
+    }
+
+    private func treasureBoostRewards(for treasureID: Int) -> [DungeonBoost] {
+        switch treasureID {
+        case 5:
+            return [DungeonBoost(type: .safeShield, charges: 1)]
+        case 14:
+            return [DungeonBoost(type: .attackSurge, charges: 2)]
+        case 24:
+            return [DungeonBoost(type: .coinBonus, charges: 1)]
+        case 30:
+            return [
+                DungeonBoost(type: .attackSurge, charges: 2),
+                DungeonBoost(type: .safeShield, charges: 1)
+            ]
+        default:
+            return []
         }
     }
     

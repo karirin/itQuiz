@@ -9,56 +9,64 @@ import SwiftUI
 import GoogleMobileAds
 
 class Reward: NSObject, FullScreenContentDelegate, ObservableObject {
+    private enum Placement {
+        case standard
+        case story
+    }
+
     @Published var rewardLoaded: Bool = false
-    @Published var rewardEarned: Bool = false // この行を追加
+    @Published var rewardEarned: Bool = false
     var rewardedAd: RewardedAd?
     @ObservedObject var authManager = AuthManager.shared
     @ObservedObject var viewModel: PositionViewModel = PositionViewModel.shared
+    private var currentPlacement: Placement = .standard
 
     override init() {
         super.init()
 //        LoadReward() // 初期化時に広告をロード
     }
 
-    // リワード広告の読み込み
-    func LoadReward() {
-        RewardedAd.load(with: "ca-app-pub-4898800212808837/5768331457", request: Request()) { (ad, error) in
+    private func loadReward(for placement: Placement) {
+        currentPlacement = placement
+
+        let adUnitID: String
+        switch placement {
+        case .standard:
+            adUnitID = "ca-app-pub-4898800212808837/5768331457"
+        case .story:
+            adUnitID = "ca-app-pub-4898800212808837/6563091309"
+        }
+
+        RewardedAd.load(with: adUnitID, request: Request()) { (ad, error) in
             if let error = error {
-                print("LoadReward 😭: 読み込みに失敗しました: \(error.localizedDescription)")
+                let label = placement == .story ? "LoadStoryReward" : "LoadReward"
+                print("\(label) 😭: 読み込みに失敗しました: \(error.localizedDescription)")
                 self.rewardLoaded = false
 
-                // デバッグ用：5秒後に自動でリトライ（必要なければ消してOK）
                 DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
-                    self.LoadReward()
+                    self.loadReward(for: placement)
                 }
                 return
             }
-            print("LoadReward 😍: 読み込みに成功しました")
+            let label = placement == .story ? "LoadStoryReward" : "LoadReward"
+            print("\(label) 😍: 読み込みに成功しました")
             self.rewardLoaded = true
             self.rewardedAd = ad
             self.rewardedAd?.fullScreenContentDelegate = self
         }
     }
+
+    private func reloadCurrentReward() {
+        loadReward(for: currentPlacement)
+    }
+
+    // リワード広告の読み込み
+    func LoadReward() {
+        loadReward(for: .standard)
+    }
     
     func LoadStoryReward() {
-        //        GADRewardedAd.load(withAdUnitID: "ca-app-pub-3940256099942544/1712485313", request: GADRequest()) { (ad, error) in //テスト
-        RewardedAd.load(with: "ca-app-pub-4898800212808837/6563091309",
-                        request: Request()) { (ad, error) in
-            if let error = error {
-                print("LoadStoryReward 😭: 読み込みに失敗しました: \(error.localizedDescription)")
-                self.rewardLoaded = false
-
-                // デバッグ用リトライ
-                DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
-                    self.LoadStoryReward()
-                }
-                return
-            }
-            print("LoadStoryReward 😍: 読み込みに成功しました")
-            self.rewardLoaded = true
-            self.rewardedAd = ad
-            self.rewardedAd?.fullScreenContentDelegate = self
-        }
+        loadReward(for: .story)
     }
 
     // リワード広告の表示
@@ -68,12 +76,11 @@ class Reward: NSObject, FullScreenContentDelegate, ObservableObject {
                 ad.present(from: root, userDidEarnRewardHandler: {
                     print("😍: 報酬を獲得しました")
                     self.authManager.addMoney(amount: 300)
-                    self.LoadReward()
                     self.rewardEarned = true
                 })
             } else {
                 print("😭: 広告の準備ができていませんでした")
-                LoadReward()
+                reloadCurrentReward()
             }
         }
     }
@@ -84,12 +91,11 @@ class Reward: NSObject, FullScreenContentDelegate, ObservableObject {
                 ad.present(from: root, userDidEarnRewardHandler: { [self] in
                     print("😍: 報酬を獲得しました")
                     viewModel.recoverStamina(by: 30)
-                    self.LoadReward()
                     self.rewardEarned = true
                 })
             } else {
                 print("😭: 広告の準備ができていませんでした")
-                LoadReward()
+                reloadCurrentReward()
             }
         }
     }
@@ -100,44 +106,34 @@ class Reward: NSObject, FullScreenContentDelegate, ObservableObject {
             if let ad = rewardedAd {
                 ad.present(from: root, userDidEarnRewardHandler: {
                     print("ExAndMoReward 😍: 報酬を獲得しました")
-                    self.authManager.updateRewardFlag(userId: self.authManager.currentUserId!, userFlag: 2)
-                    let now = Date()
-                            UserDefaults.standard.set(now, forKey: "rewardAcquiredDate")
-                    self.rewardEarned = true
-                    print("::::::\(self.rewardEarned)")
-                    self.resetupdateRewardFlag()
-                    // 報酬を得た後に、新しい広告をロードする
-                    self.LoadReward()
+                    self.authManager.activateOneHourBoost { success in
+                        guard success else { return }
+                        self.rewardEarned = true
+                        print("::::::\(self.rewardEarned)")
+                    }
                 })
             } else {
                 print("ExAndMoReward 😭: 広告の準備ができていませんでした")
-                // 広告がない場合はロードする
-                LoadReward()
+                reloadCurrentReward()
             }
         }
     }
     
     func checkRewardReset() {
         print("checkRewardReset")
-        if let rewardDate = UserDefaults.standard.object(forKey: "rewardAcquiredDate") as? Date {
-            if Date().timeIntervalSince(rewardDate) >= 3600 { // 1時間経過しているかチェック
-                self.authManager.updateRewardFlag(userId: self.authManager.currentUserId!, userFlag: 1)
-            }
-        }
+        self.authManager.syncRewardBoostState()
     }
     
     func resetupdateRewardFlag() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3600) { // 3600秒（1時間）後
-            self.authManager.updateRewardFlag(userId: self.authManager.currentUserId!, userFlag: 1)
-            print("💰: Moneyが0にリセットされました")
-        }
+        self.authManager.syncRewardBoostState()
     }
     
     // 広告が閉じられたときに呼ばれるデリゲートメソッド
     func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd) {
         print("広告が閉じられました。新しい広告をロードします。")
-        self.rewardLoaded = false // 必要に応じて、UIの更新をトリガする
-        LoadReward()
+        self.rewardLoaded = false
+        self.rewardedAd = nil
+        reloadCurrentReward()
     }
 
 }

@@ -22,6 +22,7 @@ struct AvatarListView: View {
     @Binding var isPresenting: Bool
     @Namespace private var heroAnimation
     @State private var showDetailView = false
+    @State private var selectedTab = 0
     
     init(isPresenting: Binding<Bool>) {
         _isPresenting = isPresenting
@@ -49,18 +50,25 @@ struct AvatarListView: View {
                 VStack(spacing: 10) {
                     // ヘッダー
                     headerView
+
+                    categoryTabs
                     
-                    // 選択されたアバターの詳細表示
-                    if let selected = selectedItem {
-                        selectedAvatarDetailView(selected: selected, geometry: geometry)
-                            .transition(.asymmetric(
-                                insertion: .scale.combined(with: .opacity),
-                                removal: .opacity
-                            ))
+                    if selectedTab == 0 {
+                        // 選択されたアバターの詳細表示
+                        if let selected = selectedItem {
+                            selectedAvatarDetailView(selected: selected, geometry: geometry)
+                                .transition(.asymmetric(
+                                    insertion: .scale.combined(with: .opacity),
+                                    removal: .opacity
+                                ))
+                        }
+
+                        // アバターグリッド
+                        avatarGridView
+                    } else {
+                        InventoryView(showsNavigationTitle: false, showsOwnBackground: false)
+                            .transition(.opacity)
                     }
-                    
-                    // アバターグリッド
-                    avatarGridView
                 }
                 .padding(.horizontal, 20)
                 .padding(.bottom, 20)
@@ -97,7 +105,7 @@ struct AvatarListView: View {
     // MARK: - Header View
     private var headerView: some View {
         HStack {
-            Text("おとも一覧")
+            Text(selectedTab == 0 ? "おとも一覧" : "持ち物")
                 .font(.system(size: 28, weight: .bold, design: .rounded))
                 .foregroundStyle(
                     LinearGradient(
@@ -110,6 +118,51 @@ struct AvatarListView: View {
             Spacer()
         }
         .padding(.top, 10)
+    }
+
+    private var categoryTabs: some View {
+        HStack(spacing: 0) {
+            tabButton(title: "おとも", systemImage: "person.3.fill", index: 0)
+            tabButton(title: "持ち物", systemImage: "shippingbox.fill", index: 1)
+        }
+        .padding(4)
+        .background(Color.white.opacity(0.75))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+
+    private func tabButton(title: String, systemImage: String, index: Int) -> some View {
+        Button(action: {
+            generateHapticFeedback()
+            audioManager.playSound()
+            withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
+                selectedTab = index
+            }
+        }) {
+            HStack(spacing: 6) {
+                Image(systemName: systemImage)
+                    .font(.system(size: 12, weight: .bold))
+                Text(title)
+                    .font(.system(size: 14, weight: .bold))
+            }
+            .foregroundColor(selectedTab == index ? .white : Color("fontGray"))
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 11)
+            .background(
+                Group {
+                    if selectedTab == index {
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(
+                                LinearGradient(
+                                    colors: [Color.blue, Color.purple.opacity(0.85)],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                    }
+                }
+            )
+        }
+        .buttonStyle(.plain)
     }
     
     // MARK: - Selected Avatar Detail View

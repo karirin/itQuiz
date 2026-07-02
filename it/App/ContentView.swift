@@ -504,7 +504,7 @@ struct ContentView: View {
     @State private var showCoinAlert: Bool = false
     @State private var isSignUpFlag: Bool = true
     @State private var updateNameFlag: Bool = false
-    @State private var isPresentingMissionView: Bool = false
+
     @State private var showLoginBonusModern: Bool = false
     
     // 経験値の最大値（レベルに応じて変更可能）
@@ -550,7 +550,7 @@ struct ContentView: View {
                 } else {
                     VStack(spacing: 0) {
                         // 広告バナー
-                        if !appState.isSubscribed && authManager.currentUserId != "dzarHuAdiXXLtDjtwIRvIfVhA1A2" {
+                        if appState.shouldShowAds && authManager.currentUserId != "dzarHuAdiXXLtDjtwIRvIfVhA1A2" {
                             BannerAdView()
                                 .frame(height: 60)
                                 .padding(.bottom, -10)
@@ -702,7 +702,7 @@ struct ContentView: View {
                                                             .padding(.trailing, 10)
                                                     }
                                                     .shadow(radius: 3)
-                                                    
+
                                                     Button(action: {
                                                         generateHapticFeedback()
                                                         self.isPresentingTittleView = true
@@ -715,6 +715,7 @@ struct ContentView: View {
                                                             .padding(.top, 10)
                                                     }
                                                     .shadow(radius: 3)
+
                                                 }
 
                                             }
@@ -732,7 +733,6 @@ struct ContentView: View {
                                         }
                                         NavigationLink("", destination: TittlesView(isPresenting: .constant(false)).navigationBarBackButtonHidden(true), isActive: $isPresentingTittleView)
                                         NavigationLink("", destination: RankingView(audioManager: audioManager).navigationBarBackButtonHidden(true), isActive: $isPresentingRankingView)
-                                        NavigationLink("", destination: MissionView().navigationBarBackButtonHidden(true), isActive: $isPresentingMissionView)
                                     }
                                 }
                             }
@@ -983,7 +983,7 @@ struct ContentView: View {
                     if isUserExists != nil {
                         appState.checkSubscription()
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                            if !appState.isSubscribed {
+                            if appState.shouldShowAds {
                                 executeProcessEveryFortyTimes()
                             }
                         }

@@ -12,15 +12,13 @@ struct ProgressStoryView: View {
     @State private var animateGradient = false
 
     var body: some View {
-        HStack{
+        GeometryReader { geometry in
             ZStack(alignment: .leading) {
-                // 背景バー
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(Color.gray.opacity(0.3))
-                    .frame(width:350, height: 20)
-                
-                // 進捗バー
-                RoundedRectangle(cornerRadius: 10)
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color.white.opacity(0.14))
+                    .frame(height: 18)
+
+                RoundedRectangle(cornerRadius: 12)
                     .fill(
                         LinearGradient(
                             gradient: Gradient(colors: [Color.orange, Color.yellow, Color.orange]),
@@ -28,12 +26,15 @@ struct ProgressStoryView: View {
                             endPoint: animateGradient ? .trailing : .leading
                         )
                     )
-                    .frame(width: 350 * CGFloat(progress), height: 20)
+                    .frame(width: geometry.size.width * CGFloat(progress), height: 18)
                     .onAppear {
-                        animateGradient = true
+                        withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) {
+                            animateGradient = true
+                        }
                     }
             }
         }
+        .frame(height: 18)
     }
 }
 

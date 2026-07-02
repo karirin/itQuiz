@@ -1,5 +1,5 @@
 //
-//  RaidResultView.swift
+//  GuerrillaResultView.swift
 //  it
 //
 //  Created on 2026/03/12.
@@ -7,8 +7,8 @@
 
 import SwiftUI
 
-struct RaidResultView: View {
-    @ObservedObject var raidManager: RaidManager
+struct GuerrillaResultView: View {
+    @ObservedObject var guerrillaManager: GuerrillaManager
     @ObservedObject var authManager: AuthManager
     @ObservedObject var audioManager: AudioManager
     let results: [QuizResult]
@@ -19,20 +19,29 @@ struct RaidResultView: View {
     @State private var selectedTab = 0
 
     private var isVictory: Bool {
-        raidManager.bossHP <= 0
+        guerrillaManager.bossHP <= 0
     }
 
-    private var myPlayer: RaidPlayer? {
-        raidManager.players.first { $0.id == raidManager.currentUserId }
+    private var myPlayer: GuerrillaPlayer? {
+        guerrillaManager.players.first { $0.id == guerrillaManager.currentUserId }
     }
 
-    private var mvpPlayer: RaidPlayer? {
-        raidManager.players.max(by: { $0.totalDamage < $1.totalDamage })
+    private var mvpPlayer: GuerrillaPlayer? {
+        guerrillaManager.players.max(by: { $0.totalDamage < $1.totalDamage })
     }
 
     private var myReward: (experience: Int, money: Int) {
         guard let me = myPlayer else { return (5, 5) }
-        return raidManager.rewardForPlayer(me)
+        return guerrillaManager.rewardForPlayer(me)
+    }
+
+    private var guerrillaItemRewards: [InventoryReward] {
+        guard myPlayer != nil else { return [] }
+        return GuerrillaRewardPlanner.rewards(
+            forDifficulty: guerrillaManager.difficulty,
+            rank: guerrillaManager.myRank,
+            isVictory: isVictory
+        )
     }
 
     var body: some View {
@@ -67,7 +76,7 @@ struct RaidResultView: View {
                 Button(action: {
                     generateHapticFeedback()
                     audioManager.playCancelSound()
-                    raidManager.stopObserving()
+                    guerrillaManager.stopObserving()
                     isPresenting = false
                 }) {
                     Text("ホームに戻る")
@@ -97,10 +106,19 @@ struct RaidResultView: View {
 
             if !hasAwardedRewards {
                 hasAwardedRewards = true
+                // ゲリラ参加のミッション進捗
+                authManager.recordGuerrillaParticipation()
                 if isVictory {
+                    // ゲリラ1位勝利のミッション進捗
+                    if guerrillaManager.myRank == 1 {
+                        authManager.recordGuerrillaWin()
+                    }
                     audioManager.playGameClearSound()
                     authManager.addExperience(points: myReward.experience, onSuccess: {}, onFailure: { _ in })
                     authManager.addMoney(amount: myReward.money)
+                    if !guerrillaItemRewards.isEmpty {
+                        authManager.addItems(guerrillaItemRewards)
+                    }
                 } else {
                     audioManager.playGameOverSound()
                     authManager.addExperience(points: 5, onSuccess: {}, onFailure: { _ in })
@@ -135,11 +153,11 @@ struct RaidResultView: View {
                 .animation(.easeInOut(duration: 0.5).delay(0.4), value: showContent)
 
             HStack(spacing: 8) {
-                Image(raidManager.bossImageName)
+                Image(guerrillaManager.bossImageName)
                     .resizable()
                     .scaledToFit()
                     .frame(width: 40, height: 40)
-                Text(raidManager.bossName)
+                Text(guerrillaManager.bossName)
                     .font(.headline)
                     .foregroundColor(.white.opacity(0.7))
             }
@@ -152,10 +170,10 @@ struct RaidResultView: View {
                     Text("あなたの順位:")
                         .font(.subheadline)
                         .foregroundColor(.white.opacity(0.6))
-                    Text("\(raidManager.myRank)位")
+                    Text("\(guerrillaManager.myRank)位")
                         .font(.system(size: 20, weight: .bold))
-                        .foregroundColor(raidManager.myRank == 1 ? .yellow : .orange)
-                    if raidManager.myRank == 1 {
+                        .foregroundColor(guerrillaManager.myRank == 1 ? .yellow : .orange)
+                    if guerrillaManager.myRank == 1 {
                         Image(systemName: "crown.fill")
                             .foregroundColor(.yellow)
                     }
@@ -175,7 +193,7 @@ struct RaidResultView: View {
                 .font(.headline)
                 .foregroundColor(.white)
 
-            if raidManager.myRank == 1 {
+            if guerrillaManager.myRank == 1 {
                 Text("MVP ボーナス 1.5x！")
                     .font(.system(size: 14, weight: .bold))
                     .foregroundColor(.yellow)
@@ -207,6 +225,31 @@ struct RaidResultView: View {
                     Text("コイン")
                         .font(.caption)
                         .foregroundColor(.white.opacity(0.6))
+                }
+            }
+
+            if !guerrillaItemRewards.isEmpty {
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("追加アイテム")
+                        .font(.subheadline)
+                        .foregroundColor(.white.opacity(0.75))
+
+                    ForEach(Array(guerrillaItemRewards.enumerated()), id: \.offset) { entry in
+                        let reward = entry.element
+                        HStack(spacing: 10) {
+                            InventoryItemArtworkView(type: reward.type, width: 34, height: 34, cornerRadius: 10)
+
+                            Text(reward.type.displayName)
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundColor(.white)
+
+                            Spacer()
+
+                            Text("x\(reward.amount)")
+                                .font(.system(size: 14, weight: .bold))
+                                .foregroundColor(reward.type.accentColor)
+                        }
+                    }
                 }
             }
         }
@@ -260,7 +303,7 @@ struct RaidResultView: View {
 
     private var contributionList: some View {
         VStack(spacing: 10) {
-            ForEach(Array(raidManager.players.enumerated()), id: \.element.id) { index, player in
+            ForEach(Array(guerrillaManager.players.enumerated()), id: \.element.id) { index, player in
                 HStack(spacing: 10) {
                     ZStack {
                         Circle()
@@ -282,7 +325,7 @@ struct RaidResultView: View {
                             Text(player.userName)
                                 .font(.system(size: 14, weight: .semibold))
                                 .foregroundColor(.white)
-                            if player.id == raidManager.currentUserId {
+                            if player.id == guerrillaManager.currentUserId {
                                 Text("自分")
                                     .font(.system(size: 10, weight: .bold))
                                     .foregroundColor(.yellow)
@@ -312,7 +355,7 @@ struct RaidResultView: View {
                 .padding(12)
                 .background(
                     RoundedRectangle(cornerRadius: 10)
-                        .fill(player.id == raidManager.currentUserId
+                        .fill(player.id == guerrillaManager.currentUserId
                               ? Color.yellow.opacity(0.08)
                               : Color.white.opacity(0.04))
                 )

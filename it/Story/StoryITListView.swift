@@ -3136,6 +3136,18 @@ choices: [
             explanation: "システム監査の目的は、情報システムに係るリスクに適切に対応しているかを評価し、組織の目標達成に寄与することです。"
         )
     ]
+    
+    private var extendedQuizList: [QuizQuestion] {
+        let standardPools =
+            QuizITBasicList(isPresenting: .constant(false)).quizBeginnerList +
+            QuizITStrategyListView(isPresenting: .constant(false)).quizBeginnerList +
+            QuizITTechnologyListView(isPresenting: .constant(false)).quizBeginnerList +
+            QuizITManagementListView(isPresenting: .constant(false)).quizBeginnerList
+        let existingQuestions = Set(quizBeginnerList.map(\.question))
+        let additionalQuestions = standardPools.filter { !existingQuestions.contains($0.question) }
+        return quizBeginnerList + additionalQuestions
+    }
+
     @ObservedObject var viewModel: PositionViewModel
     @State private var shuffledQuizList: [QuizQuestion]
     private var authManager = AuthManager.shared
@@ -3148,12 +3160,23 @@ choices: [
         self.monsterName = monsterName
         self.backgroundName = backgroundName
         self.viewModel = viewModel
-        _shuffledQuizList = State(initialValue: quizBeginnerList.shuffled())
+        _shuffledQuizList = State(initialValue: [])
     }
     
     @StateObject var sharedInterstitial = Interstitial()
     var body: some View {
-        StoryQuizView(viewModel: viewModel, quizzes: shuffledQuizList, quizLevel: .itBasic, monsterName: monsterName, backgroundName: backgroundName, authManager: authManager, audioManager: audioManager, isPresenting: $isPresenting, interstitial: sharedInterstitial)
+        Group {
+            if shuffledQuizList.isEmpty {
+                ProgressView()
+            } else {
+                StoryQuizView(viewModel: viewModel, quizzes: shuffledQuizList, quizLevel: .itBasic, monsterName: monsterName, backgroundName: backgroundName, authManager: authManager, audioManager: audioManager, isPresenting: $isPresenting, interstitial: sharedInterstitial)
+            }
+        }
+        .onAppear {
+            if shuffledQuizList.isEmpty {
+                shuffledQuizList = extendedQuizList.shuffled()
+            }
+        }
     }
 }
 
@@ -3164,5 +3187,4 @@ struct StoryITListView_Previews: PreviewProvider {
         StoryITListView(isPresenting: .constant(false), monsterName: "モンスター1", backgroundName: "背景1", viewModel: PositionViewModel.shared)
     }
 }
-
 

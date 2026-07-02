@@ -1,5 +1,5 @@
 //
-//  RaidBossData.swift
+//  GuerrillaBossData.swift
 //  it
 //
 //  Created on 2026/03/12.
@@ -7,17 +7,17 @@
 
 import SwiftUI
 
-struct RaidBoss {
+struct GuerrillaBoss {
     let name: String
     let imageName: String
     let bossHP: Int
     let bossAttack: Int
     let rewardExperience: Int
     let rewardMoney: Int
-    let difficulty: RaidDifficulty
+    let difficulty: GuerrillaDifficulty
 }
 
-enum RaidDifficulty: String, CaseIterable {
+enum GuerrillaDifficulty: String, CaseIterable {
     case beginner = "初級"
     case intermediate = "中級"
     case advanced = "上級"
@@ -31,8 +31,8 @@ enum RaidDifficulty: String, CaseIterable {
     }
 }
 
-let raidBosses: [RaidBoss] = [
-    RaidBoss(
+let guerrillaBosses: [GuerrillaBoss] = [
+    GuerrillaBoss(
         name: "ドラゴンキング",
         imageName: "ボス15",
         bossHP: 5000,
@@ -41,7 +41,7 @@ let raidBosses: [RaidBoss] = [
         rewardMoney: 100,
         difficulty: .beginner
     ),
-    RaidBoss(
+    GuerrillaBoss(
         name: "暗黒大魔神",
         imageName: "ボス16",
         bossHP: 10000,
@@ -50,7 +50,7 @@ let raidBosses: [RaidBoss] = [
         rewardMoney: 200,
         difficulty: .intermediate
     ),
-    RaidBoss(
+    GuerrillaBoss(
         name: "神竜ヴァルハラ",
         imageName: "ボス35",
         bossHP: 20000,

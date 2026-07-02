@@ -1,5 +1,5 @@
 //
-//  RaidManager.swift
+//  GuerrillaManager.swift
 //  it
 //
 //  Created on 2026/03/12.
@@ -9,7 +9,7 @@ import SwiftUI
 import Firebase
 import FirebaseAuth
 
-struct RaidPlayer: Identifiable {
+struct GuerrillaPlayer: Identifiable {
     let id: String
     var userName: String
     var level: Int
@@ -19,7 +19,7 @@ struct RaidPlayer: Identifiable {
     var totalCount: Int
 }
 
-class RaidManager: ObservableObject {
+class GuerrillaManager: ObservableObject {
     @Published var bossHP: Int = 0
     @Published var bossMaxHP: Int = 0
     @Published var bossAttack: Int = 0
@@ -29,13 +29,13 @@ class RaidManager: ObservableObject {
     @Published var rewardExperience: Int = 0
     @Published var rewardMoney: Int = 0
     @Published var status: String = "none"  // none, active, completed
-    @Published var players: [RaidPlayer] = []
+    @Published var players: [GuerrillaPlayer] = []
     @Published var quizzes: [QuizQuestion] = []
     @Published var expiresAt: Double = 0
     @Published var isParticipating: Bool = false
     @Published var errorMessage: String = ""
 
-    private var raidRef: DatabaseReference {
+    private var guerrillaRef: DatabaseReference {
         Database.database().reference().child("activeRaid")
     }
     private var observerHandle: DatabaseHandle?
@@ -55,7 +55,7 @@ class RaidManager: ObservableObject {
     }
 
     /// 自分のプレイヤーデータ
-    var myPlayer: RaidPlayer? {
+    var myPlayer: GuerrillaPlayer? {
         players.first { $0.id == currentUserId }
     }
 
@@ -66,12 +66,12 @@ class RaidManager: ObservableObject {
         return (sorted.firstIndex { $0.id == me.id } ?? -1) + 1
     }
 
-    // MARK: - アクティブレイドを監視
+    // MARK: - アクティブゲリラを監視
 
-    func observeActiveRaid() {
+    func observeActiveGuerrilla() {
         stopObserving()
 
-        observerHandle = raidRef.observe(.value) { snapshot in
+        observerHandle = guerrillaRef.observe(.value) { snapshot in
             guard let data = snapshot.value as? [String: Any] else {
                 DispatchQueue.main.async {
                     self.status = "none"
@@ -97,7 +97,7 @@ class RaidManager: ObservableObject {
                 // プレイヤー一覧
                 if let playersData = data["players"] as? [String: [String: Any]] {
                     self.players = playersData.map { (key, value) in
-                        RaidPlayer(
+                        GuerrillaPlayer(
                             id: key,
                             userName: value["userName"] as? String ?? "",
                             level: value["level"] as? Int ?? 1,
@@ -132,15 +132,15 @@ class RaidManager: ObservableObject {
 
                 // ボス撃破判定
                 if self.bossHP <= 0 && self.status == "active" {
-                    self.raidRef.child("status").setValue("completed")
+                    self.guerrillaRef.child("status").setValue("completed")
                 }
             }
         }
     }
 
-    // MARK: - レイドに参加
+    // MARK: - ゲリラに参加
 
-    func joinRaid(userName: String, level: Int, avatarName: String, completion: @escaping (Bool) -> Void) {
+    func joinGuerrilla(userName: String, level: Int, avatarName: String, completion: @escaping (Bool) -> Void) {
         guard let userId = currentUserId else {
             errorMessage = "ログインが必要です"
             completion(false)
@@ -148,7 +148,7 @@ class RaidManager: ObservableObject {
         }
 
         guard status == "active" else {
-            errorMessage = "現在レイドは開催されていません"
+            errorMessage = "現在ゲリラは開催されていません"
             completion(false)
             return
         }
@@ -162,7 +162,7 @@ class RaidManager: ObservableObject {
             "totalCount": 0
         ]
 
-        raidRef.child("players").child(userId).setValue(playerData) { error, _ in
+        guerrillaRef.child("players").child(userId).setValue(playerData) { error, _ in
             if let error = error {
                 self.errorMessage = "参加に失敗しました: \(error.localizedDescription)"
                 completion(false)
@@ -182,14 +182,14 @@ class RaidManager: ObservableObject {
         }
 
         // ボスHPを原子的に減算
-        raidRef.child("bossHP").runTransactionBlock { currentData in
+        guerrillaRef.child("bossHP").runTransactionBlock { currentData in
             var hp = currentData.value as? Int ?? 0
             hp = max(0, hp - damage)
             currentData.value = hp
             return TransactionResult.success(withValue: currentData)
         } andCompletionBlock: { error, committed, _ in
             if committed {
-                let playerRef = self.raidRef.child("players").child(userId)
+                let playerRef = self.guerrillaRef.child("players").child(userId)
                 playerRef.child("totalDamage").runTransactionBlock { currentData in
                     let current = currentData.value as? Int ?? 0
                     currentData.value = current + damage
@@ -209,36 +209,35 @@ class RaidManager: ObservableObject {
 
     func incrementTotalCount() {
         guard let userId = currentUserId else { return }
-        raidRef.child("players").child(userId).child("totalCount").runTransactionBlock { currentData in
+        guerrillaRef.child("players").child(userId).child("totalCount").runTransactionBlock { currentData in
             let current = currentData.value as? Int ?? 0
             currentData.value = current + 1
             return TransactionResult.success(withValue: currentData)
         }
     }
 
-    // MARK: - レイドを作成（ゲリラ出現）
-    /// アプリ起動時やタイミングで呼び出してアクティブレイドを生成
-    func spawnRaidIfNeeded() {
-        raidRef.observeSingleEvent(of: .value) { snapshot in
-            // 既にアクティブなレイドがある場合はスキップ
+    // MARK: - ゲリラを作成（ゲリラ出現）
+    /// アプリ起動時やタイミングで呼び出してアクティブゲリラを生成
+    func spawnGuerrillaIfNeeded() {
+        guerrillaRef.observeSingleEvent(of: .value) { snapshot in
+            // 既にアクティブなゲリラがある場合はスキップ
             if let data = snapshot.value as? [String: Any],
                let status = data["status"] as? String,
                status == "active" {
                 return
             }
 
-            // 新しいレイドを生成
-            self.spawnNewRaid()
+            // 新しいゲリラを生成
+            self.spawnNewGuerrilla()
         }
     }
 
-    private func spawnNewRaid() {
+    private func spawnNewGuerrilla() {
         // ランダムにボスを選択
-        let boss = raidBosses.randomElement()!
+        let boss = guerrillaBosses.randomElement()!
 
         // クイズを用意
-        let quizSource = QuizITBasicList(isPresenting: .constant(false))
-        let shuffled = quizSource.quizBeginnerList.shuffled()
+        let shuffled = guerrillaQuizPool().shuffled()
         let selectedQuizzes = Array(shuffled.prefix(30))
 
         let quizzesData: [[String: Any]] = selectedQuizzes.map { quiz in
@@ -253,7 +252,7 @@ class RaidManager: ObservableObject {
         // 制限時間なし
         let expiresAt = Date().timeIntervalSince1970 + (365 * 24 * 60 * 60)
 
-        let raidData: [String: Any] = [
+        let guerrillaData: [String: Any] = [
             "bossName": boss.name,
             "bossImageName": boss.imageName,
             "bossHP": boss.bossHP,
@@ -269,12 +268,22 @@ class RaidManager: ObservableObject {
             "players": [String: Any]()
         ]
 
-        raidRef.setValue(raidData)
+        guerrillaRef.setValue(guerrillaData)
+    }
+
+    private func guerrillaQuizPool() -> [QuizQuestion] {
+        let standardPools =
+            QuizITBasicList(isPresenting: .constant(false)).quizBeginnerList +
+            QuizITStrategyListView(isPresenting: .constant(false)).quizBeginnerList +
+            QuizITTechnologyListView(isPresenting: .constant(false)).quizBeginnerList +
+            QuizITManagementListView(isPresenting: .constant(false)).quizBeginnerList
+        var seenQuestions = Set<String>()
+        return standardPools.filter { seenQuestions.insert($0.question).inserted }
     }
 
     // MARK: - 報酬計算
 
-    func rewardForPlayer(_ player: RaidPlayer) -> (experience: Int, money: Int) {
+    func rewardForPlayer(_ player: GuerrillaPlayer) -> (experience: Int, money: Int) {
         let totalDamage = players.reduce(0) { $0 + $1.totalDamage }
         guard totalDamage > 0 else { return (5, 5) }
 
@@ -294,7 +303,7 @@ class RaidManager: ObservableObject {
 
     func stopObserving() {
         if let handle = observerHandle {
-            raidRef.removeObserver(withHandle: handle)
+            guerrillaRef.removeObserver(withHandle: handle)
         }
         observerHandle = nil
     }

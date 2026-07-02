@@ -25,6 +25,10 @@ struct StoryMonsterModalView: View {
     @State private var opacity: Double = 0
     @State private var monsterScale: CGFloat = 0.8
 
+    private var rewardPreview: [InventoryReward] {
+        DungeonRewardPlanner.battleRewards(for: monsterName)
+    }
+
     let monsters: [Int: Monster] = [
         1: Monster(name: "モンスター1", playerExperience: 30, playerMoney: 30, monsterHP: 160, monsterUnderHP: 160, monsterAttack: 30),
         2: Monster(name: "モンスター2", playerExperience: 20, playerMoney: 20, monsterHP: 100, monsterUnderHP: 100, monsterAttack: 10),
@@ -144,6 +148,54 @@ struct StoryMonsterModalView: View {
                             .fill(Color.white.opacity(0.15))
                             .overlay(Capsule().stroke(Color.white.opacity(0.2), lineWidth: 1))
                     )
+                }
+
+                if !viewModel.activeBoosts.isEmpty {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("アクティブ効果")
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(.white.opacity(0.62))
+
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 8) {
+                                ForEach(viewModel.activeBoosts) { boost in
+                                    DungeonBoostChipView(boost: boost)
+                                }
+                            }
+                        }
+                    }
+                    .padding(.horizontal, 24)
+                }
+
+                if !rewardPreview.isEmpty {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("勝利報酬")
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(.white.opacity(0.62))
+
+                        VStack(spacing: 8) {
+                            ForEach(Array(rewardPreview.enumerated()), id: \.offset) { entry in
+                                let reward = entry.element
+                                HStack(spacing: 10) {
+                                    InventoryItemArtworkView(type: reward.type, width: 34, height: 34, cornerRadius: 10)
+                                    Text("\(reward.type.displayName) x\(reward.amount)")
+                                        .font(.system(size: 14, weight: .semibold))
+                                        .foregroundColor(.white)
+                                    Spacer()
+                                }
+                            }
+                        }
+                        .padding(12)
+                        .background(
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(Color.white.opacity(0.08))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 16)
+                                        .stroke(Color.white.opacity(0.12), lineWidth: 1)
+                                )
+                        )
+                    }
+                    .padding(.horizontal, 24)
                 }
                 
                 Spacer().frame(height: 10)

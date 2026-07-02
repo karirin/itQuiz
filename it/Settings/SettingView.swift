@@ -53,6 +53,12 @@ struct SettingView: View {
                         VStack(spacing: 0) {
                             soundToggleRow
                             Divider().padding(.leading, 56)
+
+                            NavigationLink(destination: InventoryView()) {
+                                settingRow(icon: "shippingbox.fill", iconColor: .teal, title: "持ち物")
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                            Divider().padding(.leading, 56)
                             
                             NavigationLink(destination: TermsOfServiceView()) {
                                 settingRow(icon: "doc.text", iconColor: .blue, title: "利用規約")
@@ -295,6 +301,494 @@ struct WebView: UIViewRepresentable {
         init(_ parent: WebView) {
             self.parent = parent
         }
+    }
+}
+
+struct InventoryView: View {
+    private enum GachaDestination: String, Identifiable {
+        case normal
+        case rare
+        case meka
+        case god
+
+        var id: String { rawValue }
+    }
+
+    var showsNavigationTitle: Bool = true
+    var showsOwnBackground: Bool = true
+    @ObservedObject private var authManager = AuthManager.shared
+    @ObservedObject private var storyViewModel = PositionViewModel.shared
+    @State private var showAlert = false
+    @State private var alertMessage = ""
+    @State private var appearAnimation = false
+    @State private var selectedCategory = 0
+    @State private var presentedGachaDestination: GachaDestination?
+
+    private let ticketTypes: [InventoryItemType] = [
+        .normalGachaTicket,
+        .rareGachaTicket,
+        .mekaGachaTicket,
+        .godGachaTicket
+    ]
+
+    private let supportItemTypes: [InventoryItemType] = [
+        .staminaPotion,
+        .boostTicket
+    ]
+
+    private var totalItemCount: Int {
+        (ticketTypes + supportItemTypes).reduce(0) { $0 + authManager.inventoryCount(for: $1) }
+    }
+
+    private var currentItems: [InventoryItemType] {
+        selectedCategory == 0 ? ticketTypes : supportItemTypes
+    }
+
+    var body: some View {
+        ScrollView(showsIndicators: false) {
+            VStack(spacing: 0) {
+                heroHeader
+                    .padding(.bottom, 20)
+
+                categoryPicker
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 16)
+
+                LazyVStack(spacing: 14) {
+                    ForEach(Array(currentItems.enumerated()), id: \.element.rawValue) { index, type in
+                        inventoryItemRow(for: type)
+                            .opacity(appearAnimation ? 1 : 0)
+                            .offset(y: appearAnimation ? 0 : 20)
+                            .animation(
+                                .spring(response: 0.5, dampingFraction: 0.8)
+                                    .delay(Double(index) * 0.08),
+                                value: appearAnimation
+                            )
+                    }
+                }
+                .padding(.horizontal, 16)
+                .padding(.bottom, 24)
+            }
+        }
+        .background(
+            Group {
+                if showsOwnBackground {
+                    Color(.systemGroupedBackground).ignoresSafeArea()
+                } else {
+                    Color.clear
+                }
+            }
+        )
+        .navigationTitle(showsNavigationTitle ? "持ち物" : "")
+        .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            authManager.fetchInventory()
+            authManager.fetchUserRewardFlag()
+            authManager.syncRewardBoostState()
+            withAnimation { appearAnimation = true }
+        }
+        .onChange(of: selectedCategory) { _ in
+            appearAnimation = false
+            withAnimation { appearAnimation = true }
+        }
+        .alert("持ち物", isPresented: $showAlert) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(alertMessage)
+        }
+        .fullScreenCover(item: $presentedGachaDestination) { destination in
+            inventoryGachaDestinationView(for: destination)
+        }
+    }
+
+    // MARK: - Hero Header
+    private var heroHeader: some View {
+        VStack(spacing: 0) {
+            ZStack {
+                LinearGradient(
+                    colors: [
+                        Color(red: 0.22, green: 0.24, blue: 0.42),
+                        Color(red: 0.35, green: 0.28, blue: 0.58)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+
+                // Decorative circles
+                Circle()
+                    .fill(Color.white.opacity(0.05))
+                    .frame(width: 200, height: 200)
+                    .offset(x: 120, y: -40)
+                Circle()
+                    .fill(Color.white.opacity(0.04))
+                    .frame(width: 140, height: 140)
+                    .offset(x: -100, y: 30)
+
+                VStack(spacing: 16) {
+                    HStack(spacing: 20) {
+                        ForEach(ticketTypes.prefix(3), id: \.rawValue) { type in
+                            miniItemBubble(type: type)
+                        }
+                    }
+
+                    VStack(spacing: 6) {
+                        Text("合計 \(totalItemCount) アイテム")
+                            .font(.system(size: 26, weight: .bold))
+                            .foregroundColor(.white)
+                        Text("チケットとサポートアイテムを管理")
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundColor(.white.opacity(0.7))
+                    }
+
+                    quickSummaryRow
+                }
+                .padding(.vertical, 24)
+                .padding(.horizontal, 16)
+            }
+            .frame(maxWidth: .infinity)
+            .clipShape(
+                RoundedShape(corners: [.bottomLeft, .bottomRight], radius: 28)
+            )
+        }
+    }
+
+    private func miniItemBubble(type: InventoryItemType) -> some View {
+        ZStack {
+            Circle()
+                .fill(type.accentColor.opacity(0.25))
+                .frame(width: 52, height: 52)
+            InventoryItemArtworkView(type: type, width: 36, height: 36, cornerRadius: 8)
+        }
+    }
+
+    private var quickSummaryRow: some View {
+        HStack(spacing: 0) {
+            ForEach(Array((ticketTypes + supportItemTypes).enumerated()), id: \.element.rawValue) { index, type in
+                if index > 0 {
+                    Divider()
+                        .frame(height: 28)
+                        .background(Color.white.opacity(0.15))
+                }
+                VStack(spacing: 3) {
+                    Text("\(authManager.inventoryCount(for: type))")
+                        .font(.system(size: 18, weight: .bold, design: .rounded))
+                        .foregroundColor(.white)
+                    Text(type.shortName)
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundColor(.white.opacity(0.6))
+                }
+                .frame(maxWidth: .infinity)
+            }
+        }
+        .padding(.vertical, 14)
+        .background(Color.white.opacity(0.1))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+
+    // MARK: - Category Picker
+    private var categoryPicker: some View {
+        HStack(spacing: 0) {
+            categoryTab(title: "ガチャチケット", icon: "ticket.fill", index: 0)
+            categoryTab(title: "サポート", icon: "cross.case.fill", index: 1)
+        }
+        .padding(4)
+        .background(Color(.systemGray6))
+        .clipShape(RoundedRectangle(cornerRadius: 14))
+    }
+
+    private func categoryTab(title: String, icon: String, index: Int) -> some View {
+        Button {
+            withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
+                selectedCategory = index
+            }
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: icon)
+                    .font(.system(size: 12, weight: .bold))
+                Text(title)
+                    .font(.system(size: 14, weight: .bold))
+            }
+            .foregroundColor(selectedCategory == index ? .white : .secondary)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 11)
+            .background(
+                Group {
+                    if selectedCategory == index {
+                        RoundedRectangle(cornerRadius: 11)
+                            .fill(Color(red: 0.30, green: 0.30, blue: 0.52))
+                    }
+                }
+            )
+        }
+        .buttonStyle(.plain)
+    }
+
+    // MARK: - Item Row
+    private func inventoryItemRow(for type: InventoryItemType) -> some View {
+        VStack(spacing: 0) {
+            // Main content
+            HStack(spacing: 14) {
+                // Item artwork with count badge
+                ZStack(alignment: .topTrailing) {
+                    InventoryItemArtworkView(type: type, width: 60, height: 60, cornerRadius: 16)
+
+                    Text("\(authManager.inventoryCount(for: type))")
+                        .font(.system(size: 12, weight: .bold, design: .rounded))
+                        .foregroundColor(.white)
+                        .frame(minWidth: 22, minHeight: 22)
+                        .background(
+                            Circle()
+                                .fill(type.accentColor)
+                                .shadow(color: type.accentColor.opacity(0.4), radius: 4, y: 2)
+                        )
+                        .offset(x: 6, y: -6)
+                }
+
+                VStack(alignment: .leading, spacing: 5) {
+                    Text(type.displayName)
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundColor(.primary)
+                    Text(type.usageDescription)
+                        .font(.system(size: 12))
+                        .foregroundColor(.secondary)
+                        .lineLimit(2)
+                }
+
+                Spacer()
+            }
+            .padding(.horizontal, 16)
+            .padding(.top, 16)
+            .padding(.bottom, 12)
+
+            // Status indicators
+            if type == .staminaPotion {
+                staminaStatusBar
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 12)
+            }
+
+            if type == .boostTicket {
+                boostStatusBar
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 12)
+            }
+
+            // Divider
+            Rectangle()
+                .fill(Color(.separator).opacity(0.3))
+                .frame(height: 0.5)
+                .padding(.horizontal, 16)
+
+            // Action area
+            actionRow(for: type)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+        }
+        .background(Color(.systemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .shadow(color: Color.black.opacity(0.06), radius: 10, x: 0, y: 4)
+    }
+
+    // MARK: - Status Bars
+    private var staminaStatusBar: some View {
+        VStack(spacing: 6) {
+            HStack {
+                Image(systemName: "heart.fill")
+                    .font(.system(size: 11))
+                    .foregroundColor(Color(red: 0.24, green: 0.74, blue: 0.48))
+                Text("スタミナ")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundColor(.secondary)
+                Spacer()
+                Text("\(storyViewModel.stamina)")
+                    .font(.system(size: 14, weight: .bold, design: .rounded))
+                    .foregroundColor(.primary)
+                Text("/ 100")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(.secondary)
+            }
+
+            GeometryReader { geo in
+                ZStack(alignment: .leading) {
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(Color(.systemGray5))
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(
+                            LinearGradient(
+                                colors: [
+                                    Color(red: 0.24, green: 0.74, blue: 0.48),
+                                    Color(red: 0.30, green: 0.85, blue: 0.55)
+                                ],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .frame(width: geo.size.width * CGFloat(min(storyViewModel.stamina, 100)) / 100.0)
+                }
+            }
+            .frame(height: 6)
+        }
+        .padding(12)
+        .background(Color(red: 0.24, green: 0.74, blue: 0.48).opacity(0.06))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+
+    private var boostStatusBar: some View {
+        HStack(spacing: 10) {
+            Image(systemName: authManager.rewardFlag >= 2 ? "bolt.fill" : "bolt.slash.fill")
+                .font(.system(size: 13, weight: .bold))
+                .foregroundColor(authManager.rewardFlag >= 2 ? Color(red: 1.0, green: 0.45, blue: 0.24) : .secondary)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("ブースト状態")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundColor(.secondary)
+                Text(authManager.rewardFlag >= 2 ? "経験値・コイン 2倍 発動中" : "未使用")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(authManager.rewardFlag >= 2 ? Color(red: 1.0, green: 0.45, blue: 0.24) : .secondary)
+            }
+
+            Spacer()
+
+            if authManager.rewardFlag >= 2 {
+                Text("ACTIVE")
+                    .font(.system(size: 10, weight: .heavy))
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
+                    .background(
+                        Capsule()
+                            .fill(Color(red: 1.0, green: 0.45, blue: 0.24))
+                    )
+            }
+        }
+        .padding(12)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(authManager.rewardFlag >= 2
+                      ? Color(red: 1.0, green: 0.45, blue: 0.24).opacity(0.08)
+                      : Color(.systemGray6))
+        )
+    }
+
+    // MARK: - Action Row
+    @ViewBuilder
+    private func actionRow(for type: InventoryItemType) -> some View {
+        switch type {
+        case .normalGachaTicket:
+            gachaNavigationButton(title: "レギュラーガチャへ", color: type.accentColor) {
+                presentedGachaDestination = .normal
+            }
+        case .rareGachaTicket:
+            gachaNavigationButton(title: "幸福ガチャへ", color: type.accentColor) {
+                presentedGachaDestination = .rare
+            }
+        case .mekaGachaTicket:
+            gachaNavigationButton(title: "メカガチャへ", color: type.accentColor) {
+                presentedGachaDestination = .meka
+            }
+        case .godGachaTicket:
+            gachaNavigationButton(title: "神ガチャへ", color: type.accentColor) {
+                presentedGachaDestination = .god
+            }
+        case .staminaPotion:
+            useItemButton(
+                title: "回復薬を使う",
+                icon: "heart.fill",
+                color: type.accentColor,
+                isDisabled: authManager.inventoryCount(for: type) == 0,
+                action: useStaminaPotion
+            )
+        case .boostTicket:
+            useItemButton(
+                title: authManager.rewardFlag >= 2 ? "ブースト発動中" : "ブースト薬を使う",
+                icon: "bolt.fill",
+                color: type.accentColor,
+                isDisabled: authManager.inventoryCount(for: type) == 0 || authManager.rewardFlag >= 2,
+                action: useBoostTicket
+            )
+        }
+    }
+
+    private func gachaNavigationButton(title: String, color: Color, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 8) {
+                Image(systemName: "arrow.right.circle.fill")
+                    .font(.system(size: 15, weight: .bold))
+                Text(title)
+                    .font(.system(size: 15, weight: .bold))
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 12, weight: .bold))
+            }
+            .foregroundColor(color)
+        }
+        .buttonStyle(.plain)
+    }
+
+    @ViewBuilder
+    private func inventoryGachaDestinationView(for destination: GachaDestination) -> some View {
+        switch destination {
+        case .normal:
+            GachaView().navigationBarBackButtonHidden(true)
+        case .rare:
+            RareGachaView().navigationBarBackButtonHidden(true)
+        case .meka:
+            MekaGachaView().navigationBarBackButtonHidden(true)
+        case .god:
+            GodGachaView().navigationBarBackButtonHidden(true)
+        }
+    }
+
+    private func useItemButton(title: String, icon: String, color: Color, isDisabled: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 8) {
+                Image(systemName: icon)
+                    .font(.system(size: 14, weight: .bold))
+                Text(title)
+                    .font(.system(size: 15, weight: .bold))
+                Spacer()
+                Image(systemName: "sparkles")
+                    .font(.system(size: 12, weight: .bold))
+            }
+            .foregroundColor(isDisabled ? .white.opacity(0.7) : .white)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(isDisabled ? Color.gray.opacity(0.35) : color)
+            )
+        }
+        .disabled(isDisabled)
+    }
+
+    private func useStaminaPotion() {
+        authManager.useStaminaPotion { success in
+            alertMessage = success ? "スタミナを30回復しました。" : "回復薬を使えませんでした。"
+            showAlert = true
+        }
+    }
+
+    private func useBoostTicket() {
+        authManager.useBoostTicket { success in
+            alertMessage = success ? "1時間ブーストを発動しました。" : "ブースト薬を使えませんでした。"
+            showAlert = true
+        }
+    }
+}
+
+// MARK: - RoundedShape helper
+private struct RoundedShape: Shape {
+    var corners: UIRectCorner
+    var radius: CGFloat
+
+    func path(in rect: CGRect) -> Path {
+        let path = UIBezierPath(
+            roundedRect: rect,
+            byRoundingCorners: corners,
+            cornerRadii: CGSize(width: radius, height: radius)
+        )
+        return Path(path.cgPath)
     }
 }
 

@@ -97,6 +97,23 @@ struct StoryUserModalView: View {
                     }
                 }
 
+                if !viewModel.activeBoosts.isEmpty {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("アクティブ効果")
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(.white.opacity(0.62))
+
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 8) {
+                                ForEach(viewModel.activeBoosts) { boost in
+                                    DungeonBoostChipView(boost: boost)
+                                }
+                            }
+                        }
+                    }
+                    .padding(.horizontal, 24)
+                }
+
                 // バトルボタン（既存処理維持）
                 Button(action: startBattle) {
                     HStack(spacing: 12) {

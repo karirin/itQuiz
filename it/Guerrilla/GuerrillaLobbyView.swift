@@ -1,5 +1,5 @@
 //
-//  RaidLobbyView.swift
+//  GuerrillaLobbyView.swift
 //  it
 //
 //  Created on 2026/03/12.
@@ -7,17 +7,17 @@
 
 import SwiftUI
 
-struct RaidLobbyView: View {
+struct GuerrillaLobbyView: View {
     @ObservedObject var authManager: AuthManager
     @ObservedObject var audioManager: AudioManager
-    @StateObject private var raidManager = RaidManager()
+    @StateObject private var guerrillaManager = GuerrillaManager()
     @Binding var isPresenting: Bool
 
     @State private var navigateToBattle = false
     @State private var showError = false
     @State private var remainingTimeText = ""
     @State private var refreshTimer: Timer? = nil
-    @State private var showRaidHelp = false
+    @State private var showGuerrillaHelp = false
 
     var body: some View {
         ZStack {
@@ -34,15 +34,15 @@ struct RaidLobbyView: View {
 
             ScrollView {
                 VStack(spacing: 20) {
-                    if raidManager.status == "active" {
-                        // レイド開催中
-                        activeRaidView
-                    } else if raidManager.status == "completed" {
-                        // レイド終了
-                        completedRaidView
+                    if guerrillaManager.status == "active" {
+                        // ゲリラ開催中
+                        activeGuerrillaView
+                    } else if guerrillaManager.status == "completed" {
+                        // ゲリラ終了
+                        completedGuerrillaView
                     } else {
-                        // レイドなし
-                        noRaidView
+                        // ゲリラなし
+                        noGuerrillaView
                     }
                 }
                 .padding(.bottom, 40)
@@ -50,8 +50,8 @@ struct RaidLobbyView: View {
 
             // バトル画面への遷移
             NavigationLink("",
-                destination: RaidBattleView(
-                    raidManager: raidManager,
+                destination: GuerrillaBattleView(
+                    guerrillaManager: guerrillaManager,
                     authManager: authManager,
                     audioManager: audioManager,
                     isPresenting: $isPresenting
@@ -60,8 +60,8 @@ struct RaidLobbyView: View {
             )
 
             // チュートリアル / ヘルプモーダル
-            if showRaidHelp {
-                RaidHelpModalView(isPresented: $showRaidHelp)
+            if showGuerrillaHelp {
+                GuerrillaHelpModalView(isPresented: $showGuerrillaHelp)
             }
         }
         .navigationBarBackButtonHidden(true)
@@ -75,7 +75,7 @@ struct RaidLobbyView: View {
                     .foregroundColor(.white)
             }
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: { showRaidHelp = true }) {
+                Button(action: { showGuerrillaHelp = true }) {
                     Image(systemName: "questionmark.circle")
                         .font(.system(size: 18))
                         .foregroundColor(.white)
@@ -83,26 +83,26 @@ struct RaidLobbyView: View {
             }
         }
         .onAppear {
-            raidManager.observeActiveRaid()
-            raidManager.spawnRaidIfNeeded()
+            guerrillaManager.observeActiveGuerrilla()
+            guerrillaManager.spawnGuerrillaIfNeeded()
             authManager.fetchUsedAvatars { _ in }
-            if !UserDefaults.standard.bool(forKey: "hasSeenRaidTutorial") {
+            if !UserDefaults.standard.bool(forKey: "hasSeenGuerrillaTutorial") {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    showRaidHelp = true
+                    showGuerrillaHelp = true
                 }
-                UserDefaults.standard.set(true, forKey: "hasSeenRaidTutorial")
+                UserDefaults.standard.set(true, forKey: "hasSeenGuerrillaTutorial")
             }
         }
         .alert("エラー", isPresented: $showError) {
             Button("OK") {}
         } message: {
-            Text(raidManager.errorMessage)
+            Text(guerrillaManager.errorMessage)
         }
     }
 
-    // MARK: - レイド開催中
+    // MARK: - ゲリラ開催中
 
-    private var activeRaidView: some View {
+    private var activeGuerrillaView: some View {
         VStack(spacing: 20) {
             // ゲリラ出現バナー
             EmptyView()
@@ -113,7 +113,7 @@ struct RaidLobbyView: View {
                 // 難易度
                 HStack {
                     Spacer()
-                    Text(raidManager.difficulty)
+                    Text(guerrillaManager.difficulty)
                         .font(.caption)
                         .fontWeight(.bold)
                         .foregroundColor(.white)
@@ -138,7 +138,7 @@ struct RaidLobbyView: View {
                         )
                         .frame(width: 200, height: 200)
 
-                    Image(raidManager.bossImageName)
+                    Image(guerrillaManager.bossImageName)
                         .resizable()
                         .scaledToFit()
                         .frame(height: 140)
@@ -146,18 +146,18 @@ struct RaidLobbyView: View {
                 }
 
                 // ボス名
-                Text(raidManager.bossName)
+                Text(guerrillaManager.bossName)
                     .font(.system(size: 24, weight: .bold, design: .rounded))
                     .foregroundColor(.white)
 
                 // HPバー
                 VStack(spacing: 4) {
-                    ProgressView(value: max(0, Double(raidManager.bossHP)), total: Double(raidManager.bossMaxHP))
+                    ProgressView(value: max(0, Double(guerrillaManager.bossHP)), total: Double(guerrillaManager.bossMaxHP))
                         .progressViewStyle(LinearProgressViewStyle(tint: .red))
                         .scaleEffect(x: 1, y: 2.5, anchor: .center)
                         .padding(.horizontal, 30)
 
-                    Text("HP  \(raidManager.bossHP) / \(raidManager.bossMaxHP)")
+                    Text("HP  \(guerrillaManager.bossHP) / \(guerrillaManager.bossMaxHP)")
                         .font(.system(size: 13, weight: .bold, design: .monospaced))
                         .foregroundColor(.white.opacity(0.8))
                 }
@@ -166,7 +166,7 @@ struct RaidLobbyView: View {
                 HStack {
                     Image(systemName: "person.3.fill")
                         .foregroundColor(.white.opacity(0.7))
-                    Text("\(raidManager.playerCount) 人が参戦中")
+                    Text("\(guerrillaManager.playerCount) 人が参戦中")
                         .font(.subheadline)
                         .foregroundColor(.white.opacity(0.7))
                 }
@@ -185,7 +185,7 @@ struct RaidLobbyView: View {
             .padding(.horizontal)
 
             // 参加 or バトルボタン
-            if raidManager.isParticipating {
+            if guerrillaManager.isParticipating {
                 Button(action: {
                     generateHapticFeedback()
                     audioManager.playSound()
@@ -217,7 +217,7 @@ struct RaidLobbyView: View {
                 Button(action: {
                     generateHapticFeedback()
                     audioManager.playSound()
-                    joinRaid()
+                    joinGuerrilla()
                 }) {
                     HStack(spacing: 8) {
                         Image(systemName: "figure.run")
@@ -244,7 +244,7 @@ struct RaidLobbyView: View {
             }
 
             // ダメージランキング
-            if !raidManager.players.isEmpty {
+            if !guerrillaManager.players.isEmpty {
                 damageRankingSection
             }
 
@@ -264,13 +264,13 @@ struct RaidLobbyView: View {
                     .font(.headline)
                     .foregroundColor(.white)
                 Spacer()
-                Text("TOP \(min(raidManager.playerCount, 10))")
+                Text("TOP \(min(guerrillaManager.playerCount, 10))")
                     .font(.caption)
                     .foregroundColor(.white.opacity(0.6))
             }
 
-            ForEach(Array(raidManager.players.prefix(10).enumerated()), id: \.element.id) { index, player in
-                let isMe = player.id == raidManager.currentUserId
+            ForEach(Array(guerrillaManager.players.prefix(10).enumerated()), id: \.element.id) { index, player in
+                let isMe = player.id == guerrillaManager.currentUserId
                 let displayAvatarName = player.avatarName.isEmpty && isMe
                     ? (authManager.usedAvatars.first?.name ?? "")
                     : player.avatarName
@@ -310,7 +310,7 @@ struct RaidLobbyView: View {
                                 .font(.system(size: 14, weight: .semibold))
                                 .foregroundColor(.white)
                                 .lineLimit(1)
-                            if player.id == raidManager.currentUserId {
+                            if player.id == guerrillaManager.currentUserId {
                                 Text("自分")
                                     .font(.system(size: 10, weight: .bold))
                                     .foregroundColor(.yellow)
@@ -338,7 +338,7 @@ struct RaidLobbyView: View {
                 .padding(.horizontal, 10)
                 .background(
                     RoundedRectangle(cornerRadius: 8)
-                        .fill(player.id == raidManager.currentUserId
+                        .fill(player.id == guerrillaManager.currentUserId
                               ? Color.yellow.opacity(0.08)
                               : Color.white.opacity(0.03))
                 )
@@ -355,7 +355,9 @@ struct RaidLobbyView: View {
     // MARK: - 報酬情報
 
     private var rewardInfoSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        let baseItemRewards = GuerrillaRewardPlanner.baseRewards(forDifficulty: guerrillaManager.difficulty)
+
+        return VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Image(systemName: "gift.fill")
                     .foregroundColor(.purple)
@@ -368,6 +370,36 @@ struct RaidLobbyView: View {
                 rewardRow(rank: "1位 (MVP)", expMultiplier: "1.5x", color: .yellow)
                 rewardRow(rank: "2位〜3位", expMultiplier: "1.0x", color: .white)
                 rewardRow(rank: "4位以降", expMultiplier: "貢献度に応じて", color: .white.opacity(0.6))
+            }
+
+            if !baseItemRewards.isEmpty {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("アイテム報酬")
+                        .font(.subheadline)
+                        .foregroundColor(.white.opacity(0.8))
+
+                    HStack(spacing: 8) {
+                        ForEach(Array(baseItemRewards.enumerated()), id: \.offset) { entry in
+                            let reward = entry.element
+                            HStack(spacing: 6) {
+                                InventoryItemArtworkView(type: reward.type, width: 26, height: 26, cornerRadius: 8)
+                                Text("\(reward.type.shortName)x\(reward.amount)")
+                                    .font(.system(size: 12, weight: .semibold))
+                                    .foregroundColor(.white)
+                            }
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 6)
+                            .background(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(Color.white.opacity(0.08))
+                            )
+                        }
+                    }
+
+                    Text("※ 上位3名はスタミナ回復薬 x1、MVPはさらにブースト薬 x1")
+                        .font(.caption)
+                        .foregroundColor(.white.opacity(0.45))
+                }
             }
 
             Text("※ 報酬はダメージ貢献度に応じて分配されます")
@@ -388,15 +420,15 @@ struct RaidLobbyView: View {
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundColor(color)
             Spacer()
-            Text("経験値 \(raidManager.rewardExperience) × \(expMultiplier)")
+            Text("経験値 \(guerrillaManager.rewardExperience) × \(expMultiplier)")
                 .font(.system(size: 12, weight: .medium, design: .monospaced))
                 .foregroundColor(.white.opacity(0.7))
         }
     }
 
-    // MARK: - レイド終了
+    // MARK: - ゲリラ終了
 
-    private var completedRaidView: some View {
+    private var completedGuerrillaView: some View {
         VStack(spacing: 20) {
             Spacer().frame(height: 40)
 
@@ -404,16 +436,16 @@ struct RaidLobbyView: View {
                 .font(.system(size: 60))
                 .foregroundColor(.green)
 
-            Text("レイド終了！")
+            Text("ゲリラ終了！")
                 .font(.system(size: 24, weight: .bold, design: .rounded))
                 .foregroundColor(.white)
 
-            Text("次のレイドボスの出現をお待ちください")
+            Text("次のゲリラボスの出現をお待ちください")
                 .font(.subheadline)
                 .foregroundColor(.white.opacity(0.6))
 
             // 結果を表示（参加していた場合）
-            if !raidManager.players.isEmpty {
+            if !guerrillaManager.players.isEmpty {
                 damageRankingSection
             }
 
@@ -421,9 +453,9 @@ struct RaidLobbyView: View {
         }
     }
 
-    // MARK: - レイドなし
+    // MARK: - ゲリラなし
 
-    private var noRaidView: some View {
+    private var noGuerrillaView: some View {
         VStack(spacing: 24) {
             Spacer().frame(height: 60)
 
@@ -437,11 +469,11 @@ struct RaidLobbyView: View {
                     .foregroundColor(.white.opacity(0.3))
             }
 
-            Text("現在レイドボスは出現していません")
+            Text("現在ゲリラボスは出現していません")
                 .font(.headline)
                 .foregroundColor(.white.opacity(0.6))
 
-            Text("レイドボスはゲリラ的に出現します\nしばらくお待ちください")
+            Text("ゲリラボスはゲリラ的に出現します\nしばらくお待ちください")
                 .font(.subheadline)
                 .foregroundColor(.white.opacity(0.4))
                 .multilineTextAlignment(.center)
@@ -456,7 +488,7 @@ struct RaidLobbyView: View {
         Button(action: {
             generateHapticFeedback()
             audioManager.playCancelSound()
-            raidManager.stopObserving()
+            guerrillaManager.stopObserving()
             isPresenting = false
         }) {
             HStack(spacing: 4) {
@@ -470,11 +502,11 @@ struct RaidLobbyView: View {
         .buttonStyle(.plain)
     }
 
-    private func joinRaid() {
+    private func joinGuerrilla() {
         authManager.fetchUserInfo { (name, avatar, _, _, _, _) in
             let userName = name ?? "プレイヤー"
             let avatarName = (avatar?.first?["name"] as? String) ?? ""
-            raidManager.joinRaid(userName: userName, level: authManager.level, avatarName: avatarName) { success in
+            guerrillaManager.joinGuerrilla(userName: userName, level: authManager.level, avatarName: avatarName) { success in
                 if success {
                     navigateToBattle = true
                 } else {
@@ -486,7 +518,7 @@ struct RaidLobbyView: View {
 
     private func startRefreshTimer() {
         refreshTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
-            let seconds = raidManager.remainingTime
+            let seconds = guerrillaManager.remainingTime
             let min = seconds / 60
             let sec = seconds % 60
             remainingTimeText = String(format: "%02d:%02d", min, sec)
@@ -494,7 +526,7 @@ struct RaidLobbyView: View {
     }
 
     private var difficultyColor: Color {
-        switch raidManager.difficulty {
+        switch guerrillaManager.difficulty {
         case "初級": return .green
         case "中級": return .orange
         case "上級": return .red
@@ -514,7 +546,7 @@ struct RaidLobbyView: View {
 
 // MARK: - ゲリラボス ヘルプモーダル
 
-struct RaidHelpModalView: View {
+struct GuerrillaHelpModalView: View {
     @Binding var isPresented: Bool
 
     private let items: [(icon: String, color: Color, title: String, desc: String)] = [

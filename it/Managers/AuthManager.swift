@@ -9,6 +9,252 @@ import SwiftUI
 import Firebase
 import FirebaseAuth
 
+enum InventoryItemType: String, Codable, CaseIterable {
+    case normalGachaTicket
+    case rareGachaTicket
+    case mekaGachaTicket
+    case godGachaTicket
+    case staminaPotion
+    case boostTicket
+
+    var displayName: String {
+        switch self {
+        case .normalGachaTicket:
+            return "レギュラーガチャチケット"
+        case .rareGachaTicket:
+            return "幸福ガチャチケット"
+        case .mekaGachaTicket:
+            return "メカガチャチケット"
+        case .godGachaTicket:
+            return "神ガチャチケット"
+        case .staminaPotion:
+            return "スタミナ回復薬"
+        case .boostTicket:
+            return "ブースト薬"
+        }
+    }
+
+    var shortName: String {
+        switch self {
+        case .normalGachaTicket:
+            return "レギュラー"
+        case .rareGachaTicket:
+            return "幸福"
+        case .mekaGachaTicket:
+            return "メカ"
+        case .godGachaTicket:
+            return "神"
+        case .staminaPotion:
+            return "回復薬"
+        case .boostTicket:
+            return "ブースト薬"
+        }
+    }
+
+    var systemImageName: String {
+        switch self {
+        case .normalGachaTicket:
+            return "ticket.fill"
+        case .rareGachaTicket:
+            return "giftcard.fill"
+        case .mekaGachaTicket:
+            return "cpu.fill"
+        case .godGachaTicket:
+            return "sparkles.rectangle.stack.fill"
+        case .staminaPotion:
+            return "cross.case.fill"
+        case .boostTicket:
+            return "bolt.circle.fill"
+        }
+    }
+
+    var assetImageName: String {
+        switch self {
+        case .normalGachaTicket:
+            return "レギュラーガチャチケット"
+        case .rareGachaTicket:
+            return "幸福ガチャチケット"
+        case .mekaGachaTicket:
+            return "メカガチャチケット"
+        case .godGachaTicket:
+            return "神ガチャチケット"
+        case .staminaPotion:
+            return "スタミナ回復薬"
+        case .boostTicket:
+            return "ブースト薬"
+        }
+    }
+
+    var accentColor: Color {
+        switch self {
+        case .normalGachaTicket:
+            return Color(red: 1.0, green: 0.72, blue: 0.24)
+        case .rareGachaTicket:
+            return Color(red: 1.0, green: 0.42, blue: 0.36)
+        case .mekaGachaTicket:
+            return Color(red: 0.43, green: 0.49, blue: 0.92)
+        case .godGachaTicket:
+            return Color(red: 1.0, green: 0.84, blue: 0.22)
+        case .staminaPotion:
+            return Color(red: 0.24, green: 0.74, blue: 0.48)
+        case .boostTicket:
+            return Color(red: 1.0, green: 0.45, blue: 0.24)
+        }
+    }
+
+    var userFieldKey: String {
+        rawValue
+    }
+
+    var usageDescription: String {
+        switch self {
+        case .normalGachaTicket:
+            return "レギュラーガチャをコインなしで1回引けます。"
+        case .rareGachaTicket:
+            return "幸福ガチャをコインなしで1回引けます。"
+        case .mekaGachaTicket:
+            return "メカガチャをコインなしで1回引けます。"
+        case .godGachaTicket:
+            return "神ガチャをコインなしで1回引けます。"
+        case .staminaPotion:
+            return "スタミナを30回復します。"
+        case .boostTicket:
+            return "1時間、獲得経験値とコインが2倍になります。"
+        }
+    }
+}
+
+struct InventoryReward: Codable, Hashable {
+    let type: InventoryItemType
+    let amount: Int
+
+    var displayText: String {
+        "\(type.displayName) x\(amount)"
+    }
+}
+
+extension InventoryReward {
+    static func merged(_ rewards: [InventoryReward]) -> [InventoryReward] {
+        let totals = rewards.reduce(into: [InventoryItemType: Int]()) { partialResult, reward in
+            partialResult[reward.type, default: 0] += reward.amount
+        }
+
+        return InventoryItemType.allCases.compactMap { type in
+            guard let amount = totals[type], amount > 0 else { return nil }
+            return InventoryReward(type: type, amount: amount)
+        }
+    }
+
+    static func summaryText(for rewards: [InventoryReward], useShortNames: Bool = false) -> String {
+        merged(rewards)
+            .map { reward in
+                let itemName = useShortNames ? reward.type.shortName : reward.type.displayName
+                return "\(itemName) x\(reward.amount)"
+            }
+            .joined(separator: " / ")
+    }
+}
+
+struct InventoryItemArtworkView: View {
+    let type: InventoryItemType
+    let width: CGFloat
+    let height: CGFloat
+    var cornerRadius: CGFloat = 12
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: cornerRadius)
+                .fill(type.accentColor.opacity(0.12))
+
+            Image(type.assetImageName)
+                .resizable()
+                .scaledToFit()
+                .padding(6)
+        }
+        .frame(width: width, height: height)
+        .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
+        .overlay(
+            RoundedRectangle(cornerRadius: cornerRadius)
+                .stroke(type.accentColor.opacity(0.25), lineWidth: 1)
+        )
+    }
+}
+
+struct DungeonRewardPlanner {
+    static func treasureRewards(for treasureID: Int) -> [InventoryReward] {
+        switch treasureID {
+        case 8:
+            return [InventoryReward(type: .normalGachaTicket, amount: 1)]
+        case 13:
+            return [InventoryReward(type: .staminaPotion, amount: 1)]
+        case 16:
+            return [InventoryReward(type: .rareGachaTicket, amount: 1)]
+        case 23:
+            return [InventoryReward(type: .staminaPotion, amount: 2)]
+        case 29:
+            return [InventoryReward(type: .boostTicket, amount: 1)]
+        case 30:
+            return [InventoryReward(type: .mekaGachaTicket, amount: 1)]
+        default:
+            return []
+        }
+    }
+
+    static func battleRewards(for monsterName: String) -> [InventoryReward] {
+        switch monsterName {
+        case "ボス15":
+            return [InventoryReward(type: .normalGachaTicket, amount: 1)]
+        case "ボス16":
+            return [
+                InventoryReward(type: .rareGachaTicket, amount: 1),
+                InventoryReward(type: .staminaPotion, amount: 1)
+            ]
+        case "ボス35":
+            return [
+                InventoryReward(type: .godGachaTicket, amount: 1),
+                InventoryReward(type: .boostTicket, amount: 1)
+            ]
+        default:
+            return []
+        }
+    }
+}
+
+struct GuerrillaRewardPlanner {
+    static func baseRewards(forDifficulty difficulty: String) -> [InventoryReward] {
+        switch GuerrillaDifficulty(rawValue: difficulty) {
+        case .beginner:
+            return [InventoryReward(type: .normalGachaTicket, amount: 1)]
+        case .intermediate:
+            return [InventoryReward(type: .rareGachaTicket, amount: 1)]
+        case .advanced:
+            return [InventoryReward(type: .mekaGachaTicket, amount: 1)]
+        case .none:
+            return []
+        }
+    }
+
+    static func bonusRewards(forRank rank: Int) -> [InventoryReward] {
+        guard rank > 0 else { return [] }
+
+        var rewards: [InventoryReward] = []
+
+        if rank <= 3 {
+            rewards.append(InventoryReward(type: .staminaPotion, amount: 1))
+        }
+        if rank == 1 {
+            rewards.append(InventoryReward(type: .boostTicket, amount: 1))
+        }
+
+        return rewards
+    }
+
+    static func rewards(forDifficulty difficulty: String, rank: Int, isVictory: Bool) -> [InventoryReward] {
+        guard isVictory else { return [] }
+        return InventoryReward.merged(baseRewards(forDifficulty: difficulty) + bonusRewards(forRank: rank))
+    }
+}
+
 struct Avatar: Equatable {
     var name: String
     var attack: Int
@@ -72,6 +318,16 @@ class AuthManager: ObservableObject {
     @Published var loginBonus: Int = 0  // 追加: 現在のボーナス額を保持
     @Published var usedAvatars: [Avatar] = []
     @Published var usersWithoutAvatars: [User] = []
+    @Published var normalGachaTicketCount: Int = 0
+    @Published var rareGachaTicketCount: Int = 0
+    @Published var mekaGachaTicketCount: Int = 0
+    @Published var godGachaTicketCount: Int = 0
+    @Published var staminaPotionCount: Int = 0
+    @Published var boostTicketCount: Int = 0
+
+    private let rewardBoostDuration: TimeInterval = 3600
+    private let rewardBoostDateKey = "rewardAcquiredDate"
+    private var rewardBoostResetWorkItem: DispatchWorkItem?
     
     init() {
         user = Auth.auth().currentUser
@@ -208,7 +464,13 @@ class AuthManager: ObservableObject {
             "userAttack": 20,
             "tutorialNum": 0,
             "userFlag": 0,
-            "loginCount": 0
+            "loginCount": 0,
+            InventoryItemType.normalGachaTicket.userFieldKey: 0,
+            InventoryItemType.rareGachaTicket.userFieldKey: 0,
+            InventoryItemType.mekaGachaTicket.userFieldKey: 0,
+            InventoryItemType.godGachaTicket.userFieldKey: 0,
+            InventoryItemType.staminaPotion.userFieldKey: 0,
+            InventoryItemType.boostTicket.userFieldKey: 0
         ]
 
         // ユーザーデータを保存
@@ -677,7 +939,259 @@ class AuthManager: ObservableObject {
             if let data = snapshot.value as? [String: Any] {
                 self.rewardFlag = data["rewardFlag"] as? Int ?? 1
             }
+            self.syncRewardBoostState()
         }
+    }
+
+    func inventoryCount(for type: InventoryItemType) -> Int {
+        switch type {
+        case .normalGachaTicket:
+            return normalGachaTicketCount
+        case .rareGachaTicket:
+            return rareGachaTicketCount
+        case .mekaGachaTicket:
+            return mekaGachaTicketCount
+        case .godGachaTicket:
+            return godGachaTicketCount
+        case .staminaPotion:
+            return staminaPotionCount
+        case .boostTicket:
+            return boostTicketCount
+        }
+    }
+
+    private func setInventoryCount(_ count: Int, for type: InventoryItemType) {
+        let safeCount = max(0, count)
+        switch type {
+        case .normalGachaTicket:
+            normalGachaTicketCount = safeCount
+        case .rareGachaTicket:
+            rareGachaTicketCount = safeCount
+        case .mekaGachaTicket:
+            mekaGachaTicketCount = safeCount
+        case .godGachaTicket:
+            godGachaTicketCount = safeCount
+        case .staminaPotion:
+            staminaPotionCount = safeCount
+        case .boostTicket:
+            boostTicketCount = safeCount
+        }
+    }
+
+    private func intValue(from value: Any?) -> Int {
+        if let intValue = value as? Int {
+            return intValue
+        }
+        if let numberValue = value as? NSNumber {
+            return numberValue.intValue
+        }
+        if let doubleValue = value as? Double {
+            return Int(doubleValue)
+        }
+        if let stringValue = value as? String, let intValue = Int(stringValue) {
+            return intValue
+        }
+        return 0
+    }
+
+    func fetchInventory(completion: ((Bool) -> Void)? = nil) {
+        guard let userId = currentUserId else {
+            completion?(false)
+            return
+        }
+
+        let userRef = Database.database().reference().child("users").child(userId)
+        userRef.observeSingleEvent(of: .value) { snapshot in
+            let data = snapshot.value as? [String: Any] ?? [:]
+            DispatchQueue.main.async {
+                self.normalGachaTicketCount = self.intValue(from: data[InventoryItemType.normalGachaTicket.userFieldKey])
+                self.rareGachaTicketCount = self.intValue(from: data[InventoryItemType.rareGachaTicket.userFieldKey])
+                self.mekaGachaTicketCount = self.intValue(from: data[InventoryItemType.mekaGachaTicket.userFieldKey])
+                self.godGachaTicketCount = self.intValue(from: data[InventoryItemType.godGachaTicket.userFieldKey])
+                self.staminaPotionCount = self.intValue(from: data[InventoryItemType.staminaPotion.userFieldKey])
+                self.boostTicketCount = self.intValue(from: data[InventoryItemType.boostTicket.userFieldKey])
+            }
+            completion?(true)
+        }
+    }
+
+    func addItem(_ type: InventoryItemType, amount: Int = 1, completion: ((Bool) -> Void)? = nil) {
+        guard amount > 0 else {
+            completion?(false)
+            return
+        }
+        guard let userId = currentUserId else {
+            completion?(false)
+            return
+        }
+
+        let itemRef = Database.database().reference()
+            .child("users")
+            .child(userId)
+            .child(type.userFieldKey)
+
+        itemRef.runTransactionBlock { currentData in
+            let current = self.intValue(from: currentData.value)
+            currentData.value = current + amount
+            return TransactionResult.success(withValue: currentData)
+        } andCompletionBlock: { error, committed, snapshot in
+            guard error == nil, committed else {
+                DispatchQueue.main.async {
+                    completion?(false)
+                }
+                return
+            }
+            DispatchQueue.main.async {
+                self.setInventoryCount(self.intValue(from: snapshot?.value), for: type)
+                completion?(true)
+            }
+        }
+    }
+
+    func addItems(_ rewards: [InventoryReward], completion: ((Bool) -> Void)? = nil) {
+        let validRewards = rewards.filter { $0.amount > 0 }
+        guard !validRewards.isEmpty else {
+            completion?(true)
+            return
+        }
+
+        let group = DispatchGroup()
+        var allSucceeded = true
+
+        for reward in validRewards {
+            group.enter()
+            addItem(reward.type, amount: reward.amount) { success in
+                allSucceeded = allSucceeded && success
+                group.leave()
+            }
+        }
+
+        group.notify(queue: .main) {
+            completion?(allSucceeded)
+        }
+    }
+
+    func consumeItem(_ type: InventoryItemType, amount: Int = 1, completion: @escaping (Bool) -> Void) {
+        guard amount > 0 else {
+            completion(false)
+            return
+        }
+        guard let userId = currentUserId else {
+            completion(false)
+            return
+        }
+
+        let itemRef = Database.database().reference()
+            .child("users")
+            .child(userId)
+            .child(type.userFieldKey)
+
+        itemRef.observeSingleEvent(of: .value) { snapshot in
+            let remoteCount = self.intValue(from: snapshot.value)
+            let localCount = self.inventoryCount(for: type)
+            let currentCount = max(remoteCount, localCount)
+
+            guard currentCount >= amount else {
+                DispatchQueue.main.async {
+                    completion(false)
+                }
+                return
+            }
+
+            let newCount = currentCount - amount
+            itemRef.setValue(newCount) { error, _ in
+                guard error == nil else {
+                    DispatchQueue.main.async {
+                        completion(false)
+                    }
+                    return
+                }
+
+                DispatchQueue.main.async {
+                    self.setInventoryCount(newCount, for: type)
+                    completion(true)
+                }
+            }
+        }
+    }
+
+    func useStaminaPotion(recoveryAmount: Int = 30, completion: @escaping (Bool) -> Void) {
+        consumeItem(.staminaPotion) { success in
+            guard success else {
+                completion(false)
+                return
+            }
+            PositionViewModel.shared.recoverStamina(by: recoveryAmount)
+            completion(true)
+        }
+    }
+
+    func useBoostTicket(completion: @escaping (Bool) -> Void) {
+        consumeItem(.boostTicket) { success in
+            guard success else {
+                completion(false)
+                return
+            }
+            self.activateOneHourBoost(completion: completion)
+        }
+    }
+
+    func activateOneHourBoost(completion: @escaping (Bool) -> Void) {
+        guard let userId = currentUserId else {
+            completion(false)
+            return
+        }
+
+        let activatedAt = Date()
+        UserDefaults.standard.set(activatedAt, forKey: rewardBoostDateKey)
+        updateRewardFlag(userId: userId, userFlag: 2) { success in
+            guard success else {
+                completion(false)
+                return
+            }
+            DispatchQueue.main.async {
+                self.rewardFlag = 2
+            }
+            self.scheduleRewardBoostReset(from: activatedAt)
+            completion(true)
+        }
+    }
+
+    func syncRewardBoostState() {
+        rewardBoostResetWorkItem?.cancel()
+
+        guard let userId = currentUserId else {
+            rewardFlag = 1
+            return
+        }
+
+        guard let activatedAt = UserDefaults.standard.object(forKey: rewardBoostDateKey) as? Date else {
+            return
+        }
+
+        let elapsed = Date().timeIntervalSince(activatedAt)
+        if elapsed >= rewardBoostDuration {
+            UserDefaults.standard.removeObject(forKey: rewardBoostDateKey)
+            updateRewardFlag(userId: userId, userFlag: 1)
+            return
+        }
+
+        rewardFlag = 2
+        scheduleRewardBoostReset(from: activatedAt)
+    }
+
+    private func scheduleRewardBoostReset(from activatedAt: Date) {
+        rewardBoostResetWorkItem?.cancel()
+
+        let remaining = max(0, rewardBoostDuration - Date().timeIntervalSince(activatedAt))
+        let workItem = DispatchWorkItem { [weak self] in
+            guard let self = self, let userId = self.currentUserId else { return }
+            UserDefaults.standard.removeObject(forKey: self.rewardBoostDateKey)
+            self.updateRewardFlag(userId: userId, userFlag: 1)
+        }
+
+        rewardBoostResetWorkItem = workItem
+        DispatchQueue.main.asyncAfter(deadline: .now() + remaining, execute: workItem)
     }
     
     func fetchUserFlag() {
@@ -1117,13 +1631,20 @@ class AuthManager: ObservableObject {
         }
     }
     
-    func updateRewardFlag(userId: String, userFlag: Int) {
+    func updateRewardFlag(userId: String, userFlag: Int, completion: ((Bool) -> Void)? = nil) {
         let userRef = Database.database().reference().child("users").child(userId)
         userRef.updateChildValues(["rewardFlag": userFlag]) { error, _ in
             if let error = error {
                 print("Error updating rewardFlag: \(error)")
+                DispatchQueue.main.async {
+                    completion?(false)
+                }
             } else {
                 print("userFlag successfully updated")
+                DispatchQueue.main.async {
+                    self.rewardFlag = userFlag
+                    completion?(true)
+                }
             }
         }
     }
@@ -1288,13 +1809,14 @@ extension AuthManager {
                 self.fetchLoginCount500 { currentCount in
                     let newCount = days == 1 ? min(currentCount + 1, LoginBonusConfig.maxDay) : 1
                     let bonus = LoginBonusConfig.coinAmount(for: newCount)
+                    let itemRewards = LoginBonusConfig.itemRewards(for: newCount)
 
                     DispatchQueue.main.async {
                         self.loginCount = newCount
                         self.loginBonus = bonus
                     }
 
-                    self.grantLoginBonus(amount: bonus) { success in
+                    self.grantLoginBonus(amount: bonus, itemRewards: itemRewards) { success in
                         guard success else {
                             completion(false)
                             return
@@ -1306,20 +1828,24 @@ extension AuthManager {
                                 return
                             }
 
-                            self.updateLoginCount500(to: newCount, completion: completion)
+                            self.updateLoginCount500(to: newCount) { success in
+                                MissionManager.shared.updateMissionProgressWithValue(type: .login, currentValue: newCount) { _ in }
+                                completion(success)
+                            }
                         }
                     }
                 }
             } else {
                 let newCount = 1
                 let bonus = LoginBonusConfig.coinAmount(for: newCount)
+                let itemRewards = LoginBonusConfig.itemRewards(for: newCount)
 
                 DispatchQueue.main.async {
                     self.loginCount = newCount
                     self.loginBonus = bonus
                 }
 
-                self.grantLoginBonus(amount: bonus) { success in
+                self.grantLoginBonus(amount: bonus, itemRewards: itemRewards) { success in
                     guard success else {
                         completion(false)
                         return
@@ -1503,15 +2029,25 @@ extension AuthManager {
         }
     }
 
-    func grantLoginBonus(amount: Int, completion: @escaping (Bool) -> Void) {
+    func grantLoginBonus(amount: Int, itemRewards: [InventoryReward] = [], completion: @escaping (Bool) -> Void) {
         addLoginMoney(amount: amount) { success in
             guard success else {
                 completion(false)
                 return
             }
 
-            print("ログインボーナスを付与: +\(amount) コイン")
-            self.saveLastLoginDate(completion: completion)
+            self.addItems(itemRewards) { itemSuccess in
+                guard itemSuccess else {
+                    completion(false)
+                    return
+                }
+
+                let bonusSummary = itemRewards.isEmpty
+                    ? "\(amount)コイン"
+                    : "\(amount)コイン, \(itemRewards.map { $0.displayText }.joined(separator: ", "))"
+                print("ログインボーナスを付与: +\(bonusSummary)")
+                self.saveLastLoginDate(completion: completion)
+            }
         }
     }
 

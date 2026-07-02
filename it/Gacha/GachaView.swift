@@ -2,6 +2,7 @@ import Foundation
 import FirebaseDatabaseInternal
 import SwiftUI
 import AVKit
+import UIKit
 
 enum GachaRarity: String, Codable {
     case normal
@@ -215,6 +216,989 @@ class GachaManager {
     }
 }
 
+enum GachaCatalogTier: Int, CaseIterable, Identifiable {
+    case normal
+    case rare
+    case superRare
+    case ultraRare
+    case legendRare
+    case mythicRare
+
+    var id: Int { rawValue }
+
+    var title: String {
+        switch self {
+        case .normal:
+            return "ノーマル"
+        case .rare:
+            return "レア"
+        case .superRare:
+            return "スーパーレア"
+        case .ultraRare:
+            return "ウルトラレア"
+        case .legendRare:
+            return "レジェンド"
+        case .mythicRare:
+            return "神レア"
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .normal:
+            return Color(red: 0.62, green: 0.64, blue: 0.7)
+        case .rare:
+            return Color(red: 0.34, green: 0.58, blue: 0.96)
+        case .superRare:
+            return Color(red: 0.74, green: 0.38, blue: 0.96)
+        case .ultraRare:
+            return Color(red: 1.0, green: 0.66, blue: 0.22)
+        case .legendRare:
+            return Color(red: 1.0, green: 0.85, blue: 0.28)
+        case .mythicRare:
+            return Color(red: 1.0, green: 0.96, blue: 0.7)
+        }
+    }
+
+    var backgroundGradient: LinearGradient {
+        switch self {
+        case .normal:
+            return LinearGradient(
+                colors: [Color(red: 0.22, green: 0.23, blue: 0.28), Color(red: 0.16, green: 0.17, blue: 0.2)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        case .rare:
+            return LinearGradient(
+                colors: [Color(red: 0.12, green: 0.18, blue: 0.34), Color(red: 0.08, green: 0.12, blue: 0.24)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        case .superRare:
+            return LinearGradient(
+                colors: [Color(red: 0.2, green: 0.12, blue: 0.34), Color(red: 0.14, green: 0.08, blue: 0.24)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        case .ultraRare:
+            return LinearGradient(
+                colors: [Color(red: 0.3, green: 0.18, blue: 0.1), Color(red: 0.2, green: 0.11, blue: 0.06)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        case .legendRare:
+            return LinearGradient(
+                colors: [Color(red: 0.28, green: 0.24, blue: 0.1), Color(red: 0.2, green: 0.16, blue: 0.04)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        case .mythicRare:
+            return LinearGradient(
+                colors: [Color(red: 0.32, green: 0.28, blue: 0.16), Color(red: 0.22, green: 0.18, blue: 0.08)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        }
+    }
+}
+
+extension GachaRarity {
+    var catalogTier: GachaCatalogTier {
+        switch self {
+        case .normal:
+            return .normal
+        case .rare, .Rrare, .mekaRare, .godRare:
+            return .rare
+        case .superRare, .RsuperRare, .mekaSuperRare, .godSuperRare:
+            return .superRare
+        case .ultraRare, .RultraRare, .mekaUltraRare, .godUltraRare:
+            return .ultraRare
+        case .legendRare, .mekaLegendRare, .godLegendRare:
+            return .legendRare
+        case .godMythicRare:
+            return .mythicRare
+        }
+    }
+}
+
+extension InventoryItemType {
+    var gachaButtonTrailingColor: Color {
+        switch self {
+        case .normalGachaTicket:
+            return Color(red: 0.16, green: 0.75, blue: 0.72)
+        case .rareGachaTicket:
+            return Color(red: 0.93, green: 0.38, blue: 0.35)
+        case .mekaGachaTicket:
+            return Color(red: 0.32, green: 0.41, blue: 0.92)
+        case .godGachaTicket:
+            return Color(red: 1.0, green: 0.67, blue: 0.24)
+        case .staminaPotion:
+            return Color(red: 0.24, green: 0.74, blue: 0.48)
+        case .boostTicket:
+            return Color(red: 1.0, green: 0.45, blue: 0.24)
+        }
+    }
+}
+
+struct GachaCatalogEntry: Identifiable {
+    let item: GachaManager.Item
+    let totalWeight: Int
+
+    var id: String { item.name }
+    var tier: GachaCatalogTier { item.rarity.catalogTier }
+
+    var dropRateText: String {
+        guard totalWeight > 0 else { return "-" }
+        let percentage = Double(item.probability) / Double(totalWeight) * 100
+        if percentage >= 10 {
+            return String(format: "%.0f%%", percentage)
+        } else if percentage >= 1 {
+            return String(format: "%.1f%%", percentage)
+        } else {
+            return String(format: "%.2f%%", percentage)
+        }
+    }
+}
+
+struct GachaLobbyScreen: View {
+    let gachaTitle: String
+    let heroImageName: String
+    let ticketType: InventoryItemType
+    let ticketCount: Int
+    let userMoney: Int
+    let cost: Int
+    let isDrawEnabled: Bool
+    let rewardLoaded: Bool
+    let catalogItems: [GachaManager.Item]
+    let onBack: () -> Void
+    let onCoinTap: () -> Void
+    let onDraw: () -> Void
+    let onTicketDraw: () -> Void
+    let onRewardAd: () -> Void
+
+    @State private var showCatalogSheet = false
+
+    private var isCompact: Bool {
+        UIScreen.main.bounds.width < 390
+    }
+
+    private var primaryGradient: [Color] {
+        isDrawEnabled
+            ? [Color.purple, Color.pink, Color.orange]
+            : [Color.gray, Color.gray.opacity(0.7)]
+    }
+
+    private var ticketGradient: [Color] {
+        ticketCount > 0
+            ? [ticketType.accentColor, ticketType.gachaButtonTrailingColor]
+            : [Color.gray, Color.gray.opacity(0.7)]
+    }
+
+    var body: some View {
+        ScrollView(showsIndicators: false) {
+            VStack(spacing: 20) {
+                headerView
+                heroCard
+                drawButton
+                ticketButton
+                utilityButtons
+                catalogButton
+            }
+            .frame(maxWidth: 560)
+            .padding(.horizontal, 20)
+            .padding(.top, 12)
+            .padding(.bottom, 110)
+        }
+        .sheet(isPresented: $showCatalogSheet) {
+            GachaCatalogSheet(
+                gachaTitle: gachaTitle,
+                items: catalogItems,
+                accentColor: ticketType.accentColor
+            )
+            .presentationDetents([.large])
+            .presentationDragIndicator(.visible)
+        }
+    }
+
+    private var headerView: some View {
+        HStack(alignment: .center) {
+            Button(action: {
+                generateHapticFeedback()
+                onBack()
+            }) {
+                HStack(spacing: 6) {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 18, weight: .semibold))
+                    Text("戻る")
+                        .font(.system(size: 18, weight: .medium))
+                }
+                .foregroundColor(Color("fontGray"))
+            }
+            .buttonStyle(.plain)
+
+            Spacer()
+
+            Button(action: {
+                generateHapticFeedback()
+                onCoinTap()
+            }) {
+                HStack(spacing: 12) {
+                    Image(systemName: "dollarsign.circle.fill")
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundColor(.yellow)
+
+                    Text("\(userMoney)")
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundColor(.white)
+
+                    Text("コイン")
+                        .font(.system(size: 18, weight: .medium))
+                        .foregroundColor(.white.opacity(0.8))
+
+                    Image(systemName: "plus.circle.fill")
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundColor(.yellow)
+                }
+                .padding(.horizontal, 18)
+                .padding(.vertical, 8)
+                .background(
+                    Capsule()
+                        .fill(Color.black.opacity(0.32))
+                        .overlay(
+                            Capsule()
+                                .stroke(Color.yellow.opacity(0.65), lineWidth: 2)
+                        )
+                )
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    private var heroCard: some View {
+        VStack(spacing: 0) {
+            Image(heroImageName)
+                .resizable()
+                .scaledToFit()
+                .frame(maxWidth: isCompact ? 260 : 340)
+                .shadow(color: Color.black.opacity(0.18), radius: 12, x: 0, y: 6)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, 18)
+        .padding(.vertical, isCompact ? 14 : 18)
+        .background(
+            RoundedRectangle(cornerRadius: 30)
+                .fill(Color.white.opacity(0.12))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 30)
+                        .stroke(Color.white.opacity(0.26), lineWidth: 1.5)
+                )
+        )
+    }
+
+    private var drawButton: some View {
+        Button(action: {
+            generateHapticFeedback()
+            onDraw()
+        }) {
+            HStack(spacing: 15) {
+                Image(systemName: "sparkles")
+                    .font(.system(size: 24, weight: .bold))
+
+                VStack(spacing: 2) {
+                    Text("ガチャを引く")
+                        .font(.system(size: isCompact ? 22 : 24, weight: .bold))
+
+                    Text("\(cost)コイン")
+                        .font(.system(size: 14, weight: .medium))
+                        .opacity(0.9)
+                }
+
+                Image(systemName: "sparkles")
+                    .font(.system(size: 24, weight: .bold))
+            }
+            .foregroundColor(.white)
+            .frame(maxWidth: .infinity)
+            .frame(height: 74)
+            .background(
+                LinearGradient(
+                    colors: primaryGradient,
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
+            )
+            .cornerRadius(22)
+            .shadow(color: isDrawEnabled ? Color.purple.opacity(0.35) : .clear, radius: 14, x: 0, y: 6)
+            .overlay(
+                RoundedRectangle(cornerRadius: 22)
+                    .stroke(Color.white.opacity(0.3), lineWidth: 2)
+            )
+        }
+        .disabled(!isDrawEnabled)
+    }
+
+    private var ticketButton: some View {
+        Button(action: {
+            generateHapticFeedback()
+            onTicketDraw()
+        }) {
+            HStack(spacing: 14) {
+                InventoryItemArtworkView(type: ticketType, width: 38, height: 38, cornerRadius: 10)
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("チケットで引く")
+                        .font(.system(size: isCompact ? 20 : 22, weight: .bold))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+
+                    Text("\(ticketType.shortName)チケットを1枚消費")
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundColor(.white.opacity(0.86))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                }
+
+                Spacer()
+
+                Text("x\(ticketCount)")
+                    .font(.system(size: 22, weight: .heavy))
+            }
+            .foregroundColor(.white)
+            .frame(maxWidth: .infinity)
+            .frame(height: 76)
+            .padding(.horizontal, 20)
+            .background(
+                LinearGradient(
+                    colors: ticketGradient,
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
+            )
+                .cornerRadius(22)
+                .shadow(color: ticketCount > 0 ? ticketType.accentColor.opacity(0.25) : .clear, radius: 10, x: 0, y: 5)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 22)
+                        .stroke(Color.white.opacity(0.24), lineWidth: 1.5)
+                )
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var utilityButtons: some View {
+        VStack(spacing: 12) {
+            GachaUtilityButton(
+                iconName: "play.rectangle.fill",
+                title: rewardLoaded ? "広告を見て" : "広告を準備中",
+                subtitle: rewardLoaded ? "300コイン獲得" : "読み込みが終わると利用できます",
+                gradientColors: rewardLoaded
+                    ? [Color(red: 0.95, green: 0.6, blue: 0.2), Color(red: 0.98, green: 0.75, blue: 0.3)]
+                    : [Color.gray.opacity(0.75), Color.gray.opacity(0.55)],
+                isLoading: !rewardLoaded,
+                action: {
+                    generateHapticFeedback()
+                    onRewardAd()
+                }
+            )
+            .disabled(!rewardLoaded)
+
+            GachaUtilityButton(
+                iconName: "cart.fill",
+                title: "コイン購入",
+                subtitle: "必要な分だけ追加できます",
+                gradientColors: [Color(red: 0.2, green: 0.7, blue: 0.5), Color(red: 0.3, green: 0.8, blue: 0.62)],
+                action: {
+                    generateHapticFeedback()
+                    onCoinTap()
+                }
+            )
+        }
+    }
+
+    private var catalogButton: some View {
+        Button(action: {
+            generateHapticFeedback()
+            showCatalogSheet = true
+        }) {
+            HStack(spacing: 14) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(ticketType.accentColor.opacity(0.2))
+                        .frame(width: 46, height: 46)
+
+                    Image(systemName: "square.grid.2x2.fill")
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundColor(ticketType.accentColor)
+                }
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("おとも一覧")
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundColor(.white)
+
+                    Text("このガチャで登場するおともを確認")
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundColor(.white.opacity(0.7))
+                }
+
+                Spacer()
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundColor(.white.opacity(0.8))
+            }
+            .padding(.horizontal, 18)
+            .padding(.vertical, 16)
+            .background(
+                RoundedRectangle(cornerRadius: 22)
+                    .fill(Color.black.opacity(0.24))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 22)
+                            .stroke(Color.white.opacity(0.15), lineWidth: 1.2)
+                    )
+            )
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+struct GachaUtilityButton: View {
+    let iconName: String
+    let title: String
+    let subtitle: String
+    let gradientColors: [Color]
+    var isLoading: Bool = false
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 12) {
+                Image(systemName: iconName)
+                    .font(.system(size: 20, weight: .bold))
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title)
+                        .font(.system(size: 14, weight: .medium))
+                    Text(subtitle)
+                        .font(.system(size: 18, weight: .bold))
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.8)
+                }
+
+                Spacer()
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 16, weight: .semibold))
+            }
+            .foregroundColor(.white)
+            .padding(.horizontal, 24)
+            .padding(.vertical, 16)
+            .background(
+                LinearGradient(
+                    colors: gradientColors,
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
+            )
+            .cornerRadius(18)
+            .shadow(color: gradientColors.first?.opacity(0.28) ?? .clear, radius: 8, x: 0, y: 4)
+            .overlay(
+                RoundedRectangle(cornerRadius: 18)
+                    .stroke(Color.white.opacity(0.3), lineWidth: 1.5)
+            )
+            .overlay {
+                if isLoading {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 18)
+                            .fill(Color.black.opacity(0.28))
+
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                            .scaleEffect(1.3)
+                    }
+                }
+            }
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+struct GachaCatalogSheet: View {
+    let gachaTitle: String
+    let items: [GachaManager.Item]
+    let accentColor: Color
+
+    @Environment(\.dismiss) private var dismiss
+    @ObservedObject private var authManager = AuthManager.shared
+    @State private var selectedTier: GachaCatalogTier? = nil
+    @State private var selectedEntry: GachaCatalogEntry? = nil
+
+    private let columns = [
+        GridItem(.flexible(), spacing: 12),
+        GridItem(.flexible(), spacing: 12),
+        GridItem(.flexible(), spacing: 12)
+    ]
+
+    private var entries: [GachaCatalogEntry] {
+        let totalWeight = max(items.map(\.probability).reduce(0, +), 1)
+        return items
+            .map { GachaCatalogEntry(item: $0, totalWeight: totalWeight) }
+            .sorted { lhs, rhs in
+                if lhs.tier.rawValue != rhs.tier.rawValue {
+                    return lhs.tier.rawValue < rhs.tier.rawValue
+                }
+                if lhs.item.probability != rhs.item.probability {
+                    return lhs.item.probability > rhs.item.probability
+                }
+                return lhs.item.name < rhs.item.name
+            }
+    }
+
+    private var availableTiers: [GachaCatalogTier] {
+        GachaCatalogTier.allCases.filter { tier in
+            entries.contains(where: { $0.tier == tier })
+        }
+    }
+
+    private var filteredEntries: [GachaCatalogEntry] {
+        if let selectedTier {
+            return entries.filter { $0.tier == selectedTier }
+        }
+        return entries
+    }
+
+    private var highestTier: GachaCatalogTier {
+        availableTiers.last ?? .normal
+    }
+
+    var body: some View {
+        ZStack {
+            LinearGradient(
+                colors: [
+                    Color(red: 0.08, green: 0.08, blue: 0.12),
+                    Color(red: 0.11, green: 0.11, blue: 0.17)
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
+
+            VStack(spacing: 0) {
+                headerView
+
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 10) {
+                        FilterChip(
+                            title: "すべて",
+                            isSelected: selectedTier == nil,
+                            color: .white
+                        ) {
+                            withAnimation(.spring(response: 0.3)) {
+                                selectedTier = nil
+                            }
+                        }
+
+                        ForEach(availableTiers) { tier in
+                            FilterChip(
+                                title: tier.title,
+                                isSelected: selectedTier == tier,
+                                color: tier.color
+                            ) {
+                                withAnimation(.spring(response: 0.3)) {
+                                    selectedTier = tier
+                                }
+                            }
+                        }
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.top, 14)
+                }
+
+                summaryView
+                    .padding(.horizontal, 20)
+                    .padding(.top, 14)
+
+                ScrollView(showsIndicators: false) {
+                    LazyVGrid(columns: columns, spacing: 14) {
+                        ForEach(filteredEntries) { entry in
+                            GachaCatalogCardView(
+                                entry: entry,
+                                isOwned: isOwned(entry.item.name),
+                                isSelected: selectedEntry?.id == entry.id
+                            )
+                            .onTapGesture {
+                                generateHapticFeedback()
+                                withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
+                                    selectedEntry = entry
+                                }
+                            }
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.top, 18)
+                    .padding(.bottom, 100)
+                }
+            }
+
+            if let selectedEntry {
+                GachaCatalogDetailOverlay(
+                    entry: selectedEntry,
+                    isOwned: isOwned(selectedEntry.item.name)
+                ) {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+                        self.selectedEntry = nil
+                    }
+                }
+            }
+        }
+        .onAppear {
+            authManager.fetchAvatars {}
+        }
+    }
+
+    private var headerView: some View {
+        HStack(alignment: .top) {
+            VStack(alignment: .leading, spacing: 6) {
+                Text("\(gachaTitle)のおとも一覧")
+                    .font(.system(size: 28, weight: .bold, design: .rounded))
+                    .foregroundColor(.white)
+
+                Text("\(entries.count)体のおともを確認できます")
+                    .font(.system(size: 14, weight: .medium, design: .rounded))
+                    .foregroundColor(.white.opacity(0.65))
+            }
+
+            Spacer()
+
+            Button(action: { dismiss() }) {
+                Image(systemName: "xmark")
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundColor(.white)
+                    .frame(width: 38, height: 38)
+                    .background(
+                        Circle()
+                            .fill(Color.white.opacity(0.12))
+                    )
+            }
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 18)
+    }
+
+    private var summaryView: some View {
+        HStack(spacing: 12) {
+            GachaCatalogSummaryCard(
+                title: "おとも数",
+                value: "\(entries.count)体",
+                accentColor: accentColor
+            )
+
+            GachaCatalogSummaryCard(
+                title: "最高レア",
+                value: highestTier.title,
+                accentColor: highestTier.color
+            )
+        }
+    }
+
+    private func isOwned(_ name: String) -> Bool {
+        authManager.avatars.contains(where: { $0.name == name })
+    }
+}
+
+struct GachaCatalogSummaryCard: View {
+    let title: String
+    let value: String
+    let accentColor: Color
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title)
+                .font(.system(size: 12, weight: .medium))
+                .foregroundColor(.white.opacity(0.65))
+
+            Text(value)
+                .font(.system(size: 18, weight: .bold))
+                .foregroundColor(.white)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 14)
+        .background(
+            RoundedRectangle(cornerRadius: 18)
+                .fill(Color.white.opacity(0.08))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 18)
+                        .stroke(accentColor.opacity(0.4), lineWidth: 1.2)
+                )
+        )
+    }
+}
+
+struct GachaCatalogCardView: View {
+    let entry: GachaCatalogEntry
+    let isOwned: Bool
+    let isSelected: Bool
+
+    @State private var shimmer = false
+
+    var body: some View {
+        VStack(spacing: 8) {
+            ZStack {
+                if entry.tier == .legendRare || entry.tier == .mythicRare {
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(entry.tier.color.opacity(0.22))
+                        .blur(radius: 10)
+                }
+
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(entry.tier.backgroundGradient)
+
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(
+                        isSelected ? entry.tier.color : Color.white.opacity(0.1),
+                        lineWidth: isSelected ? 2 : 1
+                    )
+
+                VStack(spacing: 8) {
+                    ZStack {
+                        if entry.tier == .legendRare || entry.tier == .mythicRare {
+                            Circle()
+                                .fill(
+                                    AngularGradient(
+                                        colors: [.yellow, .orange, .yellow, .white, .yellow],
+                                        center: .center
+                                    )
+                                )
+                                .frame(width: 64, height: 64)
+                                .blur(radius: 14)
+                                .rotationEffect(.degrees(shimmer ? 360 : 0))
+                        }
+
+                        catalogImage(width: 66, height: 66)
+                    }
+
+                    Text(entry.tier.title)
+                        .font(.system(size: 10, weight: .bold))
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(
+                            Capsule()
+                                .fill(entry.tier.color.opacity(0.8))
+                        )
+                }
+                .padding(12)
+            }
+            .frame(height: 128)
+
+            VStack(spacing: 4) {
+                Text(isOwned ? entry.item.name : "???")
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundColor(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+
+                Text("出現率 \(entry.dropRateText)")
+                    .font(.system(size: 10, weight: .medium))
+                    .foregroundColor(entry.tier.color)
+            }
+        }
+        .scaleEffect(isSelected ? 1.03 : 1.0)
+        .animation(.spring(response: 0.25, dampingFraction: 0.8), value: isSelected)
+        .onAppear {
+            if entry.tier == .legendRare || entry.tier == .mythicRare {
+                withAnimation(.linear(duration: 3).repeatForever(autoreverses: false)) {
+                    shimmer = true
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func catalogImage(width: CGFloat, height: CGFloat) -> some View {
+        let imageName = GachaCatalogAvatarResolver.imageName(for: entry.item.name, owned: isOwned)
+
+        if imageName == "questionmark.circle.fill" {
+            Image(systemName: imageName)
+                .resizable()
+                .scaledToFit()
+                .frame(width: width, height: height)
+                .foregroundColor(.white.opacity(isOwned ? 0.9 : 0.35))
+        } else {
+            Image(imageName)
+                .resizable()
+                .scaledToFit()
+                .frame(width: width, height: height)
+                .opacity(isOwned ? 1 : 0.4)
+        }
+    }
+}
+
+struct GachaCatalogDetailOverlay: View {
+    let entry: GachaCatalogEntry
+    let isOwned: Bool
+    let onClose: () -> Void
+
+    @State private var appear = false
+    @State private var floatAnimation = false
+    @State private var glowAnimation = false
+
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.72)
+                .ignoresSafeArea()
+                .onTapGesture {
+                    onClose()
+                }
+
+            VStack(spacing: 22) {
+                HStack {
+                    Spacer()
+
+                    Button(action: onClose) {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 16, weight: .bold))
+                            .foregroundColor(.white)
+                            .frame(width: 36, height: 36)
+                            .background(Circle().fill(Color.white.opacity(0.18)))
+                    }
+                }
+
+                Text(entry.tier.title)
+                    .font(.system(size: 14, weight: .bold, design: .rounded))
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 8)
+                    .background(
+                        Capsule()
+                            .fill(entry.tier.color.opacity(0.92))
+                    )
+
+                ZStack {
+                    Circle()
+                        .fill(
+                            RadialGradient(
+                                colors: [entry.tier.color.opacity(0.45), Color.clear],
+                                center: .center,
+                                startRadius: 0,
+                                endRadius: 120
+                            )
+                        )
+                        .frame(width: 240, height: 240)
+                        .scaleEffect(glowAnimation ? 1.08 : 0.92)
+
+                    catalogImage(width: 170, height: 170)
+                        .shadow(color: entry.tier.color.opacity(0.45), radius: 18, x: 0, y: 10)
+                        .offset(y: floatAnimation ? -8 : 8)
+                }
+
+                VStack(spacing: 6) {
+                    Text(isOwned ? entry.item.name : "???")
+                        .font(.system(size: 28, weight: .bold, design: .rounded))
+                        .foregroundColor(.white)
+                        .multilineTextAlignment(.center)
+
+                    Text("出現率 \(entry.dropRateText)")
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundColor(entry.tier.color)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 8)
+                        .background(
+                            Capsule()
+                                .fill(entry.tier.color.opacity(0.16))
+                        )
+                }
+
+                if isOwned {
+                    HStack(spacing: 36) {
+                        StatDisplay(
+                            icon: "heart.fill",
+                            value: entry.item.health,
+                            label: "HP",
+                            color: .red
+                        )
+
+                        StatDisplay(
+                            icon: "bolt.fill",
+                            value: entry.item.attack,
+                            label: "ATK",
+                            color: .blue
+                        )
+                    }
+                }
+            }
+            .padding(24)
+            .background(
+                RoundedRectangle(cornerRadius: 32)
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                Color(red: 0.15, green: 0.15, blue: 0.2),
+                                Color(red: 0.1, green: 0.1, blue: 0.15)
+                            ],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 32)
+                            .stroke(entry.tier.color.opacity(0.55), lineWidth: 2)
+                    )
+            )
+            .padding(.horizontal, 28)
+            .scaleEffect(appear ? 1 : 0.82)
+            .opacity(appear ? 1 : 0)
+        }
+        .onAppear {
+            withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
+                appear = true
+            }
+            withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true)) {
+                floatAnimation = true
+            }
+            withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
+                glowAnimation = true
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func catalogImage(width: CGFloat, height: CGFloat) -> some View {
+        let imageName = GachaCatalogAvatarResolver.imageName(for: entry.item.name, owned: isOwned)
+
+        if imageName == "questionmark.circle.fill" {
+            Image(systemName: imageName)
+                .resizable()
+                .scaledToFit()
+                .frame(width: width, height: height)
+                .foregroundColor(.white.opacity(isOwned ? 0.9 : 0.4))
+        } else {
+            Image(imageName)
+                .resizable()
+                .scaledToFit()
+                .frame(width: width, height: height)
+                .opacity(isOwned ? 1 : 0.5)
+        }
+    }
+}
+
+private enum GachaCatalogAvatarResolver {
+    static func imageName(for name: String, owned: Bool) -> String {
+        let primaryName = owned ? name : "\(name)_シルエット"
+        if UIImage(named: primaryName) != nil {
+            return primaryName
+        }
+
+        if let fallback = UIImage(named: name) != nil ? name : nil {
+            return fallback
+        }
+
+        return "questionmark.circle.fill"
+    }
+}
+
 struct GachaView: View {
     @StateObject private var authManager = AuthManager.shared
     @State private var gachaManager = GachaManager(mode: .normal)
@@ -235,6 +1219,8 @@ struct GachaView: View {
     @State private var obtainedTitle: String = ""
     
     @State private var showRewardAlert: Bool = false
+    @State private var showTicketErrorAlert: Bool = false
+    @State private var ticketErrorMessage: String = ""
     
     @ObservedObject var audioManager = AudioManager.shared
     @StateObject var reward = Reward()
@@ -282,7 +1268,7 @@ struct GachaView: View {
                                      if success {
                                          completed += 1
                                          if completed == decreaseCount {
-                                             fetchUserMoney()
+                                             refreshPlayerResources()
                                          }
                                      }
                                  }
@@ -292,6 +1278,7 @@ struct GachaView: View {
                              gachaManager.shuffleItems()
                              if let item = gachaManager.drawGacha() {
                                  obtainedRareItem = item
+                                 authManager.recordGachaUsed()
                                  
                                  DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                                      showAnimation = true
@@ -340,7 +1327,7 @@ struct GachaView: View {
             }
         }
         .onAppear {
-            fetchUserMoney()
+            refreshPlayerResources()
             reward.LoadReward()
         }
         .fullScreenCover(isPresented: $showAnimation) {
@@ -354,6 +1341,11 @@ struct GachaView: View {
             }
         }
         .alert("コインが足りません", isPresented: $showUnCoinModal) {
+            if authManager.normalGachaTicketCount > 0 {
+                Button("チケットで引く") {
+                    startGachaWithTicket(resetResult: false)
+                }
+            }
             Button(action: {
                 if reward.rewardLoaded {
                     reward.ShowReward()
@@ -373,8 +1365,13 @@ struct GachaView: View {
         }
         .alert("300コイン獲得しました。", isPresented: $showRewardAlert) {
             Button("OK") {
-                fetchUserMoney()
+                refreshPlayerResources()
             }
+        }
+        .alert("チケットを使えません", isPresented: $showTicketErrorAlert) {
+            Button("OK") {}
+        } message: {
+            Text(ticketErrorMessage)
         }
         .alert("称号獲得!", isPresented: $showTitleModal) {
             Button("OK") {}
@@ -384,231 +1381,43 @@ struct GachaView: View {
         .onChange(of: reward.rewardEarned) { rewardEarned in
             showRewardAlert = rewardEarned
             if rewardEarned {
-                fetchUserMoney()
+                refreshPlayerResources()
                 reward.rewardEarned = false
             }
         }
         .onChange(of: showCoinModal) { _ in
-            fetchUserMoney()
+            refreshPlayerResources()
         }
     }
     
     private var gachaMainView: some View {
-        VStack(spacing: 30) {
-            
-            // コイン表示（購入ボタン付き）
-            HStack {
-                Button(action: {
-                    generateHapticFeedback()
-                    self.presentationMode.wrappedValue.dismiss()
-                    audioManager.playCancelSound()
-                }) {
-                    Image(systemName: "chevron.left")
-                        .foregroundColor(Color("fontGray"))
-                    Text("戻る")
-                        .foregroundColor(Color("fontGray"))
-                }.buttonStyle(.plain)
-                .padding(.leading)
-                Spacer()
-                
-                Button(action: {
-                    showCoinModal = true
-                }) {
-                    HStack(spacing: 12) {
-                        Image(systemName: "dollarsign.circle.fill")
-                            .font(.system(size: 20))
-                            .foregroundColor(.yellow)
-                        
-                        Text("\(userMoney)")
-                            .font(.system(size: 20, weight: .bold))
-                            .foregroundColor(.white)
-                        
-                        Text("コイン")
-                            .font(.system(size: 18, weight: .medium))
-                            .foregroundColor(.white.opacity(0.8))
-                        
-                        // プラスアイコン
-                        Image(systemName: "plus.circle.fill")
-                            .font(.system(size: 18))
-                            .foregroundColor(.yellow)
-                    }
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 5)
-                    .background(
-                        RoundedRectangle(cornerRadius: 25)
-                            .fill(Color.black.opacity(0.4))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 25)
-                                    .stroke(Color.yellow.opacity(0.6), lineWidth: 2)
-                            )
-                    )
+        GachaLobbyScreen(
+            gachaTitle: "レギュラーガチャ",
+            heroImageName: "ガチャ",
+            ticketType: .normalGachaTicket,
+            ticketCount: authManager.normalGachaTicketCount,
+            userMoney: userMoney,
+            cost: gachaManager.gachaCost,
+            isDrawEnabled: isGachaButtonDisabled,
+            rewardLoaded: reward.rewardLoaded,
+            catalogItems: gachaManager.catalogItems,
+            onBack: {
+                self.presentationMode.wrappedValue.dismiss()
+                audioManager.playCancelSound()
+            },
+            onCoinTap: {
+                showCoinModal = true
+            },
+            onDraw: startGacha,
+            onTicketDraw: {
+                startGachaWithTicket()
+            },
+            onRewardAd: {
+                if reward.rewardLoaded {
+                    reward.ShowReward()
                 }
             }
-            .padding(.trailing)
-            
-            Image("ガチャ")
-                .resizable()
-                .scaledToFit()
-            
-            // ガチャボタン
-            Button(action: startGacha) {
-                HStack(spacing: 15) {
-                    Image(systemName: "sparkles")
-                        .font(.system(size: 24, weight: .bold))
-                    
-                    VStack(spacing: 2) {
-                        Text("ガチャを引く")
-                            .font(.system(size: 24, weight: .bold))
-                        
-                        Text("\(gachaManager.gachaCost)コイン")
-                            .font(.system(size: 14, weight: .medium))
-                            .opacity(0.9)
-                    }
-                    
-                    Image(systemName: "sparkles")
-                        .font(.system(size: 24, weight: .bold))
-                }
-                .foregroundColor(.white)
-                .frame(maxWidth: .infinity)
-                .frame(height: 70)
-                .background(
-                    Group {
-                        if isGachaButtonDisabled {
-                            LinearGradient(
-                                colors: [.purple, .pink, .orange],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        } else {
-                            LinearGradient(
-                                colors: [.gray, .gray.opacity(0.6)],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        }
-                    }
-                )
-                .cornerRadius(20)
-                .shadow(color: isGachaButtonDisabled ? .purple.opacity(0.6) : .clear, radius: 15, x: 0, y: 5)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 20)
-                        .stroke(Color.white.opacity(0.3), lineWidth: 2)
-                )
-            }
-            .disabled(!isGachaButtonDisabled)
-            .padding(.horizontal, 30)
-            .padding(.bottom, 0)
-            
-            // ボタングループ（リワード広告・コイン購入）
-            VStack(spacing: 12) {
-                // リワード広告ボタン
-                // GachaView内のリワード広告ボタンを修正
-
-                Button(action: {
-                    if reward.rewardLoaded {
-                        reward.ShowReward()
-                    }
-                }) {
-                    HStack(spacing: 12) {
-                        Image(systemName: "play.rectangle.fill")
-                            .font(.system(size: 22, weight: .bold))
-                        
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("広告を見て")
-                                .font(.system(size: 14, weight: .medium))
-                            Text("300コイン獲得")
-                                .font(.system(size: 18, weight: .bold))
-                        }
-                        
-                        Spacer()
-                        
-                        Image(systemName: "chevron.right")
-                            .font(.system(size: 16, weight: .semibold))
-                    }
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 24)
-                    .padding(.vertical, 16)
-                    .background(
-                        LinearGradient(
-                            gradient: Gradient(colors: reward.rewardLoaded ? [
-                                Color(red: 0.95, green: 0.6, blue: 0.2),
-                                Color(red: 0.98, green: 0.75, blue: 0.3)
-                            ] : [
-                                Color.gray.opacity(0.6),
-                                Color.gray.opacity(0.4)
-                            ]),
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
-                    .cornerRadius(16)
-                    .shadow(color: reward.rewardLoaded ? Color(red: 0.95, green: 0.6, blue: 0.2).opacity(0.4) : Color.clear, radius: 8, x: 0, y: 4)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                            .stroke(Color.white.opacity(0.3), lineWidth: 1.5)
-                    )
-                    .overlay(
-                        // ローディング中のオーバーレイ
-                        Group {
-                            if !reward.rewardLoaded {
-                                ZStack {
-                                    Color.black.opacity(0.3)
-                                        .cornerRadius(16)
-                                    
-                                    ProgressView()
-                                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                                        .scaleEffect(1.5)
-                                }
-                            }
-                        }
-                    )
-                }
-                .disabled(!reward.rewardLoaded)
-                
-                // コイン購入ボタン（新規追加）
-                Button(action: {
-                    showCoinModal = true
-                }) {
-                    HStack(spacing: 12) {
-                        Image(systemName: "cart.fill")
-                            .font(.system(size: 20, weight: .bold))
-                        
-                        Text("コイン購入")
-                            .font(.system(size: 18, weight: .bold))
-                        
-                        Spacer()
-                        
-                        Image(systemName: "chevron.right")
-                            .font(.system(size: 16, weight: .semibold))
-                    }
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 24)
-                    .padding(.vertical, 16)
-                    .background(
-                        LinearGradient(
-                            gradient: Gradient(colors: [
-                                Color(red: 0.2, green: 0.7, blue: 0.5),
-                                Color(red: 0.3, green: 0.8, blue: 0.6)
-                            ]),
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
-                    .cornerRadius(16)
-                    .shadow(color: Color(red: 0.2, green: 0.7, blue: 0.5).opacity(0.4), radius: 8, x: 0, y: 4)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                            .stroke(Color.white.opacity(0.3), lineWidth: 1.5)
-                    )
-                }
-            }
-            .padding(.horizontal, 30)
-
-            Image("卵レア度")
-                .resizable()
-                .scaledToFit()
-                .padding(.horizontal)
-        }
+        )
     }
     
     private func startGacha() {
@@ -624,7 +1433,7 @@ struct GachaView: View {
                     if success {
                         completed += 1
                         if completed == decreaseCount {
-                            fetchUserMoney()
+                            refreshPlayerResources()
                         }
                     }
                 }
@@ -634,6 +1443,7 @@ struct GachaView: View {
             gachaManager.shuffleItems()
             if let item = gachaManager.drawGacha() {
                 obtainedRareItem = item
+                authManager.recordGachaUsed()
                 
                 showResult = false
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -646,7 +1456,45 @@ struct GachaView: View {
             showUnCoinModal = true
         }
     }
-    
+
+    private func startGachaWithTicket(resetResult: Bool = true) {
+        guard authManager.normalGachaTicketCount > 0 else {
+            ticketErrorMessage = "レギュラーガチャチケットがありません。"
+            showTicketErrorAlert = true
+            refreshPlayerResources()
+            return
+        }
+
+        authManager.consumeItem(.normalGachaTicket) { success in
+            guard success else {
+                ticketErrorMessage = "チケットの消費に失敗しました。通信状況を確認してもう一度お試しください。"
+                showTicketErrorAlert = true
+                refreshPlayerResources()
+                return
+            }
+
+            DispatchQueue.main.async {
+                audioManager.playSound()
+                gachaManager.shuffleItems()
+                if let item = gachaManager.drawGacha() {
+                    obtainedRareItem = item
+                    authManager.recordGachaUsed()
+
+                    if resetResult {
+                        showResult = false
+                    }
+
+                    DispatchQueue.main.asyncAfter(deadline: .now() + (resetResult ? 0.5 : 0.1)) {
+                        showAnimation = true
+                    }
+                }
+
+                checkAvatarCount()
+                refreshPlayerResources()
+            }
+        }
+    }
+
     private func fetchUserMoney() {
         authManager.getUserMoney { money in
             self.userMoney = money
@@ -654,6 +1502,11 @@ struct GachaView: View {
             let cost = gachaManager.gachaCost
             isGachaButtonDisabled = money >= cost
         }
+    }
+
+    private func refreshPlayerResources() {
+        fetchUserMoney()
+        authManager.fetchInventory()
     }
     
     private func checkAvatarCount() {

@@ -45,14 +45,13 @@ struct TopView: View {
                         }
 
                     ZStack {
-                            StoryView(isReturnActive: .constant(false), isPresented: .constant(false))
+                            MissionView()
                         }
                         .tabItem {
-                            Image(systemName: "map")
-                            //                        .resizable()
-                                .frame(width:1,height:1)
-                            Text("ダンジョン")
+                            Image(systemName: "checklist")
+                            Text("ミッション")
                         }
+                        .badge(MissionManager.shared.totalClaimableCount)
 
                         AvatarListView(isPresenting: $isPresentingAvatarList)
                             .tabItem {

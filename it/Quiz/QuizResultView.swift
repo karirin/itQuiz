@@ -100,7 +100,7 @@ struct QuizResultView: View {
             
             NavigationView {
                 VStack(spacing: 0) {
-                    if appState.isBannerVisible {
+                    if appState.shouldShowAds {
                         // ヘッダー部分
                         headerView
                     }
@@ -133,7 +133,7 @@ struct QuizResultView: View {
                     }
             )
             .background {
-                if appState.isBannerVisible {
+                if appState.shouldShowAds {
                     adViewControllerRepresentable
                         .frame(width: .zero, height: .zero)
                 }
@@ -609,8 +609,7 @@ struct QuizResultView: View {
     private func setupOnAppear() {
         authManager.fetchUserStory()
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            // サブスク未加入（広告表示ON）のときだけ、サブスク誘導 PreView を出すカウント処理を動かす
-            if appState.isBannerVisible {
+            if appState.shouldShowAds {
                 executeProcessEveryFortyTimes()
             }
         }
@@ -621,7 +620,7 @@ struct QuizResultView: View {
         }
         
         // 広告処理
-        if appState.isBannerVisible && !hasRequestedInterstitial {
+        if appState.shouldShowAds && !hasRequestedInterstitial {
 //            && authManager.currentUserId != "dzarHuAdiXXLtDjtwIRvIfVhA1A2" {  // ★ここを追加
             hasRequestedInterstitial = true
 
@@ -743,6 +742,7 @@ struct ExperienceModalView: View {
     @Binding var showModal: Bool
     var addedExperience: Int
     var addedMoney: Int
+    var itemRewards: [InventoryReward] = []
     @State private var currentExperience: Double = 0
     @State private var currentMoney: Double = 0
     @State private var showContent = false
@@ -789,6 +789,40 @@ struct ExperienceModalView: View {
                 }
                 .opacity(showContent ? 1 : 0)
                 .animation(.easeInOut(duration: 0.5).delay(0.6), value: showContent)
+
+                if !itemRewards.isEmpty {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("追加アイテム")
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundColor(.secondary)
+
+                        ForEach(Array(itemRewards.enumerated()), id: \.offset) { entry in
+                            let reward = entry.element
+                            HStack(spacing: 12) {
+                                InventoryItemArtworkView(type: reward.type, width: 34, height: 34, cornerRadius: 10)
+
+                                Text(reward.type.displayName)
+                                    .font(.body)
+                                    .foregroundColor(.primary)
+
+                                Spacer()
+
+                                Text("x\(reward.amount)")
+                                    .font(.headline)
+                                    .foregroundColor(reward.type.accentColor)
+                                    .fontWeight(.semibold)
+                            }
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 12)
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(Color(.systemGray6))
+                            )
+                        }
+                    }
+                    .opacity(showContent ? 1 : 0)
+                    .animation(.easeInOut(duration: 0.5).delay(0.7), value: showContent)
+                }
                 
                 // プログレスバー
                 VStack(spacing: 12) {
@@ -889,137 +923,273 @@ struct ExperienceModalView: View {
 
 struct LevelUpModalView: View {
     @Binding var showLevelUpModal: Bool
-    @State private var showContent = false
-    @State private var showParticles = false
+    @State private var showBackground = false
+    @State private var showCard = false
+    @State private var showIcon = false
+    @State private var showLevel = false
+    @State private var showText = false
+    @State private var showButton = false
+    @State private var ringRotation: Double = 0
+    @State private var outerRingScale: CGFloat = 0.3
+    @State private var confettiParticles: [LevelUpConfetti] = []
+    @State private var glowPulse = false
     @ObservedObject var authManager: AuthManager
     @ObservedObject var audioManager = AudioManager.shared
 
     var body: some View {
         ZStack {
-            Color.black.opacity(0.7)
+            // 背景
+            Color.black.opacity(showBackground ? 0.75 : 0)
                 .ignoresSafeArea()
-                .onTapGesture {
-                    dismissModal()
-                }
-            
-            VStack(spacing: 24) {
-                // パーティクルエフェクト背景
-                ZStack {
-                    if showParticles {
-                        ForEach(0..<20, id: \.self) { _ in
-                            Circle()
-                                .fill(Color.yellow.opacity(0.8))
-                                .frame(width: CGFloat.random(in: 4...8))
-                                .position(
-                                    x: CGFloat.random(in: 0...300),
-                                    y: CGFloat.random(in: 0...300)
-                                )
-                                .animation(
-                                    Animation.easeInOut(duration: Double.random(in: 2...4))
-                                        .repeatForever(autoreverses: true),
-                                    value: showParticles
-                                )
-                        }
-                    }
-                    
-                    // レベルアップアイコン
+                .onTapGesture { }
+
+            // コンフェティ
+            ForEach(confettiParticles) { p in
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(p.color)
+                    .frame(width: p.width, height: p.height)
+                    .rotationEffect(.degrees(p.rotation))
+                    .offset(x: p.x, y: p.y)
+                    .opacity(p.opacity)
+            }
+
+            if showCard {
+                VStack(spacing: 28) {
+                    // レベルアイコン
                     ZStack {
+                        // 外側リング（回転）
+                        Circle()
+                            .stroke(
+                                AngularGradient(
+                                    colors: [.yellow, .orange, .red, .orange, .yellow],
+                                    center: .center
+                                ),
+                                lineWidth: 4
+                            )
+                            .frame(width: 140, height: 140)
+                            .scaleEffect(outerRingScale)
+                            .rotationEffect(.degrees(ringRotation))
+
+                        // グロー
                         Circle()
                             .fill(
                                 RadialGradient(
-                                    gradient: Gradient(colors: [Color.yellow, Color.orange]),
+                                    colors: [Color.yellow.opacity(0.4), Color.clear],
                                     center: .center,
                                     startRadius: 0,
-                                    endRadius: 60
+                                    endRadius: 80
                                 )
                             )
-                            .frame(width: 120, height: 120)
-                            .scaleEffect(showContent ? 1.0 : 0.5)
-                            .animation(.spring(response: 0.8, dampingFraction: 0.6), value: showContent)
-                        
-                        Image("レベルアップ")
-                            .resizable()
-                            .frame(width: 100, height: 100)
-                            .scaleEffect(showContent ? 1.0 : 0.5)
-                            .animation(.spring(response: 0.8, dampingFraction: 0.6).delay(0.2), value: showContent)
+                            .frame(width: 160, height: 160)
+                            .scaleEffect(glowPulse ? 1.1 : 0.9)
+
+                        // 中央円
+                        Circle()
+                            .fill(
+                                LinearGradient(
+                                    colors: [Color(red: 1.0, green: 0.85, blue: 0.2), Color(red: 1.0, green: 0.55, blue: 0.1)],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                            .frame(width: 110, height: 110)
+                            .shadow(color: .orange.opacity(0.6), radius: 20)
+                            .scaleEffect(showIcon ? 1.0 : 0.3)
+
+                        // 矢印アイコン（画像の代わり）
+                        Image(systemName: "arrow.up.circle.fill")
+                            .font(.system(size: 44, weight: .bold))
+                            .foregroundStyle(.white)
+                            .scaleEffect(showIcon ? 1.0 : 0.1)
+                            .opacity(showIcon ? 1 : 0)
+
+                        // レベル数字
+                        if showLevel {
+                            Text("Lv.\(authManager.level)")
+                                .font(.system(size: 22, weight: .black, design: .rounded))
+                                .foregroundColor(.white)
+                                .shadow(color: .black.opacity(0.4), radius: 4, y: 2)
+                                .offset(y: 44)
+                                .transition(.scale.combined(with: .opacity))
+                        }
                     }
-                    
-                    // レベル数字
-                    Text("\(authManager.level)")
-                        .font(.system(size: 48, weight: .bold, design: .rounded))
-                        .foregroundColor(.white)
-                        .shadow(color: .black.opacity(0.3), radius: 2, x: 0, y: 2)
-                        .scaleEffect(showContent ? 1.0 : 0.3)
-                        .animation(.spring(response: 1.0, dampingFraction: 0.6).delay(0.4), value: showContent)
-                }
-                .frame(width: 200, height: 200)
-                
-                VStack(spacing: 12) {
-                    Text("レベルアップ！")
-                        .font(.system(size: 28, weight: .bold, design: .rounded))
-                        .foregroundColor(.primary)
-                        .opacity(showContent ? 1 : 0)
-                        .animation(.easeInOut(duration: 0.5).delay(0.6), value: showContent)
-                    
-                    Text("レベル \(authManager.level) に到達しました！")
-                        .font(.headline)
-                        .foregroundColor(.secondary)
-                        .opacity(showContent ? 1 : 0)
-                        .animation(.easeInOut(duration: 0.5).delay(0.8), value: showContent)
-                }
-                
-                // 閉じるボタン
-                Button(action: dismissModal) {
-                    Text("素晴らしい！")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 14)
-                        .background(
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(
+                    .frame(height: 170)
+
+                    // テキスト
+                    if showText {
+                        VStack(spacing: 10) {
+                            Text("LEVEL UP!")
+                                .font(.system(size: 30, weight: .black, design: .rounded))
+                                .foregroundStyle(
                                     LinearGradient(
-                                        gradient: Gradient(colors: [Color.yellow, Color.orange]),
+                                        colors: [Color.yellow, Color.orange],
                                         startPoint: .leading,
                                         endPoint: .trailing
                                     )
                                 )
-                        )
+
+                            Text("レベル \(authManager.level) に到達しました！")
+                                .font(.system(size: 16, weight: .semibold))
+                                .foregroundColor(.white.opacity(0.7))
+                        }
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                    }
+
+                    // ボタン
+                    if showButton {
+                        Button(action: dismissModal) {
+                            Text("素晴らしい！")
+                                .font(.system(size: 18, weight: .bold))
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 50)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 14)
+                                        .fill(
+                                            LinearGradient(
+                                                colors: [Color(red: 1.0, green: 0.7, blue: 0.1), Color(red: 1.0, green: 0.45, blue: 0.1)],
+                                                startPoint: .leading,
+                                                endPoint: .trailing
+                                            )
+                                        )
+                                )
+                                .shadow(color: .orange.opacity(0.5), radius: 10, y: 4)
+                        }
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                    }
                 }
-                .opacity(showContent ? 1 : 0)
-                .animation(.easeInOut(duration: 0.5).delay(1.0), value: showContent)
+                .padding(30)
+                .background(
+                    RoundedRectangle(cornerRadius: 24)
+                        .fill(
+                            LinearGradient(
+                                colors: [
+                                    Color(red: 0.12, green: 0.10, blue: 0.22),
+                                    Color(red: 0.08, green: 0.06, blue: 0.16)
+                                ],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 24)
+                                .stroke(Color.orange.opacity(0.3), lineWidth: 1)
+                        )
+                        .shadow(color: .black.opacity(0.5), radius: 30, y: 10)
+                )
+                .padding(.horizontal, 36)
+                .transition(.scale(scale: 0.8).combined(with: .opacity))
             }
-            .padding(24)
-            .background(
-                RoundedRectangle(cornerRadius: 20)
-                    .fill(Color(.systemBackground))
-                    .shadow(color: .black.opacity(0.3), radius: 20, x: 0, y: 10)
-            )
-            .padding(.horizontal, 32)
-            .scaleEffect(showContent ? 1.0 : 0.8)
-            .animation(.spring(response: 0.6, dampingFraction: 0.8), value: showContent)
         }
         .onAppear {
             authManager.fetchUserExperienceAndLevel()
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                showContent = true
-                showParticles = true
+            playSequence()
+        }
+    }
+
+    private func playSequence() {
+        // 背景
+        withAnimation(.easeOut(duration: 0.3)) {
+            showBackground = true
+        }
+
+        // カード
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+            withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
+                showCard = true
+            }
+        }
+
+        // アイコン
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+            withAnimation(.spring(response: 0.6, dampingFraction: 0.5)) {
+                showIcon = true
+                outerRingScale = 1.0
+            }
+            // リング回転開始
+            withAnimation(.linear(duration: 8).repeatForever(autoreverses: false)) {
+                ringRotation = 360
+            }
+            // グローパルス
+            withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
+                glowPulse = true
+            }
+        }
+
+        // レベル数字
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {
+                showLevel = true
+            }
+        }
+
+        // コンフェティ
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            spawnConfetti()
+        }
+
+        // テキスト
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+                showText = true
+            }
+        }
+
+        // ボタン
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.1) {
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+                showButton = true
             }
         }
     }
-    
+
+    private func spawnConfetti() {
+        let colors: [Color] = [.yellow, .orange, .red, .pink, .purple, .cyan]
+        for i in 0..<25 {
+            var piece = LevelUpConfetti(
+                x: CGFloat.random(in: -180...180),
+                y: -400,
+                width: CGFloat.random(in: 4...8),
+                height: CGFloat.random(in: 10...18),
+                color: colors.randomElement()!,
+                rotation: 0,
+                opacity: 1.0
+            )
+            let delay = Double(i) * 0.025
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                withAnimation(.easeIn(duration: Double.random(in: 1.5...3.0))) {
+                    piece.y = 500
+                    piece.x += CGFloat.random(in: -30...30)
+                    piece.rotation = Double.random(in: 360...720)
+                    piece.opacity = 0
+                }
+                confettiParticles.append(piece)
+            }
+        }
+    }
+
     private func dismissModal() {
         generateHapticFeedback()
-        withAnimation(.spring()) {
-            showContent = false
-            showParticles = false
+        audioManager.playCancelSound()
+        withAnimation(.easeOut(duration: 0.2)) {
+            showCard = false
+            showBackground = false
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
             showLevelUpModal = false
         }
-        audioManager.playCancelSound()
     }
+}
+
+struct LevelUpConfetti: Identifiable {
+    let id = UUID()
+    var x: CGFloat
+    var y: CGFloat
+    var width: CGFloat
+    var height: CGFloat
+    var color: Color
+    var rotation: Double
+    var opacity: Double
 }
 
 struct ProgressBar1: View {

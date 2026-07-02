@@ -153,6 +153,7 @@ struct StoryQuizView: View {
     @State private var comboBurstSubtitle: String = ""
     @State private var comboBurstColors: [Color] = [Color.blue, Color.cyan]
     @State private var showComboBurst: Bool = false
+    @State private var itemRewards: [InventoryReward] = []
     @Environment(\.presentationMode) var presentationMode
 //    var user: User // ここでユーザー情報全体を受け取る
 //    var userName2: String
@@ -412,7 +413,7 @@ struct StoryQuizView: View {
                            .bold()
                    }
                }
-            NavigationLink("", destination: StoryQuizResultView(results: quizResults, authManager: authManager, isPresenting: $isPresenting, navigateToQuizResultView: $navigateToQuizResultView, playerExperience: playerExperience, playerMoney: playerMoney, elapsedTime: 0, quizLevel: quizLevel,victoryFlag:$victoryFlag, isUserStoryFlag: .constant(false), viewModel: viewModel).navigationBarBackButtonHidden(true), isActive: $navigateToQuizResultView)
+            NavigationLink("", destination: StoryQuizResultView(results: quizResults, authManager: authManager, isPresenting: $isPresenting, navigateToQuizResultView: $navigateToQuizResultView, playerExperience: playerExperience, playerMoney: playerMoney, itemRewards: itemRewards, elapsedTime: 0, quizLevel: quizLevel,victoryFlag:$victoryFlag, isUserStoryFlag: .constant(false), viewModel: viewModel).navigationBarBackButtonHidden(true), isActive: $navigateToQuizResultView)
                 .onAppear{
                     print("isPresenting     :\(isPresenting)")
                 }
@@ -565,6 +566,7 @@ struct StoryQuizView: View {
             // 味方のHPが０以下のとき
             if newValue && playerHP <= 0 {
                 victoryFlag = false
+                itemRewards = []
                 if let userId = authManager.currentUserId {
                     authManager.addRankMatchPoints(for: userId, points: 10, onSuccess: {
                         print("@@@@@@@@@@@@@@@@@@@@@@@1")
@@ -588,6 +590,7 @@ struct StoryQuizView: View {
                 }
             } else {
                 victoryFlag = true
+                let rewardsToGrant = itemRewards
                 DispatchQueue.global(qos: .background).async {
                     if let userId = authManager.currentUserId {
                         authManager.addRankMatchPoints(for: userId, points: 10, onSuccess: {
@@ -603,6 +606,9 @@ struct StoryQuizView: View {
                         // 失敗した時の処理をここに書きます。`error`は失敗の原因を示す情報が含まれている可能性があります。
                     })
                     authManager.addMoney(amount: playerMoney * authManager.rewardFlag)
+                    if !rewardsToGrant.isEmpty {
+                        authManager.addItems(rewardsToGrant)
+                    }
                     DispatchQueue.main.async {
                         // ここでUIの更新を行います。
                     }
@@ -711,11 +717,13 @@ extension StoryQuizView {
 
     func moveToNextQuiz() {
         if monsterHP <= 0 {
+            itemRewards = DungeonRewardPlanner.battleRewards(for: monsterName)
             showCompletionMessage = true
             timer?.invalidate()
             persistQuizStatsIfPossible()
             navigateToQuizResultView = true
         } else if playerHP <= 0 {
+            itemRewards = []
             showCompletionMessage = true
             timer?.invalidate()
             playerExperience = 5
@@ -729,6 +737,7 @@ extension StoryQuizView {
                 startTimer()
                 hasAnswered = false
             } else {
+                itemRewards = []
                 showCompletionMessage = true
                 timer?.invalidate()
                 navigateToQuizResultView = true
@@ -743,6 +752,7 @@ extension StoryQuizView {
             }
             hasAnswered = false
         } else {
+            itemRewards = []
             showCompletionMessage = true
             timer?.invalidate()
             navigateToQuizResultView = true
@@ -756,8 +766,10 @@ extension StoryQuizView {
         timer?.invalidate()
 
         let isAnswerCorrect = selectedAnswerIndex == currentQuiz.correctAnswerIndex
+        authManager.recordAnswer(isCorrect: isAnswerCorrect)
         if isAnswerCorrect {
-            let damage = comboAdjustedDamage()
+            let attackBoost = viewModel.consumeAttackBoostMultiplier()
+            let damage = comboAdjustedDamage(extraMultiplier: attackBoost)
             audioManager.playCorrectSound()
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 audioManager.playAttackSound()
@@ -841,8 +853,8 @@ extension StoryQuizView {
         hasAnswered = true
     }
 
-    private func comboAdjustedDamage() -> Int {
-        let multiplier = MonsterComboSystem.multiplier(for: comboCount + 1)
+    private func comboAdjustedDamage(extraMultiplier: Double = 1.0) -> Int {
+        let multiplier = MonsterComboSystem.multiplier(for: comboCount + 1) * extraMultiplier
         return max(Int((Double(userAttack) * multiplier).rounded()), userAttack)
     }
 

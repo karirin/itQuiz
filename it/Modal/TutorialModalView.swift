@@ -135,10 +135,7 @@ struct TutorialModalView: View {
                                 .scaleEffect(pulseAnimation ? 1.05 : 1.0)
                         } else if currentStep == 0 {
                             // ウェルカム画面
-                            Image("チュートリアル")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(height: isSmallDevice() ? 100 : 120)
+                            welcomeArtwork
                         } else {
                             // 完了画面アイコン
                             Image(systemName: steps[currentStep].icon)
@@ -340,6 +337,33 @@ struct TutorialModalView: View {
 
             startPulseAnimation()
         }
+    }
+
+    private var welcomeArtwork: some View {
+        ZStack {
+            Circle()
+                .fill(.white.opacity(0.16))
+                .frame(width: isSmallDevice() ? 88 : 104, height: isSmallDevice() ? 88 : 104)
+
+            Circle()
+                .stroke(.white.opacity(0.2), lineWidth: 2)
+                .frame(width: isSmallDevice() ? 112 : 128, height: isSmallDevice() ? 112 : 128)
+
+            Image(systemName: steps[currentStep].icon)
+                .font(.system(size: isSmallDevice() ? 40 : 46, weight: .semibold))
+                .foregroundColor(.white)
+
+            Image(systemName: "sparkles")
+                .font(.system(size: isSmallDevice() ? 16 : 18, weight: .bold))
+                .foregroundColor(.white.opacity(0.9))
+                .offset(x: isSmallDevice() ? 34 : 40, y: isSmallDevice() ? -28 : -32)
+
+            Image(systemName: "book.fill")
+                .font(.system(size: isSmallDevice() ? 14 : 16, weight: .bold))
+                .foregroundColor(.white.opacity(0.85))
+                .offset(x: isSmallDevice() ? -36 : -42, y: isSmallDevice() ? 26 : 30)
+        }
+        .frame(height: isSmallDevice() ? 100 : 120)
     }
 
     private func goToNextStep() {

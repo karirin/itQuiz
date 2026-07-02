@@ -1793,6 +1793,7 @@ extension QuizView {
         timer?.invalidate()
 
         let isAnswerCorrect = selectedAnswerIndex == currentQuiz.correctAnswerIndex
+        authManager.recordAnswer(isCorrect: isAnswerCorrect)
         if isAnswerCorrect {
             let damage = comboAdjustedDamage()
             audioManager.playCorrectSound()

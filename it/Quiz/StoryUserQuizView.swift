@@ -349,6 +349,7 @@ struct StoryUserQuizView: View {
                     navigateToQuizResultView: $navigateToQuizResultView,
                     playerExperience: playerExperience,
                     playerMoney: playerMoney,
+                    itemRewards: [],
                     elapsedTime: quizLevel == .timeBeginner ? self.elapsedTime ?? 0 : 0,
                     quizLevel: quizLevel,
                     victoryFlag: $victoryFlag,
@@ -686,7 +687,9 @@ extension StoryUserQuizView {
         timer?.invalidate()
 
         let isAnswerCorrect = selectedAnswerIndex == currentQuiz.correctAnswerIndex
+        authManager.recordAnswer(isCorrect: isAnswerCorrect)
         if isAnswerCorrect {
+            let boostedAttack = max(Int((Double(userAttack) * viewModel.consumeAttackBoostMultiplier()).rounded()), userAttack)
             audioManager.playCorrectSound()
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 audioManager.playAttackSound()
@@ -695,7 +698,7 @@ extension StoryUserQuizView {
                 incorrectCount -= 1
                 answerCount += 1
                 if quizLevel != .incorrectAnswer && quizLevel != .incorrectITAnswer && quizLevel != .incorrectInfoAnswer && quizLevel != .incorrectAppliedAnswer {
-                    monsterHP -= userAttack
+                    monsterHP -= boostedAttack
                 }
                 if monsterHP <= 0 {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {

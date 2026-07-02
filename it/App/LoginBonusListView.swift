@@ -11,6 +11,7 @@ struct LoginBonusListView: View {
     let currentDay: Int
     @Environment(\.dismiss) private var dismiss
     @State private var scrollTarget: Int? = nil
+    @State private var selectedRewardDay: RewardDay? = nil
     
     // 全500日の累計
     private var totalAllCoins: Int {
@@ -31,6 +32,7 @@ struct LoginBonusListView: View {
                 RewardDay(
                     day: day,
                     coins: LoginBonusConfig.coinAmount(for: day),
+                    itemRewards: LoginBonusConfig.itemRewards(for: day),
                     milestone: LoginBonusConfig.milestoneRank(day: day),
                     isCollected: day < currentDay,
                     isToday: day == currentDay
@@ -65,7 +67,10 @@ struct LoginBonusListView: View {
                             ForEach(sections) { section in
                                 Section {
                                     ForEach(section.days) { day in
-                                        RewardRowView(day: day)
+                                        RewardRowView(day: day) {
+                                            guard !day.itemRewards.isEmpty else { return }
+                                            selectedRewardDay = day
+                                        }
                                             .id(day.day)
                                             .listRowBackground(
                                                 day.isToday
@@ -101,6 +106,9 @@ struct LoginBonusListView: View {
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbarBackground(Color(red: 0.07, green: 0.07, blue: 0.12), for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
+        }
+        .sheet(item: $selectedRewardDay) { day in
+            LoginBonusRewardDetailModal(day: day)
         }
         .preferredColorScheme(.dark)
     }
@@ -212,6 +220,7 @@ struct RewardDay: Identifiable {
     var id: Int { day }
     let day: Int
     let coins: Int
+    let itemRewards: [InventoryReward]
     let milestone: LoginBonusConfig.MilestoneRank
     let isCollected: Bool
     let isToday: Bool
@@ -220,6 +229,7 @@ struct RewardDay: Identifiable {
 // MARK: - Row View
 struct RewardRowView: View {
     let day: RewardDay
+    var onTap: (() -> Void)? = nil
     
     private var accentColor: Color {
         LoginBonusConfig.color(for: day.day)
@@ -227,6 +237,10 @@ struct RewardRowView: View {
     
     private var icon: String {
         LoginBonusConfig.icon(for: day.day)
+    }
+
+    private var isInteractive: Bool {
+        !day.itemRewards.isEmpty && onTap != nil
     }
     
     var body: some View {
@@ -278,6 +292,20 @@ struct RewardRowView: View {
                         .font(.system(size: 11, weight: .medium, design: .rounded))
                         .foregroundColor(accentColor.opacity(0.8))
                 }
+
+                if !day.itemRewards.isEmpty {
+                    HStack(spacing: 6) {
+                        ForEach(Array(day.itemRewards.enumerated()), id: \.offset) { entry in
+                            let reward = entry.element
+                            HStack(spacing: 4) {
+                                InventoryItemArtworkView(type: reward.type, width: 20, height: 20, cornerRadius: 5)
+                                Text("x\(reward.amount)")
+                                    .font(.system(size: 11, weight: .semibold, design: .rounded))
+                                    .foregroundColor(.white.opacity(0.75))
+                            }
+                        }
+                    }
+                }
             }
             
             Spacer()
@@ -297,9 +325,19 @@ struct RewardRowView: View {
                         .white.opacity(0.4)
                     )
             }
+
+            if isInteractive {
+                Image(systemName: "chevron.right.circle.fill")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(.white.opacity(0.35))
+            }
         }
         .padding(.vertical, 4)
         .opacity(day.isCollected ? 0.7 : 1.0)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            onTap?()
+        }
         .listRowBackground(
             day.isToday ? Color.yellow.opacity(0.08) :
             day.milestone == .ultra ? Color(red: 1, green: 0.84, blue: 0).opacity(0.05) :
@@ -351,6 +389,143 @@ struct RewardRowView: View {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
         return formatter.string(from: NSNumber(value: amount)) ?? "\(amount)"
+    }
+}
+
+struct LoginBonusRewardDetailModal: View {
+    let day: RewardDay
+    @Environment(\.dismiss) private var dismiss
+
+    private var accentColor: Color {
+        LoginBonusConfig.color(for: day.day)
+    }
+
+    private var milestoneText: String? {
+        switch day.milestone {
+        case .ultra:
+            return "超特別ボーナス"
+        case .super_:
+            return "特大ボーナス"
+        case .normal:
+            return "ボーナスデー"
+        case .none:
+            return nil
+        }
+    }
+
+    var body: some View {
+        NavigationView {
+            ZStack {
+                LinearGradient(
+                    colors: [
+                        Color(red: 0.08, green: 0.08, blue: 0.13),
+                        Color(red: 0.12, green: 0.08, blue: 0.18)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .ignoresSafeArea()
+
+                VStack(spacing: 18) {
+                    VStack(spacing: 10) {
+                        Text("Day \(day.day)")
+                            .font(.system(size: 28, weight: .bold, design: .rounded))
+                            .foregroundColor(.white)
+
+                        if let milestoneText {
+                            Text(milestoneText)
+                                .font(.system(size: 12, weight: .bold, design: .rounded))
+                                .foregroundColor(accentColor)
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 5)
+                                .background(accentColor.opacity(0.18))
+                                .clipShape(Capsule())
+                        }
+                    }
+
+                    VStack(spacing: 12) {
+                        rewardDetailRow(
+                            iconView: AnyView(
+                                Image("コイン")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 34, height: 34)
+                            ),
+                            title: "コイン",
+                            value: "\(day.coins)"
+                        )
+
+                        ForEach(Array(day.itemRewards.enumerated()), id: \.offset) { entry in
+                            let reward = entry.element
+                            rewardDetailRow(
+                                iconView: AnyView(
+                                    InventoryItemArtworkView(type: reward.type, width: 40, height: 40, cornerRadius: 12)
+                                ),
+                                title: reward.type.displayName,
+                                value: "x\(reward.amount)"
+                            )
+                        }
+                    }
+                    .padding(18)
+                    .background(
+                        RoundedRectangle(cornerRadius: 20)
+                            .fill(Color.white.opacity(0.08))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 20)
+                                    .stroke(Color.white.opacity(0.1), lineWidth: 1)
+                            )
+                    )
+
+                    Text("この日に受け取れるアイテム報酬です。")
+                        .font(.system(size: 13, weight: .medium, design: .rounded))
+                        .foregroundColor(.white.opacity(0.6))
+
+                    Spacer()
+                }
+                .padding(20)
+            }
+            .navigationTitle("報酬詳細")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("閉じる") {
+                        dismiss()
+                    }
+                    .foregroundColor(.yellow)
+                }
+            }
+            .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbarBackground(Color(red: 0.08, green: 0.08, blue: 0.13), for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
+        }
+        .preferredColorScheme(.dark)
+    }
+
+    private func rewardDetailRow(iconView: AnyView, title: String, value: String) -> some View {
+        HStack(spacing: 12) {
+            iconView
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(title)
+                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+                    .foregroundColor(.white)
+                Text("獲得報酬")
+                    .font(.system(size: 11, weight: .medium, design: .rounded))
+                    .foregroundColor(.white.opacity(0.45))
+            }
+
+            Spacer()
+
+            Text(value)
+                .font(.system(size: 22, weight: .bold, design: .rounded))
+                .foregroundColor(accentColor)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color.white.opacity(0.06))
+        )
     }
 }
 

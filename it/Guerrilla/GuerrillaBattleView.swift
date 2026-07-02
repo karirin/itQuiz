@@ -1,5 +1,5 @@
 //
-//  RaidBattleView.swift
+//  GuerrillaBattleView.swift
 //  it
 //
 //  Created on 2026/03/12.
@@ -8,8 +8,8 @@
 import SwiftUI
 import AVFoundation
 
-struct RaidBattleView: View {
-    @ObservedObject var raidManager: RaidManager
+struct GuerrillaBattleView: View {
+    @ObservedObject var guerrillaManager: GuerrillaManager
     @ObservedObject var authManager: AuthManager
     @ObservedObject var audioManager: AudioManager
     @Binding var isPresenting: Bool
@@ -42,8 +42,8 @@ struct RaidBattleView: View {
     @State private var isSoundOn: Bool = true
 
     var currentQuiz: QuizQuestion? {
-        guard currentQuizIndex < raidManager.quizzes.count else { return nil }
-        return raidManager.quizzes[currentQuizIndex]
+        guard currentQuizIndex < guerrillaManager.quizzes.count else { return nil }
+        return guerrillaManager.quizzes[currentQuizIndex]
     }
 
     var body: some View {
@@ -92,7 +92,7 @@ struct RaidBattleView: View {
 
                             // モンスター画像 + コンボバッジ
                             ZStack {
-                                Image(raidManager.bossImageName)
+                                Image(guerrillaManager.bossImageName)
                                     .resizable()
                                     .scaledToFit()
                                     .shadow(radius: 10)
@@ -134,9 +134,9 @@ struct RaidBattleView: View {
                                 VStack {
                                     // ボスHP
                                     HStack {
-                                        ProgressBar3(value: Double(max(0, raidManager.bossHP)), maxValue: Double(raidManager.bossMaxHP), color: Color("hpMonsterColor"))
+                                        ProgressBar3(value: Double(max(0, guerrillaManager.bossHP)), maxValue: Double(guerrillaManager.bossMaxHP), color: Color("hpMonsterColor"))
                                             .frame(height: 20)
-                                        Text("\(max(0, raidManager.bossHP))/\(raidManager.bossMaxHP)")
+                                        Text("\(max(0, guerrillaManager.bossHP))/\(guerrillaManager.bossMaxHP)")
                                             .padding(.horizontal, 10)
                                             .padding(.vertical, 3)
                                             .foregroundColor(Color(.white))
@@ -188,7 +188,7 @@ struct RaidBattleView: View {
                                 }
                             }
 
-                            // 参加者ダメージバー（レイド専用）
+                            // 参加者ダメージバー（ゲリラ専用）
                             playersBar
                         }
                     }
@@ -220,7 +220,7 @@ struct RaidBattleView: View {
                     ZStack {
                         Color.black.opacity(0.7)
                             .edgesIgnoringSafeArea(.all)
-                        RaidHomeModalView(
+                        GuerrillaHomeModalView(
                             isSoundOn: $isSoundOn,
                             isPresented: $showHomeModal,
                             isPresenting: $isPresenting,
@@ -231,8 +231,8 @@ struct RaidBattleView: View {
 
                 // 結果画面への遷移
                 NavigationLink("",
-                    destination: RaidResultView(
-                        raidManager: raidManager,
+                    destination: GuerrillaResultView(
+                        guerrillaManager: guerrillaManager,
                         authManager: authManager,
                         audioManager: audioManager,
                         results: quizResults,
@@ -246,25 +246,25 @@ struct RaidBattleView: View {
         .onAppear {
             setupBattle()
         }
-        .onChange(of: raidManager.status) { newStatus in
+        .onChange(of: guerrillaManager.status) { newStatus in
             if newStatus == "completed" {
                 handleBossDefeated()
             }
         }
-        .onChange(of: raidManager.bossHP) { newHP in
+        .onChange(of: guerrillaManager.bossHP) { newHP in
             if newHP <= 0 && !navigateToResult {
                 handleBossDefeated()
             }
         }
     }
 
-    // MARK: - 参加者バー（レイド専用）
+    // MARK: - 参加者バー（ゲリラ専用）
 
     private var playersBar: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 10) {
-                ForEach(raidManager.players) { player in
-                    let isMe = player.id == raidManager.currentUserId
+                ForEach(guerrillaManager.players) { player in
+                    let isMe = player.id == guerrillaManager.currentUserId
                     let displayAvatarName = player.avatarName.isEmpty && isMe
                         ? (authManager.usedAvatars.first?.name ?? "")
                         : player.avatarName
@@ -353,6 +353,7 @@ struct RaidBattleView: View {
         selectedAnswerIndex = index
 
         let isCorrect = index == quiz.correctAnswerIndex
+        authManager.recordAnswer(isCorrect: isCorrect)
 
         if isCorrect {
             audioManager.playCorrectSound()
@@ -364,7 +365,7 @@ struct RaidBattleView: View {
                 audioManager.playAttackSound()
                 showAttackImage = true
                 registerSuccessfulCombo()
-                raidManager.attackBoss(damage: damage) { _ in }
+                guerrillaManager.attackBoss(damage: damage) { _ in }
             }
 
             quizResults.append(QuizResult(
@@ -376,7 +377,7 @@ struct RaidBattleView: View {
             ))
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                raidManager.incrementTotalCount()
+                guerrillaManager.incrementTotalCount()
                 if playerHP <= 0 {
                     navigateToResult = true
                     return
@@ -390,7 +391,7 @@ struct RaidBattleView: View {
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 audioManager.playMonsterAttackSound()
-                playerHP -= raidManager.bossAttack
+                playerHP -= guerrillaManager.bossAttack
                 showAttackImage = true
                 showIncorrectBackground = true
             }
@@ -405,7 +406,7 @@ struct RaidBattleView: View {
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                 showIncorrectBackground = false
-                raidManager.incrementTotalCount()
+                guerrillaManager.incrementTotalCount()
                 if playerHP <= 0 {
                     navigateToResult = true
                     return
@@ -416,9 +417,9 @@ struct RaidBattleView: View {
     }
 
     private func moveToNextQuiz() {
-        if raidManager.bossHP <= 0 { return }
+        if guerrillaManager.bossHP <= 0 { return }
 
-        if currentQuizIndex + 1 < raidManager.quizzes.count {
+        if currentQuizIndex + 1 < guerrillaManager.quizzes.count {
             currentQuizIndex += 1
             selectedAnswerIndex = nil
             hasAnswered = false
@@ -444,9 +445,9 @@ struct RaidBattleView: View {
     }
 }
 
-// MARK: - レイド用ホームモーダル（RankModalViewと同じデザイン）
+// MARK: - ゲリラ用ホームモーダル（RankModalViewと同じデザイン）
 
-struct RaidHomeModalView: View {
+struct GuerrillaHomeModalView: View {
     @Binding var isSoundOn: Bool
     @Binding var isPresented: Bool
     @Binding var isPresenting: Bool

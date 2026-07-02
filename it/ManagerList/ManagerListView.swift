@@ -41,11 +41,11 @@ struct ManagerListView: View {
     // Reward
     @StateObject var reward = Reward()
 
-    // Raid
-    @StateObject private var raidManager = RaidManager()
-    @State private var isPresentingRaid = false
-    @State private var showRaidButton: Bool = false
-    private let raidClickedKey = "raidButtonClickedExpiresAt"
+    // Guerrilla
+    @StateObject private var guerrillaManager = GuerrillaManager()
+    @State private var isPresentingGuerrilla = false
+    @State private var showGuerrillaButton: Bool = false
+    private let guerrillaClickedKey = "guerrillaButtonClickedExpiresAt"
     
     // Animation
     @State private var animateCards: Bool = false
@@ -74,8 +74,8 @@ struct ManagerListView: View {
 
             floatingRewardButton
 
-            if showRaidButton {
-                floatingRaidButton
+            if showGuerrillaButton {
+                guerrillaBossButton
             }
 
             if tutorialNum == 2 {
@@ -86,8 +86,8 @@ struct ManagerListView: View {
             navigationLinks
         }
         .onAppear(perform: setupView)
-        .onChange(of: raidManager.status) { _ in
-            updateRaidButtonVisibility()
+        .onChange(of: guerrillaManager.status) { _ in
+            updateGuerrillaButtonVisibility()
         }
 
         .alert(isPresented: $showAlert) {
@@ -414,8 +414,8 @@ struct ManagerListView: View {
         }
     }
     
-    // MARK: - Floating Raid Button
-    private var floatingRaidButton: some View {
+    // MARK: - Guerrilla Boss Button
+    private var guerrillaBossButton: some View {
         VStack {
             Spacer()
             HStack {
@@ -423,38 +423,15 @@ struct ManagerListView: View {
                 Button(action: {
                     generateHapticFeedback()
                     audioManager.playSound()
-                    UserDefaults.standard.set(raidManager.expiresAt, forKey: raidClickedKey)
-                    isPresentingRaid = true
+                    UserDefaults.standard.set(guerrillaManager.expiresAt, forKey: guerrillaClickedKey)
+                    isPresentingGuerrilla = true
                 }) {
-                    HStack(spacing: 8) {
-                        Image(raidManager.bossImageName)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 44, height: 44)
-
-                        VStack(alignment: .leading, spacing: 2) {
-                            HStack(spacing: 4) {
-                                Image(systemName: "bolt.fill")
-                                    .font(.system(size: 10, weight: .bold))
-                                Text("ゲリラボス出現中")
-                                    .font(.system(size: 11, weight: .bold))
-                            }
-                            Text(raidManager.bossName)
-                                .font(.system(size: 13, weight: .bold))
-                        }
-                        .foregroundColor(.white)
-                    }
-                    .frame(height: 90)
-                    .padding(.horizontal, 14)
-                    .background(
-                        LinearGradient(
-                            colors: [Color.orange, Color.red],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
-                    .shadow(color: .orange.opacity(0.6), radius: 8, y: 4)
+                    Image("ゲリラボスボタン")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 160)
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                        .shadow(color: .orange.opacity(0.6), radius: 10, y: 4)
                 }
                 .padding(.trailing, 20)
                 .padding(.bottom, 30)
@@ -628,8 +605,8 @@ struct ManagerListView: View {
             ) { EmptyView() }
 
             NavigationLink(
-                destination: RaidLobbyView(authManager: authManager, audioManager: audioManager, isPresenting: $isPresentingRaid).navigationBarBackButtonHidden(true),
-                isActive: $isPresentingRaid
+                destination: GuerrillaLobbyView(authManager: authManager, audioManager: audioManager, isPresenting: $isPresentingGuerrilla).navigationBarBackButtonHidden(true),
+                isActive: $isPresentingGuerrilla
             ) { EmptyView() }
         }
         .hidden()
@@ -637,28 +614,28 @@ struct ManagerListView: View {
     }
 
     
-    // MARK: - Raid Button Visibility
-    private func updateRaidButtonVisibility() {
-        guard raidManager.status == "active" else {
-            showRaidButton = false
-            UserDefaults.standard.removeObject(forKey: raidClickedKey)
+    // MARK: - Guerrilla Button Visibility
+    private func updateGuerrillaButtonVisibility() {
+        guard guerrillaManager.status == "active" else {
+            showGuerrillaButton = false
+            UserDefaults.standard.removeObject(forKey: guerrillaClickedKey)
             return
         }
 
-        let clickedExpiresAt = UserDefaults.standard.double(forKey: raidClickedKey)
-        if clickedExpiresAt > 0 && clickedExpiresAt == raidManager.expiresAt {
-            showRaidButton = true
+        let clickedExpiresAt = UserDefaults.standard.double(forKey: guerrillaClickedKey)
+        if clickedExpiresAt > 0 && clickedExpiresAt == guerrillaManager.expiresAt {
+            showGuerrillaButton = true
             return
         }
 
         // 30% random chance
-        showRaidButton = Int.random(in: 1...10) <= 3
+        showGuerrillaButton = Int.random(in: 1...10) <= 3
     }
 
     // MARK: - Setup
     private func setupView() {
         reward.LoadReward()
-        raidManager.observeActiveRaid()
+        guerrillaManager.observeActiveGuerrilla()
 
         authManager.fetchUserInfo { _, _, _, _, _, tutorial in
             if let tutorial = tutorial {

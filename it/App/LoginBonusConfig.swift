@@ -68,6 +68,63 @@ struct LoginBonusConfig {
     static func totalCoins(upTo day: Int) -> Int {
         (1...min(max(day, 1), maxDay)).reduce(0) { $0 + coinAmount(for: $1) }
     }
+
+    static func itemRewards(for day: Int) -> [InventoryReward] {
+        let clampedDay = min(max(day, 1), maxDay)
+
+        if clampedDay % 100 == 0 {
+            return [
+                InventoryReward(type: .normalGachaTicket, amount: 5),
+                InventoryReward(type: .rareGachaTicket, amount: 2),
+                InventoryReward(type: .mekaGachaTicket, amount: 1),
+                InventoryReward(type: .godGachaTicket, amount: 1),
+                InventoryReward(type: .staminaPotion, amount: 5),
+                InventoryReward(type: .boostTicket, amount: 2)
+            ]
+        }
+
+        if clampedDay % 50 == 0 {
+            return [
+                InventoryReward(type: .normalGachaTicket, amount: 2),
+                InventoryReward(type: .rareGachaTicket, amount: 1),
+                InventoryReward(type: .mekaGachaTicket, amount: 1),
+                InventoryReward(type: .staminaPotion, amount: 3),
+                InventoryReward(type: .boostTicket, amount: 1)
+            ]
+        }
+
+        if clampedDay % 30 == 0 {
+            return [InventoryReward(type: .mekaGachaTicket, amount: 1)]
+        }
+
+        if clampedDay % 20 == 0 {
+            return [InventoryReward(type: .boostTicket, amount: 1)]
+        }
+
+        if clampedDay % 15 == 0 {
+            return [InventoryReward(type: .rareGachaTicket, amount: 1)]
+        }
+
+        if clampedDay % 10 == 0 {
+            return [InventoryReward(type: .staminaPotion, amount: 2)]
+        }
+
+        if clampedDay % 5 == 0 {
+            return [InventoryReward(type: .normalGachaTicket, amount: 1)]
+        }
+
+        return []
+    }
+
+    static func itemRewardText(for day: Int) -> String {
+        let rewards = itemRewards(for: day)
+        guard !rewards.isEmpty else { return "" }
+        let labels = rewards.map { "\($0.type.shortName)x\($0.amount)" }
+        if labels.count <= 2 {
+            return labels.joined(separator: " / ")
+        }
+        return labels.prefix(2).joined(separator: " / ") + " / +\(labels.count - 2)種"
+    }
     
     /// 現在の5日間ページ（0-indexed）
     static func currentPage(for day: Int) -> Int {

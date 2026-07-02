@@ -91,6 +91,10 @@ struct LoginBonusModernView: View {
     private var isMilestone: Bool {
         LoginBonusConfig.isMilestone(day: loginCount)
     }
+
+    private var currentItemRewards: [InventoryReward] {
+        LoginBonusConfig.itemRewards(for: loginCount)
+    }
     
     var body: some View {
         ZStack {
@@ -273,6 +277,7 @@ struct LoginBonusModernView: View {
                     DayStampView(
                         day: day,
                         coinAmount: LoginBonusConfig.coinAmount(for: day),
+                        itemRewardText: LoginBonusConfig.itemRewardText(for: day),
                         isToday: day == loginCount,
                         isCollected: day < loginCount,
                         todayStampScale: day == loginCount ? todayStampScale : 1.0
@@ -336,6 +341,38 @@ struct LoginBonusModernView: View {
                     .font(.system(size: 18, weight: .bold, design: .rounded))
                     .foregroundColor(.white.opacity(0.8))
             }
+
+            if !currentItemRewards.isEmpty {
+                VStack(spacing: 8) {
+                    Text("追加アイテム")
+                        .font(.system(size: 13, weight: .semibold, design: .rounded))
+                        .foregroundColor(.white.opacity(0.55))
+
+                    VStack(spacing: 8) {
+                        ForEach(Array(currentItemRewards.enumerated()), id: \.offset) { entry in
+                            let reward = entry.element
+                            HStack(spacing: 10) {
+                                InventoryItemArtworkView(type: reward.type, width: 36, height: 36, cornerRadius: 10)
+
+                                Text(reward.type.displayName)
+                                    .font(.system(size: 14, weight: .bold, design: .rounded))
+                                    .foregroundColor(.white)
+
+                                Spacer()
+
+                                Text("x\(reward.amount)")
+                                    .font(.system(size: 14, weight: .bold, design: .rounded))
+                                    .foregroundColor(reward.type.accentColor)
+                            }
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 10)
+                            .background(Color.white.opacity(0.07))
+                            .clipShape(RoundedRectangle(cornerRadius: 14))
+                        }
+                    }
+                }
+                .padding(.top, 4)
+            }
         }
     }
     
@@ -385,6 +422,7 @@ struct LoginBonusModernView: View {
         impactMed.impactOccurred()
         UINotificationFeedbackGenerator().notificationOccurred(.success)
         withAnimation(.spring(response: 0.3)) { coinBurstAnimation = true; confettiActive = true }
+        authManager.fetchInventory()
         onCollected?()
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.8) {
             withAnimation(.easeOut(duration: 0.3)) { appearAnimation = false }
@@ -397,6 +435,7 @@ struct LoginBonusModernView: View {
 struct DayStampView: View {
     let day: Int
     let coinAmount: Int
+    let itemRewardText: String
     let isToday: Bool
     let isCollected: Bool
     let todayStampScale: CGFloat
@@ -459,6 +498,15 @@ struct DayStampView: View {
                 .foregroundColor(isToday ? dayColor : isCollected ? .white.opacity(0.6) : .white.opacity(0.3))
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
+
+            if !itemRewardText.isEmpty {
+                Text(itemRewardText)
+                    .font(.system(size: 7, weight: .bold, design: .rounded))
+                    .foregroundColor(isToday ? .white : isCollected ? .white.opacity(0.65) : .white.opacity(0.28))
+                    .lineLimit(2)
+                    .multilineTextAlignment(.center)
+                    .minimumScaleFactor(0.7)
+            }
         }
         .frame(maxWidth: .infinity)
         .onAppear { if isToday { glowPulse = true } }

@@ -14,7 +14,12 @@ final class AppState: ObservableObject {
 
     @Published var isBannerVisible = true
     @Published var isSubscribed: Bool = false
+    @Published var hasResolvedSubscriptionState = false
     private var transactionListenerTask: Task<Void, Never>?
+
+    var shouldShowAds: Bool {
+        hasResolvedSubscriptionState && isBannerVisible
+    }
 
     init() {
         transactionListenerTask = observeTransactionUpdates()
@@ -35,6 +40,7 @@ final class AppState: ObservableObject {
         } catch {
             print("サブスクリプションの確認中にエラー: \(error)")
         }
+        hasResolvedSubscriptionState = true
     }
 
     func checkCurrentSubscription() async {
@@ -49,6 +55,7 @@ final class AppState: ObservableObject {
 
         isSubscribed = isActiveSubscription
         isBannerVisible = !isActiveSubscription
+        hasResolvedSubscriptionState = true
     }
     
     func checkSubscription() {

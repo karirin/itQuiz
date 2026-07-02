@@ -19,6 +19,7 @@ struct StoryQuizResultView: View {
     @ObservedObject var audioManager = AudioManager.shared
     @State private var playerExperience: Int
     @State private var playerMoney: Int
+    @State private var itemRewards: [InventoryReward]
     @State private var isContentView: Bool = false
     var elapsedTime: TimeInterval
     @State var results: [QuizResult]
@@ -47,14 +48,16 @@ struct StoryQuizResultView: View {
     @ObservedObject var viewModel: PositionViewModel
     @State private var hasRequestedInterstitial = false
     @State private var hasPresentedInterstitial = false
+    @State private var hasRecordedDungeonSummary = false
 
-    init(results: [QuizResult], authManager: AuthManager, isPresenting: Binding<Bool>, navigateToQuizResultView: Binding<Bool>, playerExperience: Int, playerMoney: Int, elapsedTime: TimeInterval, quizLevel: QuizLevel, victoryFlag: Binding<Bool>, isUserStoryFlag: Binding<Bool>, viewModel: PositionViewModel) {
+    init(results: [QuizResult], authManager: AuthManager, isPresenting: Binding<Bool>, navigateToQuizResultView: Binding<Bool>, playerExperience: Int, playerMoney: Int, itemRewards: [InventoryReward], elapsedTime: TimeInterval, quizLevel: QuizLevel, victoryFlag: Binding<Bool>, isUserStoryFlag: Binding<Bool>, viewModel: PositionViewModel) {
         _results = State(initialValue: results)
         self.authManager = authManager
         _isPresenting = isPresenting
         _navigateToQuizResultView = navigateToQuizResultView
         _playerExperience = State(initialValue: playerExperience)
         _playerMoney = State(initialValue: playerMoney)
+        _itemRewards = State(initialValue: itemRewards)
         self.elapsedTime = elapsedTime
         self.quizLevel = quizLevel
         _victoryFlag = victoryFlag
@@ -87,7 +90,7 @@ struct StoryQuizResultView: View {
             
             NavigationView {
                 VStack(spacing: 0) {
-                    if appState.isBannerVisible {
+                    if appState.shouldShowAds {
                         // ヘッダー部分
                         headerView
                     }
@@ -112,7 +115,7 @@ struct StoryQuizResultView: View {
                 .navigationBarTitleDisplayMode(.inline)
             }
             .background {
-                if appState.isBannerVisible {
+                if appState.shouldShowAds {
                     adViewControllerRepresentable
                         .frame(width: .zero, height: .zero)
                 }
@@ -158,6 +161,20 @@ struct StoryQuizResultView: View {
         }
         .onAppear {
             setupOnAppear()
+            if !hasRecordedDungeonSummary {
+                viewModel.recordBattleSession(
+                    accuracy: accuracyPercentage,
+                    maxConsecutiveCorrect: maxConsecutiveCorrect(),
+                    correctCount: correctAnswersCount,
+                    totalCount: results.count,
+                    victory: victoryFlag
+                )
+                hasRecordedDungeonSummary = true
+            }
+            // ストーリークリア時のミッション進捗
+            if victoryFlag {
+                authManager.recordStoryCompleted()
+            }
             // モーダルを少し遅れて表示
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 showModal = true
@@ -171,7 +188,9 @@ struct StoryQuizResultView: View {
                     viewModel.incrementPosition()
                 }
             } else {
-                viewModel.decreaseStamina(by: 10)
+                if !viewModel.consumeDefeatShield() {
+                    viewModel.decreaseStamina(by: 10)
+                }
             }
         }
     }
@@ -286,6 +305,45 @@ struct StoryQuizResultView: View {
                     Text("\(String(format: "%.1f", accuracyPercentage))%")
                         .font(.system(size: 32, weight: .bold, design: .rounded))
                         .foregroundColor(.primary)
+                }
+            }
+
+            HStack(spacing: 12) {
+                rewardSummaryChip(icon: "経験値", title: "経験値", value: "+\(playerExperience * authManager.rewardFlag)")
+                rewardSummaryChip(icon: "コイン", title: "コイン", value: "+\(playerMoney * authManager.rewardFlag)")
+            }
+
+            if !itemRewards.isEmpty {
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("追加アイテム")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 10) {
+                            ForEach(Array(itemRewards.enumerated()), id: \.offset) { entry in
+                                let reward = entry.element
+                                HStack(spacing: 8) {
+                                    InventoryItemArtworkView(type: reward.type, width: 34, height: 34, cornerRadius: 10)
+
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(reward.type.shortName)
+                                            .font(.system(size: 13, weight: .semibold))
+                                            .foregroundColor(.primary)
+                                        Text("x\(reward.amount)")
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                    }
+                                }
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 8)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .fill(Color(.systemGray6))
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -542,6 +600,33 @@ struct StoryQuizResultView: View {
             )
         }
     }
+
+    private func rewardSummaryChip(icon: String, title: String, value: String) -> some View {
+        HStack(spacing: 10) {
+            Image(icon)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 24, height: 24)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                Text(value)
+                    .font(.system(size: 18, weight: .bold, design: .rounded))
+                    .foregroundColor(.primary)
+            }
+
+            Spacer(minLength: 0)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color(.systemGray6))
+        )
+    }
     
     private var backButton: some View {
         Button(action: {
@@ -564,7 +649,7 @@ struct StoryQuizResultView: View {
     @ViewBuilder
     private var modalOverlays: some View {
         if showModal {
-            ExperienceModalView(showModal: $showModal, addedExperience: playerExperience, addedMoney: playerMoney, authManager: authManager)
+            ExperienceModalView(showModal: $showModal, addedExperience: playerExperience, addedMoney: playerMoney, itemRewards: itemRewards, authManager: authManager)
         }
         if showLevelUpModal {
             LevelUpModalView(showLevelUpModal: $showLevelUpModal, authManager: authManager)
@@ -625,26 +710,12 @@ struct StoryQuizResultView: View {
     private func setupOnAppear() {
         authManager.fetchUserStory()
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            if appState.isBannerVisible {
+            if appState.shouldShowAds {
                 executeProcessEveryFortyTimes()
             }
         }
-        
-        // 広告処理
-        DispatchQueue.main.async {
-            if !interstitial.interstitialAdLoaded && interstitial.wasAdDismissed == false {
-                interstitial.loadInterstitial(completion: { isLoaded in
-                    if isLoaded {
-                        self.interstitial.presentInterstitial(from: adViewControllerRepresentable.viewController)
-                    }
-                })
-            } else if !interstitial.wasAdDismissed {
-                interstitial.presentInterstitial(from: adViewControllerRepresentable.viewController)
-            }
-        }
-        
-        // 広告処理
-        if appState.isBannerVisible && !hasRequestedInterstitial {
+
+        if appState.shouldShowAds && !hasRequestedInterstitial {
             hasRequestedInterstitial = true
 
             interstitial.loadInterstitial { isLoaded in
@@ -753,6 +824,7 @@ struct StoryQuizResultView_Previews: PreviewProvider {
             navigateToQuizResultView: $navigateToQuizResultView,
             playerExperience: 25,
             playerMoney: 15,
+            itemRewards: [InventoryReward(type: .normalGachaTicket, amount: 1)],
             elapsedTime: 0,
             quizLevel: .beginner,
             victoryFlag: .constant(true),
