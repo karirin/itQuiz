@@ -31,96 +31,89 @@ struct SettingView: View {
     @State private var isSoundOn: Bool = true
     @ObservedObject var authManager = AuthManager.shared
     @State private var showingDeleteAlert = false
-    @Environment(\.colorScheme) private var colorScheme
-    var backgroundColor: Color { colorScheme == .dark ? Color(.systemBackground) : Color(.white) }
+
+    private var appVersion: String {
+        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "-"
+    }
 
     var body: some View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 0) {
-                    // フィードバックセクション
+                    // 各種設定セクション
                     VStack(spacing: 0) {
-                        HStack {
-                            Text("各種設定")
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                            Spacer()
-                        }
-                        .padding(.horizontal, 20)
-                        .padding(.top, 20)
-                        .padding(.bottom, 8)
-                        
+                        sectionHeader(title: "各種設定")
+
                         VStack(spacing: 0) {
                             soundToggleRow
-                            Divider().padding(.leading, 56)
+                            Divider().padding(.leading, 60)
 
                             NavigationLink(destination: InventoryView()) {
                                 settingRow(icon: "shippingbox.fill", iconColor: .teal, title: "持ち物")
                             }
                             .buttonStyle(PlainButtonStyle())
-                            Divider().padding(.leading, 56)
-                            
+                            Divider().padding(.leading, 60)
+
                             NavigationLink(destination: TermsOfServiceView()) {
-                                settingRow(icon: "doc.text", iconColor: .blue, title: "利用規約")
+                                settingRow(icon: "doc.text.fill", iconColor: .blue, title: "利用規約")
                             }
                             .buttonStyle(PlainButtonStyle())
-                            Divider().padding(.leading, 56)
-                            
+                            Divider().padding(.leading, 60)
+
                             NavigationLink(destination: PrivacyView()) {
-                                settingRow(icon: "lock.shield", iconColor: .orange, title: "プライバシーポリシー")
+                                settingRow(icon: "lock.shield.fill", iconColor: .orange, title: "プライバシーポリシー")
                             }
                             .buttonStyle(PlainButtonStyle())
-                            Divider().padding(.leading, 56)
-                            
+                            Divider().padding(.leading, 60)
+
                             NavigationLink(destination: WebView(urlString: "https://docs.google.com/forms/d/e/1FAIpQLSfHxhubkEjUw_gexZtQGU8ujZROUgBkBcIhB3R6b8KZpKtOEQ/viewform?embedded=true")) {
-                                settingRow(icon: "envelope", iconColor: .green, title: "お問い合せ")
+                                settingRow(icon: "envelope.fill", iconColor: .green, title: "お問い合せ")
                             }
                             .buttonStyle(PlainButtonStyle())
-                            Divider().padding(.leading, 56)
-                            
+                            Divider().padding(.leading, 60)
+
                             NavigationLink(destination: PreView(audioManager: audioManager).navigationBarBackButtonHidden(true)) {
-                                settingRow(icon: "eye.slash", iconColor: .purple, title: "広告を非表示にする")
+                                settingRow(icon: "eye.slash.fill", iconColor: .purple, title: "広告を非表示にする")
                             }
                             .buttonStyle(PlainButtonStyle())
-                            Divider().padding(.leading, 56)
-                            
+                            Divider().padding(.leading, 60)
+
                             deleteAccountRow
                         }
-                        .background(Color.white)
-                        .cornerRadius(12)
+                        .background(Color(.secondarySystemGroupedBackground))
+                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        .shadow(color: Color.black.opacity(0.05), radius: 8, y: 2)
                     }
-                    .shadow(color: Color.black.opacity(0.1), radius: 5)
-                    
+
                     // おすすめのアプリセクション
                     VStack(spacing: 0) {
-                        HStack {
-                            Text("おすすめのアプリ")
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                            Spacer()
-                        }
-                        .padding(.horizontal, 20)
-                        .padding(.top, 32)
-                        .padding(.bottom, 8)
-                        
+                        sectionHeader(title: "おすすめのアプリ")
+
                         VStack(spacing: 0) {
                             ForEach(Array(OtherApp.allApps.enumerated()), id: \.element.id) { index, app in
                                 appRow(app: app)
                                 if index < OtherApp.allApps.count - 1 {
-                                    Divider().padding(.leading, 72)
+                                    Divider().padding(.leading, 76)
                                 }
                             }
                         }
-                        .background(Color.white)
-                        .cornerRadius(12)
+                        .background(Color(.secondarySystemGroupedBackground))
+                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        .shadow(color: Color.black.opacity(0.05), radius: 8, y: 2)
                     }
-                    .shadow(color: Color.black.opacity(0.1), radius: 5)
+
+                    // バージョン情報
+                    Text("バージョン \(appVersion)")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundColor(Color(.tertiaryLabel))
+                        .padding(.top, 28)
+
                     Spacer(minLength: 40)
                 }
                 .padding(.horizontal, 16)
             }
-            .background(backgroundColor.ignoresSafeArea())
-            .navigationBarTitle("", displayMode: .inline)
+            .background(Color(.systemGroupedBackground).ignoresSafeArea())
+            .navigationBarTitle("設定", displayMode: .inline)
         }
         .gesture(
             DragGesture()
@@ -154,73 +147,91 @@ struct SettingView: View {
         }
     }
     
+    private func sectionHeader(title: String) -> some View {
+        HStack {
+            Text(title)
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundColor(.secondary)
+                .textCase(nil)
+            Spacer()
+        }
+        .padding(.horizontal, 8)
+        .padding(.top, 24)
+        .padding(.bottom, 8)
+    }
+
+    /// iOS設定アプリ風のアイコンチップ
+    private func iconChip(icon: String, color: Color) -> some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(color)
+                .frame(width: 30, height: 30)
+
+            Image(systemName: icon)
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundColor(.white)
+        }
+    }
+
     private var soundToggleRow: some View {
-        HStack(spacing: 12) {
-            Image(systemName: isSoundOn ? "speaker.wave.2" : "speaker.slash")
-                .font(.system(size: 20))
-                .foregroundColor(isSoundOn ? .blue : .gray)
-                .frame(width: 24, height: 24)
-            
+        HStack(spacing: 14) {
+            iconChip(icon: isSoundOn ? "speaker.wave.2.fill" : "speaker.slash.fill", color: isSoundOn ? .blue : .gray)
+
             Text(isSoundOn ? "音声オン" : "音声オフ")
                 .font(.system(size: 16))
-                .foregroundColor(.black)
-            
+                .foregroundColor(.primary)
+
             Spacer()
-            
+
             Toggle("", isOn: $isSoundOn)
                 .toggleStyle(SwitchToggleStyle())
+                .tint(AppTheme.primary)
         }
-        .padding(.horizontal, 20)
+        .padding(.horizontal, 16)
         .padding(.vertical, 12)
         .contentShape(Rectangle())
         .onChange(of: isSoundOn) { newValue in
             audioManager.toggleSound()
         }
     }
-    
+
     private func settingRow(icon: String, iconColor: Color, title: String) -> some View {
-        HStack(spacing: 12) {
-            Image(systemName: icon)
-                .font(.system(size: 20))
-                .foregroundColor(iconColor)
-                .frame(width: 24, height: 24)
-            
+        HStack(spacing: 14) {
+            iconChip(icon: icon, color: iconColor)
+
             Text(title)
                 .font(.system(size: 16))
-                .foregroundColor(.black)
-            
+                .foregroundColor(.primary)
+
             Spacer()
-            
+
             Image(systemName: "chevron.right")
-                .font(.system(size: 14, weight: .medium))
-//                .foregroundColor(.tertiaryLabel)
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundColor(Color(.tertiaryLabel))
         }
-        .padding(.horizontal, 20)
+        .padding(.horizontal, 16)
         .padding(.vertical, 12)
         .contentShape(Rectangle())
     }
-    
+
     private var deleteAccountRow: some View {
         Button(action: {
             showingDeleteAlert = true
         }) {
-            HStack(spacing: 12) {
-                Image(systemName: "trash")
-                    .font(.system(size: 20))
-                    .foregroundColor(.red)
-                    .frame(width: 24, height: 24)
-                
+            HStack(spacing: 14) {
+                iconChip(icon: "trash.fill", color: .red)
+
                 Text("アカウントを削除")
                     .font(.system(size: 16))
                     .foregroundColor(.red)
-                
+
                 Spacer()
-                
+
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 14, weight: .medium))
-//                    .foregroundColor(.tertiaryLabel)
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(Color(.tertiaryLabel))
             }
-            .padding(.horizontal, 20)
+            .padding(.horizontal, 16)
             .padding(.vertical, 12)
             .contentShape(Rectangle())
         }
@@ -240,35 +251,33 @@ struct SettingView: View {
     
     private func appRow(app: OtherApp) -> some View {
         Link(destination: URL(string: app.appStoreLink)!) {
-            HStack(spacing: 12) {
+            HStack(spacing: 14) {
                 Image(app.name)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .frame(width: 48, height: 48)
-                    .cornerRadius(10)
-                    .clipped()
-                
-                VStack(alignment: .leading, spacing: 2) {
+                    .clipShape(RoundedRectangle(cornerRadius: 11, style: .continuous))
+
+                VStack(alignment: .leading, spacing: 3) {
                     Text(app.name)
-                        .font(.system(size: 16, weight: .medium))
-                    
-                    .foregroundColor(.black)
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(.primary)
                         .lineLimit(1)
-                    
+
                     Text(app.description2)
                         .font(.system(size: 13))
-                        .foregroundColor(.black)
+                        .foregroundColor(.secondary)
                         .lineLimit(3)
                         .multilineTextAlignment(.leading)
                 }
-                
+
                 Spacer()
-                
+
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 14, weight: .medium))
-//                    .foregroundColor(.tertiaryLabel)
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(Color(.tertiaryLabel))
             }
-            .padding(.horizontal, 20)
+            .padding(.horizontal, 16)
             .padding(.vertical, 12)
             .contentShape(Rectangle())
         }

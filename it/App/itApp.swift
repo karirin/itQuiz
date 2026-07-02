@@ -105,6 +105,7 @@ struct itApp: App {
     init() {
         FirebaseApp.configure()
         authManager = AuthManager.shared
+        AppTheme.configureAppearance()
     }
     
     var body: some Scene {

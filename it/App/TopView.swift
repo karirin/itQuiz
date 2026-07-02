@@ -27,52 +27,35 @@ struct TopView: View {
     @Environment(\.scenePhase) var scenePhase
 
     var body: some View {
-        ZStack{
-                Image("背景")
-                                .resizable()
-            VStack {
-                TabView {
-                    HStack{
-                            ContentView()
-                                .background(Color("sky"))
-                        }
-                    
-                        .tabItem {
-                            Image(systemName: "house")
-                                .padding()
-                            Text("ホーム")
-                                .padding()
-                        }
-
-                    ZStack {
-                            MissionView()
-                        }
-                        .tabItem {
-                            Image(systemName: "checklist")
-                            Text("ミッション")
-                        }
-                        .badge(MissionManager.shared.totalClaimableCount)
-
-                        AvatarListView(isPresenting: $isPresentingAvatarList)
-                            .tabItem {
-                                Image(systemName: "square.grid.2x2")
-                                Text("おとも一覧")
-                            }
-                    GraphManagerView()
-                            .tabItem {
-                                Image(systemName: "chart.pie")
-                                Text("分析")
-                            }
-                    ZStack {
-                        SettingView()
-                    }
-                    .tabItem {
-                        Image(systemName: "gearshape.fill")
-                        Text("設定")
-                    }
+        TabView {
+            ContentView()
+                .background(Color("sky"))
+                .tabItem {
+                    Label("ホーム", systemImage: "house.fill")
                 }
-            }
+
+            MissionView()
+                .tabItem {
+                    Label("ミッション", systemImage: "checklist")
+                }
+                .badge(MissionManager.shared.totalClaimableCount)
+
+            AvatarListView(isPresenting: $isPresentingAvatarList)
+                .tabItem {
+                    Label("おとも一覧", systemImage: "square.grid.2x2.fill")
+                }
+
+            GraphManagerView()
+                .tabItem {
+                    Label("分析", systemImage: "chart.pie.fill")
+                }
+
+            SettingView()
+                .tabItem {
+                    Label("設定", systemImage: "gearshape.fill")
+                }
         }
+        .tint(AppTheme.primary)
         .onChange(of: scenePhase) { newPhase in
              switch newPhase {
              case .background:

@@ -6,6 +6,69 @@
 //
 
 import SwiftUI
+import UIKit
+
+// MARK: - アプリ全体テーマ
+/// アプリ全体で共有するブランドカラーと、UIKit由来のバー外観の一括設定
+enum AppTheme {
+    // ブランドカラー
+    static let primary = Color(hex: "667eea")
+    static let primaryDark = Color(hex: "764ba2")
+    static let success = Color(hex: "34c759")
+    static let warning = Color(hex: "ff9f0a")
+    static let danger = Color(hex: "ff3b30")
+    static let gold = Color(hex: "ffd700")
+
+    static let primaryGradient = LinearGradient(
+        colors: [primary, primaryDark],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
+
+    static let accentUIColor = UIColor(red: 0x66 / 255, green: 0x7e / 255, blue: 0xea / 255, alpha: 1)
+
+    /// タブバー・ナビゲーションバーの外観をアプリ全体で統一する
+    /// （アプリ起動時に一度だけ呼び出す）
+    static func configureAppearance() {
+        // タブバー
+        let tabAppearance = UITabBarAppearance()
+        tabAppearance.configureWithDefaultBackground()
+
+        let itemAppearance = UITabBarItemAppearance()
+        itemAppearance.normal.iconColor = .secondaryLabel
+        itemAppearance.normal.titleTextAttributes = [
+            .foregroundColor: UIColor.secondaryLabel,
+            .font: UIFont.systemFont(ofSize: 11, weight: .medium)
+        ]
+        itemAppearance.normal.badgeBackgroundColor = .systemRed
+        itemAppearance.selected.iconColor = accentUIColor
+        itemAppearance.selected.titleTextAttributes = [
+            .foregroundColor: accentUIColor,
+            .font: UIFont.systemFont(ofSize: 11, weight: .bold)
+        ]
+        itemAppearance.selected.badgeBackgroundColor = .systemRed
+
+        tabAppearance.stackedLayoutAppearance = itemAppearance
+        tabAppearance.inlineLayoutAppearance = itemAppearance
+        tabAppearance.compactInlineLayoutAppearance = itemAppearance
+
+        UITabBar.appearance().standardAppearance = tabAppearance
+        UITabBar.appearance().scrollEdgeAppearance = tabAppearance
+
+        // ナビゲーションバー
+        let navAppearance = UINavigationBarAppearance()
+        navAppearance.configureWithDefaultBackground()
+        navAppearance.titleTextAttributes = [
+            .font: UIFont.systemFont(ofSize: 17, weight: .bold)
+        ]
+        navAppearance.largeTitleTextAttributes = [
+            .font: UIFont.systemFont(ofSize: 32, weight: .heavy)
+        ]
+        UINavigationBar.appearance().standardAppearance = navAppearance
+        UINavigationBar.appearance().scrollEdgeAppearance = navAppearance
+        UINavigationBar.appearance().tintColor = accentUIColor
+    }
+}
 
 // MARK: - カラーテーマ
 struct QuizColors {
