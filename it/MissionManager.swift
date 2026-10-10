@@ -301,6 +301,16 @@ class MissionManager: ObservableObject {
                     rewardIcon: "足場1",
                     rewardItemType: .staminaPotion,
                     rewardItemAmount: 2),
+
+            Mission(type: .review,
+                    category: .normal,
+                    title: "苦手問題を1問克服しよう",
+                    description: "1日後・3日後・7日後の復習に正解して、苦手問題を克服しましょう",
+                    targetCount: 1,
+                    rewardCoin: 300,
+                    rewardIcon: "ミッション正解",
+                    rewardItemType: .rareGachaTicket,
+                    rewardItemAmount: 1),
         ]
     }
 
@@ -414,8 +424,13 @@ class MissionManager: ObservableObject {
                                    isCompleted: isCompleted, isClaimed: isClaimed)
                 }.map { self.applyRewardConfig(to: $0) }
 
+                let addedMissingMissions = self.addMissingCategoryMissions()
+
                 // リセットチェック
                 self.checkAndResetMissions()
+                if addedMissingMissions {
+                    self.saveMissions { _ in }
+                }
             } else {
                 // 旧形式チェック: 配列形式
                 if snapshot.exists(), let missionsData = snapshot.value as? [[String: Any]] {
@@ -448,7 +463,7 @@ class MissionManager: ObservableObject {
                     }.map { self.applyRewardConfig(to: $0) }
 
                     // 旧形式 → 新形式: デイリー/ウィークリーを追加
-                    self.addMissingCategoryMissions()
+                    _ = self.addMissingCategoryMissions()
                     self.saveMissions { _ in }
                 } else {
                     self.loadedUserId = userId
@@ -468,22 +483,22 @@ class MissionManager: ObservableObject {
     }
 
     // 不足しているカテゴリのミッションを補完
-    private func addMissingCategoryMissions() {
-        let existingDaily = missions.filter { $0.category == .daily }
-        let existingWeekly = missions.filter { $0.category == .weekly }
+    private func addMissingCategoryMissions() -> Bool {
+        var added = false
+        let defaultsByCategory: [(MissionCategory, [Mission])] = [
+            (.daily, defaultDailyMissions()),
+            (.weekly, defaultWeeklyMissions()),
+            (.normal, defaultNormalMissions())
+        ]
 
-        if existingDaily.isEmpty {
-            missions.append(contentsOf: defaultDailyMissions())
+        for (category, defaultMissions) in defaultsByCategory {
+            let existingTypes = Set(missions.filter { $0.category == category }.map { $0.type })
+            for mission in defaultMissions where !existingTypes.contains(mission.type) {
+                missions.append(mission)
+                added = true
+            }
         }
-        if existingWeekly.isEmpty {
-            missions.append(contentsOf: defaultWeeklyMissions())
-        }
-
-        // 通常ミッションで不足タイプを補完
-        let existingNormalTypes = Set(normalMissions.map { $0.type })
-        for m in defaultNormalMissions() where !existingNormalTypes.contains(m.type) {
-            missions.append(m)
-        }
+        return added
     }
 
     // MARK: - Reset Logic
@@ -519,6 +534,7 @@ class MissionManager: ObservableObject {
         // デイリー全クリアだった場合、ウィークリーの dailyComplete を進捗
         if isDailyAllCompleted {
             updateMissionProgress(type: .dailyComplete, category: .weekly, increment: 1) { _ in }
+            GuildManager.shared.recordDailyMissionCompleted()
         }
 
         // デイリーミッションをリセット
@@ -780,51 +796,95 @@ class MissionManager: ObservableObject {
 
         let reward = missions[index].rewardCoin
         let items = itemRewards(for: missions[index])
-        missions[index].isClaimed = true
 
-        authManager.addMoney(amount: reward)
+        authManager.grantRewardBundle(
+            idempotencyKey: "missionReward:\(missionId)",
+            coinAmount: reward,
+            itemRewards: items
+        ) { rewardSuccess in
+            guard rewardSuccess,
+                  let currentIndex = self.missions.firstIndex(where: { $0.id == missionId }) else {
+                completion(false, 0, [])
+                return
+            }
 
-        authManager.addItems(items) { itemSuccess in
-            self.saveMissions { success in
-                completion(success && itemSuccess, reward, items)
+            self.missions[currentIndex].isClaimed = true
+            self.saveMissions { saveSuccess in
+                if saveSuccess {
+                    completion(true, reward, items)
+                } else {
+                    self.missions[currentIndex].isClaimed = false
+                    completion(false, 0, [])
+                }
             }
         }
     }
 
     func claimAllRewards(for category: MissionCategory? = nil, completion: @escaping (Bool, Int, [InventoryReward]) -> Void) {
-        let targetMissions: [Mission]
-        if let category = category {
-            targetMissions = missions.filter { $0.category == category && $0.isCompleted && !$0.isClaimed }
+        let targets: [Mission]
+        if let category {
+            targets = missions.filter { $0.category == category && $0.isCompleted && !$0.isClaimed }
         } else {
-            targetMissions = missions.filter { $0.isCompleted && !$0.isClaimed }
+            targets = missions.filter { $0.isCompleted && !$0.isClaimed }
         }
 
-        let totalReward = targetMissions.reduce(0) { $0 + $1.rewardCoin }
-        let totalItemRewards = mergedRewards(targetMissions.flatMap { itemRewards(for: $0) })
-
-        guard totalReward > 0 || !totalItemRewards.isEmpty else {
+        guard !targets.isEmpty else {
             completion(false, 0, [])
             return
         }
 
-        for index in missions.indices {
-            if let cat = category {
-                if missions[index].category == cat && missions[index].isCompleted && !missions[index].isClaimed {
-                    missions[index].isClaimed = true
-                }
-            } else {
-                if missions[index].isCompleted && !missions[index].isClaimed {
-                    missions[index].isClaimed = true
+        let totalReward = targets.reduce(0) { $0 + $1.rewardCoin }
+        let totalItems = InventoryReward.merged(targets.flatMap { itemRewards(for: $0) })
+
+        grantRewardsSequentially(for: targets) { rewardSuccess in
+            guard rewardSuccess else {
+                completion(false, 0, [])
+                return
+            }
+
+            let claimedIDs = Set(targets.map(\.id))
+            for index in self.missions.indices where claimedIDs.contains(self.missions[index].id) {
+                self.missions[index].isClaimed = true
+            }
+
+            self.saveMissions { saveSuccess in
+                if saveSuccess {
+                    completion(true, totalReward, totalItems)
+                } else {
+                    for index in self.missions.indices where claimedIDs.contains(self.missions[index].id) {
+                        self.missions[index].isClaimed = false
+                    }
+                    completion(false, 0, [])
                 }
             }
         }
+    }
 
-        authManager.addMoney(amount: totalReward)
+    private func grantRewardsSequentially(
+        for targets: [Mission],
+        at index: Int = 0,
+        completion: @escaping (Bool) -> Void
+    ) {
+        guard index < targets.count else {
+            completion(true)
+            return
+        }
 
-        authManager.addItems(totalItemRewards) { itemSuccess in
-            self.saveMissions { success in
-                completion(success && itemSuccess, totalReward, totalItemRewards)
+        let mission = targets[index]
+        authManager.grantRewardBundle(
+            idempotencyKey: "missionReward:\(mission.id)",
+            coinAmount: mission.rewardCoin,
+            itemRewards: itemRewards(for: mission)
+        ) { success in
+            guard success else {
+                completion(false)
+                return
             }
+            self.grantRewardsSequentially(
+                for: targets,
+                at: index + 1,
+                completion: completion
+            )
         }
     }
 
@@ -852,6 +912,7 @@ class MissionManager: ObservableObject {
 extension AuthManager {
     func recordAnswer(isCorrect: Bool) {
         MissionManager.shared.recordAnswerProgress(isCorrect: isCorrect)
+        GuildManager.shared.recordAnswer(isCorrect: isCorrect)
     }
 
     func recordGachaUsed() {
@@ -863,8 +924,9 @@ extension AuthManager {
         MissionManager.shared.updateMissionProgressWithValue(type: .avatar, currentValue: avatarCount) { _ in }
     }
 
-    func recordStoryCompleted() {
+    func recordStoryCompleted(isBoss: Bool = false) {
         MissionManager.shared.updateMissionProgress(type: .story, increment: 1) { _ in }
+        GuildManager.shared.recordStoryCompleted(isBoss: isBoss)
     }
 
     func recordDungeonStep(position: Int) {
@@ -873,6 +935,7 @@ extension AuthManager {
 
     func recordGuerrillaParticipation() {
         MissionManager.shared.updateMissionProgress(type: .guerrilla, increment: 1) { _ in }
+        GuildManager.shared.recordGuerrillaParticipation()
     }
 
     func recordGuerrillaWin() {

@@ -456,7 +456,7 @@ struct RankingCard: View {
                 .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
             
             VStack(alignment: .leading, spacing: 2) {
-                Text(userName)
+                Text(userName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "ゲスト" : userName)
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundColor(Color("fontGray"))
                     .lineLimit(1)
@@ -540,12 +540,24 @@ struct LoadingView: View {
     }
 }
 
+// MARK: - ランキング読み込み中のスケルトン
+/// タブ内のリスト領域だけを占めるため、全画面ではなく行の形を保つスケルトンにする。
+private struct RankingSkeletonPlaceholder: View {
+    var body: some View {
+        SlimeSkeletonList(rows: 6, accessibilityMessage: "ランキングを読み込み中")
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .background(Color(red: 0.96, green: 0.96, blue: 0.98))
+    }
+}
+
 // MARK: - ランクランキングビュー
 struct RankRankingView: View {
     @ObservedObject var viewModel: RankingViewModel
     
     var body: some View {
-        if viewModel.rankedUsers.isEmpty { LoadingView() }
+        if viewModel.rankedUsers.isEmpty { RankingSkeletonPlaceholder() }
         else {
             ScrollView {
                 LazyVStack(spacing: 10) {
@@ -568,7 +580,7 @@ struct StoryRankingView: View {
     var body: some View {
         ZStack {
             Color(red: 0.96, green: 0.96, blue: 0.98).ignoresSafeArea()
-            if viewModel.storyUsers.isEmpty { LoadingView() }
+            if viewModel.storyUsers.isEmpty { RankingSkeletonPlaceholder() }
             else {
                 VStack(spacing: 0) {
                     if isReturnFlag {
@@ -601,7 +613,7 @@ struct LevelRankingView: View {
     @ObservedObject var viewModel: RankingViewModel
     
     var body: some View {
-        if viewModel.users.isEmpty { LoadingView() }
+        if viewModel.users.isEmpty { RankingSkeletonPlaceholder() }
         else {
             ScrollView {
                 LazyVStack(spacing: 10) {
@@ -627,7 +639,7 @@ struct MonthlyAnswersRankingView: View {
     @ObservedObject var viewModel: RankingViewModel
     
     var body: some View {
-        if viewModel.userAnswerDataList.isEmpty { LoadingView() }
+        if viewModel.userAnswerDataList.isEmpty { RankingSkeletonPlaceholder() }
         else {
             ScrollView {
                 LazyVStack(spacing: 10) {
@@ -646,7 +658,7 @@ struct StreakRankingView: View {
     @ObservedObject var viewModel: RankingViewModel
 
     var body: some View {
-        if viewModel.streakUsers.isEmpty { LoadingView() }
+        if viewModel.streakUsers.isEmpty { RankingSkeletonPlaceholder() }
         else {
             ScrollView {
                 LazyVStack(spacing: 10) {
@@ -672,7 +684,7 @@ struct AvatarRankingView: View {
     @ObservedObject var viewModel: RankingViewModel
     
     var body: some View {
-        if viewModel.userAvatarCounts.isEmpty { LoadingView() }
+        if viewModel.userAvatarCounts.isEmpty { RankingSkeletonPlaceholder() }
         else {
             ScrollView {
                 LazyVStack(spacing: 10) {

@@ -1,0 +1,23 @@
+{
+  "_comment": "既存のRealtime Databaseルールへマージする通知機能用ルール案。notificationDeliveriesはCloud Functions専用のためクライアントアクセスを禁止します。",
+  "rules": {
+    "pushTokens": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        "$tokenId": {
+          ".write": "auth != null && auth.uid === $uid"
+        }
+      }
+    },
+    "notificationPreferences": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+    "notificationDeliveries": {
+      ".read": false,
+      ".write": false
+    }
+  }
+}

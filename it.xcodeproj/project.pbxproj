@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D5EA20261006000000000002 /* DeepSeaGachaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5EA20261006000000000001 /* DeepSeaGachaView.swift */; };
+		7A1C0D010000000000000002 /* GachaTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A1C0D010000000000000001 /* GachaTheme.swift */; };
+		7A1C0D010000000000000004 /* DelaGothicOne-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7A1C0D010000000000000003 /* DelaGothicOne-Regular.ttf */; };
+		7A1C0D010000000000000006 /* Cinzel-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7A1C0D010000000000000005 /* Cinzel-Bold.ttf */; };
+		105CA59D27FCBA23385E94E9 /* GuildBossBattleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2738E2826904014A3BD33F6 /* GuildBossBattleView.swift */; };
 		1801FFD52D4482F6007625A2 /* レベルアップ.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1801FFC82D4482F5007625A2 /* レベルアップ.mp3 */; };
 		1801FFD62D4482F6007625A2 /* 倒れる.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1801FFC92D4482F5007625A2 /* 倒れる.mp3 */; };
 		1801FFD72D4482F6007625A2 /* キャンセル.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1801FFCA2D4482F5007625A2 /* キャンセル.mp3 */; };
@@ -20,13 +25,20 @@
 		1801FFDF2D4482F6007625A2 /* 味方攻撃.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1801FFD22D4482F5007625A2 /* 味方攻撃.mp3 */; };
 		1801FFE02D4482F6007625A2 /* ホームに戻る.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1801FFD32D4482F5007625A2 /* ホームに戻る.mp3 */; };
 		1801FFE12D4482F6007625A2 /* おとも切り替え.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 1801FFD42D4482F6007625A2 /* おとも切り替え.mp3 */; };
-		181B01582F1150180075C9BE /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = 181B01572F1150180075C9BE /* GoogleMobileAds */; };
 		181BFFA02F10F8ED0075C9BE /* UIComponentsUpdated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181BFF9F2F10F8EB0075C9BE /* UIComponentsUpdated.swift */; };
 		181BFFA22F10FB1F0075C9BE /* QuizDesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181BFFA12F10FB180075C9BE /* QuizDesignSystem.swift */; };
 		181E65542F3758A8007ECEC9 /* LoginBonusModernView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181E65532F3758A6007ECEC9 /* LoginBonusModernView.swift */; };
 		181E65562F375F65007ECEC9 /* LoginBonusConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181E65552F375F5F007ECEC9 /* LoginBonusConfig.swift */; };
 		181E655B2F375FD0007ECEC9 /* LoginBonusListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181E655A2F375FC9007ECEC9 /* LoginBonusListView.swift */; };
 		181E68322F548A36007ECEC9 /* GodGachaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181E68312F548A2D007ECEC9 /* GodGachaView.swift */; };
+		18209D592F5C889400BFD12A /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 18209D582F5C889400BFD12A /* FirebaseMessaging */; };
+		18209EEB2F6044BA00BFD12A /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 18209EEA2F6044BA00BFD12A /* FirebaseAnalytics */; };
+		18209EED2F6044BA00BFD12A /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 18209EEC2F6044BA00BFD12A /* FirebaseAuth */; };
+		18209EEF2F6044BA00BFD12A /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 18209EEE2F6044BA00BFD12A /* FirebaseDatabase */; };
+		18209EF12F6044BA00BFD12A /* FirebaseInAppMessaging-Beta in Frameworks */ = {isa = PBXBuildFile; productRef = 18209EF02F6044BA00BFD12A /* FirebaseInAppMessaging-Beta */; };
+		18209EF32F6044BA00BFD12A /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 18209EF22F6044BA00BFD12A /* FirebaseMessaging */; };
+		18209EF62F60451B00BFD12A /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = 18209EF52F60451B00BFD12A /* GoogleMobileAds */; };
+		18209EF92F6045B800BFD12A /* AppVersionMonitorSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 18209EF82F6045B800BFD12A /* AppVersionMonitorSwiftUI */; };
 		182FF4BD2ED18CA0001DE74F /* ProgressStoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182FF4AE2ED18CA0001DE74F /* ProgressStoryView.swift */; };
 		182FF4BE2ED18CA0001DE74F /* PentagonManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182FF49F2ED18CA0001DE74F /* PentagonManagerView.swift */; };
 		182FF4BF2ED18CA0001DE74F /* ChangeNameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182FF4722ED18CA0001DE74F /* ChangeNameView.swift */; };
@@ -69,6 +81,7 @@
 		182FF4EE2ED18CA0001DE74F /* OtherAppsPromotionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182FF47D2ED18CA0001DE74F /* OtherAppsPromotionView.swift */; };
 		182FF4EF2ED18CA0001DE74F /* StoryITListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182FF4B02ED18CA0001DE74F /* StoryITListView.swift */; };
 		182FF4F12ED18CA0001DE74F /* AudioManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182FF49A2ED18CA0001DE74F /* AudioManager.swift */; };
+		5B1E0B0A2F80000100000002 /* SlimeBounceSplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1E0B0A2F80000100000001 /* SlimeBounceSplashView.swift */; };
 		182FF4F22ED18CA0001DE74F /* SplashScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182FF4882ED18CA0001DE74F /* SplashScreenView.swift */; };
 		182FF4F32ED18CA0001DE74F /* GraphManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182FF4A32ED18CA0001DE74F /* GraphManagerView.swift */; };
 		182FF4F52ED18CA0001DE74F /* TermsOfServiceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182FF4AB2ED18CA0001DE74F /* TermsOfServiceView.swift */; };
@@ -79,24 +92,61 @@
 		182FF4FC2ED18CA0001DE74F /* InterstitialStory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182FF4AD2ED18CA0001DE74F /* InterstitialStory.swift */; };
 		182FF4FD2ED18CA0001DE74F /* MekaGachaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182FF4972ED18CA0001DE74F /* MekaGachaView.swift */; };
 		182FF4FF2ED18CA0001DE74F /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182FF4862ED18CA0001DE74F /* RootView.swift */; };
+		18AA01022F9E000000IN0002 /* IntroOfferInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18AA01012F9E000000IN0001 /* IntroOfferInfo.swift */; };
+		18B3057E2F62F388000DDE64 /* GuerrillaBossData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18B305792F62F388000DDE64 /* GuerrillaBossData.swift */; };
+		18B3057F2F62F388000DDE64 /* GuerrillaManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18B3057B2F62F388000DDE64 /* GuerrillaManager.swift */; };
+		18B305802F62F388000DDE64 /* GuerrillaBattleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18B305782F62F388000DDE64 /* GuerrillaBattleView.swift */; };
+		18B305812F62F388000DDE64 /* GuerrillaLobbyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18B3057A2F62F388000DDE64 /* GuerrillaLobbyView.swift */; };
+		18B305822F62F388000DDE64 /* GuerrillaResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18B3057C2F62F388000DDE64 /* GuerrillaResultView.swift */; };
 		18B9E1FA2E0FC355000F4B57 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 18B9E1F92E0FC355000F4B57 /* FirebaseFirestore */; };
 		18B9E2072E0FE1F8000F4B57 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 18B9E2062E0FE1F8000F4B57 /* FirebaseAuth */; };
-		18D778E82F12536A002E7EFB /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 18D778E72F12536A002E7EFB /* FirebaseAuth */; };
-		18D778EA2F12536A002E7EFB /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 18D778E92F12536A002E7EFB /* FirebaseDatabase */; };
-		18D778EC2F12543F002E7EFB /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 18D778EB2F12543F002E7EFB /* FirebaseMessaging */; };
+		18C0D0012F6A000100000001 /* WeeklyLeagueService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C0D0012F6A000100000003 /* WeeklyLeagueService.swift */; };
+		18C0D0012F6A000100000002 /* WeeklyLeagueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C0D0012F6A000100000004 /* WeeklyLeagueView.swift */; };
+		18C0D0012F6A000100000005 /* FriendManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C0D0012F6A000100000007 /* FriendManager.swift */; };
+		18C0D0012F6A000100000006 /* FriendListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C0D0012F6A000100000008 /* FriendListView.swift */; };
+		18C0D0012F6A000100000009 /* BattleManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C0D0012F6A00010000000B /* BattleManager.swift */; };
+		18C0D0012F6A00010000000A /* BattleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C0D0012F6A00010000000C /* BattleView.swift */; };
+		18C0D0012F6A00010000000D /* GuildManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C0D0012F6A00010000000F /* GuildManager.swift */; };
+		18C0D0012F6A00010000000E /* GuildView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C0D0012F6A000100000010 /* GuildView.swift */; };
+		18C0D0012F6A000100000011 /* DemoDataSeeder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C0D0012F6A000100000012 /* DemoDataSeeder.swift */; };
+		18C0D0012F6A000100000013 /* SocialDesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C0D0012F6A000100000014 /* SocialDesignSystem.swift */; };
+		18C0D0012F6A000100000015 /* PushNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C0D0012F6A000100000016 /* PushNotificationService.swift */; };
+		18C0D0012F9A000100000001 /* DailyLearningCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C0D0012F9A000100000011 /* DailyLearningCard.swift */; };
+		18C0D0012F9A000100000002 /* ReviewReminderOptInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C0D0012F9A000100000012 /* ReviewReminderOptInView.swift */; };
+		18C0D0012F9A000100000003 /* GrowthAnalytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C0D0012F9A000100000013 /* GrowthAnalytics.swift */; };
+		18C0D0012F9A000100000004 /* SubscriptionLifecycleAnalytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C0D0012F9A000100000014 /* SubscriptionLifecycleAnalytics.swift */; };
 		18F6F22F2EF1833800488BCA /* Mission.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18F6F22E2EF1833400488BCA /* Mission.swift */; };
 		18F6F2312EF1834D00488BCA /* MissionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18F6F2302EF1834C00488BCA /* MissionManager.swift */; };
 		18F6F2332EF1836E00488BCA /* MisssionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18F6F2322EF1836700488BCA /* MisssionView.swift */; };
+		1B46B6507754A03C44EB193D /* GuardianGachaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A80AA4C2275E1F8E0BA5333C /* GuardianGachaView.swift */; };
 		260E44172AB572DE00FBB487 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 260E44162AB572DE00FBB487 /* Assets.xcassets */; };
 		260E441A2AB572DE00FBB487 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 260E44192AB572DE00FBB487 /* Preview Assets.xcassets */; };
 		260E44212AB5958300FBB487 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 260E44202AB5958300FBB487 /* GoogleService-Info.plist */; };
-		26266B292B4A5179007B5964 /* AppVersionMonitorSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 26266B282B4A5179007B5964 /* AppVersionMonitorSwiftUI */; };
 		26266B352B4A5802007B5964 /* Charts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26266B342B4A5802007B5964 /* Charts.framework */; };
 		262F0FF42B1ADB85004C0C47 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 262F0FF32B1ADB85004C0C47 /* StoreKit.framework */; };
 		26A25D4C2AB9613A006B368F /* AVKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26A25D4B2AB9613A006B368F /* AVKit.framework */; };
+		3FE0EEEFE8C8E26E28E58A3A /* AdventureProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE062CBA21FF34103BC14DB8 /* AdventureProgress.swift */; };
+		4019FC80DAA292D0CB1740C6 /* AdventureWorld.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9227FF10A4E154204177AED /* AdventureWorld.swift */; };
+		5E67C73BB5BD2ABF14231755 /* AdventureImageBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BF2D5259AD588045C2BD292 /* AdventureImageBackground.swift */; };
+		61089DC787347D3B877A6013 /* AdventureMapGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9ED89005BF08F15A57F777A /* AdventureMapGeometry.swift */; };
+		9FB7ECD44E6EF9E6EBBA190E /* AdventureArtwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = D25D99A14C9772D3A044FF9C /* AdventureArtwork.swift */; };
+		A34E6E2173D37569221AC29B /* AdventureStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78F1806247CAB4756117D02A /* AdventureStore.swift */; };
+		C8C56617CD6DA2FEFF5168B8 /* StoryAdventureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6289FED575C8BF4C98CCA431 /* StoryAdventureView.swift */; };
+		CBFBFC05A0506830B05DC710 /* AdventureMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B4AE31CA4399A8BE198E04B /* AdventureMapView.swift */; };
+		E90222000000000000000001 /* AdventureStory.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90222000000000000000003 /* AdventureStory.swift */; };
+		E90222000000000000000002 /* AdventureDialogueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90222000000000000000004 /* AdventureDialogueView.swift */; };
+		C20200000000000000000001 /* ChapterTwoStory.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20200000000000000000011 /* ChapterTwoStory.swift */; };
+		C20200000000000000000002 /* ChapterTwoProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20200000000000000000012 /* ChapterTwoProgress.swift */; };
+		C20200000000000000000003 /* ChapterTwoAdventureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20200000000000000000013 /* ChapterTwoAdventureView.swift */; };
+		EAD54131F23C54AC73498636 /* AdventureEventSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB7AE7BE511CAE7E1E28B679 /* AdventureEventSheet.swift */; };
+		18C0D0042FA0000100000001 /* InitialLearningFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C0D0042FA0000100000011 /* InitialLearningFlow.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		D5EA20261006000000000001 /* DeepSeaGachaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepSeaGachaView.swift; sourceTree = "<group>"; };
+		7A1C0D010000000000000001 /* GachaTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GachaTheme.swift; sourceTree = "<group>"; };
+		7A1C0D010000000000000003 /* DelaGothicOne-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "DelaGothicOne-Regular.ttf"; sourceTree = "<group>"; };
+		7A1C0D010000000000000005 /* Cinzel-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Cinzel-Bold.ttf"; sourceTree = "<group>"; };
 		1801FFC82D4482F5007625A2 /* レベルアップ.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "レベルアップ.mp3"; sourceTree = "<group>"; };
 		1801FFC92D4482F5007625A2 /* 倒れる.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "倒れる.mp3"; sourceTree = "<group>"; };
 		1801FFCA2D4482F5007625A2 /* キャンセル.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "キャンセル.mp3"; sourceTree = "<group>"; };
@@ -135,6 +185,7 @@
 		182FF4852ED18CA0001DE74F /* ReviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewView.swift; sourceTree = "<group>"; };
 		182FF4862ED18CA0001DE74F /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		182FF4872ED18CA0001DE74F /* SignUp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUp.swift; sourceTree = "<group>"; };
+		5B1E0B0A2F80000100000001 /* SlimeBounceSplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlimeBounceSplashView.swift; sourceTree = "<group>"; };
 		182FF4882ED18CA0001DE74F /* SplashScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashScreenView.swift; sourceTree = "<group>"; };
 		182FF4892ED18CA0001DE74F /* StampAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StampAnimationView.swift; sourceTree = "<group>"; };
 		182FF48A2ED18CA0001DE74F /* StoreKitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreKitView.swift; sourceTree = "<group>"; };
@@ -170,6 +221,27 @@
 		182FF4B92ED18CA0001DE74F /* UsersListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsersListView.swift; sourceTree = "<group>"; };
 		186C39A82B70B3B7007F625E /* StoreKit.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = StoreKit.storekit; sourceTree = "<group>"; };
 		186C39AD2B71D2B3007F625E /* it.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = it.entitlements; sourceTree = "<group>"; };
+		18AA01012F9E000000IN0001 /* IntroOfferInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntroOfferInfo.swift; sourceTree = "<group>"; };
+		18B305782F62F388000DDE64 /* GuerrillaBattleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuerrillaBattleView.swift; sourceTree = "<group>"; };
+		18B305792F62F388000DDE64 /* GuerrillaBossData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuerrillaBossData.swift; sourceTree = "<group>"; };
+		18B3057A2F62F388000DDE64 /* GuerrillaLobbyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuerrillaLobbyView.swift; sourceTree = "<group>"; };
+		18B3057B2F62F388000DDE64 /* GuerrillaManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuerrillaManager.swift; sourceTree = "<group>"; };
+		18B3057C2F62F388000DDE64 /* GuerrillaResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuerrillaResultView.swift; sourceTree = "<group>"; };
+		18C0D0012F6A000100000003 /* WeeklyLeagueService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyLeagueService.swift; sourceTree = "<group>"; };
+		18C0D0012F6A000100000004 /* WeeklyLeagueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyLeagueView.swift; sourceTree = "<group>"; };
+		18C0D0012F6A000100000007 /* FriendManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendManager.swift; sourceTree = "<group>"; };
+		18C0D0012F6A000100000008 /* FriendListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendListView.swift; sourceTree = "<group>"; };
+		18C0D0012F6A00010000000B /* BattleManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BattleManager.swift; sourceTree = "<group>"; };
+		18C0D0012F6A00010000000C /* BattleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BattleView.swift; sourceTree = "<group>"; };
+		18C0D0012F6A00010000000F /* GuildManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuildManager.swift; sourceTree = "<group>"; };
+		18C0D0012F6A000100000010 /* GuildView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuildView.swift; sourceTree = "<group>"; };
+		18C0D0012F6A000100000012 /* DemoDataSeeder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoDataSeeder.swift; sourceTree = "<group>"; };
+		18C0D0012F6A000100000014 /* SocialDesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocialDesignSystem.swift; sourceTree = "<group>"; };
+		18C0D0012F6A000100000016 /* PushNotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushNotificationService.swift; sourceTree = "<group>"; };
+		18C0D0012F9A000100000011 /* DailyLearningCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyLearningCard.swift; sourceTree = "<group>"; };
+		18C0D0012F9A000100000012 /* ReviewReminderOptInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewReminderOptInView.swift; sourceTree = "<group>"; };
+		18C0D0012F9A000100000013 /* GrowthAnalytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrowthAnalytics.swift; sourceTree = "<group>"; };
+		18C0D0012F9A000100000014 /* SubscriptionLifecycleAnalytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionLifecycleAnalytics.swift; sourceTree = "<group>"; };
 		18F6F22E2EF1833400488BCA /* Mission.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mission.swift; sourceTree = "<group>"; };
 		18F6F2302EF1834C00488BCA /* MissionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MissionManager.swift; sourceTree = "<group>"; };
 		18F6F2322EF1836700488BCA /* MisssionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MisssionView.swift; sourceTree = "<group>"; };
@@ -182,12 +254,30 @@
 		262F0FF32B1ADB85004C0C47 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		267E708A2AD5ACDF00EA7AA2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		26A25D4B2AB9613A006B368F /* AVKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVKit.framework; path = System/Library/Frameworks/AVKit.framework; sourceTree = SDKROOT; };
+		2BF2D5259AD588045C2BD292 /* AdventureImageBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdventureImageBackground.swift; sourceTree = "<group>"; };
+		6289FED575C8BF4C98CCA431 /* StoryAdventureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryAdventureView.swift; sourceTree = "<group>"; };
+		78F1806247CAB4756117D02A /* AdventureStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdventureStore.swift; sourceTree = "<group>"; };
+		8B4AE31CA4399A8BE198E04B /* AdventureMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdventureMapView.swift; sourceTree = "<group>"; };
+		A2738E2826904014A3BD33F6 /* GuildBossBattleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuildBossBattleView.swift; sourceTree = "<group>"; };
+		A80AA4C2275E1F8E0BA5333C /* GuardianGachaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuardianGachaView.swift; sourceTree = "<group>"; };
+		A9ED89005BF08F15A57F777A /* AdventureMapGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdventureMapGeometry.swift; sourceTree = "<group>"; };
+		BB7AE7BE511CAE7E1E28B679 /* AdventureEventSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdventureEventSheet.swift; sourceTree = "<group>"; };
+		C9227FF10A4E154204177AED /* AdventureWorld.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdventureWorld.swift; sourceTree = "<group>"; };
+		CE062CBA21FF34103BC14DB8 /* AdventureProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdventureProgress.swift; sourceTree = "<group>"; };
+		D25D99A14C9772D3A044FF9C /* AdventureArtwork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdventureArtwork.swift; sourceTree = "<group>"; };
+		E90222000000000000000003 /* AdventureStory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdventureStory.swift; sourceTree = "<group>"; };
+		E90222000000000000000004 /* AdventureDialogueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdventureDialogueView.swift; sourceTree = "<group>"; };
+		C20200000000000000000011 /* ChapterTwoStory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChapterTwoStory.swift; sourceTree = "<group>"; };
+		C20200000000000000000012 /* ChapterTwoProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChapterTwoProgress.swift; sourceTree = "<group>"; };
+		C20200000000000000000013 /* ChapterTwoAdventureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChapterTwoAdventureView.swift; sourceTree = "<group>"; };
+		18C0D0042FA0000100000011 /* InitialLearningFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InitialLearningFlow.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		180BE92C2E0FF72B00F92223 /* Quiz */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Quiz; sourceTree = "<group>"; };
 		180BE92E2E0FF82100F92223 /* Modal */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Modal; sourceTree = "<group>"; };
 		180BE92F2E0FF92200F92223 /* ManagerList */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = ManagerList; sourceTree = "<group>"; };
+		5B1E0C0A2F80000100000010 /* Loading */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Loading; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -195,16 +285,19 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				18209EF92F6045B800BFD12A /* AppVersionMonitorSwiftUI in Frameworks */,
+				18209EF62F60451B00BFD12A /* GoogleMobileAds in Frameworks */,
+				18209EEB2F6044BA00BFD12A /* FirebaseAnalytics in Frameworks */,
+				18209D592F5C889400BFD12A /* FirebaseMessaging in Frameworks */,
 				262F0FF42B1ADB85004C0C47 /* StoreKit.framework in Frameworks */,
 				26A25D4C2AB9613A006B368F /* AVKit.framework in Frameworks */,
-				18D778EC2F12543F002E7EFB /* FirebaseMessaging in Frameworks */,
 				26266B352B4A5802007B5964 /* Charts.framework in Frameworks */,
-				26266B292B4A5179007B5964 /* AppVersionMonitorSwiftUI in Frameworks */,
 				18B9E2072E0FE1F8000F4B57 /* FirebaseAuth in Frameworks */,
+				18209EEF2F6044BA00BFD12A /* FirebaseDatabase in Frameworks */,
 				18B9E1FA2E0FC355000F4B57 /* FirebaseFirestore in Frameworks */,
-				18D778EA2F12536A002E7EFB /* FirebaseDatabase in Frameworks */,
-				181B01582F1150180075C9BE /* GoogleMobileAds in Frameworks */,
-				18D778E82F12536A002E7EFB /* FirebaseAuth in Frameworks */,
+				18209EED2F6044BA00BFD12A /* FirebaseAuth in Frameworks */,
+				18209EF32F6044BA00BFD12A /* FirebaseMessaging in Frameworks */,
+				18209EF12F6044BA00BFD12A /* FirebaseInAppMessaging-Beta in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -214,6 +307,9 @@
 		182FF4902ED18CA0001DE74F /* App */ = {
 			isa = PBXGroup;
 			children = (
+				18C0D0042FA0000100000011 /* InitialLearningFlow.swift */,
+				18C0D0012F9A000100000011 /* DailyLearningCard.swift */,
+				18C0D0012F9A000100000012 /* ReviewReminderOptInView.swift */,
 				182FF4702ED18CA0001DE74F /* AnswerSelectionView.swift */,
 				182FF4712ED18CA0001DE74F /* Banner.swift */,
 				182FF4722ED18CA0001DE74F /* ChangeNameView.swift */,
@@ -224,6 +320,7 @@
 				182FF4762ED18CA0001DE74F /* IllustratedView.swift */,
 				182FF4772ED18CA0001DE74F /* Interstitial.swift */,
 				182FF4782ED18CA0001DE74F /* itApp.swift */,
+				18C0D0012F6A000100000016 /* PushNotificationService.swift */,
 				182FF4792ED18CA0001DE74F /* LoadingView.swift */,
 				182FF47D2ED18CA0001DE74F /* OtherAppsPromotionView.swift */,
 				182FF47E2ED18CA0001DE74F /* PentagonAppliedShape.swift */,
@@ -236,6 +333,7 @@
 				182FF4852ED18CA0001DE74F /* ReviewView.swift */,
 				182FF4862ED18CA0001DE74F /* RootView.swift */,
 				182FF4872ED18CA0001DE74F /* SignUp.swift */,
+				5B1E0B0A2F80000100000001 /* SlimeBounceSplashView.swift */,
 				182FF4882ED18CA0001DE74F /* SplashScreenView.swift */,
 				182FF4892ED18CA0001DE74F /* StampAnimationView.swift */,
 				182FF48A2ED18CA0001DE74F /* StoreKitView.swift */,
@@ -243,8 +341,18 @@
 				182FF48D2ED18CA0001DE74F /* TitleListView.swift */,
 				182FF48E2ED18CA0001DE74F /* TittlesView.swift */,
 				182FF48F2ED18CA0001DE74F /* TopView.swift */,
+				5B1E0C0A2F80000100000010 /* Loading */,
 			);
 			path = App;
+			sourceTree = "<group>";
+		};
+		7A1C0D010000000000000007 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				7A1C0D010000000000000003 /* DelaGothicOne-Regular.ttf */,
+				7A1C0D010000000000000005 /* Cinzel-Bold.ttf */,
+			);
+			path = Fonts;
 			sourceTree = "<group>";
 		};
 		182FF4992ED18CA0001DE74F /* Gacha */ = {
@@ -255,6 +363,9 @@
 				182FF4972ED18CA0001DE74F /* MekaGachaView.swift */,
 				182FF4982ED18CA0001DE74F /* RareGachaView.swift */,
 				181E68312F548A2D007ECEC9 /* GodGachaView.swift */,
+				A80AA4C2275E1F8E0BA5333C /* GuardianGachaView.swift */,
+				D5EA20261006000000000001 /* DeepSeaGachaView.swift */,
+				7A1C0D010000000000000001 /* GachaTheme.swift */,
 			);
 			path = Gacha;
 			sourceTree = "<group>";
@@ -262,8 +373,13 @@
 		182FF4A12ED18CA0001DE74F /* Managers */ = {
 			isa = PBXGroup;
 			children = (
+				18C0D0012F9A000100000013 /* GrowthAnalytics.swift */,
 				182FF49A2ED18CA0001DE74F /* AudioManager.swift */,
 				182FF49B2ED18CA0001DE74F /* AuthManager.swift */,
+				18C0D0012F6A000100000007 /* FriendManager.swift */,
+				18C0D0012F6A00010000000B /* BattleManager.swift */,
+				18C0D0012F6A00010000000F /* GuildManager.swift */,
+				18C0D0012F6A000100000012 /* DemoDataSeeder.swift */,
 				182FF49C2ED18CA0001DE74F /* ManagerListTabView.swift */,
 				182FF49F2ED18CA0001DE74F /* PentagonManagerView.swift */,
 				182FF4A02ED18CA0001DE74F /* RateManager.swift */,
@@ -277,6 +393,8 @@
 				182FF4A22ED18CA0001DE74F /* BarChartView.swift */,
 				182FF4A32ED18CA0001DE74F /* GraphManagerView.swift */,
 				182FF4A42ED18CA0001DE74F /* RankingView.swift */,
+				18C0D0012F6A000100000003 /* WeeklyLeagueService.swift */,
+				18C0D0012F6A000100000004 /* WeeklyLeagueView.swift */,
 			);
 			path = Ranking;
 			sourceTree = "<group>";
@@ -295,6 +413,20 @@
 		182FF4B32ED18CA0001DE74F /* Story */ = {
 			isa = PBXGroup;
 			children = (
+				2BF2D5259AD588045C2BD292 /* AdventureImageBackground.swift */,
+				A9ED89005BF08F15A57F777A /* AdventureMapGeometry.swift */,
+				C9227FF10A4E154204177AED /* AdventureWorld.swift */,
+				E90222000000000000000003 /* AdventureStory.swift */,
+				E90222000000000000000004 /* AdventureDialogueView.swift */,
+				C20200000000000000000011 /* ChapterTwoStory.swift */,
+				C20200000000000000000012 /* ChapterTwoProgress.swift */,
+				C20200000000000000000013 /* ChapterTwoAdventureView.swift */,
+				CE062CBA21FF34103BC14DB8 /* AdventureProgress.swift */,
+				78F1806247CAB4756117D02A /* AdventureStore.swift */,
+				D25D99A14C9772D3A044FF9C /* AdventureArtwork.swift */,
+				8B4AE31CA4399A8BE198E04B /* AdventureMapView.swift */,
+				6289FED575C8BF4C98CCA431 /* StoryAdventureView.swift */,
+				BB7AE7BE511CAE7E1E28B679 /* AdventureEventSheet.swift */,
 				182FF4AD2ED18CA0001DE74F /* InterstitialStory.swift */,
 				182FF4AE2ED18CA0001DE74F /* ProgressStoryView.swift */,
 				182FF4B02ED18CA0001DE74F /* StoryITListView.swift */,
@@ -307,6 +439,8 @@
 		182FF4B62ED18CA0001DE74F /* Subscription */ = {
 			isa = PBXGroup;
 			children = (
+				18C0D0012F9A000100000014 /* SubscriptionLifecycleAnalytics.swift */,
+				18AA01012F9E000000IN0001 /* IntroOfferInfo.swift */,
 				182FF4B42ED18CA0001DE74F /* RewardView.swift */,
 				182FF4B52ED18CA0001DE74F /* SubscriptionView.swift */,
 			);
@@ -318,9 +452,26 @@
 			children = (
 				182FF4B72ED18CA0001DE74F /* AvatarList.swift */,
 				182FF4B82ED18CA0001DE74F /* CheckUsersListView.swift */,
+				18C0D0012F6A000100000008 /* FriendListView.swift */,
+				18C0D0012F6A00010000000C /* BattleView.swift */,
+				18C0D0012F6A000100000014 /* SocialDesignSystem.swift */,
 				182FF4B92ED18CA0001DE74F /* UsersListView.swift */,
 			);
 			path = User;
+			sourceTree = "<group>";
+		};
+		18B3057D2F62F388000DDE64 /* Guerrilla */ = {
+			isa = PBXGroup;
+			children = (
+				18B305782F62F388000DDE64 /* GuerrillaBattleView.swift */,
+				18B305792F62F388000DDE64 /* GuerrillaBossData.swift */,
+				18B3057A2F62F388000DDE64 /* GuerrillaLobbyView.swift */,
+				18B3057B2F62F388000DDE64 /* GuerrillaManager.swift */,
+				18B3057C2F62F388000DDE64 /* GuerrillaResultView.swift */,
+				18C0D0012F6A000100000010 /* GuildView.swift */,
+				A2738E2826904014A3BD33F6 /* GuildBossBattleView.swift */,
+			);
+			path = Guerrilla;
 			sourceTree = "<group>";
 		};
 		260E44062AB572DC00FBB487 = {
@@ -345,9 +496,11 @@
 		260E44112AB572DC00FBB487 /* it */ = {
 			isa = PBXGroup;
 			children = (
+				18B3057D2F62F388000DDE64 /* Guerrilla */,
 				181BFFA12F10FB180075C9BE /* QuizDesignSystem.swift */,
 				181BFF9F2F10F8EB0075C9BE /* UIComponentsUpdated.swift */,
 				182FF4902ED18CA0001DE74F /* App */,
+				7A1C0D010000000000000007 /* Fonts */,
 				182FF4992ED18CA0001DE74F /* Gacha */,
 				182FF4A12ED18CA0001DE74F /* Managers */,
 				182FF4A52ED18CA0001DE74F /* Ranking */,
@@ -429,16 +582,20 @@
 				180BE92C2E0FF72B00F92223 /* Quiz */,
 				180BE92E2E0FF82100F92223 /* Modal */,
 				180BE92F2E0FF92200F92223 /* ManagerList */,
+				5B1E0C0A2F80000100000010 /* Loading */,
 			);
 			name = it;
 			packageProductDependencies = (
-				26266B282B4A5179007B5964 /* AppVersionMonitorSwiftUI */,
 				18B9E1F92E0FC355000F4B57 /* FirebaseFirestore */,
 				18B9E2062E0FE1F8000F4B57 /* FirebaseAuth */,
-				181B01572F1150180075C9BE /* GoogleMobileAds */,
-				18D778E72F12536A002E7EFB /* FirebaseAuth */,
-				18D778E92F12536A002E7EFB /* FirebaseDatabase */,
-				18D778EB2F12543F002E7EFB /* FirebaseMessaging */,
+				18209D582F5C889400BFD12A /* FirebaseMessaging */,
+				18209EEA2F6044BA00BFD12A /* FirebaseAnalytics */,
+				18209EEC2F6044BA00BFD12A /* FirebaseAuth */,
+				18209EEE2F6044BA00BFD12A /* FirebaseDatabase */,
+				18209EF02F6044BA00BFD12A /* FirebaseInAppMessaging-Beta */,
+				18209EF22F6044BA00BFD12A /* FirebaseMessaging */,
+				18209EF52F60451B00BFD12A /* GoogleMobileAds */,
+				18209EF82F6045B800BFD12A /* AppVersionMonitorSwiftUI */,
 			);
 			productName = it;
 			productReference = 260E440F2AB572DC00FBB487 /* it.app */;
@@ -456,6 +613,11 @@
 				TargetAttributes = {
 					260E440E2AB572DC00FBB487 = {
 						CreatedOnToolsVersion = 14.3;
+						SystemCapabilities = {
+							com.apple.Push = {
+								enabled = 1;
+							};
+						};
 					};
 				};
 			};
@@ -469,9 +631,9 @@
 			);
 			mainGroup = 260E44062AB572DC00FBB487;
 			packageReferences = (
-				26266B272B4A5179007B5964 /* XCRemoteSwiftPackageReference "AppVersionMonitorSwiftUI" */,
-				181B01562F1150180075C9BE /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */,
-				18D778E62F12536A002E7EFB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				18209EE92F6044BA00BFD12A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				18209EF42F60451B00BFD12A /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */,
+				18209EF72F6045B800BFD12A /* XCRemoteSwiftPackageReference "AppVersionMonitorSwiftUI" */,
 			);
 			productRefGroup = 260E44102AB572DC00FBB487 /* Products */;
 			projectDirPath = "";
@@ -487,6 +649,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7A1C0D010000000000000004 /* DelaGothicOne-Regular.ttf in Resources */,
+				7A1C0D010000000000000006 /* Cinzel-Bold.ttf in Resources */,
 				1801FFDE2D4482F6007625A2 /* 称号.mp3 in Resources */,
 				1801FFDD2D4482F6007625A2 /* 不正解.mp3 in Resources */,
 				260E441A2AB572DE00FBB487 /* Preview Assets.xcassets in Resources */,
@@ -536,6 +700,38 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7A1C0D010000000000000002 /* GachaTheme.swift in Sources */,
+				D5EA20261006000000000002 /* DeepSeaGachaView.swift in Sources */,
+				5E67C73BB5BD2ABF14231755 /* AdventureImageBackground.swift in Sources */,
+				61089DC787347D3B877A6013 /* AdventureMapGeometry.swift in Sources */,
+				4019FC80DAA292D0CB1740C6 /* AdventureWorld.swift in Sources */,
+				E90222000000000000000001 /* AdventureStory.swift in Sources */,
+				E90222000000000000000002 /* AdventureDialogueView.swift in Sources */,
+				C20200000000000000000001 /* ChapterTwoStory.swift in Sources */,
+				C20200000000000000000002 /* ChapterTwoProgress.swift in Sources */,
+				C20200000000000000000003 /* ChapterTwoAdventureView.swift in Sources */,
+				3FE0EEEFE8C8E26E28E58A3A /* AdventureProgress.swift in Sources */,
+				A34E6E2173D37569221AC29B /* AdventureStore.swift in Sources */,
+				9FB7ECD44E6EF9E6EBBA190E /* AdventureArtwork.swift in Sources */,
+				CBFBFC05A0506830B05DC710 /* AdventureMapView.swift in Sources */,
+				C8C56617CD6DA2FEFF5168B8 /* StoryAdventureView.swift in Sources */,
+				EAD54131F23C54AC73498636 /* AdventureEventSheet.swift in Sources */,
+				18C0D0042FA0000100000001 /* InitialLearningFlow.swift in Sources */,
+				18C0D0012F9A000100000001 /* DailyLearningCard.swift in Sources */,
+				18C0D0012F9A000100000002 /* ReviewReminderOptInView.swift in Sources */,
+				18C0D0012F9A000100000003 /* GrowthAnalytics.swift in Sources */,
+				18C0D0012F9A000100000004 /* SubscriptionLifecycleAnalytics.swift in Sources */,
+				18C0D0012F6A000100000001 /* WeeklyLeagueService.swift in Sources */,
+				18C0D0012F6A000100000002 /* WeeklyLeagueView.swift in Sources */,
+				18C0D0012F6A000100000005 /* FriendManager.swift in Sources */,
+				18C0D0012F6A000100000006 /* FriendListView.swift in Sources */,
+				18C0D0012F6A000100000009 /* BattleManager.swift in Sources */,
+				18C0D0012F6A00010000000A /* BattleView.swift in Sources */,
+				18C0D0012F6A00010000000D /* GuildManager.swift in Sources */,
+				18C0D0012F6A00010000000E /* GuildView.swift in Sources */,
+				18C0D0012F6A000100000011 /* DemoDataSeeder.swift in Sources */,
+				18C0D0012F6A000100000013 /* SocialDesignSystem.swift in Sources */,
+				18C0D0012F6A000100000015 /* PushNotificationService.swift in Sources */,
 				182FF4BD2ED18CA0001DE74F /* ProgressStoryView.swift in Sources */,
 				181E65542F3758A8007ECEC9 /* LoginBonusModernView.swift in Sources */,
 				182FF4BE2ED18CA0001DE74F /* PentagonManagerView.swift in Sources */,
@@ -562,6 +758,7 @@
 				182FF4D72ED18CA0001DE74F /* Banner.swift in Sources */,
 				182FF4D82ED18CA0001DE74F /* ProgressBar3.swift in Sources */,
 				182FF4DA2ED18CA0001DE74F /* SubscriptionView.swift in Sources */,
+				18AA01022F9E000000IN0002 /* IntroOfferInfo.swift in Sources */,
 				182FF4DB2ED18CA0001DE74F /* PreView.swift in Sources */,
 				182FF4DC2ED18CA0001DE74F /* GachaView.swift in Sources */,
 				181BFFA02F10F8ED0075C9BE /* UIComponentsUpdated.swift in Sources */,
@@ -585,10 +782,18 @@
 				182FF4ED2ED18CA0001DE74F /* PentagonAppliedShape.swift in Sources */,
 				182FF4EE2ED18CA0001DE74F /* OtherAppsPromotionView.swift in Sources */,
 				181E68322F548A36007ECEC9 /* GodGachaView.swift in Sources */,
+				1B46B6507754A03C44EB193D /* GuardianGachaView.swift in Sources */,
 				182FF4EF2ED18CA0001DE74F /* StoryITListView.swift in Sources */,
 				182FF4F12ED18CA0001DE74F /* AudioManager.swift in Sources */,
+				5B1E0B0A2F80000100000002 /* SlimeBounceSplashView.swift in Sources */,
 				182FF4F22ED18CA0001DE74F /* SplashScreenView.swift in Sources */,
 				182FF4F32ED18CA0001DE74F /* GraphManagerView.swift in Sources */,
+				18B3057E2F62F388000DDE64 /* GuerrillaBossData.swift in Sources */,
+				18B3057F2F62F388000DDE64 /* GuerrillaManager.swift in Sources */,
+				18B305802F62F388000DDE64 /* GuerrillaBattleView.swift in Sources */,
+				18B305812F62F388000DDE64 /* GuerrillaLobbyView.swift in Sources */,
+				18B305822F62F388000DDE64 /* GuerrillaResultView.swift in Sources */,
+				105CA59D27FCBA23385E94E9 /* GuildBossBattleView.swift in Sources */,
 				182FF4F52ED18CA0001DE74F /* TermsOfServiceView.swift in Sources */,
 				182FF4F72ED18CA0001DE74F /* IllustratedView.swift in Sources */,
 				182FF4F82ED18CA0001DE74F /* HelpView1.swift in Sources */,
@@ -725,7 +930,7 @@
 				CODE_SIGN_ENTITLEMENTS = it/it.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 9.4;
+				CURRENT_PROJECT_VERSION = 10.17;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"it/Preview Content\"";
 				DEVELOPMENT_TEAM = F3XS565TSX;
@@ -733,17 +938,18 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = it/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "ITクエスト";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UIStatusBarStyle = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 9.4;
+				MARKETING_VERSION = 10.12;
 				PRODUCT_BUNDLE_IDENTIFIER = "Swift-Beginners-app.it";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -761,7 +967,7 @@
 				CODE_SIGN_ENTITLEMENTS = it/it.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 9.4;
+				CURRENT_PROJECT_VERSION = 10.17;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"it/Preview Content\"";
 				DEVELOPMENT_TEAM = F3XS565TSX;
@@ -769,17 +975,18 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = it/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "ITクエスト";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UIStatusBarStyle = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 9.4;
+				MARKETING_VERSION = 10.12;
 				PRODUCT_BUNDLE_IDENTIFIER = "Swift-Beginners-app.it";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -813,23 +1020,23 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		181B01562F1150180075C9BE /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/googleads/swift-package-manager-google-mobile-ads";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 12.14.0;
-			};
-		};
-		18D778E62F12536A002E7EFB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+		18209EE92F6044BA00BFD12A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 12.7.0;
+				minimumVersion = 12.10.0;
 			};
 		};
-		26266B272B4A5179007B5964 /* XCRemoteSwiftPackageReference "AppVersionMonitorSwiftUI" */ = {
+		18209EF42F60451B00BFD12A /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/googleads/swift-package-manager-google-mobile-ads";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 13.1.0;
+			};
+		};
+		18209EF72F6045B800BFD12A /* XCRemoteSwiftPackageReference "AppVersionMonitorSwiftUI" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SNQ-2001/AppVersionMonitorSwiftUI";
 			requirement = {
@@ -840,10 +1047,44 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		181B01572F1150180075C9BE /* GoogleMobileAds */ = {
+		18209D582F5C889400BFD12A /* FirebaseMessaging */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 181B01562F1150180075C9BE /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */;
+			productName = FirebaseMessaging;
+		};
+		18209EEA2F6044BA00BFD12A /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 18209EE92F6044BA00BFD12A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		18209EEC2F6044BA00BFD12A /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 18209EE92F6044BA00BFD12A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		18209EEE2F6044BA00BFD12A /* FirebaseDatabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 18209EE92F6044BA00BFD12A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseDatabase;
+		};
+		18209EF02F6044BA00BFD12A /* FirebaseInAppMessaging-Beta */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 18209EE92F6044BA00BFD12A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = "FirebaseInAppMessaging-Beta";
+		};
+		18209EF22F6044BA00BFD12A /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 18209EE92F6044BA00BFD12A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
+		};
+		18209EF52F60451B00BFD12A /* GoogleMobileAds */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 18209EF42F60451B00BFD12A /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */;
 			productName = GoogleMobileAds;
+		};
+		18209EF82F6045B800BFD12A /* AppVersionMonitorSwiftUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 18209EF72F6045B800BFD12A /* XCRemoteSwiftPackageReference "AppVersionMonitorSwiftUI" */;
+			productName = AppVersionMonitorSwiftUI;
 		};
 		18B9E1F92E0FC355000F4B57 /* FirebaseFirestore */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -852,26 +1093,6 @@
 		18B9E2062E0FE1F8000F4B57 /* FirebaseAuth */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = FirebaseAuth;
-		};
-		18D778E72F12536A002E7EFB /* FirebaseAuth */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 18D778E62F12536A002E7EFB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseAuth;
-		};
-		18D778E92F12536A002E7EFB /* FirebaseDatabase */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 18D778E62F12536A002E7EFB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseDatabase;
-		};
-		18D778EB2F12543F002E7EFB /* FirebaseMessaging */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 18D778E62F12536A002E7EFB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseMessaging;
-		};
-		26266B282B4A5179007B5964 /* AppVersionMonitorSwiftUI */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 26266B272B4A5179007B5964 /* XCRemoteSwiftPackageReference "AppVersionMonitorSwiftUI" */;
-			productName = AppVersionMonitorSwiftUI;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

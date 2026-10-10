@@ -36,6 +36,8 @@ struct ManagerListTabView: View {
     @State private var buttonRect: CGRect = .zero
     @State private var bubbleHeight: CGFloat = 0.0
     @State private var isIncorrectAnswersEmpty: Bool = true
+    @State private var dueReviewCount: Int = 0
+    @State private var nextReviewDate: Date?
     @StateObject var reward = Reward()
     @State private var showLoginModal: Bool = false
     @State private var isButtonClickable: Bool = false
@@ -56,7 +58,7 @@ struct ManagerListTabView: View {
                                 Text(" ")
                                     .frame(width:isIPad() ? 10 : 5,height: isIPad() ? 40 : 20)
                                     .background(.gray)
-                                Text("不正解した問題だけを解くことができます")
+                                Text(reviewHeaderText)
                                     .font(.system(size: isIPad() ? 40 : 16))
                                     .foregroundColor(Color("fontGray"))
                                 Spacer()
@@ -72,14 +74,20 @@ struct ManagerListTabView: View {
                                 self.isPresentingQuizIncorrectAnswer = true
                             }) {
                                 //                        Image("IT基礎知識の問題の初級")
-                                if isIncorrectAnswersEmpty == true {
-                                Image("白黒選択肢0")
-                                    .resizable()
-                                    .frame(height: isIPad() ? 200 : 70)
-                                }else{
-                                    Image("選択肢0")
+                                ZStack(alignment: .topTrailing) {
+                                    Image(isIncorrectAnswersEmpty ? "白黒選択肢0" : "選択肢0")
                                         .resizable()
                                         .frame(height: isIPad() ? 200 : 70)
+                                    if dueReviewCount > 0 {
+                                        Text("\(dueReviewCount)")
+                                            .font(.system(size: isIPad() ? 30 : 14, weight: .bold))
+                                            .foregroundColor(.white)
+                                            .padding(.horizontal, isIPad() ? 16 : 9)
+                                            .padding(.vertical, isIPad() ? 8 : 4)
+                                            .background(Color.red)
+                                            .clipShape(Capsule())
+                                            .offset(x: -10, y: -8)
+                                    }
                                 }
                             }
                             .disabled(isIncorrectAnswersEmpty)
@@ -91,36 +99,28 @@ struct ManagerListTabView: View {
                                 QuizIncorrectAnswerListView(isPresenting: $isPresentingQuizIncorrectAnswer)
                                         }
                             .onChange(of: isPresentingQuizBeginner) { isPresenting in
-                                    fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
-                                }
+                                refreshReviewSummary()
                             }
                             .onChange(of: isPresentingQuizIncorrectAnswer) { isPresenting in
-                                    fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
-                                }
+                                refreshReviewSummary()
                             }
                             .onChange(of: isPresentingQuizIntermediate) { isPresenting in
-                                    fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
-                                }
+                                refreshReviewSummary()
                             }
                             .onChange(of: isPresentingQuizAdvanced) { isPresenting in
-                                    fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
-                                }
+                                refreshReviewSummary()
                             }
                             .onChange(of: isPresentingQuizGod) { isPresenting in
-                                    fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
-                                }
+                                refreshReviewSummary()
                             }
                             .onChange(of: isPresentingQuizNetwork) { isPresenting in
-                                    fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
-                                }
+                                refreshReviewSummary()
                             }
                             .onChange(of: isPresentingQuizSecurity) { isPresenting in
-                                    fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
-                                }
+                                refreshReviewSummary()
                             }
                             .onChange(of: isPresentingQuizDatabase) { isPresenting in
-                                    fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
-                                }
+                                refreshReviewSummary()
                             }
                         
                             HStack{
@@ -380,10 +380,7 @@ struct ManagerListTabView: View {
             .onAppear {
 //                print("isButtonClickable:\(isButtonClickable)")
                 reward.LoadReward()
-                fetchNumberOfIncorrectAnswers(userId: authManager.currentUserId!) { count in
-//                self.incorrectAnswerCount = count
-//                incorrectCount = count
-                }
+                refreshReviewSummary()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { // 1秒後に
                     self.isButtonClickable = true // ボタンをクリック可能に設定
                 }
@@ -445,14 +442,32 @@ struct ManagerListTabView: View {
     }
     
     func fetchNumberOfIncorrectAnswers(userId: String, completion: @escaping (Int) -> Void) {
-    let ref = Database.database().reference().child("IncorrectAnswers").child(userId)
-    ref.observeSingleEvent(of: .value) { snapshot in
-        
-    let count = snapshot.childrenCount // 子ノードの数を取得
-    completion(Int(count))
-        print("count:\(count)")
-        self.isIncorrectAnswersEmpty = (count == 0)
+        ReviewScheduleService.fetchSummary(userId: userId) { summary in
+            dueReviewCount = summary.dueCount
+            nextReviewDate = summary.nextReviewDate
+            isIncorrectAnswersEmpty = summary.totalCount == 0
+            completion(summary.dueCount)
+        }
     }
+
+    private var reviewHeaderText: String {
+        if dueReviewCount > 0 {
+            return "今日の復習が\(dueReviewCount)問あります"
+        }
+        if let nextReviewDate {
+            return "次の復習は\(nextReviewDate.formatted(date: .abbreviated, time: .omitted))です"
+        }
+        return "忘れかけた問題を自動で復習します"
+    }
+
+    private func refreshReviewSummary() {
+        guard let userId = authManager.currentUserId else {
+            dueReviewCount = 0
+            nextReviewDate = nil
+            isIncorrectAnswersEmpty = true
+            return
+        }
+        fetchNumberOfIncorrectAnswers(userId: userId) { _ in }
     }
     func isSmallDevice() -> Bool {
         return UIScreen.main.bounds.width < 390
@@ -462,4 +477,3 @@ struct ManagerListTabView: View {
 #Preview {
     ManagerListTabView()
 }
-

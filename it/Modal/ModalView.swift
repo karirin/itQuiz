@@ -21,6 +21,9 @@ struct ModalView: View {
     var pauseTimer: () -> Void
     var resumeTimer: () -> Void
     @Binding var userFlag: Int
+    var exitTitle = "ホームに戻る"
+    var onExit: (() -> Void)? = nil
+    var onHelp: (() -> Void)? = nil
     @Environment(\.presentationMode) var presentationMode
     
     // アニメーション用
@@ -66,11 +69,12 @@ struct ModalView: View {
                     // ホームに戻るボタン
                     MenuButton(
                         icon: "house.fill",
-                        title: "ホームに戻る",
+                        title: exitTitle,
                         iconColor: Color(hex: "FF6B6B"),
                         action: {
                             generateHapticFeedback()
-                            isPresenting = false
+                            if let onExit { onExit() }
+                            else { isPresenting = false }
                             audioManager.playReturnSound()
                         }
                     )
@@ -88,12 +92,10 @@ struct ModalView: View {
                             generateHapticFeedback()
                             isSoundOn.toggle()
                             audioManager.playSound()
-                            if userFlag == 0 {
-                                userFlag = 1
-                                authManager.updateUserFlag(userId: authManager.currentUserId!, userFlag: 1)
-                            } else {
-                                userFlag = 0
-                                authManager.updateUserFlag(userId: authManager.currentUserId!, userFlag: 0)
+                            userFlag = isSoundOn ? 0 : 1
+                            authManager.userFlag = userFlag
+                            if let userID = authManager.currentUserId {
+                                authManager.updateUserFlag(userId: userID, userFlag: userFlag)
                             }
                         }
                     )
@@ -108,8 +110,11 @@ struct ModalView: View {
                         action: {
                             generateHapticFeedback()
                             showHomeModal = false
-                            tutorialNum = 4
-                            authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 4) { _ in }
+                            if let onHelp { onHelp() }
+                            else {
+                                tutorialNum = 4
+                                authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 4) { _ in }
+                            }
                             audioManager.playSound()
                         }
                     )

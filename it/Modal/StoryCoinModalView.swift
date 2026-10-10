@@ -327,7 +327,7 @@ struct StoryCoinModalView: View {
     }
     
     private func setTreasureParameters(coin: Int) {
-        if let treasure = treasures[coin] {
+        if let treasure = DungeonExpansion.treasure(for: coin) ?? treasures[coin] {
             let plannedItemRewards = DungeonRewardPlanner.treasureRewards(for: coin)
             let plannedBoostRewards = treasureBoostRewards(for: coin)
             coinImage = treasure.coinImage
@@ -363,6 +363,7 @@ struct StoryCoinModalView: View {
     }
 
     private func treasureBoostRewards(for treasureID: Int) -> [DungeonBoost] {
+        if treasureID > 30 { return DungeonExpansion.treasureBoosts(for: treasureID) }
         switch treasureID {
         case 5:
             return [DungeonBoost(type: .safeShield, charges: 1)]

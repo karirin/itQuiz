@@ -35,6 +35,7 @@ enum MissionType: String, Codable {
     case login = "login"                     // ○日ログインしよう
     case dailyComplete = "dailyComplete"     // デイリーミッションを全クリアしよう
     case dungeonStep = "dungeonStep"         // ダンジョンを○コマ進もう
+    case review = "review"                   // 復習で苦手問題を克服しよう
 }
 
 struct Mission: Identifiable, Codable {

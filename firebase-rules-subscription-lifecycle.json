@@ -1,0 +1,9 @@
+{
+  "_comment": "既存のRealtime Databaseルールへマージする購読ライフサイクル用ルール案です。subscriptionLifecycleは署名検証済みのCloud Functionsだけが書き込み、クライアントアクセスは禁止します。",
+  "rules": {
+    "subscriptionLifecycle": {
+      ".read": false,
+      ".write": false
+    }
+  }
+}

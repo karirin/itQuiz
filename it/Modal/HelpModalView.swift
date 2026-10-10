@@ -226,7 +226,7 @@ struct HelpModalView: View {
         isSubmitting = true
         
         if toggle {
-            authManager.updateUserFlag(userId: authManager.currentUserId!, userFlag: 1) { _ in }
+            authManager.optOutOfCurrentFeedbackPrompts()
         }
         
         authManager.updateContact(userId: authManager.currentUserId!, newContact: text) { success in
@@ -241,7 +241,7 @@ struct HelpModalView: View {
         generateHapticFeedback()
         
         if toggle {
-            authManager.updateUserFlag(userId: authManager.currentUserId!, userFlag: 1) { _ in }
+            authManager.optOutOfCurrentFeedbackPrompts()
         }
         
         withAnimation(.easeOut(duration: 0.2)) {

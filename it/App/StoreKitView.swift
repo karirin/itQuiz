@@ -9,6 +9,36 @@ import SwiftUI
 import Foundation
 import StoreKit
 
+enum CoinPurchaseCatalog {
+    static let productIDs = ["it.coin1000", "it.coin4000", "it.coin15000"]
+
+    static func coinAmount(for productId: String) -> Int? {
+        switch productId {
+        case "it.coin1000": return 1_000
+        case "it.coin4000": return 4_000
+        case "it.coin15000": return 15_000
+        default: return nil
+        }
+    }
+}
+
+func fulfillCoinPurchase(_ transaction: StoreKit.Transaction) async -> Bool {
+    guard transaction.productType == .consumable,
+          let amount = CoinPurchaseCatalog.coinAmount(for: transaction.productID) else {
+        return false
+    }
+
+    return await withCheckedContinuation { continuation in
+        AuthManager.shared.grantPurchasedCoins(
+            transactionId: transaction.id,
+            productId: transaction.productID,
+            amount: amount
+        ) { success in
+            continuation.resume(returning: success)
+        }
+    }
+}
+
 class Store: ObservableObject {
     
     private var updates: Task<Void, Never>? = nil
@@ -30,7 +60,7 @@ class Store: ObservableObject {
     @MainActor
     func fetchProducts() async {
         do {
-            let fetchedProducts = try await Product.products(for: ["it.coin1000", "it.coin4000", "it.coin15000"])
+            let fetchedProducts = try await Product.products(for: CoinPurchaseCatalog.productIDs)
 //            let fetchedProducts = try await Product.products(for: ["consumable.it1", "consumable.it2", "consumable.it3"])
             
             // コインの量に基づいてソート
@@ -52,11 +82,14 @@ class Store: ObservableObject {
                 guard
                     case .verified(let transaction) = verificationResult,
                     transaction.revocationDate == nil // 払い戻されたものは無視する
-                else { return }
-                
-                // 購入情報の更新
-                await refreshPurchasedProducts()
-                
+                else { continue }
+
+                if transaction.productType == .consumable {
+                    guard await fulfillCoinPurchase(transaction) else { continue }
+                } else {
+                    await refreshPurchasedProducts()
+                }
+
                 await transaction.finish()
             }
         }
@@ -83,31 +116,14 @@ func refreshPurchasedProducts() async {
 
 func purchase(_ product: Product) async throws {
     let result = try await product.purchase()
-    @ObservedObject var authManager = AuthManager.shared
     
     switch result {
     case let .success(verificationResult):
         switch verificationResult {
         case let .verified(transaction):
-            // 購入情報を更新する
-           await refreshPurchasedProducts()
-            
-//            print("verificationResult:\(transaction.price)")
-            if transaction.price == 500 {
-                authManager.addMoney(amount: 15000)
-            }else if transaction.price == 200 {
-                authManager.addMoney(amount: 4000)
-            }else{
-                authManager.addMoney(amount: 1000)
+            guard await fulfillCoinPurchase(transaction) else {
+                throw SubscribeError.otherError
             }
-           // consumable については refreshPurchasedProducts() で更新できなかったのでここで更新
-           // currentEntitlements の説明では更新できそうに思えたができなかった
-           if case .consumable = transaction.productType {
-               let amount = UserDefaults.standard.integer(forKey: transaction.productID)
-               UserDefaults.standard.set(amount + 1, forKey: transaction.productID)
-           }
-
-            // transaction を終了させる必要がある
             await transaction.finish()
 
         case let .unverified(_, verificationError):

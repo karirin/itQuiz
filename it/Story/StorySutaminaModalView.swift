@@ -15,7 +15,7 @@ struct StoryRecoveryQuestion: Identifiable {
 }
 
 struct StorySutaminaModalView: View {
-    @StateObject var reward = Reward()
+    @StateObject var reward = Reward(placement: .story)
     @ObservedObject var viewModel: PositionViewModel
     @ObservedObject var audioManager = AudioManager.shared
     @ObservedObject var authManager = AuthManager.shared

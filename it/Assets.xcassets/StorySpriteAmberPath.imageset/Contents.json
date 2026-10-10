@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "amber-path.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

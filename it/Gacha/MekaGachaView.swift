@@ -16,6 +16,8 @@ struct MekaGachaView: View {
     @State private var isGachaButtonDisabled: Bool = false
     @State private var obtainedRareItem: GachaManager.Item?
     @State private var obtainedItem: GachaManager.Item?
+    /// 結果画面の NEW 表示用（抽選前の所持状態で判定）
+    @State private var obtainedIsNew: Bool = false
     
     @State private var showAnimation: Bool = false
     @State private var showResult: Bool = false
@@ -66,37 +68,13 @@ struct MekaGachaView: View {
                         // 結果画面を閉じずにガチャを再実行
                         obtainedItem = nil  // アイテムだけクリア
                         
-                        // コインチェック
-                        if userMoney >= 600 {
-                            // コイン減少
-                            authManager.decreaseRareUserMoney { success in
-                                if success {
-                                    print("User money decreased successfully.")
-                                    refreshPlayerResources()
-                                } else {
-                                    print("Failed to decrease user money.")
-                                }
-                            }
-                            
-                            // ガチャ抽選
-                            gachaManager.shuffleItems()
-                            if let item = gachaManager.drawGacha() {
-                                obtainedRareItem = item
-                                authManager.recordGachaUsed()
-                                
-                                // アニメーション表示（結果画面は残したまま）
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                    showAnimation = true
-                                }
-                            }
-                            
-                            // アバター数チェック
-                            checkAvatarCount()
-                        } else {
-                            // コイン不足
+                        guard userMoney >= gachaManager.gachaCost else {
                             showUnCoinModal = true
+                            return
                         }
-                    }
+                        performGachaDraw(coinCost: gachaManager.gachaCost, resetResult: false)
+                    },
+                    isNew: obtainedIsNew
                 )
             }
             VStack{
@@ -137,7 +115,7 @@ struct MekaGachaView: View {
         }
         .fullScreenCover(isPresented: $showAnimation) {
             if let rarity = obtainedRareItem?.rarity {
-                GachaAnimationView(rarity: rarity) {
+                GachaAnimationView(rarity: rarity, item: obtainedRareItem) {
                     showAnimation = false
                     obtainedItem = obtainedRareItem
                     showResult = true
@@ -173,7 +151,7 @@ struct MekaGachaView: View {
                 refreshPlayerResources()
             }
         }
-        .alert("チケットを使えません", isPresented: $showTicketErrorAlert) {
+        .alert("ガチャを引けませんでした", isPresented: $showTicketErrorAlert) {
             Button("OK") {}
         } message: {
             Text(ticketErrorMessage)
@@ -199,6 +177,7 @@ struct MekaGachaView: View {
         GachaLobbyScreen(
             gachaTitle: "メカガチャ",
             heroImageName: "メカガチャトップ",
+            backgroundImageName: "MekaGachaSceneBackground",
             ticketType: .mekaGachaTicket,
             ticketCount: authManager.mekaGachaTicketCount,
             userMoney: userMoney,
@@ -224,37 +203,11 @@ struct MekaGachaView: View {
     }
     
     private func startGacha() {
-        // コインチェック
-        if userMoney >= 600 {
-            // コイン減少
-            authManager.decreaseRareUserMoney { success in
-                if success {
-                    print("User money decreased successfully.")
-                    refreshPlayerResources()
-                } else {
-                    print("Failed to decrease user money.")
-                }
-            }
-            
-            // ガチャ抽選
-            gachaManager.shuffleItems()
-            if let item = gachaManager.drawGacha() {
-                obtainedRareItem = item
-                authManager.recordGachaUsed()
-                
-                // アニメーション表示
-                showResult = false
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    showAnimation = true
-                }
-            }
-            
-            // アバター数チェック
-            checkAvatarCount()
-        } else {
-            // コイン不足
+        guard userMoney >= gachaManager.gachaCost else {
             showUnCoinModal = true
+            return
         }
+        performGachaDraw(coinCost: gachaManager.gachaCost)
     }
 
     private func startGachaWithTicket() {
@@ -265,32 +218,67 @@ struct MekaGachaView: View {
             return
         }
 
-        authManager.consumeItem(.mekaGachaTicket) { success in
+        performGachaDraw(ticketType: .mekaGachaTicket)
+    }
+
+    private func performGachaDraw(
+        coinCost: Int = 0,
+        ticketType: InventoryItemType? = nil,
+        resetResult: Bool = true
+    ) {
+        gachaManager.shuffleItems()
+        guard let item = gachaManager.drawGacha() else {
+            ticketErrorMessage = "ガチャ結果を取得できませんでした。"
+            showTicketErrorAlert = true
+            return
+        }
+
+        let avatar = Avatar(
+            name: item.name,
+            attack: item.attack,
+            health: item.health,
+            usedFlag: 0,
+            count: 1
+        )
+        let isNewAvatar = !authManager.avatars.contains { $0.name == item.name }
+        authManager.commitGachaResult(
+            avatar: avatar,
+            coinCost: coinCost,
+            ticketType: ticketType
+        ) { success in
             guard success else {
-                ticketErrorMessage = "チケットの消費に失敗しました。通信状況を確認してもう一度お試しください。"
-                showTicketErrorAlert = true
+                if ticketType == nil {
+                    if userMoney < coinCost {
+                        showUnCoinModal = true
+                    } else {
+                        ticketErrorMessage = "ガチャの確定に失敗しました。時間をおいて再度お試しください。"
+                        showTicketErrorAlert = true
+                    }
+                } else {
+                    ticketErrorMessage = "チケットの消費またはおともの保存に失敗しました。"
+                    showTicketErrorAlert = true
+                }
                 refreshPlayerResources()
                 return
             }
 
-            DispatchQueue.main.async {
-                audioManager.playSound()
-                gachaManager.shuffleItems()
-                if let item = gachaManager.drawGacha() {
-                    obtainedRareItem = item
-                    authManager.recordGachaUsed()
-                    showResult = false
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                        showAnimation = true
-                    }
-                }
-
-                checkAvatarCount()
-                refreshPlayerResources()
+            audioManager.playSound()
+            obtainedRareItem = item
+            obtainedIsNew = isNewAvatar
+            // 次回の NEW 判定のため所持おともを読み直す（読み取りのみ）
+            authManager.fetchAvatars {}
+            authManager.recordGachaUsed()
+            if resetResult {
+                showResult = false
             }
+            DispatchQueue.main.asyncAfter(deadline: .now() + (resetResult ? 0.5 : 0.1)) {
+                showAnimation = true
+            }
+            checkAvatarCount()
+            refreshPlayerResources()
         }
     }
-    
+
     private func fetchUserMoney() {
         authManager.getUserMoney { money in
             self.userMoney = money

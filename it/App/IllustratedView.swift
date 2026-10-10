@@ -24,7 +24,7 @@ struct IllustratedView: View {
     
     // MARK: - Rarity Enum
     enum Rarity: CaseIterable {
-        case normal, rare, superRare, ultraRare, legendRare, mythic
+        case normal, rare, superRare, ultraRare, legendRare, mythic, ultimateRare
         
         var displayString: String {
             switch self {
@@ -34,6 +34,7 @@ struct IllustratedView: View {
             case .ultraRare: return "ウルトラレア"
             case .legendRare: return "レジェンド"
             case .mythic: return "ゴットレア"
+            case .ultimateRare: return "アルティメットレア"
             }
         }
         
@@ -45,6 +46,7 @@ struct IllustratedView: View {
             case .ultraRare: return Color(red: 0.95, green: 0.6, blue: 0.2)
             case .legendRare: return Color(red: 0.95, green: 0.8, blue: 0.2)
             case .mythic: return Color(red: 0.95, green: 0.95, blue: 0.95)
+            case .ultimateRare: return Color(red: 0.85, green: 0.7, blue: 0.15)
             }
         }
         
@@ -80,7 +82,7 @@ struct IllustratedView: View {
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
-            case .mythic:
+            case .mythic, .ultimateRare:
                 return LinearGradient(
                     colors: [Color.white, Color(red: 1, green: 0.92, blue: 0.55), Color(red: 0.9, green: 0.75, blue: 0.2)],
                     startPoint: .topLeading,
@@ -121,7 +123,7 @@ struct IllustratedView: View {
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
-            case .mythic:
+            case .mythic, .ultimateRare:
                 return LinearGradient(
                     colors: [Color(red: 0.28, green: 0.28, blue: 0.32), Color(red: 0.16, green: 0.14, blue: 0.08)],
                     startPoint: .topLeading,
@@ -158,7 +160,9 @@ struct IllustratedView: View {
             GachaManager(mode: .normal),
             GachaManager(mode: .rare),
             GachaManager(mode: .meka),
-            GachaManager(mode: .god)
+            GachaManager(mode: .god),
+            GachaManager(mode: .guardian),
+            GachaManager(mode: .deepSea)
         ]
         
         var seenNames = Set<String>()
@@ -363,42 +367,33 @@ private extension IllustratedView.Rarity {
         switch gachaRarity {
         case .normal:
             self = .normal
-        case .rare, .Rrare, .mekaRare, .godRare:
+        case .rare, .Rrare, .mekaRare, .godRare, .guardianRare, .deepSeaRare:
             self = .rare
-        case .superRare, .RsuperRare, .mekaSuperRare, .godSuperRare:
+        case .superRare, .RsuperRare, .mekaSuperRare, .godSuperRare, .guardianSuperRare, .deepSeaSuperRare:
             self = .superRare
-        case .ultraRare, .RultraRare, .mekaUltraRare, .godUltraRare:
+        case .ultraRare, .RultraRare, .mekaUltraRare, .godUltraRare, .guardianUltraRare, .deepSeaUltraRare:
             self = .ultraRare
-        case .legendRare, .mekaLegendRare, .godLegendRare:
+        case .legendRare, .mekaLegendRare, .godLegendRare, .guardianLegendRare, .deepSeaLegendRare:
             self = .legendRare
         case .godMythicRare:
             self = .mythic
+        case .guardianUltimateRare, .deepSeaUltimateRare:
+            self = .ultimateRare
         }
     }
 }
 
 private extension IllustratedView.Item {
     var imageName: String {
-        AvatarAssetResolver.imageName(for: name, owned: true)
-    }
-    
-    var silhouetteImageName: String {
-        AvatarAssetResolver.imageName(for: name, owned: false)
+        AvatarAssetResolver.imageName(for: name)
     }
 }
 
 private enum AvatarAssetResolver {
-    static func imageName(for name: String, owned: Bool) -> String {
-        let primaryName = owned ? name : "\(name)_シルエット"
-        if UIImage(named: primaryName) != nil {
-            return primaryName
-        }
-        
-        if let fallback = UIImage(named: name) != nil ? name : nil {
-            return fallback
-        }
-        
-        return "questionmark.circle.fill"
+    /// 未所持でも本物のおとも画像を使い、表示側で黒く塗って隠す。
+    /// 専用のシークレット画像は用意しない(本体の形と食い違うため)。
+    static func imageName(for name: String) -> String {
+        UIImage(named: name) != nil ? name : "questionmark.circle.fill"
     }
 }
 
@@ -463,7 +458,7 @@ struct ItemCardView: View {
                 VStack(spacing: 8) {
                     // Character image
                     ZStack {
-                        if isOwned && (item.rarity == .legendRare || item.rarity == .mythic) {
+                        if isOwned && (item.rarity == .legendRare || item.rarity == .mythic || item.rarity == .ultimateRare) {
                             // Shimmer effect for legend
                             Circle()
                                 .fill(
@@ -502,7 +497,7 @@ struct ItemCardView: View {
         .scaleEffect(isSelected ? 1.05 : 1)
         .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isSelected)
         .onAppear {
-            if isOwned && (item.rarity == .legendRare || item.rarity == .mythic) {
+            if isOwned && (item.rarity == .legendRare || item.rarity == .mythic || item.rarity == .ultimateRare) {
                 withAnimation(.linear(duration: 3).repeatForever(autoreverses: false)) {
                     shimmer = true
                 }
@@ -518,13 +513,14 @@ struct ItemCardView: View {
         case .ultraRare: return 4
         case .legendRare: return 5
         case .mythic: return 6
+        case .ultimateRare: return 7
         }
     }
     
     @ViewBuilder
     private func avatarImage(width: CGFloat, height: CGFloat) -> some View {
-        let imageName = isOwned ? item.imageName : item.silhouetteImageName
-        
+        let imageName = item.imageName
+
         if imageName == "questionmark.circle.fill" {
             Image(systemName: imageName)
                 .resizable()
@@ -536,7 +532,7 @@ struct ItemCardView: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: width, height: height)
-                .opacity(isOwned ? 1 : 0.4)
+                .colorMultiply(isOwned ? .white : .black)
         }
     }
 }
@@ -668,8 +664,8 @@ struct DetailOverlayView: View {
     
     @ViewBuilder
     private func avatarImage(width: CGFloat, height: CGFloat) -> some View {
-        let imageName = isOwned ? item.imageName : item.silhouetteImageName
-        
+        let imageName = item.imageName
+
         if imageName == "questionmark.circle.fill" {
             Image(systemName: imageName)
                 .resizable()
@@ -681,7 +677,7 @@ struct DetailOverlayView: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: width, height: height)
-                .opacity(isOwned ? 1 : 0.5)
+                .colorMultiply(isOwned ? .white : .black)
         }
     }
 }

@@ -25,15 +25,19 @@ struct TopView: View {
     @State var isAlert: Bool = false
     @StateObject private var storyViewModel = PositionViewModel.shared
     @Environment(\.scenePhase) var scenePhase
+    @EnvironmentObject private var connectivity: ConnectivityMonitor
+    @State private var selectedTab = 0
+    @ObservedObject private var learningTour = InitialLearningTour.shared
 
     var body: some View {
         ZStack{
                 Image("背景")
                                 .resizable()
             VStack {
-                TabView {
+                TabView(selection: $selectedTab) {
                     HStack{
                             ContentView()
+                                .toolbar(learningTour.isActive ? .hidden : .visible, for: .tabBar)
                                 .background(Color("sky"))
                         }
                     
@@ -43,26 +47,47 @@ struct TopView: View {
                             Text("ホーム")
                                 .padding()
                         }
+                        .tag(0)
 
-                    ZStack {
-                            MissionView()
+                        // 学習モードはオフラインでも問題演習ができる（画面内にオフライン表示あり）。
+                        // ホームの「学習モード」ボタンと挙動をそろえ、タブからも開けるようにする。
+                        NavigationView {
+                            ManagerListView(
+                                isPresenting: $isPresentingQuizList,
+                                showsBackButton: false
+                            )
                         }
-                        .tabItem {
-                            Image(systemName: "checklist")
-                            Text("ミッション")
-                        }
-                        .badge(MissionManager.shared.totalClaimableCount)
+                        .navigationViewStyle(.stack)
+                            .tabItem {
+                                Image(systemName: "book.fill")
+                                Text("学習モード")
+                            }
+                            .tag(1)
 
-                        AvatarListView(isPresenting: $isPresentingAvatarList)
+                        Group {
+                            if connectivity.isConnected {
+                                AvatarListView(isPresenting: $isPresentingAvatarList)
+                            } else {
+                                OfflineUnavailableView(featureName: "おとも一覧")
+                            }
+                        }
                             .tabItem {
                                 Image(systemName: "square.grid.2x2")
                                 Text("おとも一覧")
                             }
-                    GraphManagerView()
+                            .tag(2)
+                    Group {
+                        if connectivity.isConnected {
+                            GraphManagerView()
+                        } else {
+                            OfflineUnavailableView(featureName: "分析")
+                        }
+                    }
                             .tabItem {
                                 Image(systemName: "chart.pie")
                                 Text("分析")
                             }
+                            .tag(3)
                     ZStack {
                         SettingView()
                     }
@@ -70,8 +95,12 @@ struct TopView: View {
                         Image(systemName: "gearshape.fill")
                         Text("設定")
                     }
+                    .tag(4)
                 }
             }
+        }
+        .onAppear {
+            GuildManager.shared.fetchMyGuild()
         }
         .onChange(of: scenePhase) { newPhase in
              switch newPhase {
@@ -82,7 +111,12 @@ struct TopView: View {
              default:
                  break
              }
-         }
+        }
+        .onChange(of: connectivity.isConnected) { isConnected in
+            if !isConnected && selectedTab != 4 && selectedTab != 1 {
+                selectedTab = 0
+            }
+        }
     }
 }
 
@@ -95,5 +129,6 @@ struct TopView_Previews: PreviewProvider {
     static var previews: some View {
         TopView()
             .environmentObject(AppState())
+            .environmentObject(ConnectivityMonitor.shared)
     }
 }

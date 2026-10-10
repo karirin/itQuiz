@@ -50,12 +50,12 @@ struct QuizAppliedBasicListView: View {
         QuizQuestion(
             question: "プロジェクト管理において、プロジェクトの進捗を可視化するためのツールは何か？",
             choices: [
-                "Gantt Chart",
                 "PERT Chart",
+                "Pie Chart",
                 "Flow Chart",
-                "Pie Chart"
+                "Gantt Chart"
             ],
-            correctAnswerIndex: 0,
+            correctAnswerIndex: 3,
             explanation: "Gantt Chart（ガントチャート）は、プロジェクトの進捗を可視化するためのツールです。"
         ),
         
@@ -63,23 +63,23 @@ struct QuizAppliedBasicListView: View {
             question: "ソフトウェアテストの中で、プログラムの内部構造を考慮してテストを行う手法は何か？",
             choices: [
                 "ブラックボックステスト",
-                "ホワイトボックステスト",
+                "ユーザーアクセプタンステスト",
                 "グレーボックステスト",
-                "ユーザーアクセプタンステスト"
+                "ホワイトボックステスト"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 3,
             explanation: "ホワイトボックステストは、プログラムの内部構造を考慮してテストを行う手法です。"
         ),
 
         QuizQuestion(
             question: "データベースの正規化で、部分関数従属性を排除するのは何正規形か？",
             choices: [
-                "第一正規形",
-                "第二正規形",
                 "第三正規形",
-                "BCNF"
+                "第一正規形",
+                "BCNF",
+                "第二正規形"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 3,
             explanation: "第二正規形は、部分関数従属性を排除する正規形です。"
         ),
 
@@ -87,11 +87,11 @@ struct QuizAppliedBasicListView: View {
             question: "プロジェクトのリスクを評価する際に、リスクの発生確率と影響度を掛け合わせた値を何というか？",
             choices: [
                 "リスク係数",
+                "リスクスコア",
                 "リスク指数",
-                "リスクマトリックス",
-                "リスクスコア"
+                "リスクマトリックス"
             ],
-            correctAnswerIndex: 3,
+            correctAnswerIndex: 1,
             explanation: "リスクスコアは、リスクの発生確率と影響度を掛け合わせた値です。"
         ),
 
@@ -99,9 +99,9 @@ struct QuizAppliedBasicListView: View {
             question: "プロジェクトのスコープ、時間、コストを「三角形」に例える表現は何か？",
             choices: [
                 "プロジェクトピラミッド",
-                "プロジェクトダイヤモンド",
+                "プロジェクトマトリックス",
                 "プロジェクト三角形",
-                "プロジェクトマトリックス"
+                "プロジェクトダイヤモンド"
             ],
             correctAnswerIndex: 2,
             explanation: "プロジェクト三角形は、プロジェクトのスコープ、時間、コストを「三角形」に例える表現です。"
@@ -110,48 +110,48 @@ struct QuizAppliedBasicListView: View {
         QuizQuestion(
             question: "ソフトウェア開発において、継続的にビルドとテストを行うプラクティスは何か？",
             choices: [
-                "継続的インテグレーション",
-                "継続的デリバリー",
                 "継続的デプロイメント",
+                "継続的デリバリー",
+                "継続的インテグレーション",
                 "継続的監視"
             ],
-            correctAnswerIndex: 0,
+            correctAnswerIndex: 2,
             explanation: "継続的インテグレーションは、ソフトウェア開発において継続的にビルドとテストを行うプラクティスです。"
         ),
 
         QuizQuestion(
             question: "データベースにおいて、複数のテーブルから必要なデータを取り出すSQL文は何か？",
             choices: [
-                "INSERT",
-                "UPDATE",
+                "DELETE",
                 "SELECT",
-                "DELETE"
+                "INSERT",
+                "UPDATE"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 1,
             explanation: "SELECT文は、データベースから必要なデータを取り出すSQL文です。"
         ),
 
         QuizQuestion(
             question: "プロジェクト管理で、プロジェクトの成果物がステークホルダーの要求を満たしているかを確認するプロセスは何か？",
             choices: [
-                "品質保証",
+                "品質検証",
                 "品質管理",
-                "品質監査",
-                "品質検証"
+                "品質保証",
+                "品質監査"
             ],
-            correctAnswerIndex: 3,
+            correctAnswerIndex: 0,
             explanation: "品質検証は、プロジェクトの成果物がステークホルダーの要求を満たしているかを確認するプロセスです。"
         ),
 
         QuizQuestion(
             question: "ソフトウェア開発において、一つの機能を最初から最後まで短期間で開発する手法は何か？",
             choices: [
-                "スクラム",
-                "エクストリームプログラミング",
+                "ウォーターフォール",
                 "カンバン",
-                "ウォーターフォール"
+                "スクラム",
+                "エクストリームプログラミング"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 3,
             explanation: "エクストリームプログラミング（XP）は、一つの機能を最初から最後まで短期間で開発する手法です。"
         ),
 
@@ -159,9 +159,9 @@ struct QuizAppliedBasicListView: View {
             question: "データベースで、一つのテーブル内の特定の列に重複したデータを許さない制約は何か？",
             choices: [
                 "PRIMARY KEY",
-                "FOREIGN KEY",
+                "NOT NULL",
                 "UNIQUE",
-                "NOT NULL"
+                "FOREIGN KEY"
             ],
             correctAnswerIndex: 2,
             explanation: "UNIQUEはデータベースの制約の一つで、特定の列または列の組合せにおいて、各行がユニークな値、つまり重複しない値を持つことを保証します。"
@@ -183,12 +183,12 @@ struct QuizAppliedBasicListView: View {
         QuizQuestion(
             question: "ソフトウェア開発で、プロジェクトの進捗状況を毎日共有する短いミーティングは何か？",
             choices: [
-                "スプリントレビュー",
-                "デイリースクラム",
+                "レトロスペクティブ",
                 "スプリントプランニング",
-                "レトロスペクティブ"
+                "スプリントレビュー",
+                "デイリースクラム"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 3,
             explanation: "デイリースクラムは、プロジェクトの進捗状況を毎日共有する短いミーティングです。"
         ),
 
@@ -196,11 +196,11 @@ struct QuizAppliedBasicListView: View {
             question: "データベースで、テーブル間の関係性を定義する制約は何か？",
             choices: [
                 "PRIMARY KEY",
+                "NOT NULL",
                 "FOREIGN KEY",
-                "UNIQUE",
-                "NOT NULL"
+                "UNIQUE"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 2,
             explanation: "FOREIGN KEY制約は、テーブル間の関係性を定義する制約です。"
         ),
 
@@ -208,19 +208,19 @@ struct QuizAppliedBasicListView: View {
             question: "プロジェクト管理で、プロジェクトの目的やスコープを明確にする文書は何か？",
             choices: [
                 "プロジェクト計画書",
-                "プロジェクト憲章",
                 "プロジェクトスコープ",
+                "プロジェクト憲章",
                 "プロジェクトスケジュール"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 2,
             explanation: "プロジェクト憲章は、プロジェクトの目的やスコープを明確にする文書です。"
         ),
 
         QuizQuestion(
             question: "ソフトウェア開発で、コードの変更を継続的に本番環境に適用するプラクティスは何か？",
             choices: [
-                "継続的インテグレーション",
                 "継続的デリバリー",
+                "継続的インテグレーション",
                 "継続的デプロイメント",
                 "継続的監視"
             ],
@@ -231,24 +231,24 @@ struct QuizAppliedBasicListView: View {
         QuizQuestion(
             question: "データベースで、データの一貫性を確保するための4つの特性（ACID）のうち、「分離性」を表す頭文字は何か？",
             choices: [
-                "A",
+                "D",
                 "C",
-                "I",
-                "D"
+                "A",
+                "I"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 3,
             explanation: "「分離性」は、ACIDの特性の中で「I」（Isolation）で表されます。"
         ),
 
         QuizQuestion(
             question: "プロジェクト管理で、プロジェクトの各フェーズが何を必要とするかを示す文書は何か？",
             choices: [
-                "WBS",
-                "RACIマトリックス",
                 "リソースカレンダー",
-                "リソースプラン"
+                "リソースプラン",
+                "WBS",
+                "RACIマトリックス"
             ],
-            correctAnswerIndex: 3,
+            correctAnswerIndex: 1,
             explanation: "リソースプランは、プロジェクトの各フェーズが何を必要とするかを示す文書です。"
         ),
 
@@ -256,66 +256,66 @@ struct QuizAppliedBasicListView: View {
             question: "ソフトウェア開発で、プロジェクトの進捗状況や問題点を可視化するボードは何か？",
             choices: [
                 "スプリントボード",
-                "カンバンボード",
                 "タスクボード",
+                "カンバンボード",
                 "プロジェクトボード"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 2,
             explanation: "カンバンボードは、プロジェクトの進捗状況や問題点を可視化するボードです。"
         ),
 
         QuizQuestion(
             question: "データベースで、一貫性を保ちながらデータを複数のテーブルに分割する手法は何か？",
             choices: [
-                "正規化",
                 "非正規化",
                 "パーティショニング",
+                "正規化",
                 "シャーディング"
             ],
-            correctAnswerIndex: 0,
+            correctAnswerIndex: 2,
             explanation: "正規化は、一貫性を保ちながらデータを複数のテーブルに分割する手法です。"
         ),
 
         QuizQuestion(
         question: "オブジェクト指向プログラミングにおいて、継承の概念が主にどの目的で使用されますか？",
         choices: [
-        "コードの重複を減らす",
         "パフォーマンスを向上させる",
+        "エラーを修正する",
         "データベースを管理する",
-        "エラーを修正する"
+        "コードの重複を減らす"
         ],
-        correctAnswerIndex: 0,
+        correctAnswerIndex: 3,
         explanation: "継承は、オブジェクト指向プログラミングにおいて、コードの重複を減らす主な目的で使用されます。"
         ),
         QuizQuestion(
         question: "どのプロトコルがリアルタイム通信をサポートしていますか？",
         choices: [
-        "HTTP",
-        "FTP",
+        "RTP",
         "SMTP",
-        "RTP"
+        "HTTP",
+        "FTP"
         ],
-        correctAnswerIndex: 3,
+        correctAnswerIndex: 0,
         explanation: "RTP（Real-Time Transport Protocol),はリアルタイム通信をサポートするプロトコルです。"
         ),
         QuizQuestion(
         question: "どのソフトウェア開発手法が定期的なリリースと継続的なフィードバックに重点を置いていますか？",
         choices: [
         "ウォーターフォールモデル",
-        "アジャイル開発",
         "スパイラルモデル",
-        "Vモデル"
+        "Vモデル",
+        "アジャイル開発"
         ],
-        correctAnswerIndex: 1,
+        correctAnswerIndex: 3,
         explanation: "アジャイル開発は、定期的なリリースと継続的なフィードバックに重点を置いています。"
         ),
         QuizQuestion(
         question: "どのツールがバージョン管理に使用されますか？",
         choices: [
-        "Docker",
+        "Jenkins",
         "Git",
         "Kubernetes",
-        "Jenkins"
+        "Docker"
         ],
         correctAnswerIndex: 1,
         explanation: "Gitは、ソースコードのバージョン管理に使用されるツールです。"
@@ -324,98 +324,98 @@ struct QuizAppliedBasicListView: View {
         question: "どのHTTPメソッドがリソースの作成に使用されますか？",
         choices: [
         "GET",
-        "POST",
         "PUT",
-        "DELETE"
+        "DELETE",
+        "POST"
         ],
-        correctAnswerIndex: 1,
+        correctAnswerIndex: 3,
         explanation: "POSTメソッドは、リソースの作成に使用されます。"
         ),
         QuizQuestion(
         question: "どのデータベース言語がデータの操作とクエリに使用されますか？",
         choices: [
+        "XML",
         "HTML",
         "CSS",
-        "SQL",
-        "XML"
+        "SQL"
         ],
-        correctAnswerIndex: 2,
+        correctAnswerIndex: 3,
         explanation: "SQLは、データの操作とクエリに使用されるデータベース言語です。"
         ),
         QuizQuestion(
         question: "どのネットワークデバイスがデータパケットを転送しますか？",
         choices: [
+        "モデム",
         "ルーター",
         "スイッチ",
-        "ハブ",
-        "モデム"
+        "ハブ"
         ],
-        correctAnswerIndex: 0,
+        correctAnswerIndex: 1,
         explanation: "ルーターは、データパケットを転送するネットワークデバイスです。"
         ),
         QuizQuestion(
         question: "どのプロトコルがコンピュータのホスト名をIPアドレスに変換しますか？",
         choices: [
         "DHCP",
-        "DNS",
         "FTP",
-        "HTTP"
+        "HTTP",
+        "DNS"
         ],
-        correctAnswerIndex: 1,
+        correctAnswerIndex: 3,
         explanation: "DNS（Domain Name System),は、コンピュータのホスト名をIPアドレスに変換するプロトコルです。"
         ),
         QuizQuestion(
         question: "どのプログラミングパラダイムが関数を第一級の市民として扱いますか？",
         choices: [
-        "オブジェクト指向プログラミング",
         "手続き型プログラミング",
         "関数型プログラミング",
-        "論理プログラミング"
+        "論理プログラミング",
+        "オブジェクト指向プログラミング"
         ],
-        correctAnswerIndex: 2,
+        correctAnswerIndex: 1,
         explanation: "関数型プログラミングは、関数を第一級の市民として扱います。"
         ),
         QuizQuestion(
         question: "どのツールがコンテナオーケストレーションに使用されますか？",
         choices: [
-        "Docker",
-        "Kubernetes",
         "Git",
-        "Jenkins"
+        "Jenkins",
+        "Docker",
+        "Kubernetes"
         ],
-        correctAnswerIndex: 1,
+        correctAnswerIndex: 3,
         explanation: "Kubernetesは、コンテナオーケストレーションに使用されるツールです。"
         ),
         QuizQuestion(
         question: "どの暗号アルゴリズムが公開鍵暗号方式に分類されますか？",
         choices: [
-        "AES",
-        "DES",
         "RSA",
-        "3DES"
+        "DES",
+        "3DES",
+        "AES"
         ],
-        correctAnswerIndex: 2,
+        correctAnswerIndex: 0,
         explanation: "RSAは、公開鍵暗号方式に分類される暗号アルゴリズムです。"
         ),
 
         QuizQuestion(
         question: "どのプロトコルがセッション層のプロトコルですか？",
         choices: [
-        "IP",
-        "TCP",
         "RPC",
+        "TCP",
+        "IP",
         "ARP"
         ],
-        correctAnswerIndex: 2,
+        correctAnswerIndex: 0,
         explanation: "RPC（Remote Procedure Call）は、セッション層のプロトコルです。"
         ),
 
         QuizQuestion(
         question: "どのアーキテクチャパターンが、プレゼンテーション層とビジネスロジック層とデータアクセス層に分割しますか？",
         choices: [
+        "MVVM",
         "MVC",
         "MVP",
-        "MVVM",
         "3層アーキテクチャ"
         ],
         correctAnswerIndex: 3,
@@ -425,10 +425,10 @@ struct QuizAppliedBasicListView: View {
         QuizQuestion(
         question: "どのソフトウェア開発手法が、継続的なフィードバックと頻繁なイテレーションを強調しますか？",
         choices: [
-        "ウォーターフォールモデル",
+        "Vモデル",
         "アジャイル開発",
-        "スパイラルモデル",
-        "Vモデル"
+        "ウォーターフォールモデル",
+        "スパイラルモデル"
         ],
         correctAnswerIndex: 1,
         explanation: "アジャイル開発は、継続的なフィードバックと頻繁なイテレーションを強調するソフトウェア開発手法です。"
@@ -437,36 +437,36 @@ struct QuizAppliedBasicListView: View {
         QuizQuestion(
         question: "IPv6アドレスは何ビットですか？",
         choices: [
-        "32ビット",
-        "64ビット",
         "128ビット",
-        "256ビット"
+        "256ビット",
+        "64ビット",
+        "32ビット"
         ],
-        correctAnswerIndex: 2,
+        correctAnswerIndex: 0,
         explanation: "IPv6アドレスは128ビットです。"
         ),
 
         QuizQuestion(
         question: "どのデータベーストランザクションの特性を「一貫性」が表しますか？",
         choices: [
+        "Isolation",
         "Atomicity",
         "Consistency",
-        "Isolation",
         "Durability"
         ],
-        correctAnswerIndex: 1,
+        correctAnswerIndex: 2,
         explanation: "一貫性は、データベーストランザクションの特性「Consistency」を表します。"
         ),
 
         QuizQuestion(
         question: "どのネットワークトポロジーで、各ノードがリング状に接続されていますか？",
         choices: [
-        "スター",
-        "メッシュ",
+        "バス",
         "リング",
-        "バス"
+        "スター",
+        "メッシュ"
         ],
-        correctAnswerIndex: 2,
+        correctAnswerIndex: 1,
         explanation: "リングトポロジーでは、各ノードがリング状に接続されています。"
         ),
 
@@ -474,11 +474,11 @@ struct QuizAppliedBasicListView: View {
         question: "どのソフトウェアライセンスがソースコードの変更と再配布を許可しますか？",
         choices: [
         "GPL",
+        "すべての上記",
         "MIT",
-        "Apache",
-        "すべての上記"
+        "Apache"
         ],
-        correctAnswerIndex: 3,
+        correctAnswerIndex: 1,
         explanation: "GPL、MIT、およびApacheライセンスは、ソースコードの変更と再配布を許可します。"
         ),
 
@@ -486,11 +486,11 @@ struct QuizAppliedBasicListView: View {
         question: "どのプロトコルがホスト名をIPアドレスに変換しますか？",
         choices: [
         "DHCP",
+        "HTTP",
         "DNS",
-        "FTP",
-        "HTTP"
+        "FTP"
         ],
-        correctAnswerIndex: 1,
+        correctAnswerIndex: 2,
         explanation: "DNS（Domain Name System）は、ホスト名をIPアドレスに変換するプロトコルです。"
         ),
 
@@ -499,8 +499,8 @@ struct QuizAppliedBasicListView: View {
         choices: [
         "オブジェクト指向プログラミング",
         "手続き型プログラミング",
-        "関数型プログラミング",
-        "論理プログラミング"
+        "論理プログラミング",
+        "関数型プログラミング"
         ],
         correctAnswerIndex: 0,
         explanation: "オブジェクト指向プログラミングは、オブジェクトとその相互作用に焦点を当てています。"
@@ -508,22 +508,22 @@ struct QuizAppliedBasicListView: View {
         QuizQuestion(
         question: "どの暗号化アルゴリズムが公開鍵暗号方式に分類されますか？",
         choices: [
-        "AES",
-        "DES",
         "RSA",
-        "3DES"
+        "3DES",
+        "AES",
+        "DES"
         ],
-        correctAnswerIndex: 2,
+        correctAnswerIndex: 0,
         explanation: "RSAは公開鍵暗号方式に分類される暗号化アルゴリズムです。"
         ),
 
         QuizQuestion(
         question: "どのプロトコルがネットワーク層で動作しますか？",
         choices: [
-        "TCP",
+        "HTTP",
         "UDP",
         "IP",
-        "HTTP"
+        "TCP"
         ],
         correctAnswerIndex: 2,
         explanation: "IP（Internet Protocol）はネットワーク層で動作するプロトコルです。"
@@ -533,23 +533,23 @@ struct QuizAppliedBasicListView: View {
         question: "どのアルゴリズムがNP完全な問題ですか？",
         choices: [
         "バブルソート",
-        "クイックソート",
         "トラベリングセールスマン問題",
+        "クイックソート",
         "バイナリサーチ"
         ],
-        correctAnswerIndex: 2,
+        correctAnswerIndex: 1,
         explanation: "トラベリングセールスマン問題はNP完全な問題です。"
         ),
 
         QuizQuestion(
         question: "どのソフトウェア開発手法が反復的かつ増分的なアプローチを採用していますか？",
         choices: [
-        "アジャイル",
+        "スパイラルモデル",
         "ウォーターフォール",
-        "Vモデル",
-        "スパイラルモデル"
+        "アジャイル",
+        "Vモデル"
         ],
-        correctAnswerIndex: 0,
+        correctAnswerIndex: 2,
         explanation: "アジャイルは反復的かつ増分的なアプローチを採用したソフトウェア開発手法です。"
         ),
 
@@ -558,33 +558,33 @@ struct QuizAppliedBasicListView: View {
         choices: [
         "スター",
         "バス",
-        "リング",
-        "メッシュ"
+        "メッシュ",
+        "リング"
         ],
-        correctAnswerIndex: 2,
+        correctAnswerIndex: 3,
         explanation: "リングトポロジーでは、各ノードがリング状に接続されています。"
         ),
 
         QuizQuestion(
         question: "どのプロトコルが、ホスト間の接続の確立、維持、終了を管理しますか？",
         choices: [
-        "IP",
-        "TCP",
         "UDP",
-        "ICMP"
+        "IP",
+        "ICMP",
+        "TCP"
         ],
-        correctAnswerIndex: 1,
+        correctAnswerIndex: 3,
         explanation: "TCP（Transmission Control Protocol）は、ホスト間の接続の確立、維持、終了を管理するプロトコルです。"
         ),
         QuizQuestion(
         question: "どのプロトコルがリアルタイム通信をサポートしていますか？",
         choices: [
-        "HTTP",
-        "FTP",
         "SMTP",
-        "RTP"
+        "RTP",
+        "FTP",
+        "HTTP"
         ],
-        correctAnswerIndex: 3,
+        correctAnswerIndex: 1,
         explanation: "RTP（Real-Time Transport Protocol）は、リアルタイム通信をサポートするプロトコルです。"
         ),
 
@@ -592,71 +592,71 @@ struct QuizAppliedBasicListView: View {
         question: "どのアルゴリズムが非決定的多項式時間で問題を解決しますか？",
         choices: [
         "P",
-        "NP",
         "NP完全",
-        "NP困難"
+        "NP困難",
+        "NP"
         ],
-        correctAnswerIndex: 1,
+        correctAnswerIndex: 3,
         explanation: "NP（非決定的多項式時間）は、非決定的多項式時間で問題を解決するアルゴリズムのクラスです。"
         ),
 
         QuizQuestion(
         question: "どのソフトウェア開発フレームワークがRubyで書かれていますか？",
         choices: [
+        "Ruby on Rails",
         "Django",
         "Flask",
-        "Ruby on Rails",
         "Spring Boot"
         ],
-        correctAnswerIndex: 2,
+        correctAnswerIndex: 0,
         explanation: "Ruby on RailsはRubyで書かれたソフトウェア開発フレームワークです。"
         ),
 
         QuizQuestion(
         question: "どのツールがコンテナオーケストレーションに使用されますか？",
         choices: [
-        "Docker",
         "Kubernetes",
+        "Docker",
         "Git",
         "Jenkins"
         ],
-        correctAnswerIndex: 1,
+        correctAnswerIndex: 0,
         explanation: "Kubernetesは、コンテナオーケストレーションに使用されるツールです。"
         ),
 
         QuizQuestion(
         question: "どのプロトコルがコンピュータのホスト名をIPアドレスに変換しますか？",
         choices: [
-        "DHCP",
-        "DNS",
+        "HTTP",
         "FTP",
-        "HTTP"
+        "DHCP",
+        "DNS"
         ],
-        correctAnswerIndex: 1,
+        correctAnswerIndex: 3,
         explanation: "DNS（Domain Name System）は、コンピュータのホスト名をIPアドレスに変換するプロトコルです。"
         ),
 
         QuizQuestion(
         question: "どのデータベース言語がデータの操作とクエリに使用されますか？",
         choices: [
+        "XML",
         "HTML",
         "CSS",
-        "SQL",
-        "XML"
+        "SQL"
         ],
-        correctAnswerIndex: 2,
+        correctAnswerIndex: 3,
         explanation: "SQL（Structured Query Language）は、データの操作とクエリに使用されるデータベース言語です。"
         ),
 
         QuizQuestion(
         question: "どのアルゴリズム分類が問題の最適な解決策を見つけることを目的としていますか？",
         choices: [
-        "ソートアルゴリズム",
-        "検索アルゴリズム",
         "最適化アルゴリズム",
-        "暗号化アルゴリズム"
+        "検索アルゴリズム",
+        "暗号化アルゴリズム",
+        "ソートアルゴリズム"
         ],
-        correctAnswerIndex: 2,
+        correctAnswerIndex: 0,
         explanation: "最適化アルゴリズムは、問題の最適な解決策を見つけることを目的としています。"
         ),
 
@@ -664,9 +664,9 @@ struct QuizAppliedBasicListView: View {
         question: "どのネットワークデバイスがデータパケットを転送しますか？",
         choices: [
         "ルーター",
+        "モデム",
         "スイッチ",
-        "ハブ",
-        "モデム"
+        "ハブ"
         ],
         correctAnswerIndex: 0,
         explanation: "ルーターは、データパケットを転送するネットワークデバイスです。"
@@ -675,95 +675,95 @@ struct QuizAppliedBasicListView: View {
         QuizQuestion(
         question: "どのプログラミング言語が主にWeb開発に使用されますか？",
         choices: [
+        "C++",
         "Python",
         "JavaScript",
-        "C++",
         "Java"
         ],
-        correctAnswerIndex: 1,
+        correctAnswerIndex: 2,
         explanation: "JavaScriptは、主にWeb開発に使用されるプログラミング言語です。"
         ),
 
         QuizQuestion(
         question: "どのポート番号がHTTPに割り当てられていますか？",
         choices: [
-        "21",
         "22",
         "80",
+        "21",
         "443"
         ],
-        correctAnswerIndex: 2,
+        correctAnswerIndex: 1,
         explanation: "ポート番号80は、HTTP（HyperText Transfer Protocol）に割り当てられています。"
         ),
         QuizQuestion(
         question: "CAP定理において、分散システムが同時に実現できないものはどれですか？",
         choices: [
-        "一貫性と可用性",
         "分割耐性と一貫性",
+        "一貫性、可用性、分割耐性",
         "可用性と分割耐性",
-        "一貫性、可用性、分割耐性"
+        "一貫性と可用性"
         ],
-        correctAnswerIndex: 3,
+        correctAnswerIndex: 1,
         explanation: "CAP定理によれば、分散システムは一貫性、可用性、分割耐性の3つを同時に実現することはできません。"
         ),
 
         QuizQuestion(
         question: "ランダムフォレストアルゴリズムはどのタイプの学習アルゴリズムですか？",
         choices: [
-        "教師なし学習",
-        "教師あり学習",
         "半教師あり学習",
-        "強化学習"
+        "強化学習",
+        "教師なし学習",
+        "教師あり学習"
         ],
-        correctAnswerIndex: 1,
+        correctAnswerIndex: 3,
         explanation: "ランダムフォレストは教師あり学習の一種です。"
         ),
 
         QuizQuestion(
         question: "ハッシュ関数のどの特性が、小さな入力の変更が出力に大きな変更を引き起こすことを保証しますか？",
         choices: [
-        "可逆性",
         "非可逆性",
-        "耐衝突性",
-        "アバランシュ効果"
+        "アバランシュ効果",
+        "可逆性",
+        "耐衝突性"
         ],
-        correctAnswerIndex: 3,
+        correctAnswerIndex: 1,
         explanation: "アバランシュ効果は、ハッシュ関数の入力の小さな変更が出力に大きな変更を引き起こすことを保証する特性です。"
         ),
 
         QuizQuestion(
         question: "量子コンピューティングでは、量子ビットは何と呼ばれますか？",
         choices: [
-        "qbyte",
-        "qbit",
+        "qubit",
         "quantbit",
-        "qubit"
+        "qbyte",
+        "qbit"
         ],
-        correctAnswerIndex: 3,
+        correctAnswerIndex: 0,
         explanation: "量子コンピューティングでは、量子ビットはqubitと呼ばれます。"
         ),
 
         QuizQuestion(
         question: "どの暗号化アルゴリズムが公開鍵暗号化を使用しますか？",
         choices: [
-        "AES",
-        "DES",
         "RSA",
-        "Blowfish"
+        "Blowfish",
+        "AES",
+        "DES"
         ],
-        correctAnswerIndex: 2,
+        correctAnswerIndex: 0,
         explanation: "RSAは公開鍵暗号化を使用する暗号化アルゴリズムです。"
         ),
 
         QuizQuestion(
         question: "オブジェクト指向プログラミングにおいて、オブジェクト間のメッセージの送受信を何と呼びますか？",
         choices: [
-        "継承",
         "ポリモーフィズム",
-        "カプセル化",
-        "メッセージパッシング"
+        "メッセージパッシング",
+        "継承",
+        "カプセル化"
         ],
-        correctAnswerIndex: 3,
+        correctAnswerIndex: 1,
         explanation: "オブジェクト指向プログラミングでは、オブジェクト間のメッセージの送受信をメッセージパッシングと呼びます。"
         ),
 
@@ -771,45 +771,45 @@ struct QuizAppliedBasicListView: View {
         question: "どのプログラミングパラダイムが関数を第一級の市民として扱いますか？",
         choices: [
         "オブジェクト指向プログラミング",
+        "論理プログラミング",
         "手続き型プログラミング",
-        "関数型プログラミング",
-        "論理プログラミング"
+        "関数型プログラミング"
         ],
-        correctAnswerIndex: 2,
+        correctAnswerIndex: 3,
         explanation: "関数型プログラミングでは、関数は第一級の市民として扱われます。"
         ),
 
         QuizQuestion(
         question: "どのソートアルゴリズムが最悪の場合の時間複雑度がO(n^2)ですか？",
         choices: [
-        "マージソート",
+        "バブルソート",
         "ヒープソート",
         "クイックソート",
-        "バブルソート"
+        "マージソート"
         ],
-        correctAnswerIndex: 3,
+        correctAnswerIndex: 0,
         explanation: "バブルソートの最悪の場合の時間複雑度はO(n^2)です。"
         ),
 
         QuizQuestion(
         question: "どのデータベース管理システムがオープンソースですか？",
         choices: [
-        "Oracle Database",
-        "Microsoft SQL Server",
         "MySQL",
-        "IBM Db2"
+        "Oracle Database",
+        "IBM Db2",
+        "Microsoft SQL Server"
         ],
-        correctAnswerIndex: 2,
+        correctAnswerIndex: 0,
         explanation: "MySQLはオープンソースのデータベース管理システムです。"
         ),
 
         QuizQuestion(
         question: "どのプロトコルがWebサーバーとブラウザ間で安全な通信を提供しますか？",
         choices: [
-        "HTTP",
+        "SMTP",
         "HTTPS",
-        "FTP",
-        "SMTP"
+        "HTTP",
+        "FTP"
         ],
         correctAnswerIndex: 1,
         explanation: "HTTPS（HyperText Transfer Protocol Secure）は、Webサーバーとブラウザ間で安全な通信を提供するプロトコルです。"
@@ -817,24 +817,24 @@ struct QuizAppliedBasicListView: View {
         QuizQuestion(
         question: "ハイパーバイザーがホストする仮想マシンのタイプは何ですか？",
         choices: [
-        "Type-1 ハイパーバイザー",
         "Type-2 ハイパーバイザー",
         "Type-3 ハイパーバイザー",
-        "Type-4 ハイパーバイザー"
+        "Type-4 ハイパーバイザー",
+        "Type-1 ハイパーバイザー"
         ],
-        correctAnswerIndex: 0,
+        correctAnswerIndex: 3,
         explanation: "Type-1 ハイパーバイザーは、物理ハードウェア上で直接実行され、仮想マシンをホストします。"
         ),
 
         QuizQuestion(
         question: "量子エンタングルメントが利用される量子コンピューティングのアルゴリズムは何ですか？",
         choices: [
-        "グローバーのアルゴリズム",
         "ショーアのアルゴリズム",
-        "ベルンスタイン・ヴァジラニアルゴリズム",
-        "デュッチ–ジョサアルゴリズム"
+        "グローバーのアルゴリズム",
+        "デュッチ–ジョサアルゴリズム",
+        "ベルンスタイン・ヴァジラニアルゴリズム"
         ],
-        correctAnswerIndex: 1,
+        correctAnswerIndex: 0,
         explanation: "ショーアのアルゴリズムは、量子エンタングルメントと超位置を利用して、整数を素因数分解します。"
         ),
 
@@ -842,71 +842,71 @@ struct QuizAppliedBasicListView: View {
         question: "ホモモーフィック暗号化の主な利点は何ですか？",
         choices: [
         "高速な暗号化",
-        "暗号文上での計算",
         "量子耐性",
+        "暗号文上での計算",
         "低い計算コスト"
         ],
-        correctAnswerIndex: 1,
+        correctAnswerIndex: 2,
         explanation: "ホモモーフィック暗号化の主な利点は、暗号文上で直接計算を行う能力です。"
         ),
 
         QuizQuestion(
         question: "どのネットワークトポロジーが各ノードがリング状に接続されている？",
         choices: [
-        "スター",
-        "バス",
         "リング",
+        "バス",
+        "スター",
         "メッシュ"
         ],
-        correctAnswerIndex: 2,
+        correctAnswerIndex: 0,
         explanation: "リングトポロジーでは、各ノードがリング状に接続されています。"
         ),
 
         QuizQuestion(
         question: "ノンブロッキングI/Oはどのプログラミングパラダイムに関連していますか？",
         choices: [
-        "オブジェクト指向プログラミング",
         "関数型プログラミング",
-        "イベント駆動プログラミング",
-        "手続き型プログラミング"
+        "オブジェクト指向プログラミング",
+        "手続き型プログラミング",
+        "イベント駆動プログラミング"
         ],
-        correctAnswerIndex: 2,
+        correctAnswerIndex: 3,
         explanation: "ノンブロッキングI/Oは、イベント駆動プログラミングに関連しています。"
         ),
 
         QuizQuestion(
         question: "ZKP (Zero Knowledge Proof) は何を保証しますか？",
         choices: [
-        "データの整合性",
-        "データの可用性",
         "データの機密性",
-        "証明者が特定の情報を知っていることの証明、情報自体を開示せずに"
+        "データの整合性",
+        "証明者が特定の情報を知っていることの証明、情報自体を開示せずに",
+        "データの可用性"
         ],
-        correctAnswerIndex: 3,
+        correctAnswerIndex: 2,
         explanation: "ZKPは、証明者が特定の情報を知っていることを証明するために使用されますが、情報自体は開示されません。"
         ),
 
         QuizQuestion(
         question: "量子コンピューターにおいて、量子ビットの状態を変更する操作は何と呼ばれますか？",
         choices: [
-        "量子変調",
         "量子回転",
+        "量子変調",
         "量子エンタングルメント",
         "量子テレポーテーション"
         ],
-        correctAnswerIndex: 1,
+        correctAnswerIndex: 0,
         explanation: "量子コンピューターでは、量子ビットの状態を変更する操作は量子回転と呼ばれます。"
         ),
 
         QuizQuestion(
         question: "どのアルゴリズムがNP完全問題ですか？",
         choices: [
+        "バブルソート",
         "ダイクストラのアルゴリズム",
         "旅行商人問題",
-        "バブルソート",
         "バイナリサーチ"
         ],
-        correctAnswerIndex: 1,
+        correctAnswerIndex: 2,
         explanation: "旅行商人問題は、NP完全問題の一例です。"
         ),
 
@@ -914,23 +914,23 @@ struct QuizAppliedBasicListView: View {
         question: "どのデータベースモデルが「ノード」と「エッジ」の概念を使用しますか？",
         choices: [
         "リレーショナルデータベース",
-        "ドキュメント指向データベース",
+        "グラフデータベース",
         "キー値ストア",
-        "グラフデータベース"
+        "ドキュメント指向データベース"
         ],
-        correctAnswerIndex: 3,
+        correctAnswerIndex: 1,
         explanation: "グラフデータベースは、「ノード」と「エッジ」の概念を使用します。"
         ),
 
         QuizQuestion(
         question: "どのプロトコルがブロックチェーンネットワークで使用されますか？",
         choices: [
-        "HTTP",
         "FTP",
-        "SMTP",
-        "P2P"
+        "P2P",
+        "HTTP",
+        "SMTP"
         ],
-        correctAnswerIndex: 3,
+        correctAnswerIndex: 1,
         explanation: "ブロックチェーンネットワークでは、P2P（Peer-to-Peer）プロトコルが使用されます。"
         ),
         
@@ -938,19 +938,19 @@ struct QuizAppliedBasicListView: View {
         question: "CAP定理において、分散システムが同時に確保できない2つの保証は何ですか？",
         choices: [
         "一貫性と可用性",
-        "分割耐性と一貫性",
         "可用性と分割耐性",
+        "分割耐性と一貫性",
         "一貫性と性能"
         ],
-        correctAnswerIndex: 2,
+        correctAnswerIndex: 1,
         explanation: "CAP定理によれば、分散システムは一貫性、可用性、分割耐性の3つのうち、同時に2つしか確保できません。"
         ),
 
         QuizQuestion(
         question: "量子コンピューターが古典的なコンピューターより優れているタスクは何ですか？",
         choices: [
-        "テキスト処理",
         "グラフィックスレンダリング",
+        "テキスト処理",
         "整数の素因数分解",
         "データベースのクエリ"
         ],
@@ -962,9 +962,9 @@ struct QuizAppliedBasicListView: View {
         question: "どの暗号学的ツールが、公開鍵暗号と秘密鍵暗号の両方を使用しますか？",
         choices: [
         "ハイブリッド暗号",
-        "対称暗号",
+        "ハッシュ関数",
         "非対称暗号",
-        "ハッシュ関数"
+        "対称暗号"
         ],
         correctAnswerIndex: 0,
         explanation: "ハイブリッド暗号は、公開鍵暗号と秘密鍵暗号の両方を使用します。"
@@ -973,36 +973,36 @@ struct QuizAppliedBasicListView: View {
         QuizQuestion(
         question: "どのプロトコルが、Webサーバーとブラウザ間で安全な通信を提供しますか？",
         choices: [
-        "HTTP",
-        "HTTPS",
+        "SMTP",
         "FTP",
-        "SMTP"
+        "HTTP",
+        "HTTPS"
         ],
-        correctAnswerIndex: 1,
+        correctAnswerIndex: 3,
         explanation: "HTTPSプロトコルは、Webサーバーとブラウザ間で安全な通信を提供します。"
         ),
 
         QuizQuestion(
         question: "どのアルゴリズムが、大規模なデータセットで最も効率的ですか？",
         choices: [
-        "バブルソート",
         "選択ソート",
         "クイックソート",
+        "バブルソート",
         "挿入ソート"
         ],
-        correctAnswerIndex: 2,
+        correctAnswerIndex: 1,
         explanation: "クイックソートは、大規模なデータセットで一般的に最も効率的なソートアルゴリズムの一つです。"
         ),
 
         QuizQuestion(
         question: "どのデータベース管理システムがオープンソースですか？",
         choices: [
+        "IBM Db2",
         "Oracle Database",
         "Microsoft SQL Server",
-        "MySQL",
-        "IBM Db2"
+        "MySQL"
         ],
-        correctAnswerIndex: 2,
+        correctAnswerIndex: 3,
         explanation: "MySQLは、オープンソースのデータベース管理システムです。"
         ),
 
@@ -1010,23 +1010,23 @@ struct QuizAppliedBasicListView: View {
         question: "どのプログラミング言語が主に統計計算とデータ分析に使用されますか？",
         choices: [
         "Java",
-        "C++",
         "R",
-        "PHP"
+        "PHP",
+        "C++"
         ],
-        correctAnswerIndex: 2,
+        correctAnswerIndex: 1,
         explanation: "Rは、主に統計計算とデータ分析に使用されるプログラミング言語です。"
         ),
 
         QuizQuestion(
         question: "どのネットワークデバイスがデータパケットを転送しますか？",
         choices: [
-        "ルーター",
-        "スイッチ",
         "ハブ",
+        "スイッチ",
+        "ルーター",
         "モデム"
         ],
-        correctAnswerIndex: 0,
+        correctAnswerIndex: 2,
         explanation: "ルーターは、データパケットを転送するネットワークデバイスです。"
         ),
 
@@ -1034,34 +1034,34 @@ struct QuizAppliedBasicListView: View {
         question: "どのプロトコルがコンピュータのホスト名をIPアドレスに変換しますか？",
         choices: [
         "HTTP",
-        "DNS",
         "DHCP",
+        "DNS",
         "FTP"
         ],
-        correctAnswerIndex: 1,
+        correctAnswerIndex: 2,
         explanation: "DNS（Domain Name System）は、コンピュータのホスト名をIPアドレスに変換するプロトコルです。"
         ),
         QuizQuestion(
         question: "どのプロトコルが、ネットワーク上のデバイス間で時刻情報を同期しますか？",
         choices: [
-        "NTP",
         "SMTP",
-        "FTP",
-        "HTTP"
+        "HTTP",
+        "NTP",
+        "FTP"
         ],
-        correctAnswerIndex: 0,
+        correctAnswerIndex: 2,
         explanation: "NTP（Network Time Protocol）は、ネットワーク上のデバイス間で時刻情報を同期するプロトコルです。"
         ),
 
         QuizQuestion(
         question: "どのプロトコルが、ネットワークリソースへの安全なリモートアクセスを提供しますか？",
         choices: [
-        "HTTP",
         "SSH",
+        "SMTP",
         "FTP",
-        "SMTP"
+        "HTTP"
         ],
-        correctAnswerIndex: 1,
+        correctAnswerIndex: 0,
         explanation: "SSH（Secure Shell）は、ネットワークリソースへの安全なリモートアクセスを提供するプロトコルです。"
         ),
 
@@ -1069,23 +1069,23 @@ struct QuizAppliedBasicListView: View {
         question: "どの暗号アルゴリズムが、公開鍵と秘密鍵のペアを使用しますか？",
         choices: [
         "AES",
-        "RSA",
         "DES",
-        "3DES"
+        "3DES",
+        "RSA"
         ],
-        correctAnswerIndex: 1,
+        correctAnswerIndex: 3,
         explanation: "RSAは、公開鍵と秘密鍵のペアを使用する暗号アルゴリズムです。"
         ),
 
         QuizQuestion(
         question: "どのネットワークトポロジーで、各デバイスが中央のハブに接続されていますか？",
         choices: [
-        "スター",
+        "メッシュ",
         "リング",
         "バス",
-        "メッシュ"
+        "スター"
         ],
-        correctAnswerIndex: 0,
+        correctAnswerIndex: 3,
         explanation: "スタートポロジーでは、各デバイスが中央のハブに接続されています。"
         ),
 
@@ -1093,47 +1093,47 @@ struct QuizAppliedBasicListView: View {
         question: "どのプログラミングパラダイムが、状態や変更可能なデータを避けることを重視しますか？",
         choices: [
         "オブジェクト指向プログラミング",
-        "手続き型プログラミング",
         "関数型プログラミング",
-        "論理プログラミング"
+        "論理プログラミング",
+        "手続き型プログラミング"
         ],
-        correctAnswerIndex: 2,
+        correctAnswerIndex: 1,
         explanation: "関数型プログラミングは、状態や変更可能なデータを避けることを重視するプログラミングパラダイムです。"
         ),
 
         QuizQuestion(
         question: "どのプロトコルが、ホスト名をIPアドレスに変換しますか？",
         choices: [
-        "HTTP",
         "DNS",
         "DHCP",
+        "HTTP",
         "FTP"
         ],
-        correctAnswerIndex: 1,
+        correctAnswerIndex: 0,
         explanation: "DNS（Domain Name System）は、ホスト名をIPアドレスに変換するプロトコルです。"
         ),
 
         QuizQuestion(
         question: "どのアルゴリズムが、データの整合性を確認するために使用されますか？",
         choices: [
-        "RSA",
         "SHA-256",
         "AES",
-        "3DES"
+        "3DES",
+        "RSA"
         ],
-        correctAnswerIndex: 1,
+        correctAnswerIndex: 0,
         explanation: "SHA-256は、データの整合性を確認するために使用されるハッシュ関数です。"
         ),
 
         QuizQuestion(
         question: "どのデータベースモデルが、親子関係のツリー構造を使用しますか？",
         choices: [
-        "階層型データベース",
-        "リレーショナルデータベース",
         "ネットワークデータベース",
-        "オブジェクト指向データベース"
+        "オブジェクト指向データベース",
+        "リレーショナルデータベース",
+        "階層型データベース"
         ],
-        correctAnswerIndex: 0,
+        correctAnswerIndex: 3,
         explanation: "階層型データベースモデルは、親子関係のツリー構造を使用します。"
         ),
 
@@ -1141,23 +1141,23 @@ struct QuizAppliedBasicListView: View {
         question: "どのプロトコルが、インターネット上でファイルを転送するために使用されますか？",
         choices: [
         "HTTP",
-        "FTP",
         "TCP",
-        "UDP"
+        "UDP",
+        "FTP"
         ],
-        correctAnswerIndex: 1,
+        correctAnswerIndex: 3,
         explanation: "FTP（File Transfer Protocol）は、インターネット上でファイルを転送するために使用されるプロトコルです。"
         ),
 
         QuizQuestion(
         question: "どのソフトウェア開発手法が、定期的な短いイテレーションを使用しますか？",
         choices: [
-        "ウォーターフォールモデル",
         "アジャイル開発",
         "スパイラルモデル",
+        "ウォーターフォールモデル",
         "Vモデル"
         ],
-        correctAnswerIndex: 1,
+        correctAnswerIndex: 0,
         explanation: "アジャイル開発は、定期的な短いイテレーションを使用するソフトウェア開発手法です。"
         )
 //

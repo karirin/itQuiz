@@ -28,12 +28,13 @@ struct QuizESIncorrectAnswerListView: View {
                 // データがロードされたらQuizViewを表示
                 QuizView(quizzes: shuffledQuizList, quizLevel: .incorrectESAnswer, authManager: authManager, audioManager: audioManager, isPresenting: $isPresenting, interstitial: sharedInterstitial)
             } else {
-                ActivityIndicator()
+                SlimeFullScreenLoadingView()
             }
         }
         .onAppear {
             // ビューが表示された時にデータをフェッチする
-            fetchESIncorrectAnswers(userId: authManager.currentUserId!) { quizList in
+            guard let userId = authManager.currentUserId else { return }
+            fetchESIncorrectAnswers(userId: userId) { quizList in
                 self.shuffledQuizList = quizList.shuffled()
                 print("self.shuffledQuizList")
 //                print(self.shuffledQuizList)

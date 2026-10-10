@@ -27,7 +27,7 @@ enum QuizBossLevel {
     }
 }
     
-enum QuizLevel {
+enum QuizLevel: CaseIterable {
     case beginner
     case beginnerStory1
     case beginnerStory2
@@ -158,11 +158,10 @@ enum QuizLevel {
     }
 }
 
-extension QuizLevel: CaseIterable {
-    static var allCases: [QuizLevel] {
-        return [.beginner, .intermediate, .advanced, .god, .network, .security, .database]
-        // 除外したいケースをここで除外
-    }
+extension QuizLevel {
+    static let graphCases: [QuizLevel] = [
+        .beginner, .intermediate, .advanced, .god, .network, .security, .database
+    ]
 }
 
 struct PentagonGraphShape: Shape {
@@ -175,7 +174,7 @@ struct PentagonGraphShape: Shape {
 
         var path = Path()
 
-        for (i, level) in QuizLevel.allCases.enumerated() {
+        for (i, level) in QuizLevel.graphCases.enumerated() {
             let data = quizData[level] ?? QuizData(answer: 1, correct: 0)
             let radius = baseRadius * data.correctRate // 正解率に基づく半径
             let x = center.x + radius * cos(angle * CGFloat(i) - .pi / 2)
@@ -239,7 +238,7 @@ struct PentagonGraphLabelView: View {
 
     var body: some View {
         GeometryReader { geometry in
-            let angle = (2 * CGFloat.pi) / CGFloat(QuizLevel.allCases.count) * CGFloat(index) - .pi / 2
+            let angle = (2 * CGFloat.pi) / CGFloat(QuizLevel.graphCases.count) * CGFloat(index) - .pi / 2
             let center = CGPoint(x: geometry.size.width / 2, y: geometry.size.height / 2)
             // ビューのサイズに基づいて radius を計算します
             let radius = min(geometry.size.width, geometry.size.height) / 2 * 1.13 // 85% をラベルの配置に使用します
@@ -318,7 +317,7 @@ struct PentagonGraphView: View {
                                    .stroke(Color.orange, lineWidth: 2)
                            )
 
-                    ForEach(Array(QuizLevel.allCases.enumerated()), id: \.offset) { (i, _) in
+                    ForEach(Array(QuizLevel.graphCases.enumerated()), id: \.offset) { (i, _) in
                         PentagonGraphLabelView(label: labels[i], index: i)
                     }
                     // 目盛りの数字を表示する
@@ -366,7 +365,7 @@ struct PentagonView: View {
                 .font(.system(size: 18))
                 .padding()
                 ScrollView{
-                    ForEach(QuizLevel.allCases, id: \.self) { level in
+                    ForEach(QuizLevel.graphCases, id: \.self) { level in
                         if let quizDataForLevel = quizData[level] {
                             VStack{
                                 HStack{

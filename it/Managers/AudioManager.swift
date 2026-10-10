@@ -10,6 +10,7 @@ import AVFoundation
 
 class AudioManager: ObservableObject {
     static let shared = AudioManager()
+    private let mutedKey = "AudioManager.isMuted"
     var audioPlayer: AVPlayer?
     var audioKetteiPlayer: AVPlayer?
     var audioCorrectPlayer: AVPlayer?
@@ -26,9 +27,11 @@ class AudioManager: ObservableObject {
     var audioGameOverPlayer: AVPlayer?
     var audioTittlePlayer: AVPlayer?
 
-    @Published var isMuted: Bool = false
+    @Published var isMuted: Bool
 
     init() {
+        isMuted = UserDefaults.standard.bool(forKey: mutedKey)
+
         if let soundURL = Bundle.main.url(forResource: "sound", withExtension: "mp3") {
             audioPlayer = AVPlayer(url: soundURL)
         }
@@ -74,20 +77,24 @@ class AudioManager: ObservableObject {
         if let soundURL = Bundle.main.url(forResource: "称号", withExtension: "mp3") {
             audioTittlePlayer = AVPlayer(url: soundURL)
         }
+
+        applyMutedState()
     }
     
     func toggleSound() {
-        let players = [audioPlayer, audioKetteiPlayer, audioCorrectPlayer,audioUnCorrectPlayer,audioAttackPlayer,audioMonsterAttackPlayer,audioCountdownPlayer,audioCancelPlayer,audioChangePlayer,audioReturnPlayer,audioDownPlayer,audioLevelUpPlayer,audioGameClearPlayer,audioGameOverPlayer]
+        setMuted(!isMuted)
+    }
+
+    func setMuted(_ muted: Bool) {
+        isMuted = muted
+        UserDefaults.standard.set(muted, forKey: mutedKey)
+        applyMutedState()
+    }
+
+    private func applyMutedState() {
+        let players = [audioPlayer, audioKetteiPlayer, audioCorrectPlayer,audioUnCorrectPlayer,audioAttackPlayer,audioMonsterAttackPlayer,audioCountdownPlayer,audioCancelPlayer,audioChangePlayer,audioReturnPlayer,audioDownPlayer,audioLevelUpPlayer,audioGameClearPlayer,audioGameOverPlayer,audioTittlePlayer]
         for player in players {
-            if let player = player {
-                if player.volume == 0 {
-                    player.volume = 1.0
-                    isMuted = false
-                } else {
-                    player.volume = 0
-                    isMuted = true
-                }
-            }
+            player?.volume = isMuted ? 0 : 1.0
         }
     }
 

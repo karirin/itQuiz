@@ -10,6 +10,7 @@ import SwiftUI
 
 struct StoryMonsterModalView: View {
     @ObservedObject var authManager = AuthManager.shared
+    @ObservedObject private var friendManager = FriendManager.shared
     @Binding var monster: Int
     @Binding var isPresented: Bool
     @State var toggle = false
@@ -78,7 +79,7 @@ struct StoryMonsterModalView: View {
         46: Monster(name: "モンスター46", playerExperience: 310, playerMoney: 310, monsterHP: 660, monsterUnderHP: 660, monsterAttack: 250),
         47: Monster(name: "モンスター47", playerExperience: 340, playerMoney: 340, monsterHP: 690, monsterUnderHP: 690, monsterAttack: 270),
         48: Monster(name: "モンスター48", playerExperience: 370, playerMoney: 370, monsterHP: 720, monsterUnderHP: 720, monsterAttack: 290),
-        49: Monster(name: "モンスター49", playerExperience: 400, playerMoney: 400, monsterHP: 750, monsterUnderHP: 550, monsterAttack: 310),
+        49: Monster(name: "モンスター49", playerExperience: 400, playerMoney: 400, monsterHP: 750, monsterUnderHP: 750, monsterAttack: 310),
         50: Monster(name: "モンスター50", playerExperience: 430, playerMoney: 430, monsterHP: 800, monsterUnderHP: 800, monsterAttack: 350),
         51: Monster(name: "モンスター51", playerExperience: 460, playerMoney: 460, monsterHP: 850, monsterUnderHP: 850, monsterAttack: 400),
         52: Monster(name: "モンスター52", playerExperience: 500, playerMoney: 500, monsterHP: 900, monsterUnderHP: 900, monsterAttack: 500),
@@ -113,7 +114,7 @@ struct StoryMonsterModalView: View {
                             )
                             .frame(width: 240, height: 240)
                         
-                        Image(monsterName)
+                        Image(DungeonExpansion.artworkName(for: monsterName))
                             .resizable()
                             .scaledToFit()
                             .frame(height: 180)
@@ -128,6 +129,14 @@ struct StoryMonsterModalView: View {
                     }
                 }
                 
+                if DungeonExpansion.monster(for: monster) != nil {
+                    Text(DungeonExpansion.displayName(for: monsterName))
+                        .font(.system(size: 19, weight: .bold))
+                        .foregroundColor(.white)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 24)
+                }
+
                 // クイズ情報
                 VStack(spacing: 8) {
                     Text("出題カテゴリ")
@@ -139,6 +148,7 @@ struct StoryMonsterModalView: View {
                             .font(.system(size: 16))
                         Text(quizTitle)
                             .font(.system(size: 18, weight: .bold))
+                            .multilineTextAlignment(.center)
                     }
                     .foregroundColor(.white)
                     .padding(.horizontal, 20)
@@ -198,6 +208,11 @@ struct StoryMonsterModalView: View {
                     .padding(.horizontal, 24)
                 }
                 
+                if let helper = friendManager.activeHelper {
+                    DungeonHelperReadyView(helper: helper)
+                        .padding(.horizontal, 24)
+                }
+
                 Spacer().frame(height: 10)
                 
                 // バトルボタン
@@ -254,7 +269,7 @@ struct StoryMonsterModalView: View {
     }
     
     private func setMonsterParameters(monster: Int) {
-        if let m = monsters[monster] {
+        if let m = DungeonExpansion.monster(for: monster) ?? monsters[monster] {
             monsterName = m.name
             monsterHP = m.monsterHP
             monsterAttack = m.monsterAttack
@@ -262,6 +277,10 @@ struct StoryMonsterModalView: View {
     }
     
     private func setQuizTitle() {
+        if let area = DungeonExpansion.area(at: viewModel.userPosition + 1) {
+            quizTitle = area.quizTitle
+            return
+        }
         switch viewModel.userPosition {
         case 1...52: quizTitle = "ITパスポート"
         case 53...101: quizTitle = "基本情報技術者試験"
@@ -293,6 +312,43 @@ struct StoryMonsterModalView: View {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             isPresented = false
         }
+    }
+}
+
+struct DungeonHelperReadyView: View {
+    let helper: ActiveHelper
+
+    var body: some View {
+        HStack(spacing: 9) {
+            Image(helper.avatarName)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 34, height: 34)
+            VStack(alignment: .leading, spacing: 1) {
+                Text("フレンドの助っ人を編成中")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundColor(.white.opacity(0.72))
+                Text("\(helper.ownerName)のおとも · 攻撃+\(helper.attackBonus)")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(.white)
+                    .lineLimit(1)
+            }
+            Spacer(minLength: 4)
+            Image(systemName: "checkmark.seal.fill")
+                .foregroundColor(Color(hex: "38ef7d"))
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(Color.white.opacity(0.13))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .stroke(Color.white.opacity(0.18), lineWidth: 1)
+                )
+        )
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(helper.ownerName)さんの助っ人を編成中。攻撃力プラス\(helper.attackBonus)")
     }
 }
 

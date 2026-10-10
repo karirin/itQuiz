@@ -144,7 +144,8 @@ struct TermsOfServiceView: View {
             }
             .padding()
         }
-        .navigationBarTitle("ライセンス", displayMode: .inline)
+        .navigationBarTitle("利用規約", displayMode: .inline)
+        .appNavigationBackButton()
     }
 }
 

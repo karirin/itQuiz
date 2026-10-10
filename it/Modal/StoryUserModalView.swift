@@ -9,6 +9,7 @@ import SwiftUI
 
 struct StoryUserModalView: View {
     @ObservedObject var authManager = AuthManager.shared
+    @ObservedObject private var friendManager = FriendManager.shared
     @ObservedObject var viewModel: PositionViewModel
 //    @Binding var monster: Int
     @Binding var isPresented: Bool
@@ -112,6 +113,11 @@ struct StoryUserModalView: View {
                         }
                     }
                     .padding(.horizontal, 24)
+                }
+
+                if let helper = friendManager.activeHelper {
+                    DungeonHelperReadyView(helper: helper)
+                        .padding(.horizontal, 24)
                 }
 
                 // バトルボタン（既存処理維持）

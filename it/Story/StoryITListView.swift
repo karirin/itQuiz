@@ -3155,7 +3155,7 @@ choices: [
     let monsterName: String
     let backgroundName: String
     
-    init(isPresenting: Binding<Bool>,monsterName: String,backgroundName: String, viewModel: PositionViewModel) {  //初期化メソッドに user を追加
+    init(isPresenting: Binding<Bool>, monsterName: String, backgroundName: String, viewModel: PositionViewModel) {
         _isPresenting = isPresenting
         self.monsterName = monsterName
         self.backgroundName = backgroundName
@@ -3187,4 +3187,3 @@ struct StoryITListView_Previews: PreviewProvider {
         StoryITListView(isPresenting: .constant(false), monsterName: "モンスター1", backgroundName: "背景1", viewModel: PositionViewModel.shared)
     }
 }
-

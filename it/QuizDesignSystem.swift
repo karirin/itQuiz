@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UIKit
 
 // MARK: - カラーテーマ
 struct QuizColors {
@@ -446,6 +447,107 @@ struct QuizNavigationBar: View {
     }
 }
 
+// MARK: - Standard Navigation Back Button
+private struct AppNavigationBackButtonModifier: ViewModifier {
+    @Environment(\.dismiss) private var dismiss
+
+    func body(content: Content) -> some View {
+        content
+            .navigationBarBackButtonHidden(true)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button {
+                        generateHapticFeedback()
+                        dismiss()
+                    } label: {
+                        Label("戻る", systemImage: "chevron.left")
+                            .labelStyle(.titleAndIcon)
+                    }
+                    .accessibilityLabel("戻る")
+                }
+            }
+    }
+}
+
+// MARK: - Interactive Swipe Back
+
+/// カスタムヘッダーで標準ナビゲーションバーを隠していても、
+/// 画面左端からのスワイプで前の画面へ戻れるようにする。
+private struct InteractivePopGestureEnabler: UIViewControllerRepresentable {
+    final class Coordinator: NSObject, UIGestureRecognizerDelegate {
+        weak var navigationController: UINavigationController?
+
+        func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+            guard let navigationController else { return false }
+            return navigationController.viewControllers.count > 1
+                && navigationController.transitionCoordinator == nil
+        }
+    }
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator()
+    }
+
+    func makeUIViewController(context: Context) -> InteractivePopGestureViewController {
+        let viewController = InteractivePopGestureViewController()
+        viewController.coordinator = context.coordinator
+        viewController.view.backgroundColor = .clear
+        viewController.view.isUserInteractionEnabled = false
+        return viewController
+    }
+
+    func updateUIViewController(
+        _ uiViewController: InteractivePopGestureViewController,
+        context: Context
+    ) {
+        uiViewController.coordinator = context.coordinator
+        DispatchQueue.main.async {
+            uiViewController.enableInteractivePopGesture()
+        }
+    }
+}
+
+private final class InteractivePopGestureViewController: UIViewController {
+    weak var coordinator: InteractivePopGestureEnabler.Coordinator?
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        DispatchQueue.main.async { [weak self] in
+            self?.enableInteractivePopGesture()
+        }
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        enableInteractivePopGesture()
+    }
+
+    func enableInteractivePopGesture() {
+        guard let navigationController,
+              navigationController.viewControllers.count > 1,
+              let coordinator else { return }
+
+        coordinator.navigationController = navigationController
+        navigationController.interactivePopGestureRecognizer?.delegate = coordinator
+        navigationController.interactivePopGestureRecognizer?.isEnabled = true
+    }
+}
+
+extension View {
+    /// 親画面のタイトルや横幅に左右されず、「戻る」を常に表示する。
+    func appNavigationBackButton() -> some View {
+        modifier(AppNavigationBackButtonModifier())
+    }
+
+    /// 画面左端から右へスワイプしたとき、ナビゲーションスタックを1つ戻す。
+    func interactiveSwipeBackEnabled() -> some View {
+        background(
+            InteractivePopGestureEnabler()
+                .frame(width: 0, height: 0)
+        )
+    }
+}
+
 // MARK: - プレビュー
 struct QuizDesignSystem_Previews: PreviewProvider {
     static var previews: some View {
@@ -496,5 +598,237 @@ struct QuizDesignSystem_Previews: PreviewProvider {
             .padding(.vertical)
         }
         .background(QuizColors.background)
+    }
+}
+
+// MARK: - チュートリアルのスポットライト
+//
+// 以前は同じ実装が9画面にコピーされていた。見た目とステップ番号の管理を
+// ここへ集約し、各画面は対象の矩形と文言を渡すだけにする。
+struct TutorialSpotlight: View {
+    enum Placement {
+        case above
+        case below
+        /// スポットライトが画面上半分なら下、下半分なら上に出す。
+        case auto
+    }
+
+    let spotlight: CGRect
+    var cornerRadius: CGFloat = 20
+    let step: Int
+    var totalSteps: Int = TutorialSpotlight.defaultTotalSteps
+    let icon: String
+    let title: String
+    let message: String
+    var accent: [Color] = [Color(hex: "667eea"), Color(hex: "764ba2")]
+    var placement: Placement = .auto
+    let onSkip: () -> Void
+
+    /// tutorialNum 1〜7 に対応する。
+    static let defaultTotalSteps = 7
+
+    @State private var pulsing = false
+    @State private var appeared = false
+
+    private var gradient: LinearGradient {
+        LinearGradient(colors: accent, startPoint: .topLeading, endPoint: .bottomTrailing)
+    }
+
+    var body: some View {
+        GeometryReader { geo in
+            let origin = geo.frame(in: .global).origin
+            let midX = spotlight.midX - origin.x
+            let midY = spotlight.midY - origin.y
+            let minY = spotlight.minY - origin.y
+            let maxY = spotlight.maxY - origin.y
+            let width = max(spotlight.width, 0)
+            let height = max(spotlight.height, 0)
+            let below = showsBelow(spotlightMidY: midY, viewportHeight: geo.size.height)
+
+            ZStack {
+                scrim(midX: midX, midY: midY, width: width, height: height)
+                ring(midX: midX, midY: midY, width: width, height: height)
+
+                VStack(spacing: 0) {
+                    if below {
+                        Spacer(minLength: 0).frame(height: max(maxY + 12, 0))
+                        pointer(pointingUp: true, offsetX: pointerOffset(midX: midX, viewportWidth: geo.size.width))
+                        card
+                        Spacer(minLength: 0)
+                    } else {
+                        Spacer(minLength: 0)
+                        card
+                        pointer(pointingUp: false, offsetX: pointerOffset(midX: midX, viewportWidth: geo.size.width))
+                        Spacer(minLength: 0).frame(height: max(geo.size.height - minY + 12, 0))
+                    }
+                }
+                .padding(.horizontal, 20)
+                .opacity(appeared ? 1 : 0)
+                .offset(y: appeared ? 0 : (below ? 12 : -12))
+
+                skipButton
+            }
+        }
+        .ignoresSafeArea()
+        .onAppear {
+            withAnimation(.easeOut(duration: 0.28)) { appeared = true }
+            withAnimation(.easeInOut(duration: 1.1).repeatForever(autoreverses: true)) { pulsing = true }
+        }
+    }
+
+    private func showsBelow(spotlightMidY: CGFloat, viewportHeight: CGFloat) -> Bool {
+        switch placement {
+        case .above: return false
+        case .below: return true
+        case .auto: return spotlightMidY < viewportHeight * 0.5
+        }
+    }
+
+    /// 吹き出しの三角をスポットライトの中心に合わせる。端では見切れないよう内側に寄せる。
+    private func pointerOffset(midX: CGFloat, viewportWidth: CGFloat) -> CGFloat {
+        let raw = midX - viewportWidth / 2
+        let limit = max(viewportWidth / 2 - 56, 0)
+        return min(max(raw, -limit), limit)
+    }
+
+    private func scrim(midX: CGFloat, midY: CGFloat, width: CGFloat, height: CGFloat) -> some View {
+        Color.black.opacity(0.68)
+            .overlay(
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .frame(width: width, height: height)
+                    .position(x: midX, y: midY)
+                    .blendMode(.destinationOut)
+            )
+            .compositingGroup()
+    }
+
+    private func ring(midX: CGFloat, midY: CGFloat, width: CGFloat, height: CGFloat) -> some View {
+        RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+            .stroke(gradient, lineWidth: 3)
+            .frame(width: width, height: height)
+            .position(x: midX, y: midY)
+            .scaleEffect(pulsing ? 1.04 : 1.0)
+            .opacity(pulsing ? 0.55 : 1.0)
+            .allowsHitTesting(false)
+    }
+
+    private var card: some View {
+        VStack(alignment: .leading, spacing: 13) {
+            progressRow
+
+            HStack(alignment: .top, spacing: 12) {
+                Image(systemName: icon)
+                    .font(.system(size: 19, weight: .bold))
+                    .foregroundStyle(gradient)
+                    .frame(width: 42, height: 42)
+                    .background(Circle().fill(accent[0].opacity(0.13)))
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(title)
+                        .font(.system(size: 16, weight: .heavy))
+                        .foregroundColor(Color(hex: "2C3038"))
+                        .fixedSize(horizontal: false, vertical: true)
+                    Text(message)
+                        .font(.system(size: 12.5))
+                        .foregroundColor(Color(hex: "6B7280"))
+                        .lineSpacing(2)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Spacer(minLength: 0)
+            }
+
+            HStack(spacing: 5) {
+                Image(systemName: "hand.tap.fill")
+                    .font(.system(size: 11, weight: .bold))
+                Text("画面をタップして次へ")
+                    .font(.system(size: 11, weight: .heavy))
+            }
+            .foregroundColor(accent[0])
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 9)
+            .background(Capsule().fill(accent[0].opacity(0.10)))
+        }
+        .padding(.horizontal, 18)
+        .padding(.vertical, 16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        // 暗いスクリム上に置くため、ライト/ダークどちらでも白のまま読ませる
+        .background(Color.white)
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .shadow(color: .black.opacity(0.28), radius: 18, y: 8)
+    }
+
+    /// 何ステップ中の何番目かを示す。終わりが見えると離脱しにくい。
+    private var progressRow: some View {
+        HStack(spacing: 8) {
+            HStack(spacing: 4) {
+                ForEach(1...max(totalSteps, 1), id: \.self) { index in
+                    Capsule()
+                        .fill(index <= step
+                              ? AnyShapeStyle(gradient)
+                              : AnyShapeStyle(Color(hex: "D8DCE5")))
+                        .frame(width: index == step ? 16 : 6, height: 6)
+                }
+            }
+            Spacer(minLength: 0)
+            Text("\(step) / \(totalSteps)")
+                .font(.system(size: 11, weight: .heavy, design: .rounded))
+                .foregroundColor(Color(hex: "9AA1AE"))
+                .monospacedDigit()
+        }
+        .accessibilityElement()
+        .accessibilityLabel("全\(totalSteps)ステップ中\(step)ステップ目")
+    }
+
+    private func pointer(pointingUp: Bool, offsetX: CGFloat) -> some View {
+        TutorialPointer(pointingUp: pointingUp)
+            .fill(Color.white)
+            .frame(width: 22, height: 11)
+            .offset(x: offsetX)
+            .frame(maxWidth: .infinity, alignment: .center)
+    }
+
+    private var skipButton: some View {
+        VStack {
+            HStack {
+                Spacer()
+                Button(action: onSkip) {
+                    HStack(spacing: 5) {
+                        Text("スキップ")
+                            .font(.system(size: 13, weight: .heavy))
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 10, weight: .black))
+                    }
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 9)
+                    .background(Capsule().fill(Color.white.opacity(0.18)))
+                    .overlay(Capsule().stroke(Color.white.opacity(0.45), lineWidth: 1))
+                }
+                .padding(.trailing, 20)
+                .padding(.top, 58)
+                .accessibilityLabel("チュートリアルをスキップ")
+            }
+            Spacer()
+        }
+    }
+}
+
+private struct TutorialPointer: Shape {
+    let pointingUp: Bool
+
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        if pointingUp {
+            path.move(to: CGPoint(x: rect.midX, y: rect.minY))
+            path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
+            path.addLine(to: CGPoint(x: rect.minX, y: rect.maxY))
+        } else {
+            path.move(to: CGPoint(x: rect.midX, y: rect.maxY))
+            path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY))
+            path.addLine(to: CGPoint(x: rect.minX, y: rect.minY))
+        }
+        path.closeSubpath()
+        return path
     }
 }

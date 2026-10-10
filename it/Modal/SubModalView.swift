@@ -15,7 +15,6 @@ struct SubModalView: View {
     @ObservedObject var audioManager:AudioManager
     @ObservedObject var authManager = AuthManager.shared
     @Binding var showHomeModal: Bool
-//    @Binding var tutorialNum: Int
     @State private var isContentView: Bool = false
     @State private var isDaily: Bool = false
     var pauseTimer: () -> Void
@@ -25,158 +24,390 @@ struct SubModalView: View {
     @EnvironmentObject var appState: AppState
     @Environment(\.presentationMode) var presentationMode
     @State private var showAlert = false
-    
+    @State private var alertTitle = ""
+    @State private var alertMessage = ""
+    @State private var didLogPaywallView = false
+    @State private var didLogPaywallReady = false
+    @State private var didLogPaywallDismiss = false
+    @State private var paywallDisplayID = UUID().uuidString
+    @State private var selectedProduct: Product? = nil
+    @State private var isPurchasing = false
+    @State private var didPurchase = false
+    @State private var showTerms = false
+    @State private var showPrivacy = false
+
+    private let source: PremiumPaywallSource = .quiz
+
     var body: some View {
         ZStack {
-            ScrollView { // Listの代わりにScrollViewを使用
-                VStack { // VStackで各要素を縦に並べる
-                    HStack{
-//                        Button(action: { 
-//                        generateHapticFeedback()
-//                            self.presentationMode.wrappedValue.dismiss()
-//                            audioManager.playCancelSound()
-//                        }) {
-//                            Image(systemName: "chevron.left")
-//                                .foregroundColor(Color("fontGray"))
-//                            Text("戻る")
-//                                .foregroundColor(Color("fontGray"))
-//                        }
-//                        .padding(.leading)
-                        Spacer()
-                        Text("プレミアムプラン")
-                            .font(.system(size:24))
-                        Spacer()
-//                        Button(action: { 
-//                        generateHapticFeedback()
-//                            self.presentationMode.wrappedValue.dismiss()
-//                            audioManager.playCancelSound()
-//                        }) {
-//                            Image(systemName: "chevron.left")
-//                                .foregroundColor(Color("fontGray"))
-//                            Text("戻る")
-//                                .foregroundColor(Color("fontGray"))
-//                        }
-//                        .padding(.leading)
-//                        .opacity(0)
-                    }
-                    .padding(.top)
-                    HStack{
-                        Text("プレミアムプランに加入すると\n下記特典が受けられます")
-                            .font(.system(size:22))
-                        Spacer()
-                    }.padding()
-                    VStack{
-                        HStack{
-                            Image(systemName: "rectangle.badge.xmark")
-                                .resizable()
-                                .frame(width:40,height:30)
-                                .fontWeight(.bold)
-                        Text("広告が非表示になります")
-                                .font(.system(size: 24))
-                                .fontWeight(.bold)
-                            Spacer()
+            VStack(spacing: 0) {
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 14) {
+                        // Header
+                        VStack(spacing: 8) {
+                            HStack(spacing: 5) {
+                                Image(systemName: "crown.fill")
+                                    .font(.system(size: 11))
+                                Text("プレミアムプラン")
+                                    .font(.system(size: 12, weight: .black))
+                            }
+                            .foregroundColor(PremiumPalette.ink)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 5)
+                            .background(Capsule().fill(PremiumPalette.goldGradient))
+
+                            Text(source.headline)
+                                .font(.system(size: 19, weight: .black))
+                                .foregroundColor(.white)
+                                .multilineTextAlignment(.center)
+                                .fixedSize(horizontal: false, vertical: true)
+
+                            Text(source.detail)
+                                .font(.system(size: 12, weight: .semibold))
+                                .foregroundColor(.white.opacity(0.72))
+                                .multilineTextAlignment(.center)
+                                .fixedSize(horizontal: false, vertical: true)
+
+                            HStack(spacing: 6) {
+                                PremiumTrustChip(icon: "checkmark.shield.fill", text: "いつでも解約OK")
+                                PremiumTrustChip(icon: "applelogo", text: "App Store決済")
+                            }
+                            .padding(.top, 2)
                         }
-                    }.padding(.leading)
-                        .font(.system(size:16))
-                        .padding(.bottom)
-                    Text("※プレミアムプランはいつでも解約できます")
-                            .font(.system(size: 18))
-                            .padding(.bottom)
-    //                ForEach(viewModel.products.sorted(by: { $0.displayName == "お試しプラン" && $1.displayName != "お試しプラン" }), id: \.id) { product in
-                    ForEach(viewModel.products, id: \.id) { product in
-                        VStack{ // 各商品情報をVStackで囲む
-    //                        if product.displayName == "広告非表示" {
-                                    Button(action: {
-                                        Task {
-                                            do {
-                                                try await AppStore.sync()
-                                                try await viewModel.purchaseProduct(product, showAlert: $showAlert)
-                                            } catch {
-                                                print("購入処理中にエラーが発生しました: \(error)")
-                                            }
+                        .padding(.top, 20)
+
+                        PremiumComparisonTable()
+
+                        // Plan Selection
+                        if viewModel.productLoadState != .loaded {
+                            ProductLoadStatusView(
+                                state: viewModel.productLoadState,
+                                message: viewModel.productLoadErrorMessage,
+                                retry: retryProductLoad
+                            )
+                        } else {
+                            VStack(spacing: 10) {
+                                ForEach(sortProductsByPeriod(viewModel.products), id: \.id) { product in
+                                    PlanSelectionCard(
+                                        product: product,
+                                        isSelected: selectedProduct?.id == product.id,
+                                        introOffer: viewModel.introOffer(for: product),
+                                        allProducts: viewModel.products
+                                    ) {
+                                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                            selectedProduct = product
                                         }
-                                    }) {
-    //                                    Text("サブスクリプション登録")
-                                        Image("広告非表示ボタン")
-                                            .resizable()
-                                            .frame(width:250,height:80)
-                                    }.shadow(radius: 3)
-                                    .padding(.bottom)
+                                        PremiumAnalytics.logPlanSelect(
+                                            product: product,
+                                            source: source,
+                                            displayID: paywallDisplayID,
+                                            method: "manual"
+                                        )
+                                    }
+                                }
+                            }
                         }
-                    }
-                    
-                Button(action: { 
-                    Task {
-                        do {
-                            try await AppStore.sync()
-                            await appState.refreshSubscriptionState()
-                        } catch {
-                            print("購入処理中にエラーが発生しました: \(error)")
+
+                        // Footer links
+                        VStack(spacing: 8) {
+                            HStack(spacing: 4) {
+                                Text("購入復元は")
+                                    .foregroundColor(.white.opacity(0.6))
+                                Button("こちら") {
+                                    Task {
+                                        PremiumAnalytics.logRestoreStart(source: source, displayID: paywallDisplayID)
+                                        do {
+                                            try await AppStore.sync()
+                                            await appState.refreshSubscriptionState()
+                                            PremiumAnalytics.logRestoreSuccess(
+                                                source: source,
+                                                displayID: paywallDisplayID,
+                                                restoredSubscription: appState.isSubscribed
+                                            )
+                                        } catch {
+                                            PremiumAnalytics.logRestoreError(
+                                                source: source,
+                                                displayID: paywallDisplayID,
+                                                error: error
+                                            )
+                                            print("購入処理中にエラーが発生しました: \(error)")
+                                        }
+                                    }
+                                }
+                                .foregroundColor(.cyan)
+                                Text("・解約は")
+                                    .foregroundColor(.white.opacity(0.6))
+                                if let cancelURL = URL(string: "https://support.apple.com/ja-jp/HT202039") {
+                                    Link("こちら", destination: cancelURL)
+                                        .foregroundColor(.cyan)
+                                }
+                            }
+                            .font(.system(size: 12))
+
+                            HStack(spacing: 12) {
+                                Button("利用規約") {
+                                    showTerms = true
+                                }
+                                Text("・")
+                                    .foregroundColor(.white.opacity(0.4))
+                                Button("プライバシーポリシー") {
+                                    showPrivacy = true
+                                }
+                            }
+                            .font(.system(size: 11))
+                            .foregroundColor(.white.opacity(0.6))
                         }
+                        .padding(.bottom, 8)
                     }
-                }) {
-                    Text("購入を復元する")
-                        .fontWeight(.semibold)
-                        .frame(height:40)
-                        .padding(3)
-                        .padding(.horizontal)
-                        .foregroundColor(Color.white)
-                        .background(Color.gray)
-                        .cornerRadius(24)
-                        .shadow(radius: 3)
-                        .padding(.top)
+                    .padding(.horizontal, 16)
                 }
-                    HStack{
-                        Text("解約時は")
-                        NavigationLink(destination: WebView(urlString: "https://support.apple.com/ja-jp/HT202039")) {
-                            Text("こちら")
-                                .foregroundStyle(Color.blue)
+
+                // Purchase CTA
+                VStack(spacing: 0) {
+                    Divider().overlay(Color.white.opacity(0.2))
+                    Button(action: purchaseSelectedProduct) {
+                        HStack(spacing: 10) {
+                            if isPurchasing {
+                                ProgressView()
+                                    .progressViewStyle(CircularProgressViewStyle(tint: Color(hex: "2D1F14")))
+                            } else {
+                                Image(systemName: "crown.fill")
+                                    .font(.system(size: 16))
+                            }
+
+                            VStack(spacing: 2) {
+                                Text(purchaseButtonTitle)
+                                    .font(.system(size: 16, weight: .bold))
+                                Text(purchaseButtonCaption)
+                                    .font(.system(size: 10))
+                                    .multilineTextAlignment(.center)
+                                    .opacity(0.8)
+                            }
                         }
-                        Text("をご参考ください")
-                    }.font(.system(size: 18))
-                        .padding(.top)
-                }
-               
-                .onAppear {
-                    Task {
-                        await viewModel.loadProducts()
+                        .foregroundColor(PremiumPalette.ink)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 13)
+                        .background(
+                            RoundedRectangle(cornerRadius: 15, style: .continuous)
+                                .fill(PremiumPalette.goldGradient)
+                                .shadow(color: Color(hex: "FFB020").opacity(0.45), radius: 10, x: 0, y: 4)
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 15, style: .continuous)
+                                .stroke(Color.white.opacity(0.45), lineWidth: 1)
+                        )
                     }
+                    .buttonStyle(PlainButtonStyle())
+                    .disabled(selectedProduct == nil || isPurchasing)
+                    .opacity(selectedProduct == nil ? 0.6 : 1)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
                 }
-            } .foregroundColor(Color("fontGray"))
-                .background(Color("Color2"))
-                .cornerRadius(20)
-                .frame(height:500)
-                    .padding()
-        //            .background(Color.white)
-                    .shadow(radius: 10)
+            }
+            .background(
+                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                PremiumPalette.backdropTop,
+                                PremiumPalette.backdropMid,
+                                PremiumPalette.backdropBottom
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                    .stroke(PremiumPalette.gold.opacity(0.35), lineWidth: 1.2)
+            )
+            .frame(maxHeight: min(UIScreen.main.bounds.height * 0.82, 640))
+            .padding()
+            .shadow(radius: 10)
             .overlay(
                 // 「×」ボタンを右上に配置
-                Button(action: { 
-                        generateHapticFeedback()
+                Button(action: {
+                    generateHapticFeedback()
+                    logPaywallDismissIfNeeded(reason: "close_button")
                     isPresented = false
-                        resumeTimer()
+                    resumeTimer()
                     audioManager.playCancelSound()
                 }) {
-                    Image(systemName: "xmark.circle.fill")
-                        .resizable()
-                        .frame(width: 50, height: 50)
-                        .foregroundColor(.gray)
-                        .background(.white)
-                        .cornerRadius(30)
+                    Image(systemName: "xmark")
+                        .font(.system(size: 15, weight: .bold))
+                        .foregroundColor(.white.opacity(0.9))
+                        .frame(width: 34, height: 34)
+                        .background(Circle().fill(Color.black.opacity(0.55)))
+                        .overlay(Circle().stroke(Color.white.opacity(0.25), lineWidth: 1))
                         .padding()
                 }
-                .offset(x: 10, y: -15), // この値を調整してボタンを正しい位置に移動させます
-                alignment: .topTrailing // 枠の右上を基準に位置を調整します
+                .offset(x: 10, y: -15),
+                alignment: .topTrailing
             )
         }
         .onAppear {
             pauseTimer() // モーダルが表示されたときにタイマーを一時停止
+            if !didLogPaywallView {
+                PremiumAnalytics.logPaywallView(source: source, displayID: paywallDisplayID)
+                didLogPaywallView = true
+            }
             if userFlag == 0 {
                 isSoundOn = true
             } else {
                 isSoundOn = false
             }
+            Task {
+                await loadProductsAndConfigurePaywall(selectionMethod: "default")
+            }
         }
+        .onChange(of: isPresented) { newValue in
+            if !newValue {
+                logPaywallDismissIfNeeded(reason: didPurchase ? "purchase_success" : "parent_dismiss")
+            }
+        }
+        .sheet(isPresented: $showTerms) {
+            TermsOfServiceView()
+        }
+        .sheet(isPresented: $showPrivacy) {
+            PrivacyView()
+        }
+        .alert(isPresented: $showAlert) {
+            Alert(
+                title: Text(alertTitle),
+                message: Text(alertMessage),
+                dismissButton: .default(Text("OK")) {
+                    if didPurchase {
+                        logPaywallDismissIfNeeded(reason: "purchase_success")
+                        isPresented = false
+                        resumeTimer()
+                    }
+                }
+            )
+        }
+    }
+
+    private var purchaseButtonTitle: String {
+        guard let product = selectedProduct else {
+            return "プランを選択してください"
+        }
+        if let intro = viewModel.introOffer(for: product) {
+            return intro.ctaTitle
+        }
+        let periodLabel: String
+        switch product.subscription?.subscriptionPeriod.unit {
+        case .week: periodLabel = "週額"
+        case .month: periodLabel = "月額"
+        case .year: periodLabel = "年額"
+        default: periodLabel = ""
+        }
+        return "\(periodLabel)\(product.displayPrice)で始める"
+    }
+
+    /// トライアル時は期間と終了後の価格を明示する（App Store 審査ガイドライン 3.1.2 の要件）
+    private var purchaseButtonCaption: String {
+        if let product = selectedProduct,
+           let intro = viewModel.introOffer(for: product) {
+            return intro.disclosureText
+        }
+        return "自動更新・いつでも解約できます"
+    }
+
+    private func purchaseSelectedProduct() {
+        guard let product = selectedProduct, !isPurchasing else { return }
+        generateHapticFeedback()
+        isPurchasing = true
+        PremiumAnalytics.logPlanSelect(
+            product: product,
+            source: source,
+            displayID: paywallDisplayID,
+            method: "purchase_button"
+        )
+        PremiumAnalytics.logPurchaseStart(product: product, source: source, displayID: paywallDisplayID)
+        let startsFreeTrial = viewModel.introOffer(for: product)?.isFreeTrial == true
+        Task {
+            do {
+                let transaction = try await viewModel.purchaseProduct(product)
+                PremiumAnalytics.logPurchaseSuccess(
+                    product: product,
+                    transaction: transaction,
+                    isFreeTrial: startsFreeTrial,
+                    source: source,
+                    displayID: paywallDisplayID
+                )
+                didPurchase = true
+                alertTitle = "プレミアムプラン登録ありがとうございます！"
+                alertMessage = "プレミアム機能が利用できるようになりました"
+                showAlert = true
+            } catch SubscribeError.userCancelled {
+                PremiumAnalytics.logPurchaseCancel(product: product, source: source, displayID: paywallDisplayID)
+            } catch SubscribeError.pending {
+                PremiumAnalytics.logPurchasePending(product: product, source: source, displayID: paywallDisplayID)
+                alertTitle = "購入は保留中です"
+                alertMessage = SubscribeError.pending.errorDescription ?? "承認後に自動的に反映されます"
+                showAlert = true
+            } catch {
+                PremiumAnalytics.logPurchaseError(product: product, source: source, displayID: paywallDisplayID, error: error)
+                alertTitle = "購入できませんでした"
+                alertMessage = (error as? LocalizedError)?.errorDescription
+                    ?? "購入処理中にエラーが発生しました。もう一度お試しください"
+                showAlert = true
+            }
+            isPurchasing = false
+        }
+    }
+
+    private func retryProductLoad() {
+        Task {
+            await loadProductsAndConfigurePaywall(selectionMethod: "retry_default")
+        }
+    }
+
+    @MainActor
+    private func loadProductsAndConfigurePaywall(selectionMethod: String) async {
+        await viewModel.loadProducts()
+        guard viewModel.productLoadState == .loaded else { return }
+
+        if !didLogPaywallReady {
+            let monthlyTrialEligible = viewModel.products.contains { product in
+                product.subscription?.subscriptionPeriod.unit == .month
+                    && viewModel.introOffer(for: product)?.isFreeTrial == true
+            }
+            PremiumAnalytics.logPaywallReady(
+                source: source,
+                displayID: paywallDisplayID,
+                products: viewModel.products,
+                missingProductCount: viewModel.missingProductCount,
+                loadAttemptCount: viewModel.productLoadAttemptCount,
+                hasEligibleMonthlyTrial: monthlyTrialEligible
+            )
+            didLogPaywallReady = true
+        }
+
+        let defaultProduct = viewModel.products.first(where: {
+            $0.subscription?.subscriptionPeriod.unit == .month
+        }) ?? sortProductsByPeriod(viewModel.products).first
+
+        guard selectedProduct == nil else { return }
+        guard let product = defaultProduct else { return }
+        selectedProduct = product
+        PremiumAnalytics.logPlanSelect(
+            product: product,
+            source: source,
+            displayID: paywallDisplayID,
+            method: selectionMethod
+        )
+    }
+
+    private func logPaywallDismissIfNeeded(reason: String) {
+        guard !didLogPaywallDismiss else { return }
+        didLogPaywallDismiss = true
+        PremiumAnalytics.logPaywallDismiss(
+            source: source,
+            displayID: paywallDisplayID,
+            reason: reason,
+            selectedProductID: selectedProduct?.id
+        )
     }
 }
 //

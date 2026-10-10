@@ -109,6 +109,10 @@ struct GuerrillaResultView: View {
                 // ゲリラ参加のミッション進捗
                 authManager.recordGuerrillaParticipation()
                 if isVictory {
+                    GuildManager.shared.recordGuerrillaResult(
+                        isVictory: true,
+                        isFirstPlace: guerrillaManager.myRank == 1
+                    )
                     // ゲリラ1位勝利のミッション進捗
                     if guerrillaManager.myRank == 1 {
                         authManager.recordGuerrillaWin()

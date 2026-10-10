@@ -16,6 +16,8 @@ struct GodGachaView: View {
     @State private var isGachaButtonDisabled: Bool = false
     @State private var obtainedRareItem: GachaManager.Item?
     @State private var obtainedItem: GachaManager.Item?
+    /// 結果画面の NEW 表示用（抽選前の所持状態で判定）
+    @State private var obtainedIsNew: Bool = false
     
     @State private var showAnimation: Bool = false
     @State private var showResult: Bool = false
@@ -63,7 +65,8 @@ struct GodGachaView: View {
                     onPlayAgain: {
                         obtainedItem = nil
                         startGacha(resetResult: false)
-                    }
+                    },
+                    isNew: obtainedIsNew
                 )
             }
             VStack{
@@ -104,7 +107,7 @@ struct GodGachaView: View {
         }
         .fullScreenCover(isPresented: $showAnimation) {
             if let rarity = obtainedRareItem?.rarity {
-                GachaAnimationView(rarity: rarity) {
+                GachaAnimationView(rarity: rarity, item: obtainedRareItem) {
                     showAnimation = false
                     obtainedItem = obtainedRareItem
                     showResult = true
@@ -140,7 +143,7 @@ struct GodGachaView: View {
                 refreshPlayerResources()
             }
         }
-        .alert("チケットを使えません", isPresented: $showTicketErrorAlert) {
+        .alert("ガチャを引けませんでした", isPresented: $showTicketErrorAlert) {
             Button("OK") {}
         } message: {
             Text(ticketErrorMessage)
@@ -166,6 +169,7 @@ struct GodGachaView: View {
         GachaLobbyScreen(
             gachaTitle: "神ガチャ",
             heroImageName: "神ガチャトップ",
+            backgroundImageName: "GodGachaSceneBackground",
             ticketType: .godGachaTicket,
             ticketCount: authManager.godGachaTicketCount,
             userMoney: userMoney,
@@ -193,48 +197,7 @@ struct GodGachaView: View {
     }
     
     private func startGacha(resetResult: Bool = true) {
-        let cost = gachaManager.gachaCost
-        
-        authManager.getUserMoney { latestMoney in
-            DispatchQueue.main.async {
-                userMoney = latestMoney
-                isGachaButtonDisabled = latestMoney >= cost
-                
-                guard latestMoney >= cost else {
-                    showUnCoinModal = true
-                    return
-                }
-                
-                gachaManager.shuffleItems()
-                guard let item = gachaManager.drawGacha() else { return }
-                
-                obtainedRareItem = item
-                authManager.recordGachaUsed()
-                userMoney -= cost
-                
-                if resetResult {
-                    showResult = false
-                }
-                
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    showAnimation = true
-                }
-                
-                authManager.decreaseGodUserMoney { success in
-                    DispatchQueue.main.async {
-                        if success {
-                            refreshPlayerResources()
-                        } else {
-                            userMoney += cost
-                            showAnimation = false
-                            obtainedRareItem = nil
-                            refreshPlayerResources()
-                            showUnCoinModal = true
-                        }
-                    }
-                }
-            }
-        }
+        performGachaDraw(coinCost: gachaManager.gachaCost, resetResult: resetResult)
     }
 
     private func startGachaWithTicket() {
@@ -245,36 +208,67 @@ struct GodGachaView: View {
             return
         }
 
-        authManager.consumeItem(.godGachaTicket) { success in
+        performGachaDraw(ticketType: .godGachaTicket)
+    }
+
+    private func performGachaDraw(
+        coinCost: Int = 0,
+        ticketType: InventoryItemType? = nil,
+        resetResult: Bool = true
+    ) {
+        gachaManager.shuffleItems()
+        guard let item = gachaManager.drawGacha() else {
+            ticketErrorMessage = "ガチャ結果を取得できませんでした。"
+            showTicketErrorAlert = true
+            return
+        }
+
+        let avatar = Avatar(
+            name: item.name,
+            attack: item.attack,
+            health: item.health,
+            usedFlag: 0,
+            count: 1
+        )
+        let isNewAvatar = !authManager.avatars.contains { $0.name == item.name }
+        authManager.commitGachaResult(
+            avatar: avatar,
+            coinCost: coinCost,
+            ticketType: ticketType
+        ) { success in
             guard success else {
-                ticketErrorMessage = "チケットの消費に失敗しました。通信状況を確認してもう一度お試しください。"
-                showTicketErrorAlert = true
+                if ticketType == nil {
+                    if userMoney < coinCost {
+                        showUnCoinModal = true
+                    } else {
+                        ticketErrorMessage = "ガチャの確定に失敗しました。時間をおいて再度お試しください。"
+                        showTicketErrorAlert = true
+                    }
+                } else {
+                    ticketErrorMessage = "チケットの消費またはおともの保存に失敗しました。"
+                    showTicketErrorAlert = true
+                }
                 refreshPlayerResources()
                 return
             }
 
-            DispatchQueue.main.async {
-                audioManager.playSound()
-                gachaManager.shuffleItems()
-                guard let item = gachaManager.drawGacha() else {
-                    refreshPlayerResources()
-                    return
-                }
-
-                obtainedRareItem = item
-                authManager.recordGachaUsed()
+            audioManager.playSound()
+            obtainedRareItem = item
+            obtainedIsNew = isNewAvatar
+            // 次回の NEW 判定のため所持おともを読み直す（読み取りのみ）
+            authManager.fetchAvatars {}
+            authManager.recordGachaUsed()
+            if resetResult {
                 showResult = false
-
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    showAnimation = true
-                }
-
-                checkAvatarCount()
-                refreshPlayerResources()
             }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                showAnimation = true
+            }
+            checkAvatarCount()
+            refreshPlayerResources()
         }
     }
-    
+
     private func fetchUserMoney() {
         authManager.getUserMoney { money in
             self.userMoney = money

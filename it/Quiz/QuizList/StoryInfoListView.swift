@@ -2466,7 +2466,7 @@ struct StoryInfoListView: View {
     let monsterName: String
     let backgroundName: String
     
-    init(isPresenting: Binding<Bool>,monsterName: String,backgroundName: String, viewModel: PositionViewModel) {  //初期化メソッドに user を追加
+    init(isPresenting: Binding<Bool>, monsterName: String, backgroundName: String, viewModel: PositionViewModel) {
         _isPresenting = isPresenting
         self.monsterName = monsterName
         self.backgroundName = backgroundName

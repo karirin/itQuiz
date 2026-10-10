@@ -7,6 +7,7 @@
 
 import SwiftUI
 import WebKit
+import FirebaseAuth
 
 struct OtherApp: Identifiable {
     let id = UUID()
@@ -27,10 +28,14 @@ extension OtherApp {
 
 struct SettingView: View {
     @ObservedObject var audioManager = AudioManager.shared
+    @ObservedObject private var appState = AppState.shared
     @Environment(\.presentationMode) var presentationMode
     @State private var isSoundOn: Bool = true
     @ObservedObject var authManager = AuthManager.shared
+    @ObservedObject var friendManager = FriendManager.shared
+    @ObservedObject var battleManager = BattleManager.shared
     @State private var showingDeleteAlert = false
+    @State private var deleteAccountErrorMessage: String?
     @Environment(\.colorScheme) private var colorScheme
     var backgroundColor: Color { colorScheme == .dark ? Color(.systemBackground) : Color(.white) }
 
@@ -54,12 +59,66 @@ struct SettingView: View {
                             soundToggleRow
                             Divider().padding(.leading, 56)
 
-                            NavigationLink(destination: InventoryView()) {
+                            NavigationLink(destination: NotificationSettingsView().appNavigationBackButton()) {
+                                settingRow(icon: "bell.badge.fill", iconColor: .orange, title: "通知設定")
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                            Divider().padding(.leading, 56)
+
+                            NavigationLink(destination: AppUpdateHistoryView().appNavigationBackButton()) {
+                                settingRow(icon: "megaphone.fill", iconColor: .brown, title: "アップデート情報")
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                            .accessibilityIdentifier("updates.settings.entry")
+                            Divider().padding(.leading, 56)
+
+                            NavigationLink(destination: AccountLinkView().appNavigationBackButton()) {
+                                settingRow(icon: "icloud.and.arrow.up.fill", iconColor: .indigo, title: "データの引き継ぎ（Apple ID）")
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                            Divider().padding(.leading, 56)
+
+                            NavigationLink(destination: InventoryView().appNavigationBackButton()) {
                                 settingRow(icon: "shippingbox.fill", iconColor: .teal, title: "持ち物")
                             }
                             .buttonStyle(PlainButtonStyle())
                             Divider().padding(.leading, 56)
-                            
+
+                            NavigationLink(destination: FriendListView().appNavigationBackButton()) {
+                                settingRow(
+                                    icon: "person.2.fill",
+                                    iconColor: .pink,
+                                    title: "フレンド",
+                                    badge: friendManager.incomingRequests.count
+                                )
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                            .onAppear {
+                                friendManager.observeIncomingRequests()
+                            }
+                            Divider().padding(.leading, 56)
+
+                            NavigationLink(destination: GuildEntryView().appNavigationBackButton()) {
+                                settingRow(icon: "person.3.fill", iconColor: .green, title: "ギルド")
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                            Divider().padding(.leading, 56)
+
+                            NavigationLink(destination: WeeklyLeagueView().appNavigationBackButton()) {
+                                settingRow(
+                                    icon: "flag.checkered",
+                                    iconColor: .blue,
+                                    title: "週間リーグ",
+                                    badge: battleManager.incomingBattles.count
+                                )
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                            .onAppear {
+                                battleManager.fetchMyBattles()
+                            }
+                            Divider().padding(.leading, 56)
+
+
                             NavigationLink(destination: TermsOfServiceView()) {
                                 settingRow(icon: "doc.text", iconColor: .blue, title: "利用規約")
                             }
@@ -72,17 +131,22 @@ struct SettingView: View {
                             .buttonStyle(PlainButtonStyle())
                             Divider().padding(.leading, 56)
                             
-                            NavigationLink(destination: WebView(urlString: "https://docs.google.com/forms/d/e/1FAIpQLSfHxhubkEjUw_gexZtQGU8ujZROUgBkBcIhB3R6b8KZpKtOEQ/viewform?embedded=true")) {
+                            NavigationLink(destination: WebView(urlString: "https://docs.google.com/forms/d/e/1FAIpQLSfHxhubkEjUw_gexZtQGU8ujZROUgBkBcIhB3R6b8KZpKtOEQ/viewform?embedded=true").appNavigationBackButton()) {
                                 settingRow(icon: "envelope", iconColor: .green, title: "お問い合せ")
                             }
                             .buttonStyle(PlainButtonStyle())
                             Divider().padding(.leading, 56)
                             
-                            NavigationLink(destination: PreView(audioManager: audioManager).navigationBarBackButtonHidden(true)) {
-                                settingRow(icon: "eye.slash", iconColor: .purple, title: "広告を非表示にする")
+                            if !appState.isSubscribed {
+                                NavigationLink(destination: PreView(
+                                    audioManager: audioManager,
+                                    source: .settings
+                                ).navigationBarBackButtonHidden(true)) {
+                                    settingRow(icon: "eye.slash", iconColor: .purple, title: "広告を非表示にする")
+                                }
+                                .buttonStyle(PlainButtonStyle())
+                                Divider().padding(.leading, 56)
                             }
-                            .buttonStyle(PlainButtonStyle())
-                            Divider().padding(.leading, 56)
                             
                             deleteAccountRow
                         }
@@ -90,6 +154,10 @@ struct SettingView: View {
                         .cornerRadius(12)
                     }
                     .shadow(color: Color.black.opacity(0.1), radius: 5)
+
+#if DEBUG
+                    DebugDungeonPositionSettings()
+#endif
                     
                     // おすすめのアプリセクション
                     VStack(spacing: 0) {
@@ -132,6 +200,7 @@ struct SettingView: View {
         )
         .onAppear {
             AuthManager.shared.fetchCurrentUserAdminFlag()
+            isSoundOn = !audioManager.isMuted
         }
         .navigationViewStyle(StackNavigationViewStyle())
     }
@@ -174,23 +243,33 @@ struct SettingView: View {
         .padding(.vertical, 12)
         .contentShape(Rectangle())
         .onChange(of: isSoundOn) { newValue in
-            audioManager.toggleSound()
+            audioManager.setMuted(!newValue)
         }
     }
     
-    private func settingRow(icon: String, iconColor: Color, title: String) -> some View {
+
+    private func settingRow(icon: String, iconColor: Color, title: String, badge: Int = 0) -> some View {
         HStack(spacing: 12) {
             Image(systemName: icon)
                 .font(.system(size: 20))
                 .foregroundColor(iconColor)
                 .frame(width: 24, height: 24)
-            
+
             Text(title)
                 .font(.system(size: 16))
                 .foregroundColor(.black)
-            
+
             Spacer()
-            
+
+            if badge > 0 {
+                Text("\(badge)")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundColor(.white)
+                    .frame(minWidth: 20, minHeight: 20)
+                    .background(Color.red)
+                    .clipShape(Circle())
+            }
+
             Image(systemName: "chevron.right")
                 .font(.system(size: 14, weight: .medium))
 //                .foregroundColor(.tertiaryLabel)
@@ -226,18 +305,45 @@ struct SettingView: View {
         }
         .alert("アカウントを削除してもよろしいですか？この操作は元に戻せません。", isPresented: $showingDeleteAlert) {
             Button("削除", role: .destructive) {
-                authManager.deleteUserAccount { success, error in
-                    if success {
-                        // アカウント削除成功時の処理
-                    } else {
-                        // エラー処理
-                    }
-                }
+                deleteAccount()
             }
             Button("キャンセル", role: .cancel) {}
         }
+        .alert(
+            "削除できませんでした",
+            isPresented: Binding(
+                get: { deleteAccountErrorMessage != nil },
+                set: { if !$0 { deleteAccountErrorMessage = nil } }
+            )
+        ) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(deleteAccountErrorMessage ?? "")
+        }
     }
     
+    /// Apple ID 連携済みの場合は、App Store の要件に従って Apple のトークンを失効させてから削除する。
+    private func deleteAccount() {
+        let isAppleLinked = AppleAccountService.isLinked
+        AppleAccountService.revokeIfLinked { revokeError in
+            if let revokeError {
+                deleteAccountErrorMessage = "Apple ID の確認に失敗したため、削除を中止しました。\n\(revokeError.localizedDescription)"
+                return
+            }
+            authManager.deleteUserAccount { success, error in
+                guard success else {
+                    deleteAccountErrorMessage = "アカウントの削除に失敗しました。\n\(error?.localizedDescription ?? "")"
+                    return
+                }
+                guard isAppleLinked else { return }
+                // 連携を解除するため Firebase のアカウントも削除し、新しい匿名アカウントで始め直す。
+                Auth.auth().currentUser?.delete { _ in
+                    authManager.anonymousSignIn {}
+                }
+            }
+        }
+    }
+
     private func appRow(app: OtherApp) -> some View {
         Link(destination: URL(string: app.appStoreLink)!) {
             HStack(spacing: 12) {
@@ -275,6 +381,123 @@ struct SettingView: View {
     }
 }
 
+#if DEBUG
+private struct DebugDungeonPositionSettings: View {
+    @ObservedObject private var viewModel = PositionViewModel.shared
+    @ObservedObject private var authManager = AuthManager.shared
+    @EnvironmentObject private var connectivity: ConnectivityMonitor
+    @State private var positionText = ""
+    @State private var isSaving = false
+    @State private var resultMessage: String?
+    @State private var didSave = false
+    @FocusState private var isPositionFocused: Bool
+
+    private var selectedPosition: Int? {
+        guard let position = Int(positionText),
+              (1...PositionViewModel.Constants.finalFloor).contains(position) else { return nil }
+        return position
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("開発者モード")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+                .padding(.horizontal, 20)
+                .padding(.top, 32)
+
+            DebugInitialLearningSettings()
+
+            VStack(alignment: .leading, spacing: 16) {
+                Label("ダンジョンの現在地", systemImage: "map.fill")
+                    .font(.system(size: 16, weight: .semibold))
+
+                Text(viewModel.isPositionFetched ? "現在：\(viewModel.userPosition)コマ" : "現在地を読み込み中…")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+
+                HStack {
+                    TextField("1〜\(PositionViewModel.Constants.finalFloor)", text: $positionText)
+                        .keyboardType(.numberPad)
+                        .textFieldStyle(.roundedBorder)
+                        .focused($isPositionFocused)
+                        .frame(width: 100)
+                        .accessibilityLabel("移動先のコマ数")
+                        .accessibilityIdentifier("settings.debug.dungeonPosition")
+                    Text("コマ")
+                    Stepper("コマ数を調整", onIncrement: { adjustPosition(by: 1) },
+                            onDecrement: { adjustPosition(by: -1) })
+                        .labelsHidden()
+                }
+                .disabled(isSaving || !viewModel.isPositionFetched)
+
+                Text("1〜\(PositionViewModel.Constants.finalFloor)コマを指定できます。ダンジョンでは移動先の足場をタップして移動できます。開発者モードではスタミナを消費しません。")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+
+                Button(action: savePosition) {
+                    HStack {
+                        if isSaving { ProgressView() }
+                        Text(isSaving ? "保存中…" : "現在地を設定")
+                    }
+                    .frame(maxWidth: .infinity, minHeight: 36)
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(isSaving || !viewModel.isPositionFetched || selectedPosition == nil
+                          || authManager.currentUserId == nil || !connectivity.isConnected)
+                .accessibilityIdentifier("settings.debug.saveDungeonPosition")
+
+                if !connectivity.isConnected {
+                    Text("現在地の設定にはインターネット接続が必要です。")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                if let resultMessage {
+                    Text(resultMessage)
+                        .font(.subheadline)
+                        .foregroundColor(didSave ? .green : .red)
+                }
+            }
+            .padding(20)
+            .background(Color(.secondarySystemGroupedBackground))
+            .cornerRadius(12)
+        }
+        .onAppear { fillCurrentPosition() }
+        .onChange(of: viewModel.isPositionFetched) { isFetched in
+            if isFetched && positionText.isEmpty { fillCurrentPosition() }
+        }
+        .onChange(of: positionText) { _ in resultMessage = nil }
+    }
+
+    private func fillCurrentPosition() {
+        if viewModel.isPositionFetched { positionText = String(viewModel.userPosition) }
+    }
+
+    private func adjustPosition(by amount: Int) {
+        let position = selectedPosition ?? viewModel.userPosition
+        positionText = String(min(max(position + amount, 1), PositionViewModel.Constants.finalFloor))
+    }
+
+    private func savePosition() {
+        guard let position = selectedPosition else { return }
+        isPositionFocused = false
+        isSaving = true
+        resultMessage = nil
+        viewModel.setPositionForDebug(position) { result in
+            isSaving = false
+            switch result {
+            case .success:
+                didSave = true
+                resultMessage = "現在地を\(position)コマに設定しました。"
+            case .failure(let error):
+                didSave = false
+                resultMessage = "保存できませんでした：\(error.localizedDescription)"
+            }
+        }
+    }
+}
+#endif
+
 struct WebView: UIViewRepresentable {
     let urlString: String
 
@@ -310,6 +533,7 @@ struct InventoryView: View {
         case rare
         case meka
         case god
+        case guardian
 
         var id: String { rawValue }
     }
@@ -328,7 +552,8 @@ struct InventoryView: View {
         .normalGachaTicket,
         .rareGachaTicket,
         .mekaGachaTicket,
-        .godGachaTicket
+        .godGachaTicket,
+        .guardianGachaTicket
     ]
 
     private let supportItemTypes: [InventoryItemType] = [
@@ -691,6 +916,10 @@ struct InventoryView: View {
             gachaNavigationButton(title: "神ガチャへ", color: type.accentColor) {
                 presentedGachaDestination = .god
             }
+        case .guardianGachaTicket:
+            gachaNavigationButton(title: "四聖獣ガチャへ", color: type.accentColor) {
+                presentedGachaDestination = .guardian
+            }
         case .staminaPotion:
             useItemButton(
                 title: "回復薬を使う",
@@ -737,6 +966,8 @@ struct InventoryView: View {
             MekaGachaView().navigationBarBackButtonHidden(true)
         case .god:
             GodGachaView().navigationBarBackButtonHidden(true)
+        case .guardian:
+            GuardianGachaView().navigationBarBackButtonHidden(true)
         }
     }
 

@@ -66,7 +66,8 @@ struct PrivacyView: View {
             }
                 .padding()
         }
-        .navigationBarTitle("ライセンス", displayMode: .inline)
+        .navigationBarTitle("プライバシーポリシー", displayMode: .inline)
+        .appNavigationBackButton()
     }
 }
 

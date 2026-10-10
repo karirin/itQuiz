@@ -10,9 +10,7 @@
     ]
   },
   "identifier" : "D7209E2D",
-  "nonRenewingSubscriptions" : [
-
-  ],
+  "nonRenewingSubscriptions" : [],
   "products" : [
     {
       "displayPrice" : "100",
@@ -25,7 +23,7 @@
           "locale" : "ja"
         }
       ],
-      "productID" : "eg.coin1000",
+      "productID" : "it.coin1000",
       "referenceName" : "1000コイン",
       "type" : "Consumable"
     },
@@ -40,7 +38,7 @@
           "locale" : "ja"
         }
       ],
-      "productID" : "eg.coin4000",
+      "productID" : "it.coin4000",
       "referenceName" : "4000コイン",
       "type" : "Consumable"
     },
@@ -55,14 +53,14 @@
           "locale" : "ja"
         }
       ],
-      "productID" : "eg.coin15000",
+      "productID" : "it.coin15000",
       "referenceName" : "15000コイン",
       "type" : "Consumable"
     }
   ],
   "settings" : {
     "_failTransactionsEnabled" : false,
-    "_locale" : "en_US",
+    "_locale" : "ja_JP",
     "_storefront" : "JPN",
     "_storeKitErrors" : [
       {
@@ -115,18 +113,12 @@
   "subscriptionGroups" : [
     {
       "id" : "054ABA2C",
-      "localizations" : [
-
-      ],
+      "localizations" : [],
       "name" : "Sub",
       "subscriptions" : [
         {
-          "adHocOffers" : [
-
-          ],
-          "codeOffers" : [
-
-          ],
+          "adHocOffers" : [],
+          "codeOffers" : [],
           "displayPrice" : "2.00",
           "familyShareable" : false,
           "groupNumber" : 1,
@@ -144,18 +136,12 @@
           "referenceName" : "広告非表示プラン",
           "subscriptionGroupID" : "054ABA2C",
           "type" : "RecurringSubscription",
-          "winbackOffers" : [
-
-          ]
+          "winbackOffers" : []
         },
         {
-          "adHocOffers" : [
-
-          ],
-          "codeOffers" : [
-
-          ],
-          "displayPrice" : "4.80",
+          "adHocOffers" : [],
+          "codeOffers" : [],
+          "displayPrice" : "480",
           "familyShareable" : false,
           "groupNumber" : 1,
           "internalID" : "5BE2824E",
@@ -172,22 +158,20 @@
           "referenceName" : "広告非表示プラン（週間）",
           "subscriptionGroupID" : "054ABA2C",
           "type" : "RecurringSubscription",
-          "winbackOffers" : [
-
-          ]
+          "winbackOffers" : []
         },
         {
-          "adHocOffers" : [
-
-          ],
-          "codeOffers" : [
-
-          ],
-          "displayPrice" : "9.80",
+          "adHocOffers" : [],
+          "codeOffers" : [],
+          "displayPrice" : "980",
           "familyShareable" : false,
           "groupNumber" : 1,
           "internalID" : "F42D1C3A",
-          "introductoryOffer" : null,
+          "introductoryOffer" : {
+            "internalID" : "7D0F1A2B",
+            "paymentMode" : "free",
+            "subscriptionPeriod" : "P3D"
+          },
           "localizations" : [
             {
               "description" : "広告非表示",
@@ -200,22 +184,20 @@
           "referenceName" : "広告非表示プラン（月間）",
           "subscriptionGroupID" : "054ABA2C",
           "type" : "RecurringSubscription",
-          "winbackOffers" : [
-
-          ]
+          "winbackOffers" : []
         },
         {
-          "adHocOffers" : [
-
-          ],
-          "codeOffers" : [
-
-          ],
-          "displayPrice" : "98.0",
+          "adHocOffers" : [],
+          "codeOffers" : [],
+          "displayPrice" : "9800",
           "familyShareable" : false,
           "groupNumber" : 1,
           "internalID" : "951C0160",
-          "introductoryOffer" : null,
+          "introductoryOffer" : {
+            "internalID" : "3C8E5F91",
+            "paymentMode" : "free",
+            "subscriptionPeriod" : "P3D"
+          },
           "localizations" : [
             {
               "description" : "広告非表示",
@@ -228,9 +210,7 @@
           "referenceName" : "広告非表示プラン（年間） ",
           "subscriptionGroupID" : "054ABA2C",
           "type" : "RecurringSubscription",
-          "winbackOffers" : [
-
-          ]
+          "winbackOffers" : []
         }
       ]
     }

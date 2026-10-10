@@ -1,0 +1,18 @@
+{
+  "basic": {
+    "count": 156,
+    "sha256": "a3bd04763ecb5c96f2175405685928ad06f4833153ac48c9cbcb5cfefe196673"
+  },
+  "technology": {
+    "count": 213,
+    "sha256": "7a8c97cce6c42f8b7a18a1d610ea0cb2b9d118cb4c71a649f41866f38c59d8fc"
+  },
+  "strategy": {
+    "count": 258,
+    "sha256": "da07f27fc722d48f86e146ac3c21dfe7a5b88cef91c0acc5f4ee556e0403076d"
+  },
+  "management": {
+    "count": 217,
+    "sha256": "cb7d9d65d3f2c9ca6b8940fbe52fe2edd1e561f6355f0ff6bff3bd0cf054dd3f"
+  }
+}

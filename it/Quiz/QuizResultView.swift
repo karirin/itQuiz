@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import StoreKit
 
 struct QuizResult {
     var question: String
@@ -18,6 +19,51 @@ struct QuizResult {
 
 struct QuizTotal {
     var totalAnswers: Int
+}
+
+struct ResultReviewUpsellCard: View {
+    let incorrectCount: Int
+    let action: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 10) {
+                Image(systemName: "arrow.counterclockwise.circle.fill")
+                    .font(.title2)
+                    .foregroundColor(.purple)
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("間違えた問題を今すぐ復習")
+                        .font(.headline)
+                    Text("今回の誤答\(incorrectCount)問を、記憶が新しいうちに解き直せます")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            }
+
+            Button(action: action) {
+                HStack(spacing: 8) {
+                    Image(systemName: "crown.fill")
+                    Text("復習機能を開く")
+                        .fontWeight(.bold)
+                }
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 13)
+                .background(
+                    LinearGradient(
+                        colors: [Color(hex: "7F5AF0"), Color(hex: "9B5DE5")],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(16)
+        .background(ResultPalette.card, in: RoundedRectangle(cornerRadius: 16))
+    }
 }
 
 struct QuizResultView: View {
@@ -39,7 +85,6 @@ struct QuizResultView: View {
     let quizBossLevel: QuizBossLevel
     @State private var isShow: Bool = true
     @State private var flag: Bool = false
-    @State private var preFlag: Bool = false
     @State private var showSubFlag: Bool = false
     @State private var level3flag: Bool = false
     @State private var level5flag: Bool = false
@@ -51,21 +96,52 @@ struct QuizResultView: View {
     @State private var kaijyuflag: Bool = false
     @State private var shinjyuflag: Bool = false
     @EnvironmentObject var appState: AppState
+    @EnvironmentObject private var connectivity: ConnectivityMonitor
     @Binding var isPresenting: Bool
     @Binding var navigateToQuizResultView: Bool
     @State private var isHidden = false
-    @State private var selectedTab = 0 // 0: 結果, 1: 統計
-    @State private var hasRequestedInterstitial = false
-    @State private var hasPresentedInterstitial = false
-    private let interstitial = Interstitial()
+    @ObservedObject var interstitial: Interstitial
+    @StateObject private var quizResultRewardAd = QuizResultRewardAd()
+    @State private var hasClaimedRewardedCoinBonus = false
+    @State private var showRewardedCoinAlert = false
+    @State private var shouldRequestReviewAfterCelebration = false
+    @State private var hasRecordedReviewCompletion = false
+    @State private var hasShownExperienceModal = false
+    @State private var isReviewRequestScheduled = false
+    @Environment(\.requestReview) private var requestReview
     @Environment(\.presentationMode) var presentationMode
     private let adViewControllerRepresentable = AdViewControllerRepresentable()
     @State private var restart = false
     @State private var showingAllResults = false
+    private let isCleared: Bool
+    private let isFreeReviewPreview: Bool
+    private let isInitialDiagnostic: Bool
+    private let learningContext: LearningEntryContext?
+    private let reviewResultContext: ReviewResultContext?
+    @State private var reviewResult: ReviewSessionResult?
+    @State private var reviewPaywallRequested = false
+    @State private var isPresentingRemainingITReview = false
+    @State private var hasLoggedReviewPreviewComplete = false
+    @State private var hasRecordedAdLearningSet = false
+    @State private var hasRequestedInterstitial = false
+    @State private var isHandlingResultExit = false
+    @State private var hasLoggedGrowthCompletion = false
+    @State private var showAdFreeUpsellToast = false
+    /// 通常結果の「時間」「平均」に使う解答時間。0 のときは表示しない
+    private let sessionDuration: TimeInterval
+    /// 「不正解を解き直す」で出題する問題（今回の不正解）
+    private let retryQuestions: [QuizQuestion]
+    /// 「別の問題で」。nil のときは別の問題に切り替えられない入口（日課・復習など）
+    private let onStartNewSet: (() -> Void)?
+    @State private var isPresentingMistakeRetry = false
+    @State private var pendingMistakeRetryAfterPurchase = false
+    @State private var shouldExitAfterMistakeRetry = false
+    @State private var levelBeforeLevelUp: Int?
 
-    init(results: [QuizResult], authManager: AuthManager, isPresenting: Binding<Bool>, navigateToQuizResultView: Binding<Bool>, playerExperience: Int, playerMoney: Int, elapsedTime: TimeInterval, quizBossLevel: QuizBossLevel, quizLevel: QuizLevel) {
+    init(results: [QuizResult], authManager: AuthManager, isPresenting: Binding<Bool>, navigateToQuizResultView: Binding<Bool>, playerExperience: Int, playerMoney: Int, elapsedTime: TimeInterval, quizBossLevel: QuizBossLevel, quizLevel: QuizLevel, interstitial: Interstitial, isCleared: Bool? = nil, isFreeReviewPreview: Bool = false, isInitialDiagnostic: Bool = false, learningContext: LearningEntryContext? = nil, reviewResultContext: ReviewResultContext? = nil, sessionDuration: TimeInterval = 0, retryQuestions: [QuizQuestion] = [], onStartNewSet: (() -> Void)? = nil) {
         _results = State(initialValue: results)
         self.authManager = authManager
+        self.interstitial = interstitial
         _isPresenting = isPresenting
         _navigateToQuizResultView = navigateToQuizResultView
         _playerExperience = State(initialValue: playerExperience)
@@ -73,6 +149,14 @@ struct QuizResultView: View {
         self.elapsedTime = elapsedTime
         self.quizBossLevel = quizBossLevel
         self.quizLevel = quizLevel
+        self.isCleared = isCleared ?? (playerExperience != 5)
+        self.isFreeReviewPreview = isFreeReviewPreview
+        self.isInitialDiagnostic = isInitialDiagnostic
+        self.learningContext = learningContext
+        self.reviewResultContext = reviewResultContext
+        self.sessionDuration = sessionDuration
+        self.retryQuestions = retryQuestions
+        self.onStartNewSet = onStartNewSet
     }
     
     // 正解率を計算
@@ -98,42 +182,32 @@ struct QuizResultView: View {
             )
             .ignoresSafeArea()
             
-            NavigationView {
-                VStack(spacing: 0) {
-                    if appState.shouldShowAds {
-                        // ヘッダー部分
-                        headerView
-                    }
-                    ScrollView{
-                        // 結果サマリーカード
-                        resultSummaryCard
-                            .padding(.horizontal).padding(.top,5)
-                        // タブ選択
-                        tabSelector
-                        
-                        // コンテンツ
-                        if selectedTab == 0 {
-                            resultsContent
-                        } else {
-                            statisticsContent
-                        }
-                    }
-                }
-                .navigationBarBackButtonHidden(true)
-                .navigationBarItems(leading: backButton)
-                .navigationTitle("結果")
-                .navigationBarTitleDisplayMode(.inline)
+            Group {
+            if isInitialDiagnostic {
+                InitialPracticeCompletionView(
+                    correctCount: correctAnswersCount, questionCount: results.count,
+                    plan: initialLearningPlan,
+                    onContinue: { handleResultExit(action: "initial_practice_complete") },
+                    continueTitle: UserDefaults.standard.bool(forKey: "onboarding.needsNameRegistration")
+                        ? "次へ進む" : "ホームの使い方を見る"
+                )
+            } else if let reviewResultContext {
+                // 苦手克服から始めた解き直しは、専用の結果画面を出す。表示以外の処理は共通。
+                reviewResultScreen(reviewResultContext)
+            } else {
+                normalResultScreen
+            }
             }
             .gesture(
                 DragGesture()
                     .onEnded { value in
                         if value.translation.width > 80 {
-                            isPresenting = false
+                            handleResultExit(action: "swipe_back")
                         }
                     }
             )
             .background {
-                if appState.shouldShowAds {
+                if !isInitialDiagnostic && appState.shouldShowAds {
                     adViewControllerRepresentable
                         .frame(width: .zero, height: .zero)
                 }
@@ -141,12 +215,46 @@ struct QuizResultView: View {
             
             // モーダル類
             modalOverlays
+
+            if showAdFreeUpsellToast {
+                VStack {
+                    Spacer()
+                    AdFreeUpsellToast()
+                        .padding(.horizontal, 20)
+                        .padding(.bottom, 28)
+                }
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+                .zIndex(100)
+            }
         }
-        .fullScreenCover(isPresented: $preFlag) {
-            PreView(audioManager: audioManager)
+        .fullScreenCover(isPresented: $showSubFlag, onDismiss: handleSubscriptionDismiss) {
+            PreView(
+                audioManager: audioManager,
+                source: reviewPaywallRequested
+                    ? .review(incorrectCount: reviewPaywallIncorrectCount)
+                    : .result,
+                onPurchaseSuccess: reviewPaywallRequested ? {} : nil
+            )
+        }
+        .fullScreenCover(isPresented: $isPresentingRemainingITReview) {
+            QuizITIncorrectAnswerListView(isPresenting: $isPresentingRemainingITReview)
+        }
+        .fullScreenCover(isPresented: $isPresentingMistakeRetry, onDismiss: handleMistakeRetryDismiss) {
+            if let retryLevel = quizLevel.mistakeRetryLevel {
+                QuizView(
+                    quizzes: retryQuestions,
+                    quizLevel: retryLevel,
+                    authManager: authManager,
+                    audioManager: audioManager,
+                    isPresenting: mistakeRetryPresentation,
+                    interstitial: interstitial
+                )
+            }
         }
         .onChange(of: authManager.didLevelUp) { newValue in
-            if newValue {
+            if newValue && !isInitialDiagnostic {
+                // 経験値の加算が終わる前に通知されるので、ここでの level は上がる前の値
+                levelBeforeLevelUp = authManager.level
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                     showLevelUpModal = true
                     audioManager.playLevelUpSound()
@@ -154,50 +262,301 @@ struct QuizResultView: View {
             }
         }
         .onAppear {
-            setupOnAppear()
-            // モーダルを少し遅れて表示
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                showModal = true
+            if let reviewResultContext, reviewResult == nil {
+                reviewResult = reviewResultContext.load()
             }
-        }
-    }
-    
-    // MARK: - Header View
-    private var headerView: some View {
-        VStack(spacing: 16) {
-            // プレミアムボタン
-            HStack {
-                Spacer()
-                Button(action: {
-                    generateHapticFeedback()
-                    showSubFlag = true
-                    audioManager.playSound()
-                }) {
-                    Image("プレミアムプランボタン")
-                        .resizable()
-                        .frame(width: 240, height: 70)
-                }
-                .shadow(color: .black.opacity(0.2), radius: 5, x: 0, y: 2)
-                .fullScreenCover(isPresented: $showSubFlag) {
-                    PreView(audioManager: audioManager)
-                }
-                Spacer()
+            logGrowthCompletionIfNeeded()
+            logReviewPreviewCompletionIfNeeded()
+            prepareReviewRequestIfNeeded()
+            prepareInterstitialOpportunity()
+            if connectivity.isConnected {
+                setupOnAppear()
             }
-        }
-        .padding(.horizontal)
-        .padding(.top, 10)
-    }
-    
-    // MARK: - Result Summary Card
-    private var resultSummaryCard: some View {
-        VStack(spacing: 16) {
-            // タイムアタック結果 or 通常結果
-            if elapsedTime != 0 {
-                timeAttackSummary
+            if !isInitialDiagnostic && connectivity.isConnected && appState.shouldShowAds {
+                quizResultRewardAd.preloadIfNeeded()
+            }
+            if reviewResultContext != nil || isInitialDiagnostic {
+                // 専用の結果画面では獲得モーダルを出さない。レビュー依頼はそのまま判定する。
+                hasShownExperienceModal = true
+                scheduleReviewRequestIfNeeded()
             } else {
-                regularSummary
+                // モーダルを少し遅れて表示
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    showModal = true
+                }
             }
         }
+        .onChange(of: showModal) { isShowing in
+            if isShowing {
+                hasShownExperienceModal = true
+            } else if hasShownExperienceModal {
+                scheduleReviewRequestIfNeeded()
+            }
+        }
+        .onChange(of: canPresentReviewRequest) { canPresent in
+            if canPresent && hasShownExperienceModal {
+                scheduleReviewRequestIfNeeded()
+            }
+        }
+        .alert("コイン獲得！", isPresented: $showRewardedCoinAlert) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("追加で\(rewardedCoinBonusAmount)コインを獲得しました。")
+        }
+    }
+    
+    private var initialPracticeCompletionCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label("はじめての3問、おつかれさま！", systemImage: "checkmark.seal.fill")
+                .font(.headline)
+                .foregroundStyle(.blue)
+            Text(incorrectAnswersCount > 0
+                 ? "間違えた問題は保存しました。ホームの「今日の復習」から、もう一度挑戦できます。"
+                 : "3問とも正解です！ 次は「学習モード」で、資格や分野を選んでみましょう。")
+                .font(.subheadline)
+                .fixedSize(horizontal: false, vertical: true)
+            Button {
+                handleResultExit(action: "initial_practice_complete")
+            } label: {
+                Label("ホームで学習を続ける", systemImage: "house.fill")
+                    .font(.subheadline.bold())
+                    .frame(maxWidth: .infinity, minHeight: 44)
+            }
+            .buttonStyle(.borderedProminent)
+            .accessibilityIdentifier("onboarding.finishPractice")
+        }
+        .padding(18)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 20))
+    }
+
+    // MARK: - Normal Result (学習レポート)
+    private var normalResultScreen: some View {
+        VStack(spacing: 0) {
+            resultNavigationBar
+            ScrollView {
+                if elapsedTime != 0 {
+                    // タイムアタックは従来の表示のまま
+                    VStack(spacing: 12) {
+                        resultSummaryCard
+                        resultSupplements
+                    }
+                    .padding(.horizontal)
+                    .padding(.top, 8)
+                    resultsContent
+                        .padding(.bottom, 24)
+                } else {
+                    ResultReportContent(
+                        results: results,
+                        duration: sessionDuration,
+                        experience: playerExperience * authManager.rewardFlag,
+                        coins: playerMoney * authManager.rewardFlag
+                    ) {
+                        resultSupplements
+                    }
+                }
+            }
+        }
+        .background(ResultPalette.screen.ignoresSafeArea())
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            resultActionBar
+        }
+        .toolbar(.hidden, for: .navigationBar)
+    }
+
+    private var resultNavigationBar: some View {
+        ZStack {
+            Text("\(quizLevel.reviewDisplayName)・結果")
+                .font(.system(size: 17, weight: .bold, design: .rounded))
+                .foregroundColor(ResultPalette.primaryText)
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
+                .padding(.horizontal, 52)
+                .accessibilityAddTraits(.isHeader)
+
+            HStack {
+                Button {
+                    generateHapticFeedback()
+                    handleResultExit(action: "back_button")
+                } label: {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundColor(ResultPalette.primaryText)
+                        .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("戻る")
+
+                Spacer()
+
+                ShareLink(item: "ITクエストで\(correctAnswersCount)/\(results.count)問正解！") {
+                    Image(systemName: "square.and.arrow.up")
+                        .font(.system(size: 17, weight: .bold))
+                        .foregroundColor(ResultPalette.primaryText)
+                        .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
+                }
+                .accessibilityLabel("結果をシェア")
+            }
+        }
+        .padding(.horizontal, 4)
+        .padding(.vertical, 2)
+    }
+
+    /// 復習の課金導線・コイン2倍・プレミアム。目立ちすぎないよう白カードでまとめる
+    @ViewBuilder
+    private var resultSupplements: some View {
+        if isFreeReviewPreview {
+            reviewPreviewCompletionCard
+        }
+#if DEBUG
+        if quizLevel.localReviewCategory == .itPassport && incorrectAnswersCount > 0 {
+            WeaknessCourseEntryCard()
+        }
+#endif
+        if shouldShowReviewUpsell {
+            ResultReviewUpsellCard(
+                incorrectCount: incorrectAnswersCount,
+                action: handleReviewCardAction
+            )
+        }
+        if !isInitialDiagnostic && appState.shouldShowAds {
+            rewardedCoinBonusCard
+            premiumPlanCard
+        }
+    }
+
+    private var premiumPlanCard: some View {
+        Button {
+            generateHapticFeedback()
+            showSubFlag = true
+            audioManager.playSound()
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: "crown.fill")
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundColor(Color(hex: "B7791F"))
+                    .frame(width: 36, height: 36)
+                    .background(ResultPalette.coinBackground, in: RoundedRectangle(cornerRadius: 10))
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("プレミアムプラン")
+                        .font(.system(size: 14, weight: .heavy, design: .rounded))
+                        .foregroundColor(ResultPalette.primaryText)
+                    Text("広告なし・不正解の解き直しが使い放題")
+                        .font(.system(size: 12, weight: .semibold, design: .rounded))
+                        .foregroundColor(.secondary)
+                }
+                Spacer(minLength: 4)
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(.secondary)
+            }
+            .padding(14)
+            .frame(minHeight: 44)
+            .background(ResultPalette.card, in: RoundedRectangle(cornerRadius: 16))
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("プレミアムプランを見る")
+    }
+
+    // MARK: - Action Bar
+    @ViewBuilder
+    private var resultActionBar: some View {
+        let home = ResultBarButton(title: "ホームへ") { handleResultExit(action: "home_button") }
+        let newSet = onStartNewSet == nil ? nil : ResultBarButton(title: "別の問題で", subtitle: "新しい問題", action: handleStartNewSet)
+        let retry = canRetryMistakes ? mistakeRetryButton : nil
+        let exitHome: () -> Void = { handleResultExit(action: "home_link") }
+
+        if isReviewQuiz {
+            // 誤答復習の結果では「別の問題」は出さず、ホームと解き直しを並べる
+            ResultActionBar(secondary: retry == nil ? nil : home, primary: retry ?? home, onHome: nil)
+        } else if let retry {
+            ResultActionBar(secondary: newSet ?? home, primary: retry, onHome: newSet == nil ? nil : exitHome)
+        } else {
+            ResultActionBar(secondary: nil, primary: newSet ?? home, onHome: newSet == nil ? nil : exitHome)
+        }
+    }
+
+    private var mistakeRetryButton: ResultBarButton {
+        let count = retryQuestions.count
+        if appState.isSubscribed {
+            let minutes = max(1, Int((Double(count * 20) / 60).rounded(.up)))
+            return ResultBarButton(
+                title: "不正解の\(count)問を解き直す",
+                subtitle: "約\(minutes)分・記憶が新しいうちに",
+                action: handleMistakeRetry
+            )
+        }
+        return ResultBarButton(
+            title: "不正解の\(count)問を解き直す",
+            subtitle: "プレミアム限定",
+            systemImage: "crown.fill",
+            action: handleMistakeRetry
+        )
+    }
+
+    private var canRetryMistakes: Bool {
+        elapsedTime == 0 && !retryQuestions.isEmpty && quizLevel.mistakeRetryLevel != nil
+    }
+
+    /// 不正解の解き直しはプレミアム限定。無料ユーザーはプレミアムプランへ案内する
+    private func handleMistakeRetry() {
+        guard !isHandlingResultExit else { return }
+        if appState.isSubscribed {
+            audioManager.playSound()
+            isPresentingMistakeRetry = true
+        } else {
+            pendingMistakeRetryAfterPurchase = true
+            presentReviewPaywall()
+        }
+    }
+
+    /// 解き直しを閉じたら（ホームへ・途中終了とも）、この結果画面も閉じてホームに戻る
+    private var mistakeRetryPresentation: Binding<Bool> {
+        Binding(
+            get: { isPresentingMistakeRetry },
+            set: { isPresented in
+                if !isPresented { shouldExitAfterMistakeRetry = true }
+                isPresentingMistakeRetry = isPresented
+            }
+        )
+    }
+
+    private func handleMistakeRetryDismiss() {
+        guard shouldExitAfterMistakeRetry, !isHandlingResultExit else { return }
+        shouldExitAfterMistakeRetry = false
+        isHandlingResultExit = true
+        shouldRequestReviewAfterCelebration = false
+        // 効果音は解き直し側の終了時に鳴っているので、ここでは鳴らさない
+        isPresenting = false
+    }
+
+    private func handleStartNewSet() {
+        guard !isHandlingResultExit, let onStartNewSet else { return }
+        isHandlingResultExit = true
+        shouldRequestReviewAfterCelebration = false
+        audioManager.playSound()
+        onStartNewSet()
+    }
+
+    @ViewBuilder
+    private func reviewResultScreen(_ context: ReviewResultContext) -> some View {
+        if let reviewResult {
+            ReviewSessionResultScreen(result: reviewResult) { action in
+                context.finish(action)
+                handleResultExit(action: "review_result")
+            }
+        } else {
+            ProgressView().frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+    }
+
+    // MARK: - Time Attack Summary Card
+    private var resultSummaryCard: some View {
+        // 通常結果は ResultScoreCard で表示する。ここはタイムアタック専用
+        timeAttackSummary
         .frame(maxWidth: .infinity)
         .padding(20)
         .background(
@@ -205,6 +564,237 @@ struct QuizResultView: View {
                 .fill(Color(.systemBackground))
                 .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 4)
         )
+    }
+
+    private var remainingITReviewCount: Int {
+        guard let userId = authManager.currentUserId else { return 0 }
+        return LocalIncorrectAnswerStore.count(userId: userId, category: .itPassport)
+    }
+
+    private var incorrectAnswersCount: Int {
+        results.filter { !$0.isCorrect }.count
+    }
+
+    private var isReviewQuiz: Bool {
+        switch quizLevel {
+        case .incorrectAnswer, .incorrectITAnswer, .incorrectInfoAnswer,
+             .incorrectAppliedAnswer, .incorrectESAnswer, .incorrectITStrategyAnswer:
+            return true
+        default:
+            return false
+        }
+    }
+
+    private var shouldShowReviewUpsell: Bool {
+        appState.shouldShowAds
+        && !isFreeReviewPreview
+        && !isInitialDiagnostic
+        && !isReviewQuiz
+        && incorrectAnswersCount > 0
+    }
+
+    private var reviewPaywallIncorrectCount: Int {
+        if isFreeReviewPreview {
+            return remainingITReviewCount
+        }
+
+        guard let userId = authManager.currentUserId else {
+            return incorrectAnswersCount
+        }
+        return max(
+            incorrectAnswersCount,
+            LocalIncorrectAnswerStore.count(
+                userId: userId,
+                category: quizLevel.localReviewCategory
+            )
+        )
+    }
+
+    private var reviewPreviewCompletionCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 10) {
+                Image(systemName: remainingITReviewCount > 0 ? "checkmark.circle.fill" : "sparkles")
+                    .font(.title2)
+                    .foregroundColor(remainingITReviewCount > 0 ? .green : .orange)
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("今日の無料復習、おつかれさま！")
+                        .font(.headline)
+                    Text("今回、間違えた問題を\(results.count)問解き直しました")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            }
+
+            if remainingITReviewCount > 0 {
+                Text("保存された問題はあと\(remainingITReviewCount)問。無料では1日5問、プレミアムでは続けて全問題を復習できます。")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+
+                Button(action: presentReviewPaywall) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "crown.fill")
+                        Text("残り\(remainingITReviewCount)問を解放")
+                            .fontWeight(.bold)
+                    }
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 13)
+                    .background(
+                        LinearGradient(
+                            colors: [Color(hex: "f093fb"), Color(hex: "f5576c")],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+            } else {
+                Text("保存されていた誤答をすべて解き直しました。次は通常問題で新しい問題に挑戦しましょう。")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(16)
+        .background(ResultPalette.card, in: RoundedRectangle(cornerRadius: 16))
+    }
+
+    private func presentReviewPaywall() {
+        generateHapticFeedback()
+        audioManager.playSound()
+        reviewPaywallRequested = true
+        showSubFlag = true
+    }
+
+    private func handleReviewCardAction() {
+        if quizLevel.localReviewCategory == .itPassport && !appState.isSubscribed {
+            generateHapticFeedback()
+            audioManager.playSound()
+            isPresentingRemainingITReview = true
+        } else {
+            presentReviewPaywall()
+        }
+    }
+
+    private func handleSubscriptionDismiss() {
+        guard reviewPaywallRequested else { return }
+        let shouldResumeITReview = isFreeReviewPreview
+        let shouldStartMistakeRetry = pendingMistakeRetryAfterPurchase
+        reviewPaywallRequested = false
+        pendingMistakeRetryAfterPurchase = false
+
+        Task { @MainActor in
+            await appState.refreshSubscriptionState()
+            if shouldStartMistakeRetry && appState.isSubscribed && canRetryMistakes {
+                // 購入したら、そのまま今回の不正解の解き直しを始める
+                isPresentingMistakeRetry = true
+                return
+            }
+            guard shouldResumeITReview,
+                  appState.isSubscribed,
+                  remainingITReviewCount > 0 else { return }
+            isPresentingRemainingITReview = true
+        }
+    }
+
+    private func logReviewPreviewCompletionIfNeeded() {
+        guard isFreeReviewPreview, !hasLoggedReviewPreviewComplete else { return }
+        hasLoggedReviewPreviewComplete = true
+        ReviewAnalytics.logReviewPreviewComplete(
+            answeredCount: results.count,
+            correctCount: correctAnswersCount,
+            remainingCount: remainingITReviewCount
+        )
+    }
+
+    private var rewardedCoinBonusAmount: Int {
+        playerMoney * authManager.rewardFlag
+    }
+
+    private var rewardedCoinBonusCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 12) {
+                Image(systemName: "play.rectangle.fill")
+                    .font(.system(size: 28))
+                    .foregroundColor(.orange)
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("広告を見てコイン2倍")
+                        .font(.headline)
+                    Text("今回の獲得コインと同額を追加します")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+
+                Spacer()
+
+                Text("+\(rewardedCoinBonusAmount)")
+                    .font(.title3)
+                    .fontWeight(.bold)
+                    .foregroundColor(.orange)
+            }
+
+            Button(action: handleRewardedCoinBonus) {
+                HStack(spacing: 8) {
+                    if quizResultRewardAd.isLoading {
+                        ProgressView()
+                            .tint(.white)
+                    } else {
+                        Image(systemName: hasClaimedRewardedCoinBonus ? "checkmark.circle.fill" : "play.fill")
+                    }
+
+                    Text(rewardedCoinBonusButtonTitle)
+                        .fontWeight(.semibold)
+                }
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(hasClaimedRewardedCoinBonus ? Color.green : Color.orange)
+                )
+            }
+            .disabled(
+                hasClaimedRewardedCoinBonus
+                || quizResultRewardAd.isPresenting
+                || (!quizResultRewardAd.isLoaded && !quizResultRewardAd.loadFailed)
+            )
+        }
+        .padding(16)
+        .background(ResultPalette.card, in: RoundedRectangle(cornerRadius: 16))
+    }
+
+    private var rewardedCoinBonusButtonTitle: String {
+        if hasClaimedRewardedCoinBonus {
+            return "獲得済み"
+        }
+        if quizResultRewardAd.loadFailed {
+            return "広告を再読み込み"
+        }
+        if quizResultRewardAd.isLoaded {
+            return "広告を見て +\(rewardedCoinBonusAmount)コイン"
+        }
+        return "広告を準備中"
+    }
+
+    private func handleRewardedCoinBonus() {
+        generateHapticFeedback()
+
+        if quizResultRewardAd.loadFailed {
+            quizResultRewardAd.preloadIfNeeded()
+            return
+        }
+
+        quizResultRewardAd.present(from: adViewControllerRepresentable.viewController) {
+            DispatchQueue.main.async {
+                guard !self.hasClaimedRewardedCoinBonus else { return }
+
+                self.hasClaimedRewardedCoinBonus = true
+                self.authManager.addMoney(amount: self.rewardedCoinBonusAmount)
+                self.showRewardedCoinAlert = true
+            }
+        }
     }
     
     private var timeAttackSummary: some View {
@@ -235,78 +825,6 @@ struct QuizResultView: View {
                     // ランキング機能の実装
                 }
             }
-        }
-    }
-    
-    private var regularSummary: some View {
-        VStack(spacing: 16) {
-            // 正解率表示
-            HStack(spacing: 30) {
-                
-                // 円形プログレス
-                ZStack {
-                    Circle()
-                        .stroke(Color(.systemGray5), lineWidth: 8)
-                        .frame(width: 50, height: 50)
-                    
-                    Circle()
-                        .trim(from: 0, to: accuracyPercentage / 100)
-                        .stroke(
-                            accuracyPercentage >= 80 ? Color.green :
-                            accuracyPercentage >= 60 ? Color.orange : Color.red,
-                            style: StrokeStyle(lineWidth: 8, lineCap: .round)
-                        )
-                        .frame(width: 50, height: 50)
-                        .rotationEffect(.degrees(-90))
-                        .animation(.easeInOut(duration: 1.0), value: accuracyPercentage)
-                    
-                    Text("\(correctAnswersCount)/\(results.count)")
-                        .font(.caption)
-                        .fontWeight(.semibold)
-                }
-                .padding(.top,8)
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("正解率")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                    Text("\(String(format: "%.1f", accuracyPercentage))%")
-                        .font(.system(size: 32, weight: .bold, design: .rounded))
-                        .foregroundColor(.primary)
-                }
-            }
-        }
-    }
-    
-    // MARK: - Tab Selector
-    private var tabSelector: some View {
-        HStack(spacing: 0) {
-            tabButton(title: "結果詳細", index: 0, systemImage: "list.bullet")
-            tabButton(title: "統計", index: 1, systemImage: "chart.pie")
-        }
-        .padding(.horizontal)
-        .padding(.top, 16)
-    }
-    
-    private func tabButton(title: String, index: Int, systemImage: String) -> some View {
-        Button(action: {
-            generateHapticFeedback()
-            withAnimation(.spring()) {
-                selectedTab = index
-            }
-        }) {
-            HStack {
-                Image(systemName: systemImage)
-                    .font(.system(size: 16, weight: .medium))
-                Text(title)
-                    .font(.system(size: 16, weight: .medium))
-            }
-            .foregroundColor(selectedTab == index ? .white : .primary)
-            .padding(.vertical, 12)
-            .frame(maxWidth: .infinity)
-            .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(selectedTab == index ? Color.accentColor : Color.clear)
-            )
         }
     }
     
@@ -413,98 +931,6 @@ struct QuizResultView: View {
         }
     }
     
-    // MARK: - Statistics Content
-    private var statisticsContent: some View {
-        ScrollView {
-            VStack(spacing: 20) {
-                // 統計カード
-                statisticsCards
-                
-                // 詳細統計
-                detailedStatistics
-            }
-            .padding(.horizontal)
-            .padding(.top, 16)
-        }
-    }
-    
-    private var statisticsCards: some View {
-        VStack(spacing: 12) {
-            HStack(spacing: 12) {
-                statisticCard(title: "正解数", value: "\(correctAnswersCount)",
-                            icon: "checkmark.circle.fill", color: .green)
-                statisticCard(title: "不正解数", value: "\(results.count - correctAnswersCount)",
-                            icon: "xmark.circle.fill", color: .red)
-            }
-            
-            HStack(spacing: 12) {
-                statisticCard(title: "正解率", value: "\(String(format: "%.1f", accuracyPercentage))%",
-                            icon: "percent", color: .blue)
-                statisticCard(title: "総問題数", value: "\(results.count)",
-                            icon: "questionmark.circle.fill", color: .orange)
-            }
-        }
-    }
-    
-    private func statisticCard(title: String, value: String, icon: String, color: Color) -> some View {
-        VStack(spacing: 8) {
-            Image(systemName: icon)
-                .font(.title2)
-                .foregroundColor(color)
-            
-            Text(value)
-                .font(.title)
-                .fontWeight(.bold)
-                .foregroundColor(.primary)
-            
-            Text(title)
-                .font(.caption)
-                .foregroundColor(.secondary)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(16)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color(.systemBackground))
-                .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
-        )
-    }
-    
-    private var detailedStatistics: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("詳細統計")
-                .font(.headline)
-                .foregroundColor(.primary)
-            
-            VStack(spacing: 12) {
-                statisticRow(title: "平均回答時間", value: elapsedTime > 0 ?
-                           "\(String(format: "%.1f", elapsedTime / Double(results.count)))秒" : "未計測")
-                statisticRow(title: "最高連続正解", value: "\(maxConsecutiveCorrect())問")
-                statisticRow(title: "レベル", value: "Level \(authManager.level)")
-                statisticRow(title: "経験値", value: "\(authManager.experience) XP")
-            }
-        }
-        .padding(16)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color(.systemBackground))
-                .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
-        )
-    }
-    
-    private func statisticRow(title: String, value: String) -> some View {
-        HStack {
-            Text(title)
-                .font(.body)
-                .foregroundColor(.secondary)
-            Spacer()
-            Text(value)
-                .font(.body)
-                .fontWeight(.medium)
-                .foregroundColor(.primary)
-        }
-    }
-    
     // MARK: - Helper Views
     private func resultActionButton(title: String, systemImage: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
@@ -524,31 +950,14 @@ struct QuizResultView: View {
         }
     }
     
-    private var backButton: some View {
-        Button(action: {
-            generateHapticFeedback()
-            isPresenting = false
-            audioManager.playCancelSound()
-        }) {
-            HStack(spacing: 4) {
-                Image(systemName: "chevron.left")
-                    .font(.system(size: 16, weight: .medium))
-                Text("戻る")
-                    .font(.system(size: 16, weight: .medium))
-            }
-            .foregroundColor(.accentColor)
-        }
-        .buttonStyle(.plain)
-    }
-    
     // MARK: - Modal Overlays
     @ViewBuilder
     private var modalOverlays: some View {
         if showModal {
-            ExperienceModalView(showModal: $showModal, addedExperience: playerExperience, addedMoney: playerMoney, authManager: authManager)
+            ExperienceModalView(showModal: $showModal, addedExperience: playerExperience, addedMoney: playerMoney, isCleared: isCleared, authManager: authManager)
         }
         if showLevelUpModal {
-            LevelUpModalView(showLevelUpModal: $showLevelUpModal, authManager: authManager)
+            LevelUpModalView(showLevelUpModal: $showLevelUpModal, previousLevel: levelBeforeLevelUp, authManager: authManager)
         }
         if answer30flag {
             ModalTittleView(showLevelUpModal: $answer30flag, authManager: authManager, tittleNumber: .constant(30))
@@ -582,22 +991,6 @@ struct QuizResultView: View {
     }
     
     // MARK: - Helper Functions
-    private func maxConsecutiveCorrect() -> Int {
-        var maxStreak = 0
-        var currentStreak = 0
-        
-        for result in results {
-            if result.isCorrect {
-                currentStreak += 1
-                maxStreak = max(maxStreak, currentStreak)
-            } else {
-                currentStreak = 0
-            }
-        }
-        
-        return maxStreak
-    }
-    
     func formatDuration(_ duration: TimeInterval) -> String {
         let formatter = DateComponentsFormatter()
         formatter.unitsStyle = .positional
@@ -605,36 +998,152 @@ struct QuizResultView: View {
         formatter.zeroFormattingBehavior = .pad
         return formatter.string(from: duration) ?? ""
     }
-    
-    private func setupOnAppear() {
-        authManager.fetchUserStory()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            if appState.shouldShowAds {
-                executeProcessEveryFortyTimes()
-            }
-        }
-        
-        // タイトル獲得処理
-        if playerExperience != 5 {
-            checkBossTitles()
-        }
-        
-        // 広告処理
-        if appState.shouldShowAds && !hasRequestedInterstitial {
-//            && authManager.currentUserId != "dzarHuAdiXXLtDjtwIRvIfVhA1A2" {  // ★ここを追加
-            hasRequestedInterstitial = true
 
-            interstitial.loadInterstitial { isLoaded in
-                DispatchQueue.main.async {
-                    guard isLoaded,
-                          !self.hasPresentedInterstitial,
-                          !self.interstitial.wasAdDismissed
-                    else { return }
+    private func prepareInterstitialOpportunity() {
+        if !hasRecordedAdLearningSet {
+            InterstitialOpportunityCoordinator.shared.recordLearningSetCompleted()
+            hasRecordedAdLearningSet = true
+        }
 
-                    self.hasPresentedInterstitial = true
-                    self.interstitial.presentInterstitial(from: adViewControllerRepresentable.viewController)
+        guard !hasRequestedInterstitial else { return }
+        hasRequestedInterstitial = true
+
+        let coordinator = InterstitialOpportunityCoordinator.shared
+        let eligibilityDecision = coordinator.decision(
+            subscriptionStateResolved: appState.hasResolvedSubscriptionState,
+            isSubscribed: appState.isSubscribed,
+            isConnected: connectivity.isConnected,
+            isAdReady: true,
+            exclusionReason: interstitialExclusionReason
+        )
+
+        guard eligibilityDecision.shouldShow else {
+            coordinator.recordOpportunity(
+                eligibilityDecision,
+                surface: "normal_result",
+                action: "result_appear",
+                didShow: false
+            )
+            return
+        }
+
+        interstitial.preloadIfNeeded { isLoaded in
+            DispatchQueue.main.async {
+                let decision = coordinator.decision(
+                    subscriptionStateResolved: appState.hasResolvedSubscriptionState,
+                    isSubscribed: appState.isSubscribed,
+                    isConnected: connectivity.isConnected,
+                    isAdReady: isLoaded && interstitial.isReady,
+                    exclusionReason: interstitialExclusionReason
+                )
+
+                guard decision.shouldShow else {
+                    coordinator.recordOpportunity(
+                        decision,
+                        surface: "normal_result",
+                        action: "result_appear",
+                        didShow: false
+                    )
+                    return
+                }
+
+                let didPresent = interstitial.presentInterstitial(
+                    from: adViewControllerRepresentable.viewController
+                ) { didShow in
+                    DispatchQueue.main.async {
+                        coordinator.recordOpportunity(
+                            decision,
+                            surface: "normal_result",
+                            action: "result_appear",
+                            didShow: didShow
+                        )
+                        if didShow {
+                            showAdFreeMessage()
+                        }
+                    }
+                }
+
+                if !didPresent {
+                    coordinator.recordOpportunity(
+                        decision,
+                        surface: "normal_result",
+                        action: "result_appear",
+                        didShow: false
+                    )
                 }
             }
+        }
+    }
+
+    private func logGrowthCompletionIfNeeded() {
+        guard !hasLoggedGrowthCompletion else { return }
+        hasLoggedGrowthCompletion = true
+        if isInitialDiagnostic {
+            _ = InitialLearningPlanStore.recordCompletion(
+                userID: authManager.currentUserId ?? InitialLearningPlanStore.localGuestID,
+                incorrectCount: results.count - correctAnswersCount
+            )
+        }
+        GrowthAnalytics.logLearningSetComplete(
+            quizLevel: quizLevel,
+            answeredCount: results.count,
+            correctCount: correctAnswersCount,
+            isInitialDiagnostic: isInitialDiagnostic,
+            learningContext: learningContext
+        )
+    }
+
+    private func handleResultExit(action _: String) {
+        guard !isHandlingResultExit else { return }
+        isHandlingResultExit = true
+        shouldRequestReviewAfterCelebration = false
+        finishResultExit()
+    }
+
+    private var initialLearningPlan: InitialLearningPlan {
+        InitialLearningPlanStore.load(userID: authManager.currentUserId ?? InitialLearningPlanStore.localGuestID)
+            ?? InitialLearningPlan(completedAt: Date(), incorrectCount: results.count - correctAnswersCount)
+    }
+
+    private var interstitialExclusionReason: String? {
+        if isFreeReviewPreview {
+            return "free_review_preview"
+        }
+        if isInitialDiagnostic {
+            return "initial_diagnostic"
+        }
+        if showSubFlag {
+            return "paywall_presented"
+        }
+        return learningContext?.interstitialExclusionReason
+    }
+
+    private func showAdFreeMessage() {
+        withAnimation(.easeOut(duration: 0.2)) {
+            showAdFreeUpsellToast = true
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.25) {
+            withAnimation(.easeOut(duration: 0.2)) {
+                showAdFreeUpsellToast = false
+            }
+        }
+    }
+
+    private func finishResultExit() {
+        audioManager.playCancelSound()
+        isPresenting = false
+    }
+    
+    private func setupOnAppear() {
+        guard connectivity.isConnected,
+              authManager.currentUserId != nil else { return }
+
+        authManager.fetchUserStory()
+        
+        // タイトル獲得処理
+        if isCleared {
+            checkBossTitles()
         }
         
         // レベルとタイトル処理
@@ -643,6 +1152,57 @@ struct QuizResultView: View {
             checkLevelTitles()
             checkAnswerTitles()
         }
+    }
+
+    private func prepareReviewRequestIfNeeded() {
+        guard !isInitialDiagnostic, !hasRecordedReviewCompletion else { return }
+
+        hasRecordedReviewCompletion = true
+        shouldRequestReviewAfterCelebration = ReviewRequestManager.shared.recordQuizCompletion(
+            satisfactionEvent: isCleared
+        )
+    }
+
+    private func scheduleReviewRequestIfNeeded(attempt: Int = 0) {
+        guard shouldRequestReviewAfterCelebration, !isReviewRequestScheduled else { return }
+
+        isReviewRequestScheduled = true
+
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 2_000_000_000)
+            self.isReviewRequestScheduled = false
+
+            guard self.shouldRequestReviewAfterCelebration else { return }
+
+            if self.canPresentReviewRequest {
+                ReviewRequestManager.shared.markReviewRequested(source: .normalClear)
+                self.shouldRequestReviewAfterCelebration = false
+                self.requestReview()
+            } else if attempt < 3 {
+                self.scheduleReviewRequestIfNeeded(attempt: attempt + 1)
+            }
+        }
+    }
+
+    private var canPresentReviewRequest: Bool {
+        !showModal
+        && !showLevelUpModal
+        && !showTittleModal
+        && !showMemoView
+        && !showSubFlag
+        && !level3flag
+        && !level5flag
+        && !level10flag
+        && !answer30flag
+        && !answer50flag
+        && !answer100flag
+        && !goburinflag
+        && !kaijyuflag
+        && !shinjyuflag
+        && !showRewardedCoinAlert
+        && !quizResultRewardAd.isPresenting
+        && !interstitial.isLoading
+        && !interstitial.isPresenting
     }
     
     private func checkBossTitles() {
@@ -728,13 +1288,6 @@ struct QuizResultView: View {
         }
     }
     
-    func executeProcessEveryFortyTimes() {
-        let count = UserDefaults.standard.integer(forKey: "launchPreCount") + 1
-        UserDefaults.standard.set(count, forKey: "launchPreCount")
-        if count % 3 == 0 {
-            preFlag = true
-        }
-    }
 }
 
 // MARK: - Enhanced Modal Views
@@ -743,12 +1296,17 @@ struct ExperienceModalView: View {
     var addedExperience: Int
     var addedMoney: Int
     var itemRewards: [InventoryReward] = []
+    var isCleared: Bool? = nil
     @State private var currentExperience: Double = 0
     @State private var currentMoney: Double = 0
     @State private var showContent = false
     let maxExperience: Double = 100
     @ObservedObject var authManager: AuthManager
     @ObservedObject var audioManager = AudioManager.shared
+
+    private var displaysClear: Bool {
+        isCleared ?? (addedExperience != 5)
+    }
 
     var body: some View {
         ZStack {
@@ -762,20 +1320,20 @@ struct ExperienceModalView: View {
                 // アニメーション付きアイコン
                 ZStack {
                     Circle()
-                        .fill(currentExperience != 5 ? Color.green.opacity(0.2) : Color.red.opacity(0.2))
+                        .fill(displaysClear ? Color.green.opacity(0.2) : Color.red.opacity(0.2))
                         .frame(width: 100, height: 100)
                         .scaleEffect(showContent ? 1.0 : 0.8)
                         .animation(.spring(response: 0.6, dampingFraction: 0.6), value: showContent)
                     
-                    Image(systemName: currentExperience != 5 ? "checkmark.circle.fill" : "xmark.circle.fill")
+                    Image(systemName: displaysClear ? "checkmark.circle.fill" : "xmark.circle.fill")
                         .font(.system(size: 50))
-                        .foregroundColor(currentExperience != 5 ? .green : .red)
+                        .foregroundColor(displaysClear ? .green : .red)
                         .scaleEffect(showContent ? 1.0 : 0.5)
                         .animation(.spring(response: 0.8, dampingFraction: 0.6).delay(0.2), value: showContent)
                 }
                 
                 VStack(spacing: 8) {
-                    Text(currentExperience != 5 ? "クリア！" : "ゲームオーバー")
+                    Text(displaysClear ? "クリア！" : "ゲームオーバー")
                         .font(.system(size: 32, weight: .bold, design: .rounded))
                         .foregroundColor(.primary)
                         .opacity(showContent ? 1 : 0)
@@ -872,7 +1430,7 @@ struct ExperienceModalView: View {
                 }
             }
             
-            if currentExperience != 5 {
+            if displaysClear {
                 audioManager.playGameClearSound()
             } else {
                 audioManager.playGameOverSound()
@@ -923,23 +1481,23 @@ struct ExperienceModalView: View {
 
 struct LevelUpModalView: View {
     @Binding var showLevelUpModal: Bool
+    /// 上がる前のレベル。不明なときは1レベル分として表示する
+    var previousLevel: Int? = nil
     @State private var showBackground = false
     @State private var showCard = false
-    @State private var showIcon = false
-    @State private var showLevel = false
-    @State private var showText = false
+    @State private var showMedal = false
+    @State private var visibleRows = 0
+    @State private var expProgress: Double = 0
     @State private var showButton = false
-    @State private var ringRotation: Double = 0
-    @State private var outerRingScale: CGFloat = 0.3
     @State private var confettiParticles: [LevelUpConfetti] = []
-    @State private var glowPulse = false
     @ObservedObject var authManager: AuthManager
     @ObservedObject var audioManager = AudioManager.shared
 
     var body: some View {
         ZStack {
             // 背景
-            Color.black.opacity(showBackground ? 0.75 : 0)
+            Color(red: 18 / 255, green: 16 / 255, blue: 34 / 255)
+                .opacity(showBackground ? 0.62 : 0)
                 .ignoresSafeArea()
                 .onTapGesture { }
 
@@ -952,132 +1510,20 @@ struct LevelUpModalView: View {
                     .offset(x: p.x, y: p.y)
                     .opacity(p.opacity)
             }
+            .allowsHitTesting(false)
 
             if showCard {
-                VStack(spacing: 28) {
-                    // レベルアイコン
-                    ZStack {
-                        // 外側リング（回転）
-                        Circle()
-                            .stroke(
-                                AngularGradient(
-                                    colors: [.yellow, .orange, .red, .orange, .yellow],
-                                    center: .center
-                                ),
-                                lineWidth: 4
-                            )
-                            .frame(width: 140, height: 140)
-                            .scaleEffect(outerRingScale)
-                            .rotationEffect(.degrees(ringRotation))
-
-                        // グロー
-                        Circle()
-                            .fill(
-                                RadialGradient(
-                                    colors: [Color.yellow.opacity(0.4), Color.clear],
-                                    center: .center,
-                                    startRadius: 0,
-                                    endRadius: 80
-                                )
-                            )
-                            .frame(width: 160, height: 160)
-                            .scaleEffect(glowPulse ? 1.1 : 0.9)
-
-                        // 中央円
-                        Circle()
-                            .fill(
-                                LinearGradient(
-                                    colors: [Color(red: 1.0, green: 0.85, blue: 0.2), Color(red: 1.0, green: 0.55, blue: 0.1)],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
-                            )
-                            .frame(width: 110, height: 110)
-                            .shadow(color: .orange.opacity(0.6), radius: 20)
-                            .scaleEffect(showIcon ? 1.0 : 0.3)
-
-                        // 矢印アイコン（画像の代わり）
-                        Image(systemName: "arrow.up.circle.fill")
-                            .font(.system(size: 44, weight: .bold))
-                            .foregroundStyle(.white)
-                            .scaleEffect(showIcon ? 1.0 : 0.1)
-                            .opacity(showIcon ? 1 : 0)
-
-                        // レベル数字
-                        if showLevel {
-                            Text("Lv.\(authManager.level)")
-                                .font(.system(size: 22, weight: .black, design: .rounded))
-                                .foregroundColor(.white)
-                                .shadow(color: .black.opacity(0.4), radius: 4, y: 2)
-                                .offset(y: 44)
-                                .transition(.scale.combined(with: .opacity))
-                        }
-                    }
-                    .frame(height: 170)
-
-                    // テキスト
-                    if showText {
-                        VStack(spacing: 10) {
-                            Text("LEVEL UP!")
-                                .font(.system(size: 30, weight: .black, design: .rounded))
-                                .foregroundStyle(
-                                    LinearGradient(
-                                        colors: [Color.yellow, Color.orange],
-                                        startPoint: .leading,
-                                        endPoint: .trailing
-                                    )
-                                )
-
-                            Text("レベル \(authManager.level) に到達しました！")
-                                .font(.system(size: 16, weight: .semibold))
-                                .foregroundColor(.white.opacity(0.7))
-                        }
-                        .transition(.move(edge: .bottom).combined(with: .opacity))
-                    }
-
-                    // ボタン
-                    if showButton {
-                        Button(action: dismissModal) {
-                            Text("素晴らしい！")
-                                .font(.system(size: 18, weight: .bold))
-                                .foregroundColor(.white)
-                                .frame(maxWidth: .infinity)
-                                .frame(height: 50)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 14)
-                                        .fill(
-                                            LinearGradient(
-                                                colors: [Color(red: 1.0, green: 0.7, blue: 0.1), Color(red: 1.0, green: 0.45, blue: 0.1)],
-                                                startPoint: .leading,
-                                                endPoint: .trailing
-                                            )
-                                        )
-                                )
-                                .shadow(color: .orange.opacity(0.5), radius: 10, y: 4)
-                        }
-                        .transition(.move(edge: .bottom).combined(with: .opacity))
-                    }
-                }
-                .padding(30)
-                .background(
-                    RoundedRectangle(cornerRadius: 24)
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    Color(red: 0.12, green: 0.10, blue: 0.22),
-                                    Color(red: 0.08, green: 0.06, blue: 0.16)
-                                ],
-                                startPoint: .top,
-                                endPoint: .bottom
-                            )
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 24)
-                                .stroke(Color.orange.opacity(0.3), lineWidth: 1)
-                        )
-                        .shadow(color: .black.opacity(0.5), radius: 30, y: 10)
+                LevelUpRewardCard(
+                    level: authManager.level,
+                    previousLevel: previousLevel ?? authManager.level - 1,
+                    experience: authManager.experience,
+                    showsMedal: showMedal,
+                    visibleRows: visibleRows,
+                    expProgress: expProgress,
+                    showsButton: showButton,
+                    onClose: dismissModal
                 )
-                .padding(.horizontal, 36)
+                .padding(.horizontal, 24)
                 .transition(.scale(scale: 0.8).combined(with: .opacity))
             }
         }
@@ -1100,26 +1546,10 @@ struct LevelUpModalView: View {
             }
         }
 
-        // アイコン
+        // メダル
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-            withAnimation(.spring(response: 0.6, dampingFraction: 0.5)) {
-                showIcon = true
-                outerRingScale = 1.0
-            }
-            // リング回転開始
-            withAnimation(.linear(duration: 8).repeatForever(autoreverses: false)) {
-                ringRotation = 360
-            }
-            // グローパルス
-            withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
-                glowPulse = true
-            }
-        }
-
-        // レベル数字
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-            withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {
-                showLevel = true
+            withAnimation(.spring(response: 0.5, dampingFraction: 0.45)) {
+                showMedal = true
             }
         }
 
@@ -1128,10 +1558,19 @@ struct LevelUpModalView: View {
             spawnConfetti()
         }
 
-        // テキスト
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-            withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
-                showText = true
+        // 報酬の行を 0.08 秒ずつ
+        for row in 1...2 {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6 + Double(row - 1) * 0.08) {
+                withAnimation(.spring(response: 0.35, dampingFraction: 0.75)) {
+                    visibleRows = row
+                }
+            }
+        }
+
+        // EXP バー
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.85) {
+            withAnimation(.easeOut(duration: 0.6)) {
+                expProgress = 1
             }
         }
 
@@ -1177,6 +1616,21 @@ struct LevelUpModalView: View {
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
             showLevelUpModal = false
+        }
+    }
+}
+
+extension QuizLevel {
+    /// 結果画面の「不正解を解き直す」で使う誤答復習モード。EXP・コインは誤答復習と同じく付与しない。
+    /// 資格に属さない問題（.general）は保存先の復習モードがないので解き直しを出さない。
+    var mistakeRetryLevel: QuizLevel? {
+        switch localReviewCategory {
+        case .itPassport: return .incorrectITAnswer
+        case .fundamentalInformation: return .incorrectInfoAnswer
+        case .appliedInformation: return .incorrectAppliedAnswer
+        case .embeddedSystems: return .incorrectESAnswer
+        case .itStrategist: return .incorrectITStrategyAnswer
+        case .general: return nil
         }
     }
 }
@@ -1250,7 +1704,10 @@ struct QuizResultView_Previews: PreviewProvider {
             playerMoney: 15,
             elapsedTime: 0,
             quizBossLevel: .none,
-            quizLevel: .beginner
+            quizLevel: .beginner,
+            interstitial: Interstitial()
         )
+        .environmentObject(AppState())
+        .environmentObject(ConnectivityMonitor.shared)
     }
 }

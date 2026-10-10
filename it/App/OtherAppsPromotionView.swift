@@ -7,8 +7,50 @@
 
 import SwiftUI
 
+enum OtherAppsPromotionPreference {
+    static let isSuppressedKey = "otherAppsPromotion.isSuppressed"
+    static let lastShownAtKey = "otherAppsPromotion.lastShownAt"
+    /// 毎回の起動で表示すると離脱につながるため、表示間隔を空ける。
+    static let minimumInterval: TimeInterval = 3 * 24 * 60 * 60
+
+    static func isDue(now: Date = Date(), defaults: UserDefaults = .standard) -> Bool {
+        guard let lastShownAt = defaults.object(forKey: lastShownAtKey) as? Date else { return true }
+        return now.timeIntervalSince(lastShownAt) >= minimumInterval
+    }
+
+    static func recordShown(now: Date = Date(), defaults: UserDefaults = .standard) {
+        defaults.set(now, forKey: lastShownAtKey)
+    }
+}
+
+/// 起動1回あたりに出す販促系ポップアップ（更新告知・他アプリ宣伝・課金画面・レビュー依頼・ヘルプ）を1つまでに制限する。
+/// ログインボーナスは報酬のため対象外。メインスレッドからのみ呼び出す。
+final class LaunchPromptGate {
+    static let shared = LaunchPromptGate()
+
+    private var hasPresentedPrompt = false
+    private var countedKeys = Set<String>()
+
+    private init() {}
+
+    /// このプロセスでまだ販促ポップアップを出していなければ枠を確保して true を返す。
+    func claim() -> Bool {
+        guard !hasPresentedPrompt else { return false }
+        hasPresentedPrompt = true
+        return true
+    }
+
+    /// 起動回数カウンタを起動ごとに1回だけ進めるための判定。
+    /// ホームタブへ戻るたびに onAppear が呼ばれても数え直さない。
+    func shouldCountLaunch(for key: String) -> Bool {
+        countedKeys.insert(key).inserted
+    }
+}
+
 struct OtherAppsPromotionView: View {
     @State private var selectedApp: UUID? = nil
+    @AppStorage(OtherAppsPromotionPreference.isSuppressedKey)
+    private var isSuppressed = false
     
     var body: some View {
         ScrollView {
@@ -28,9 +70,27 @@ struct OtherAppsPromotionView: View {
                         .scaleEffect(selectedApp == app.id ? 0.98 : 1.0)
                         .animation(.easeInOut(duration: 0.15), value: selectedApp)
                 }
+
+                Toggle(isOn: $isSuppressed) {
+                    VStack(alignment: .leading, spacing: 3) {
+                        Label("今後は表示しない", systemImage: "eye.slash")
+                            .font(.system(size: 15, weight: .semibold))
+
+                        Text("オンにすると今後は自動で表示しません")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+                .toggleStyle(.switch)
+                .tint(.blue)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+                .background(Color(.systemBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 14))
+                .accessibilityIdentifier("otherAppsPromotion.suppressToggle")
             }
             .padding(.horizontal, 20)
-//            .padding(.bottom, 10)
+            .padding(.bottom, 20)
         }
         .background(
             LinearGradient(

@@ -15,96 +15,96 @@ struct QuizSystemKikakuListView: View {
             question: "プロジェクトマネジメントにおいて、リスクトリガーとは何ですか？",
             choices: [
                 "リスクが発生する原因",
-                "リスクが発生した場合の対応策",
                 "リスクが発生する兆候やイベント",
-                "リスクの影響を最小限に抑える手段"
+                "リスクの影響を最小限に抑える手段",
+                "リスクが発生した場合の対応策"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 1,
             explanation: "リスクトリガーとは、リスクが発生する兆候やイベントを指します。"
         ),
         QuizQuestion(
             question: "ITプロジェクトにおけるリソースの最適化を行うための技法はどれですか？",
             choices: [
-                "クリティカルチェーン法",
                 "アジャイル手法",
                 "ウォーターフォールモデル",
+                "クリティカルチェーン法",
                 "デザインスプリント"
             ],
-            correctAnswerIndex: 0,
+            correctAnswerIndex: 2,
             explanation: "クリティカルチェーン法は、リソースの最適化を行うための技法です。"
         ),
         QuizQuestion(
             question: "システム開発において、ユースケース図の主な目的は何ですか？",
             choices: [
-                "システムの内部構造を示す",
-                "システムの機能とユーザーの関係を視覚化する",
                 "システムのデータフローを示す",
-                "システムのセキュリティ要件を定義する"
+                "システムの内部構造を示す",
+                "システムのセキュリティ要件を定義する",
+                "システムの機能とユーザーの関係を視覚化する"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 3,
             explanation: "ユースケース図は、システムの機能とユーザーの関係を視覚化するために使用されます。"
         ),
         QuizQuestion(
             question: "プロジェクトのスケジュール管理において、クリティカルチェーン法の特徴はどれですか？",
             choices: [
-                "リスクの発生を最小限に抑える",
-                "リソースのバッファを考慮してスケジュールを作成する",
                 "タスクの依存関係を無視する",
-                "プロジェクトのスコープを固定する"
+                "プロジェクトのスコープを固定する",
+                "リスクの発生を最小限に抑える",
+                "リソースのバッファを考慮してスケジュールを作成する"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 3,
             explanation: "クリティカルチェーン法は、リソースのバッファを考慮してスケジュールを作成する手法です。"
         ),
         QuizQuestion(
             question: "システムのパフォーマンスを評価するために使用されるベンチマークテストの目的は何ですか？",
             choices: [
                 "システムのセキュリティを評価する",
-                "システムのデータ整合性を確認する",
                 "システムの性能を他のシステムと比較する",
+                "システムのデータ整合性を確認する",
                 "システムのユーザビリティを改善する"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 1,
             explanation: "ベンチマークテストの目的は、システムの性能を他のシステムと比較することです。"
         ),
         QuizQuestion(
             question: "IT戦略におけるロードマップの役割は何ですか？",
             choices: [
+                "システムのセキュリティ対策を強化する",
                 "システムの開発コストを削減する",
-                "システムの導入スケジュールを示す",
                 "システムの運用手順を定義する",
-                "システムのセキュリティ対策を強化する"
+                "システムの導入スケジュールを示す"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 3,
             explanation: "ロードマップは、システムの導入スケジュールを示す役割を持ちます。"
         ),
         QuizQuestion(
             question: "プロジェクトのコスト管理において、EACとは何を示しますか？",
             choices: [
-                "プロジェクトの完了時総コストの見積もり",
-                "プロジェクトの進捗率",
                 "プロジェクトの予算超過額",
-                "プロジェクトの予算内訳"
+                "プロジェクトの予算内訳",
+                "プロジェクトの進捗率",
+                "プロジェクトの完了時総コストの見積もり"
             ],
-            correctAnswerIndex: 0,
+            correctAnswerIndex: 3,
             explanation: "EAC（Estimate at Completion）は、プロジェクトの完了時総コストの見積もりを示します。"
         ),
         QuizQuestion(
             question: "システム開発におけるリファクタリングの目的は何ですか？",
             choices: [
-                "システムの機能を追加する",
                 "システムのコード品質を改善する",
+                "システムのセキュリティを強化する",
                 "システムのコストを削減する",
-                "システムのセキュリティを強化する"
+                "システムの機能を追加する"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "リファクタリングの目的は、システムのコード品質を改善することです。"
         ),
         QuizQuestion(
             question: "ITプロジェクトにおいて、プロジェクトの進捗を評価するために使用されるバーンダウンチャートの特徴は何ですか？",
             choices: [
                 "残作業量の推移を示す",
-                "プロジェクトのコスト推移を示す",
                 "プロジェクトのリスク推移を示す",
+                "プロジェクトのコスト推移を示す",
                 "プロジェクトの品質推移を示す"
             ],
             correctAnswerIndex: 0,
@@ -113,12 +113,12 @@ struct QuizSystemKikakuListView: View {
         QuizQuestion(
             question: "システム運用において、プロアクティブなモニタリングの目的は何ですか？",
             choices: [
-                "システムの障害を迅速に修復する",
                 "システムの性能を他のシステムと比較する",
                 "システムの潜在的な問題を事前に発見する",
+                "システムの障害を迅速に修復する",
                 "システムのユーザビリティを向上させる"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 1,
             explanation: "プロアクティブなモニタリングの目的は、システムの潜在的な問題を事前に発見することです。"
         ),
         QuizQuestion(
@@ -135,21 +135,21 @@ struct QuizSystemKikakuListView: View {
         QuizQuestion(
             question: "ITプロジェクトにおいて、プロジェクト憲章の役割は何ですか？",
             choices: [
-                "プロジェクトのリスクを管理する",
-                "プロジェクトのスコープを定義する",
                 "プロジェクトの承認を正式に得る",
-                "プロジェクトの品質を管理する"
+                "プロジェクトの品質を管理する",
+                "プロジェクトのリスクを管理する",
+                "プロジェクトのスコープを定義する"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 0,
             explanation: "プロジェクト憲章は、プロジェクトの承認を正式に得るための文書です。"
         ),
         QuizQuestion(
             question: "システム運用において、インシデント管理と問題管理の違いは何ですか？",
             choices: [
                 "インシデント管理は障害の影響を最小化すること、問題管理は根本原因の解決を目指すこと",
+                "インシデント管理はユーザー教育、問題管理はシステム設計",
                 "インシデント管理は長期的な対策、問題管理は短期的な対策",
-                "インシデント管理はシステムのパフォーマンス向上、問題管理はコスト削減",
-                "インシデント管理はユーザー教育、問題管理はシステム設計"
+                "インシデント管理はシステムのパフォーマンス向上、問題管理はコスト削減"
             ],
             correctAnswerIndex: 0,
             explanation: "インシデント管理は障害の影響を最小化することを目的とし、問題管理は根本原因の解決を目指します。"
@@ -157,32 +157,32 @@ struct QuizSystemKikakuListView: View {
         QuizQuestion(
             question: "ITガバナンスの一環として行われるコンプライアンス監査の目的は何ですか？",
             choices: [
-                "システムのパフォーマンスを評価する",
                 "法規制や内部規定の遵守状況を確認する",
+                "システムのパフォーマンスを評価する",
                 "プロジェクトの進捗を確認する",
                 "ユーザーの満足度を向上させる"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "コンプライアンス監査の目的は、法規制や内部規定の遵守状況を確認することです。"
         ),
         QuizQuestion(
             question: "プロジェクトマネジメントにおいて、マイルストーンの役割は何ですか？",
             choices: [
+                "プロジェクトのリスクを評価する",
                 "プロジェクトの開始を示す",
                 "重要な節目や達成点を示す",
-                "プロジェクトの終了を示す",
-                "プロジェクトのリスクを評価する"
+                "プロジェクトの終了を示す"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 2,
             explanation: "マイルストーンは、プロジェクトの重要な節目や達成点を示します。"
         ),
         QuizQuestion(
             question: "システム開発におけるスプリントとは何ですか？",
             choices: [
                 "短期間で実施される反復作業",
+                "プロジェクトの開始前の計画期間",
                 "システムの最終テスト",
-                "ユーザーのトレーニング期間",
-                "プロジェクトの開始前の計画期間"
+                "ユーザーのトレーニング期間"
             ],
             correctAnswerIndex: 0,
             explanation: "スプリントは、短期間で実施される反復作業のことです。"
@@ -190,9 +190,9 @@ struct QuizSystemKikakuListView: View {
         QuizQuestion(
             question: "ITプロジェクトのステークホルダーエンゲージメントの目的は何ですか？",
             choices: [
-                "プロジェクトのリスクを最小化する",
-                "ステークホルダーの期待とニーズを管理する",
                 "プロジェクトのコストを削減する",
+                "ステークホルダーの期待とニーズを管理する",
+                "プロジェクトのリスクを最小化する",
                 "プロジェクトのスケジュールを短縮する"
             ],
             correctAnswerIndex: 1,
@@ -201,96 +201,96 @@ struct QuizSystemKikakuListView: View {
         QuizQuestion(
             question: "システムのパフォーマンスモニタリングにおいて、ボトルネックを特定する目的は何ですか？",
             choices: [
-                "システムのセキュリティを強化するため",
-                "システムのスケーラビリティを向上させるため",
                 "システムのパフォーマンスを最適化するため",
-                "システムのコストを削減するため"
+                "システムのセキュリティを強化するため",
+                "システムのコストを削減するため",
+                "システムのスケーラビリティを向上させるため"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 0,
             explanation: "ボトルネックを特定する目的は、システムのパフォーマンスを最適化することです。"
         ),
         QuizQuestion(
             question: "ITプロジェクトにおいて、プロジェクトの終結フェーズで行うべき活動はどれですか？",
             choices: [
                 "システムの設計",
-                "システムの実装",
+                "プロジェクトの開始",
                 "プロジェクトの評価と教訓の収集",
-                "プロジェクトの開始"
+                "システムの実装"
             ],
-            correctAnswerIndex: 3,
+            correctAnswerIndex: 1,
             explanation: "プロジェクトの終結フェーズでは、プロジェクトの評価と教訓の収集を行います。"
         ),
         QuizQuestion(
             question: "システム開発プロジェクトのスコープマネジメントにおいて、スコープクリープとは何ですか？",
             choices: [
-                "プロジェクトの範囲が計画外に拡大する現象",
-                "プロジェクトの範囲が縮小する現象",
                 "プロジェクトの予算が超過する現象",
-                "プロジェクトのスケジュールが遅延する現象"
+                "プロジェクトのスケジュールが遅延する現象",
+                "プロジェクトの範囲が縮小する現象",
+                "プロジェクトの範囲が計画外に拡大する現象"
             ],
-            correctAnswerIndex: 0,
+            correctAnswerIndex: 3,
             explanation: "スコープクリープとは、プロジェクトの範囲が計画外に拡大する現象を指します。"
         ),
         QuizQuestion(
             question: "システム開発におけるテスト駆動開発（TDD）の利点は何ですか？",
             choices: [
-                "コスト削減",
-                "迅速な市場投入",
+                "スコープの拡大",
                 "コードの品質向上",
-                "スコープの拡大"
+                "コスト削減",
+                "迅速な市場投入"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 1,
             explanation: "テスト駆動開発（TDD）は、コードの品質向上に寄与します。"
         ),
         QuizQuestion(
             question: "プロジェクトマネジメントにおいて、リスク回避の具体例はどれですか？",
             choices: [
-                "プロジェクトのスコープを縮小する",
                 "プロジェクトの予算を増やす",
                 "プロジェクトのスケジュールを延長する",
-                "プロジェクトのリソースを増やす"
+                "プロジェクトのリソースを増やす",
+                "プロジェクトのスコープを縮小する"
             ],
-            correctAnswerIndex: 0,
+            correctAnswerIndex: 3,
             explanation: "リスク回避の具体例としては、プロジェクトのスコープを縮小することが挙げられます。"
         ),
         QuizQuestion(
             question: "システムの可用性を向上させるために行うべき手法はどれですか？",
             choices: [
-                "システムのパフォーマンスチューニング",
                 "冗長構成の採用",
+                "ユーザーインターフェースの改善",
                 "システムのスコープ管理",
-                "ユーザーインターフェースの改善"
+                "システムのパフォーマンスチューニング"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "冗長構成を採用することで、システムの可用性を向上させることができます。"
         ),
         QuizQuestion(
             question: "プロジェクトのコスト管理において、コストベースラインとは何ですか？",
             choices: [
-                "プロジェクトの予算全体",
                 "プロジェクトのコスト管理のための基準",
                 "プロジェクトの資金調達計画",
+                "プロジェクトの予算全体",
                 "プロジェクトの経費精算手続き"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "コストベースラインは、プロジェクトのコスト管理のための基準です。"
         ),
         QuizQuestion(
             question: "ITプロジェクトにおいて、変更管理プロセスの目的は何ですか？",
             choices: [
-                "変更を迅速に承認する",
                 "変更の影響を評価し、適切に管理する",
-                "変更を最小限に抑える",
-                "変更を完全に排除する"
+                "変更を迅速に承認する",
+                "変更を完全に排除する",
+                "変更を最小限に抑える"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "変更管理プロセスの目的は、変更の影響を評価し、適切に管理することです。"
         ),
         QuizQuestion(
             question: "システム開発におけるデプロイメントの主な目的は何ですか？",
             choices: [
-                "システムの要件定義を行う",
                 "システムのテストを実施する",
+                "システムの要件定義を行う",
                 "システムを本番環境に展開する",
                 "システムの設計を行う"
             ],
@@ -300,53 +300,53 @@ struct QuizSystemKikakuListView: View {
         QuizQuestion(
             question: "プロジェクトの品質管理において、品質監査の目的は何ですか？",
             choices: [
-                "コスト削減のため",
                 "プロジェクトのスコープを拡大するため",
-                "品質管理プロセスの効果を評価するため",
-                "プロジェクトのスケジュールを短縮するため"
+                "コスト削減のため",
+                "プロジェクトのスケジュールを短縮するため",
+                "品質管理プロセスの効果を評価するため"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 3,
             explanation: "品質監査の目的は、品質管理プロセスの効果を評価することです。"
         ),
         QuizQuestion(
             question: "システム運用において、キャパシティプランニングの目的は何ですか？",
             choices: [
-                "システムのセキュリティを強化する",
                 "システムのパフォーマンスを最適化する",
                 "システムのスケーラビリティを確保する",
-                "システムの可用性を高める"
+                "システムの可用性を高める",
+                "システムのセキュリティを強化する"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 1,
             explanation: "キャパシティプランニングの目的は、システムのスケーラビリティを確保することです。"
         ),
         QuizQuestion(
             question: "IT戦略の一環として、データマイニングの目的は何ですか？",
             choices: [
-                "データの暗号化",
                 "データの分析と洞察の抽出",
+                "データの暗号化",
                 "データのバックアップ",
                 "データの削除"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "データマイニングの目的は、データの分析と洞察の抽出です。"
         ),
         QuizQuestion(
             question: "プロジェクトマネジメントにおいて、EVMの使用目的は何ですか？",
             choices: [
+                "プロジェクトのスケジュールを作成する",
                 "プロジェクトのリスクを評価する",
                 "プロジェクトのコストパフォーマンスを評価する",
-                "プロジェクトの品質を管理する",
-                "プロジェクトのスケジュールを作成する"
+                "プロジェクトの品質を管理する"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 2,
             explanation: "EVM（Earned Value Management）は、プロジェクトのコストパフォーマンスを評価するために使用されます。"
         ),
         QuizQuestion(
             question: "システム開発プロジェクトにおけるリスクマネジメントの目的は何ですか？",
             choices: [
-                "リスクを完全に排除する",
-                "リスクの発生を最小限に抑える",
                 "リスクをすべて受け入れる",
+                "リスクの発生を最小限に抑える",
+                "リスクを完全に排除する",
                 "リスクを無視する"
             ],
             correctAnswerIndex: 1,
@@ -355,21 +355,21 @@ struct QuizSystemKikakuListView: View {
         QuizQuestion(
             question: "ITプロジェクトにおけるステークホルダー分析の目的は何ですか？",
             choices: [
+                "ステークホルダーの影響力と関心を評価する",
                 "プロジェクトの予算を決定する",
                 "プロジェクトのスコープを明確にする",
-                "ステークホルダーの影響力と関心を評価する",
                 "リスクの発生確率を分析する"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 0,
             explanation: "ステークホルダー分析の目的は、ステークホルダーの影響力と関心を評価することです。"
         ),
         QuizQuestion(
             question: "システム開発において、ソフトウェアのバージョン管理を行うためのツールはどれですか？",
             choices: [
                 "Git",
-                "JIRA",
+                "Docker",
                 "Slack",
-                "Docker"
+                "JIRA"
             ],
             correctAnswerIndex: 0,
             explanation: "Gitは、ソフトウェアのバージョン管理を行うためのツールです。"
@@ -377,32 +377,32 @@ struct QuizSystemKikakuListView: View {
         QuizQuestion(
             question: "プロジェクトの進捗を可視化するために使用されるガントチャートの特徴は何ですか？",
             choices: [
-                "タスクの依存関係を示す",
-                "タスクの開始と終了を示す",
+                "コストの見積もりを行う",
                 "リスクの評価を行う",
-                "コストの見積もりを行う"
+                "タスクの依存関係を示す",
+                "タスクの開始と終了を示す"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 3,
             explanation: "ガントチャートは、タスクの開始と終了を示すためのツールです。"
         ),
         QuizQuestion(
             question: "システムのパフォーマンス向上のために行うべき最適化はどれですか？",
             choices: [
-                "データベースのインデックス付け",
                 "ユーザーインターフェースの改善",
                 "コストの削減",
-                "プロジェクトのスコープ拡大"
+                "プロジェクトのスコープ拡大",
+                "データベースのインデックス付け"
             ],
-            correctAnswerIndex: 0,
+            correctAnswerIndex: 3,
             explanation: "データベースのインデックス付けは、システムのパフォーマンス向上に有効です。"
         ),
         QuizQuestion(
             question: "IT戦略の一環として、ビジネスインパクト分析を行う目的は何ですか？",
             choices: [
-                "市場の機会を評価する",
                 "システムの脆弱性を評価する",
+                "技術的なトレンドを評価する",
                 "業務プロセスの重要性を評価する",
-                "技術的なトレンドを評価する"
+                "市場の機会を評価する"
             ],
             correctAnswerIndex: 2,
             explanation: "ビジネスインパクト分析は、業務プロセスの重要性を評価するために行います。"
@@ -410,12 +410,12 @@ struct QuizSystemKikakuListView: View {
         QuizQuestion(
             question: "プロジェクトマネジメントにおいて、コミュニケーション計画の重要性は何ですか？",
             choices: [
-                "プロジェクトのリスクを管理するため",
                 "プロジェクトの予算を決定するため",
-                "ステークホルダーとの情報共有を円滑にするため",
-                "プロジェクトのスケジュールを作成するため"
+                "プロジェクトのスケジュールを作成するため",
+                "プロジェクトのリスクを管理するため",
+                "ステークホルダーとの情報共有を円滑にするため"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 3,
             explanation: "コミュニケーション計画は、ステークホルダーとの情報共有を円滑にするために重要です。"
         ),
         QuizQuestion(
@@ -423,8 +423,8 @@ struct QuizSystemKikakuListView: View {
             choices: [
                 "変更に対する柔軟性",
                 "明確なフェーズと成果物",
-                "迅速な市場投入",
-                "高い顧客満足度"
+                "高い顧客満足度",
+                "迅速な市場投入"
             ],
             correctAnswerIndex: 1,
             explanation: "ウォーターフォールモデルの利点は、明確なフェーズと成果物があることです。"
@@ -443,96 +443,96 @@ struct QuizSystemKikakuListView: View {
         QuizQuestion(
             question: "システムの可用性を確保するために用いられる冗長化の目的は何ですか？",
             choices: [
-                "システムのコストを削減するため",
                 "システムの信頼性を向上させるため",
                 "システムのパフォーマンスを最適化するため",
-                "システムのスコープを拡大するため"
+                "システムのスコープを拡大するため",
+                "システムのコストを削減するため"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "冗長化の目的は、システムの信頼性を向上させることです。"
         ),
         QuizQuestion(
             question: "システム開発プロジェクトにおいて、要求定義の目的は何ですか？",
             choices: [
+                "システムの運用計画を立てるため",
                 "システムの設計を行うため",
                 "システムのテストを実施するため",
-                "ユーザーのニーズを明確にするため",
-                "システムの運用計画を立てるため"
+                "ユーザーのニーズを明確にするため"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 3,
             explanation: "要求定義の目的は、ユーザーのニーズを明確にすることです。"
         ),
         QuizQuestion(
             question: "ITプロジェクトにおいて、変更管理プロセスの重要なステップはどれですか？",
             choices: [
-                "変更要求の評価",
-                "変更要求の拒否",
                 "変更要求の無視",
-                "変更要求の自動承認"
+                "変更要求の自動承認",
+                "変更要求の評価",
+                "変更要求の拒否"
             ],
-            correctAnswerIndex: 0,
+            correctAnswerIndex: 2,
             explanation: "変更管理プロセスでは、変更要求の評価が重要なステップです。"
         ),
         QuizQuestion(
             question: "プロジェクトマネジメントにおいて、コストベースラインとは何ですか？",
             choices: [
+                "プロジェクトの経費精算手続き",
                 "プロジェクトの予算全体",
-                "プロジェクトのコスト管理のための基準",
                 "プロジェクトの資金調達計画",
-                "プロジェクトの経費精算手続き"
+                "プロジェクトのコスト管理のための基準"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 3,
             explanation: "コストベースラインは、プロジェクトのコスト管理のための基準です。"
         ),
         QuizQuestion(
             question: "システム開発におけるユニットテストの主な目的は何ですか？",
             choices: [
+                "パフォーマンスの最適化",
                 "システム全体の動作確認",
                 "個々のモジュールの動作確認",
-                "ユーザーインターフェースのテスト",
-                "パフォーマンスの最適化"
+                "ユーザーインターフェースのテスト"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 2,
             explanation: "ユニットテストの主な目的は、個々のモジュールの動作を確認することです。"
         ),
         QuizQuestion(
             question: "プロジェクトのスコープクリープを防ぐための効果的な手法はどれですか？",
             choices: [
                 "プロジェクトの定義を曖昧にする",
-                "全ての要求を受け入れる",
                 "変更要求を厳密に管理する",
+                "全ての要求を受け入れる",
                 "予算を削減する"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 1,
             explanation: "スコープクリープを防ぐためには、変更要求を厳密に管理することが効果的です。"
         ),
         QuizQuestion(
             question: "システム開発ライフサイクルにおいて、設計フェーズの主な活動は何ですか？",
             choices: [
+                "システムの運用計画を立てる",
                 "システムの要件を定義する",
                 "システムのアーキテクチャを決定する",
-                "システムのテストを実施する",
-                "システムの運用計画を立てる"
+                "システムのテストを実施する"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 2,
             explanation: "設計フェーズでは、システムのアーキテクチャを決定することが主な活動です。"
         ),
         QuizQuestion(
             question: "プロジェクトマネジメントにおいて、ステークホルダーの期待を管理するためのツールはどれですか？",
             choices: [
-                "コミュニケーション計画",
-                "リスクマトリックス",
                 "コストベースライン",
-                "PERT図"
+                "PERT図",
+                "リスクマトリックス",
+                "コミュニケーション計画"
             ],
-            correctAnswerIndex: 0,
+            correctAnswerIndex: 3,
             explanation: "ステークホルダーの期待を管理するためには、コミュニケーション計画が有効です。"
         ),
         QuizQuestion(
             question: "システムの可用性を高めるための手法として最も適切なのはどれですか？",
             choices: [
-                "データのバックアップ",
                 "システムの暗号化",
+                "データのバックアップ",
                 "ロードバランシング",
                 "ユーザーインターフェースの改善"
             ],
@@ -542,12 +542,12 @@ struct QuizSystemKikakuListView: View {
         QuizQuestion(
             question: "IT戦略におけるSWOT分析の目的は何ですか？",
             choices: [
-                "市場の機会と脅威を評価する",
                 "システムのパフォーマンスを評価する",
                 "ユーザーの要件を定義する",
+                "市場の機会と脅威を評価する",
                 "プロジェクトのスコープを決定する"
             ],
-            correctAnswerIndex: 0,
+            correctAnswerIndex: 2,
             explanation: "SWOT分析は、市場の機会と脅威を評価するための手法です。"
         ),
         QuizQuestion(
@@ -564,43 +564,43 @@ struct QuizSystemKikakuListView: View {
         QuizQuestion(
             question: "ITプロジェクトにおいて、スコープマネジメントの目的は何ですか？",
             choices: [
+                "プロジェクトの品質を向上させる",
                 "プロジェクトの範囲を明確にし、管理する",
                 "プロジェクトのコストを削減する",
-                "プロジェクトの品質を向上させる",
                 "プロジェクトのスケジュールを短縮する"
             ],
-            correctAnswerIndex: 0,
+            correctAnswerIndex: 1,
             explanation: "スコープマネジメントの目的は、プロジェクトの範囲を明確にし、管理することです。"
         ),
         QuizQuestion(
             question: "プロジェクトのリスク評価において、リスクの発生確率と影響度を視覚化するためのツールはどれですか？",
             choices: [
                 "リスク登録簿",
-                "リスクマトリックス",
                 "ガントチャート",
+                "リスクマトリックス",
                 "PERT図"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 2,
             explanation: "リスクマトリックスは、リスクの発生確率と影響度を視覚化するためのツールです。"
         ),
         QuizQuestion(
             question: "システムの高可用性を確保するための重要な要素はどれですか？",
             choices: [
-                "コスト管理",
-                "ロードバランシング",
                 "品質管理",
-                "プロジェクト管理"
+                "コスト管理",
+                "プロジェクト管理",
+                "ロードバランシング"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 3,
             explanation: "システムの高可用性を確保するためには、ロードバランシングが重要です。"
         ),
         QuizQuestion(
             question: "プロジェクトマネジメントにおいて、リソースの最適化を行うための手法はどれですか？",
             choices: [
                 "クリティカルパス法",
+                "PERT図",
                 "リスク分析",
-                "EVM",
-                "PERT図"
+                "EVM"
             ],
             correctAnswerIndex: 0,
             explanation: "クリティカルパス法は、リソースの最適化を行うための手法の一つです。"
@@ -609,31 +609,31 @@ struct QuizSystemKikakuListView: View {
             question: "ITガバナンスの一環として、情報システムのリスクを管理するためのフレームワークはどれですか？",
             choices: [
                 "ITIL",
-                "COBIT",
+                "PRINCE2",
                 "PMBOK",
-                "PRINCE2"
+                "COBIT"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 3,
             explanation: "COBITは、情報システムのリスクを管理するためのフレームワークです。"
         ),
         QuizQuestion(
             question: "システム開発プロジェクトにおいて、品質を保証するための活動はどれですか？",
             choices: [
+                "リスク管理",
                 "テスト計画の策定",
                 "コスト管理",
-                "リスク管理",
                 "スコープ管理"
             ],
-            correctAnswerIndex: 0,
+            correctAnswerIndex: 1,
             explanation: "品質を保証するためには、テスト計画の策定が必要です。"
         ),
         QuizQuestion(
             question: "プロジェクトの進捗を管理するために使用される指標はどれですか？",
             choices: [
                 "EVM",
-                "NPV",
                 "ROI",
-                "IRR"
+                "IRR",
+                "NPV"
             ],
             correctAnswerIndex: 0,
             explanation: "EVM（Earned Value Management）は、プロジェクトの進捗を管理するために使用される指標です。"
@@ -641,10 +641,10 @@ struct QuizSystemKikakuListView: View {
         QuizQuestion(
             question: "ITシステムの導入後に行うべきユーザー教育の目的は何ですか？",
             choices: [
-                "システムの設計を改善するため",
+                "システムの要件を定義するため",
                 "システムの運用を円滑にするため",
                 "システムのテストを完了するため",
-                "システムの要件を定義するため"
+                "システムの設計を改善するため"
             ],
             correctAnswerIndex: 1,
             explanation: "ユーザー教育の目的は、システムの運用を円滑にすることです。"
@@ -652,10 +652,10 @@ struct QuizSystemKikakuListView: View {
         QuizQuestion(
             question: "システム開発ライフサイクルの中で、ユーザー要件を定義するフェーズはどれですか？",
             choices: [
-                "設計フェーズ",
+                "テストフェーズ",
                 "分析フェーズ",
                 "実装フェーズ",
-                "テストフェーズ"
+                "設計フェーズ"
             ],
             correctAnswerIndex: 1,
             explanation: "ユーザー要件を定義するフェーズは、分析フェーズです。"
@@ -663,21 +663,21 @@ struct QuizSystemKikakuListView: View {
         QuizQuestion(
             question: "プロジェクトのスケジュール管理において、PERT図の目的は何ですか？",
             choices: [
-                "プロジェクトのリスクを評価する",
-                "プロジェクトのコストを削減する",
                 "プロジェクトのタスクとその依存関係を視覚化する",
-                "プロジェクトの品質を向上させる"
+                "プロジェクトのコストを削減する",
+                "プロジェクトの品質を向上させる",
+                "プロジェクトのリスクを評価する"
             ],
-            correctAnswerIndex: 3,
+            correctAnswerIndex: 2,
             explanation: "PERT図の目的は、プロジェクトのタスクとその依存関係を視覚化することです。"
         ),
         QuizQuestion(
             question: "ITプロジェクトにおいて、品質保証活動の一環として行うべき作業はどれですか？",
             choices: [
-                "プロジェクトのスコープを設定する",
                 "プロジェクトのリスクを評価する",
+                "コスト見積もりを行う",
                 "品質監査を実施する",
-                "コスト見積もりを行う"
+                "プロジェクトのスコープを設定する"
             ],
             correctAnswerIndex: 2,
             explanation: "品質保証活動の一環として、品質監査を実施することが必要です。"
@@ -685,34 +685,34 @@ struct QuizSystemKikakuListView: View {
         QuizQuestion(
             question: "システム開発におけるベンチマーキングの目的は何ですか？",
             choices: [
-                "コスト削減のため",
                 "最適な技術を選定するため",
-                "他のシステムと性能を比較するため",
-                "ユーザーの満足度を向上させるため"
+                "コスト削減のため",
+                "ユーザーの満足度を向上させるため",
+                "他のシステムと性能を比較するため"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 3,
             explanation: "ベンチマーキングは、他のシステムと性能を比較するために行います。"
         ),
         QuizQuestion(
             question: "システムの性能評価において、スループットとは何を示しますか？",
             choices: [
-                "システムの応答時間",
-                "システムが処理できるデータ量",
                 "システムの稼働率",
-                "システムのメンテナンス時間"
+                "システムのメンテナンス時間",
+                "システムが処理できるデータ量",
+                "システムの応答時間"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 2,
             explanation: "スループットは、システムが処理できるデータ量を示します。"
         ),
         QuizQuestion(
             question: "プロジェクトマネジメントにおいて、クリティカルパスの長さが変わると何が影響を受けますか？",
             choices: [
-                "プロジェクトのコスト",
-                "プロジェクトのスコープ",
                 "プロジェクトのスケジュール",
-                "プロジェクトの品質"
+                "プロジェクトのコスト",
+                "プロジェクトの品質",
+                "プロジェクトのスコープ"
             ],
-            correctAnswerIndex: 3,
+            correctAnswerIndex: 2,
             explanation: "クリティカルパスの長さが変わると、プロジェクトのスケジュールに影響を与えます。"
         ),
         QuizQuestion(
@@ -720,8 +720,8 @@ struct QuizSystemKikakuListView: View {
             choices: [
                 "新しい機能の動作確認",
                 "バグ修正後の動作確認",
-                "システムのパフォーマンス評価",
-                "ユーザーインターフェースの改善"
+                "ユーザーインターフェースの改善",
+                "システムのパフォーマンス評価"
             ],
             correctAnswerIndex: 1,
             explanation: "回帰テストの目的は、バグ修正後に他の部分に影響がないかを確認することです。"
@@ -729,23 +729,23 @@ struct QuizSystemKikakuListView: View {
         QuizQuestion(
             question: "IT戦略の一環として、クラウドコンピューティングを導入するメリットは何ですか？",
             choices: [
+                "オンプレミス環境の維持",
                 "コストの固定化",
                 "柔軟なリソースのスケーリング",
-                "オンプレミス環境の維持",
                 "ユーザーエクスペリエンスの向上"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 2,
             explanation: "クラウドコンピューティングを導入することで、柔軟なリソースのスケーリングが可能になります。"
         ),
         QuizQuestion(
             question: "プロジェクトのリスク管理プロセスにおいて、リスクマトリックスを使用する目的は何ですか？",
             choices: [
-                "リスクの特定",
-                "リスクの評価",
+                "リスクの移転",
                 "リスクの回避",
-                "リスクの移転"
+                "リスクの評価",
+                "リスクの特定"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 2,
             explanation: "リスクマトリックスは、リスクの評価を行うために使用します。"
         ),
         QuizQuestion(
@@ -753,54 +753,54 @@ struct QuizSystemKikakuListView: View {
             choices: [
                 "定期的なシステムのアップデート",
                 "システムのスケーラビリティ強化",
-                "システムの負荷分散",
-                "システムのデザイン改善"
+                "システムのデザイン改善",
+                "システムの負荷分散"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 3,
             explanation: "システムの可用性を高めるためには、システムの負荷分散が有効です。"
         ),
         QuizQuestion(
             question: "プロジェクトのコストパフォーマンスを管理するために用いられる手法はどれですか？",
             choices: [
+                "スコープマネジメント",
                 "ガントチャート",
                 "EVM",
-                "PERT図",
-                "スコープマネジメント"
+                "PERT図"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 2,
             explanation: "EVM（Earned Value Management）は、プロジェクトのコストパフォーマンスを管理するための手法です。"
         ),
         QuizQuestion(
             question: "システム開発におけるアジャイル手法の利点は何ですか？",
             choices: [
-                "厳格なスコープ管理",
-                "迅速な市場投入",
                 "固定された計画",
-                "高い予測性"
+                "高い予測性",
+                "厳格なスコープ管理",
+                "迅速な市場投入"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 3,
             explanation: "アジャイル手法の利点は、迅速に市場に投入できることです。"
         ),
         QuizQuestion(
             question: "プロジェクトマネジメントにおいて、プロジェクトのステークホルダーのニーズと期待を管理するための計画はどれですか？",
             choices: [
-                "コミュニケーションマネジメント計画",
+                "品質マネジメント計画",
                 "リスクマネジメント計画",
                 "スコープマネジメント計画",
-                "品質マネジメント計画"
+                "コミュニケーションマネジメント計画"
             ],
-            correctAnswerIndex: 0,
+            correctAnswerIndex: 3,
             explanation: "コミュニケーションマネジメント計画は、ステークホルダーのニーズと期待を管理するための計画です。"
         ),
         QuizQuestion(
             question: "システム開発プロジェクトにおいて、進捗を確認するために使用される会議はどれですか？",
             choices: [
-                "ステアリングコミッティー",
-                "デイリースクラム",
+                "キックオフミーティング",
                 "レビューミーティング",
-                "キックオフミーティング"
+                "デイリースクラム",
+                "ステアリングコミッティー"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 2,
             explanation: "デイリースクラムは、進捗を確認するために毎日行われる会議です。"
         ),
         QuizQuestion(
@@ -819,8 +819,8 @@ struct QuizSystemKikakuListView: View {
             choices: [
                 "EVM",
                 "NPV",
-                "ROI",
-                "IRR"
+                "IRR",
+                "ROI"
             ],
             correctAnswerIndex: 0,
             explanation: "EVM（Earned Value Management）は、プロジェクトのコストパフォーマンスを評価するために使用される指標です。"
@@ -829,20 +829,20 @@ struct QuizSystemKikakuListView: View {
             question: "システムの運用中に発生するインシデントを管理するプロセスはどれですか？",
             choices: [
                 "問題管理",
+                "リリース管理",
                 "インシデント管理",
-                "変更管理",
-                "リリース管理"
+                "変更管理"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 2,
             explanation: "インシデント管理は、システムの運用中に発生するインシデントを管理するプロセスです。"
         ),
         QuizQuestion(
             question: "システムのパフォーマンスを最適化するために行うべき活動はどれですか？",
             choices: [
                 "システムのリファクタリング",
-                "システムの監査",
                 "システムのテスト",
-                "システムのデプロイ"
+                "システムのデプロイ",
+                "システムの監査"
             ],
             correctAnswerIndex: 0,
             explanation: "システムのリファクタリングは、システムのパフォーマンスを最適化するための活動です。"
@@ -852,8 +852,8 @@ struct QuizSystemKikakuListView: View {
             choices: [
                 "リスク回避",
                 "リソースの追加",
-                "プロジェクトスコープの変更",
-                "ステークホルダーの増加"
+                "ステークホルダーの増加",
+                "プロジェクトスコープの変更"
             ],
             correctAnswerIndex: 1,
             explanation: "リソースの追加は、プロジェクトのスケジュール遅延を防ぐための有効な対策です。"
@@ -861,12 +861,12 @@ struct QuizSystemKikakuListView: View {
         QuizQuestion(
             question: "ITシステムのセキュリティ強化のために行うべき基本的な対策はどれですか？",
             choices: [
-                "アクセス制御",
-                "パフォーマンスチューニング",
+                "データのアーカイブ",
                 "ユーザーインターフェースの改善",
-                "データのアーカイブ"
+                "パフォーマンスチューニング",
+                "アクセス制御"
             ],
-            correctAnswerIndex: 0,
+            correctAnswerIndex: 3,
             explanation: "アクセス制御は、ITシステムのセキュリティ強化のために行うべき基本的な対策です。"
         ),
         QuizQuestion(
@@ -874,76 +874,76 @@ struct QuizSystemKikakuListView: View {
             choices: [
                 "変更要求の承認",
                 "変更要求の分析",
-                "変更要求の実施",
-                "変更要求のドキュメント化"
+                "変更要求のドキュメント化",
+                "変更要求の実施"
             ],
-            correctAnswerIndex: 3,
+            correctAnswerIndex: 2,
             explanation: "変更要求を評価するためには、まず変更要求をドキュメント化することが必要です。"
         ),
         QuizQuestion(
             question: "システムの高可用性を実現するための設計手法はどれですか？",
             choices: [
-                "シングルポイントオブフェイラー",
                 "ロードバランシング",
+                "クライアントサーバモデル",
                 "キャッシュコントロール",
-                "クライアントサーバモデル"
+                "シングルポイントオブフェイラー"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "ロードバランシングは、システムの高可用性を実現するための設計手法の一つです。"
         ),
         QuizQuestion(
             question: "システム開発プロジェクトにおいて、プロジェクトの完了時に作成するべきドキュメントはどれですか？",
             choices: [
-                "要件定義書",
                 "設計書",
+                "プロジェクト完了報告書",
                 "テスト結果報告書",
-                "プロジェクト完了報告書"
+                "要件定義書"
             ],
-            correctAnswerIndex: 3,
+            correctAnswerIndex: 1,
             explanation: "プロジェクトの完了時には、プロジェクト完了報告書を作成する必要があります。"
         ),
         QuizQuestion(
             question: "システムのパフォーマンスをモニタリングするために使用されるツールはどれですか？",
             choices: [
-                "IDE",
                 "VPN",
                 "APM",
+                "IDE",
                 "CI/CD"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 1,
             explanation: "APM（Application Performance Management）は、システムのパフォーマンスをモニタリングするために使用されます。"
         ),
         QuizQuestion(
             question: "プロジェクトマネジメントにおいて、チームの生産性を向上させるための方法はどれですか？",
             choices: [
+                "コスト削減",
                 "ミクロマネジメント",
-                "定期的なフィードバックの提供",
                 "プロジェクトスコープの拡大",
-                "コスト削減"
+                "定期的なフィードバックの提供"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 3,
             explanation: "定期的なフィードバックの提供は、チームの生産性を向上させるための有効な方法です。"
         ),
         QuizQuestion(
             question: "ITシステムの運用において、ディザスタリカバリ計画の目的は何ですか？",
             choices: [
-                "システムのパフォーマンスを最適化する",
                 "システム障害時に迅速に復旧する",
+                "システムのパフォーマンスを最適化する",
                 "ユーザーの操作を簡素化する",
                 "システムの機能を拡張する"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "ディザスタリカバリ計画の目的は、システム障害時に迅速に復旧することです。"
         ),
         QuizQuestion(
             question: "システム開発ライフサイクルにおいて、最終段階で行うべき活動はどれですか？",
             choices: [
                 "設計",
-                "テスト",
+                "運用と保守",
                 "実装",
-                "運用と保守"
+                "テスト"
             ],
-            correctAnswerIndex: 3,
+            correctAnswerIndex: 1,
             explanation: "システム開発ライフサイクルの最終段階では、運用と保守を行います。"
         ),
         QuizQuestion(
@@ -951,8 +951,8 @@ struct QuizSystemKikakuListView: View {
             choices: [
                 "リスク移転",
                 "リスク特定",
-                "リスク分析",
-                "リスク評価"
+                "リスク評価",
+                "リスク分析"
             ],
             correctAnswerIndex: 0,
             explanation: "リスク移転は、リスクの影響を最小化するための対策の一つです。"
@@ -960,34 +960,34 @@ struct QuizSystemKikakuListView: View {
         QuizQuestion(
             question: "ITシステムのセキュリティを確保するために必要な対策はどれですか？",
             choices: [
+                "ユーザーインターフェースの改善",
                 "定期的なパッチ適用",
                 "システムのアップグレード",
-                "ユーザーインターフェースの改善",
                 "プロジェクトスコープの縮小"
             ],
-            correctAnswerIndex: 0,
+            correctAnswerIndex: 1,
             explanation: "定期的なパッチ適用は、ITシステムのセキュリティを確保するために必要な対策です。"
         ),
         QuizQuestion(
             question: "システム開発において、ユーザー要件を収集するための手法はどれですか？",
             choices: [
-                "ユースケースモデリング",
                 "コードレビュー",
                 "テスト駆動開発",
-                "デプロイメント"
+                "デプロイメント",
+                "ユースケースモデリング"
             ],
-            correctAnswerIndex: 0,
+            correctAnswerIndex: 3,
             explanation: "ユーザー要件を収集するための手法として、ユースケースモデリングが使用されます。"
         ),
         QuizQuestion(
             question: "プロジェクトのスケジュール管理において、クリティカルパスの特定が重要な理由は何ですか？",
             choices: [
-                "コスト削減のため",
-                "リソース配分の最適化のため",
                 "プロジェクト完了までの最短経路を把握するため",
-                "リスク管理のため"
+                "リスク管理のため",
+                "コスト削減のため",
+                "リソース配分の最適化のため"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 0,
             explanation: "クリティカルパスを特定することは、プロジェクト完了までの最短経路を把握するために重要です。"
         ),
         QuizQuestion(
@@ -995,8 +995,8 @@ struct QuizSystemKikakuListView: View {
             choices: [
                 "モノリシックアーキテクチャの採用",
                 "分散型アーキテクチャの採用",
-                "ハードウェアのスペックを下げる",
-                "ユーザー数の制限"
+                "ユーザー数の制限",
+                "ハードウェアのスペックを下げる"
             ],
             correctAnswerIndex: 1,
             explanation: "分散型アーキテクチャの採用は、システムのスケーラビリティを向上させるための方法です。"
@@ -1004,10 +1004,10 @@ struct QuizSystemKikakuListView: View {
         QuizQuestion(
             question: "システム開発において、アジャイル開発のスプリントレビューの目的は何ですか？",
             choices: [
-                "次のスプリントの計画を立てる",
+                "システムのバグを修正する",
                 "スプリントの成果を確認し、フィードバックを得る",
                 "プロジェクト全体の進捗を評価する",
-                "システムのバグを修正する"
+                "次のスプリントの計画を立てる"
             ],
             correctAnswerIndex: 1,
             explanation: "スプリントレビューの目的は、スプリントの成果を確認し、フィードバックを得ることです。"
@@ -1015,9 +1015,9 @@ struct QuizSystemKikakuListView: View {
         QuizQuestion(
             question: "プロジェクトのリスクを評価する際に用いられる手法はどれですか？",
             choices: [
-                "SWOT分析",
-                "ガントチャート",
                 "フィッシュボーンダイアグラム",
+                "ガントチャート",
+                "SWOT分析",
                 "リスクマトリックス"
             ],
             correctAnswerIndex: 3,
@@ -1026,67 +1026,67 @@ struct QuizSystemKikakuListView: View {
         QuizQuestion(
             question: "システムのバックアップ戦略において、データの完全性を確保するための手法はどれですか？",
             choices: [
-                "データの暗号化",
-                "差分バックアップ",
+                "増分バックアップ",
                 "完全バックアップ",
-                "増分バックアップ"
+                "データの暗号化",
+                "差分バックアップ"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 1,
             explanation: "完全バックアップは、データの完全性を確保するための手法です。"
         ),
         QuizQuestion(
             question: "ITサービスマネジメントにおけるITILの目的は何ですか？",
             choices: [
                 "情報システムの構築",
-                "情報セキュリティの確保",
+                "システムのパフォーマンス向上",
                 "ITサービスの効率的な運用管理",
-                "システムのパフォーマンス向上"
+                "情報セキュリティの確保"
             ],
-            correctAnswerIndex: 3,
+            correctAnswerIndex: 1,
             explanation: "ITILの目的は、ITサービスの効率的な運用管理です。"
         ),
         QuizQuestion(
             question: "システム開発において、ウォーターフォールモデルの特徴はどれですか？",
             choices: [
                 "反復的な開発プロセス",
-                "段階的な進行",
                 "柔軟な変更対応",
+                "段階的な進行",
                 "ユーザーの早期関与"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 2,
             explanation: "ウォーターフォールモデルは、各フェーズを順番に進める段階的な進行が特徴です。"
         ),
         QuizQuestion(
             question: "ITガバナンスにおいて、コンプライアンスを確保するための重要な要素はどれですか？",
             choices: [
+                "法律と規制の遵守",
                 "リスクアセスメント",
-                "コスト削減",
                 "パフォーマンス評価",
-                "法律と規制の遵守"
+                "コスト削減"
             ],
-            correctAnswerIndex: 3,
+            correctAnswerIndex: 0,
             explanation: "コンプライアンスを確保するためには、法律と規制の遵守が重要です。"
         ),
         QuizQuestion(
             question: "システム開発におけるテストフェーズの目的は何ですか？",
             choices: [
-                "システムの要件を定義する",
-                "システムの設計を行う",
+                "システムを運用する",
                 "システムの不具合を発見する",
-                "システムを運用する"
+                "システムの要件を定義する",
+                "システムの設計を行う"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 1,
             explanation: "テストフェーズの目的は、システムの不具合を発見することです。"
         ),
         QuizQuestion(
             question: "プロジェクトのスコープ管理において、スコープクリープを防ぐための対策はどれですか？",
             choices: [
-                "プロジェクトの目的を明確にする",
-                "追加の要求を承認するプロセスを確立する",
+                "すべての要求を即座に受け入れる",
                 "チームのコミュニケーションを強化する",
-                "すべての要求を即座に受け入れる"
+                "追加の要求を承認するプロセスを確立する",
+                "プロジェクトの目的を明確にする"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 2,
             explanation: "スコープクリープを防ぐためには、追加の要求を承認するプロセスを確立することが重要です。"
         ),
         QuizQuestion(
@@ -1094,8 +1094,8 @@ struct QuizSystemKikakuListView: View {
             choices: [
                 "システムのパフォーマンスを最適化する",
                 "システムの障害を迅速に検知する",
-                "システムのアップグレードを計画する",
-                "ユーザーの使用状況を分析する"
+                "ユーザーの使用状況を分析する",
+                "システムのアップグレードを計画する"
             ],
             correctAnswerIndex: 1,
             explanation: "サーバの監視は、システムの障害を迅速に検知するために行います。"
@@ -1103,65 +1103,65 @@ struct QuizSystemKikakuListView: View {
         QuizQuestion(
             question: "プロジェクトのコスト管理において、予算オーバーを防ぐための方法はどれですか？",
             choices: [
-                "定期的なコストレビュー",
                 "プロジェクトスコープの拡大",
                 "リスクの保有",
+                "定期的なコストレビュー",
                 "リソースの削減"
             ],
-            correctAnswerIndex: 0,
+            correctAnswerIndex: 2,
             explanation: "定期的なコストレビューは、予算オーバーを防ぐための有効な方法です。"
         ),
         QuizQuestion(
             question: "システム開発プロジェクトの計画段階で最初に行うべき活動はどれですか？",
             choices: [
-                "リスク評価",
-                "プロジェクトスコープの定義",
                 "コスト見積もり",
-                "ステークホルダーの識別"
+                "リスク評価",
+                "ステークホルダーの識別",
+                "プロジェクトスコープの定義"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 3,
             explanation: "計画段階では、まずプロジェクトスコープを定義することが重要です。"
         ),
         QuizQuestion(
             question: "ITプロジェクトのフェーズにおいて、変更管理が最も必要とされるフェーズはどれですか？",
             choices: [
-                "計画",
-                "実装",
                 "テスト",
-                "運用"
+                "計画",
+                "運用",
+                "実装"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 3,
             explanation: "実装フェーズでは、計画の変更が頻繁に発生するため、変更管理が重要です。"
         ),
         QuizQuestion(
             question: "システム運用におけるインシデント管理の目的は何ですか？",
             choices: [
-                "システムのパフォーマンス向上",
-                "障害の迅速な解決",
+                "システムのスケーラビリティ確保",
                 "ユーザー満足度の向上",
-                "システムのスケーラビリティ確保"
+                "障害の迅速な解決",
+                "システムのパフォーマンス向上"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 2,
             explanation: "インシデント管理の目的は、システムの障害を迅速に解決することです。"
         ),
         QuizQuestion(
             question: "システム開発におけるフェーズゲートとは何ですか？",
             choices: [
-                "プロジェクトの完了を示すマイルストーン",
                 "次のフェーズに進むためのレビューと承認のポイント",
-                "リスク管理の手法",
-                "システムテストの一部"
+                "システムテストの一部",
+                "プロジェクトの完了を示すマイルストーン",
+                "リスク管理の手法"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "フェーズゲートは、次のフェーズに進むためのレビューと承認のポイントです。"
         ),
         QuizQuestion(
             question: "IT戦略の一環として、システムのスケーラビリティを確保するための手法はどれですか？",
             choices: [
-                "リファクタリング",
+                "ユーザーインターフェースの改善",
                 "クラウドコンピューティングの利用",
-                "データベースの正規化",
-                "ユーザーインターフェースの改善"
+                "リファクタリング",
+                "データベースの正規化"
             ],
             correctAnswerIndex: 1,
             explanation: "クラウドコンピューティングの利用は、システムのスケーラビリティを確保する手法の一つです。"
@@ -1169,186 +1169,186 @@ struct QuizSystemKikakuListView: View {
         QuizQuestion(
             question: "プロジェクトマネジメントにおいて、ステークホルダーとのコミュニケーションを円滑にするための手法はどれですか？",
             choices: [
-                "リスクマネジメント計画",
                 "コミュニケーション計画",
-                "品質管理計画",
-                "スケジュール管理計画"
+                "リスクマネジメント計画",
+                "スケジュール管理計画",
+                "品質管理計画"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "ステークホルダーとのコミュニケーションを円滑にするためには、コミュニケーション計画が重要です。"
         ),
         QuizQuestion(
             question: "システム開発において、品質を保証するためのプロセスはどれですか？",
             choices: [
-                "コードレビュー",
-                "コスト管理",
                 "スコープ管理",
-                "リソース管理"
+                "コスト管理",
+                "リソース管理",
+                "コードレビュー"
             ],
-            correctAnswerIndex: 0,
+            correctAnswerIndex: 3,
             explanation: "品質を保証するためには、コードレビューなどの品質管理プロセスが重要です。"
         ),
         QuizQuestion(
             question: "ITプロジェクトの成功を評価するための基準はどれですか？",
             choices: [
                 "プロジェクトの完了期間",
-                "プロジェクトの予算内での完了",
                 "プロジェクトの品質基準の達成",
-                "以上すべて"
+                "以上すべて",
+                "プロジェクトの予算内での完了"
             ],
-            correctAnswerIndex: 3,
+            correctAnswerIndex: 2,
             explanation: "ITプロジェクトの成功を評価するためには、期間、予算、品質のすべてを基準とします。"
         ),
         QuizQuestion(
             question: "システム導入前に行うべき最も重要なテストはどれですか？",
             choices: [
+                "ユーザーテスト",
                 "ユニットテスト",
                 "システムテスト",
-                "ユーザーテスト",
                 "統合テスト"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 0,
             explanation: "システム導入前には、実際のユーザーが使用して問題がないか確認するユーザーテストが重要です。"
         ),
         QuizQuestion(
             question: "プロジェクトマネジメントにおけるリスク回避の具体例はどれですか？",
             choices: [
-                "プロジェクトスコープを縮小する",
+                "リスクに対して緊急対応計画を作成する",
                 "保険をかける",
-                "リスクの発生確率を分析する",
-                "リスクに対して緊急対応計画を作成する"
+                "プロジェクトスコープを縮小する",
+                "リスクの発生確率を分析する"
             ],
-            correctAnswerIndex: 0,
+            correctAnswerIndex: 2,
             explanation: "リスク回避の具体例としては、プロジェクトスコープを縮小してリスクの発生を防ぐ方法があります。"
         ),
         QuizQuestion(
             question: "システム開発において、プロジェクトの進捗を把握するために使用される手法はどれですか？",
             choices: [
-                "クリティカルパス法",
-                "バランススコアカード",
+                "PERT図",
                 "EVM",
-                "PERT図"
+                "バランススコアカード",
+                "クリティカルパス法"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 1,
             explanation: "EVM（Earned Value Management）は、プロジェクトの進捗を把握するために使用される手法です。"
         ),
         QuizQuestion(
             question: "IT戦略の策定において最も重要な要素はどれですか？",
             choices: [
-                "技術トレンドの分析",
-                "市場調査",
                 "コスト削減",
-                "競合他社の動向"
+                "競合他社の動向",
+                "市場調査",
+                "技術トレンドの分析"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 2,
             explanation: "IT戦略の策定においては、市場調査が最も重要な要素です。"
         ),
         QuizQuestion(
             question: "システム開発におけるアジャイル手法の特徴はどれですか？",
             choices: [
+                "固定されたスコープ",
                 "徹底した計画立案",
-                "顧客の要望に対する柔軟な対応",
                 "厳格なテスト手順",
-                "固定されたスコープ"
+                "顧客の要望に対する柔軟な対応"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 3,
             explanation: "アジャイル手法は、顧客の要望に対する柔軟な対応が特徴です。"
         ),
         QuizQuestion(
             question: "プロジェクトマネジメントにおいて、ステークホルダー分析の目的は何ですか？",
             choices: [
-                "リスクの評価",
-                "コストの見積もり",
                 "関係者の影響力と関心の評価",
-                "タスクのスケジュール化"
+                "タスクのスケジュール化",
+                "リスクの評価",
+                "コストの見積もり"
             ],
-            correctAnswerIndex: 3,
+            correctAnswerIndex: 1,
             explanation: "ステークホルダー分析の目的は、関係者の影響力と関心を評価することです。"
         ),
         QuizQuestion(
             question: "システムのセキュリティを確保するために行うべき基本的な対策はどれですか？",
             choices: [
-                "システムのパフォーマンスチューニング",
-                "暗号化と認証",
                 "デザインの美しさ",
-                "データのバックアップ"
+                "データのバックアップ",
+                "暗号化と認証",
+                "システムのパフォーマンスチューニング"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 2,
             explanation: "システムのセキュリティを確保するためには、暗号化と認証が基本的な対策です。"
         ),
         QuizQuestion(
             question: "プロジェクトのリスクを最小限に抑えるための方法はどれですか？",
             choices: [
-                "リスク回避",
-                "リスク評価",
+                "リスク移転",
                 "リスク保有",
-                "リスク移転"
+                "リスク評価",
+                "リスク回避"
             ],
-            correctAnswerIndex: 0,
+            correctAnswerIndex: 3,
             explanation: "リスク回避は、プロジェクトのリスクを最小限に抑えるための方法の一つです。"
         ),
         QuizQuestion(
             question: "システム運用における定期的なメンテナンスの目的は何ですか？",
             choices: [
-                "システムの新機能追加",
                 "システムの安定性と信頼性の確保",
                 "ユーザーインターフェースの改善",
+                "システムの新機能追加",
                 "データのエントリー"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "システム運用における定期的なメンテナンスの目的は、システムの安定性と信頼性の確保です。"
         ),
         QuizQuestion(
             question: "プロジェクト計画の立案において、リソース割り当ての最適化を行う手法はどれですか？",
             choices: [
-                "クリティカルチェーン法",
                 "ウォーターフォール法",
-                "スパイラルモデル",
-                "バックログ管理"
+                "クリティカルチェーン法",
+                "バックログ管理",
+                "スパイラルモデル"
             ],
-            correctAnswerIndex: 0,
+            correctAnswerIndex: 1,
             explanation: "クリティカルチェーン法は、プロジェクト計画の立案においてリソース割り当ての最適化を行う手法です。"
         ),
         QuizQuestion(
             question: "ITプロジェクトにおいて、ベンダーマネジメントの目的は何ですか？",
             choices: [
-                "プロジェクトの予算管理",
-                "品質の確保とコスト管理",
                 "プロジェクトの進捗管理",
-                "リスクの評価と管理"
+                "プロジェクトの予算管理",
+                "リスクの評価と管理",
+                "品質の確保とコスト管理"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 3,
             explanation: "ベンダーマネジメントの目的は、品質の確保とコスト管理です。"
         ),
         QuizQuestion(
             question: "システム開発プロジェクトの終結フェーズで行うべき活動はどれですか？",
             choices: [
-                "システムの設計",
                 "システムの運用開始",
                 "プロジェクトの評価とフィードバック",
-                "ユーザー研修"
+                "ユーザー研修",
+                "システムの設計"
             ],
-            correctAnswerIndex: 2,
+            correctAnswerIndex: 1,
             explanation: "プロジェクトの終結フェーズでは、プロジェクトの評価とフィードバックを行います。"
         ),
         QuizQuestion(
             question: "システム企画において、関係者の要望を整理するために行うべき活動はどれですか？",
             choices: [
+                "テスト",
                 "要件定義",
-                "設計",
                 "実装",
-                "テスト"
+                "設計"
             ],
-            correctAnswerIndex: 0,
+            correctAnswerIndex: 1,
             explanation: "要件定義は、関係者の要望を整理して明確にするための活動です。"
         ),
         QuizQuestion(
             question: "ITプロジェクトの成功要因として最も重要なものはどれですか？",
             choices: [
-                "最新技術の使用",
+                "高額な予算",
                 "詳細な計画立案",
                 "チームのコミュニケーション",
-                "高額な予算"
+                "最新技術の使用"
             ],
             correctAnswerIndex: 2,
             explanation: "チームのコミュニケーションは、ITプロジェクトの成功において非常に重要です。"
@@ -1356,89 +1356,89 @@ struct QuizSystemKikakuListView: View {
         QuizQuestion(
             question: "システム開発において、ウォーターフォールモデルと比べてアジャイル開発の利点はどれですか？",
             choices: [
-                "計画の変更が容易",
-                "コストが低い",
                 "リスクが少ない",
-                "プロジェクト期間が長い"
+                "プロジェクト期間が長い",
+                "計画の変更が容易",
+                "コストが低い"
             ],
-            correctAnswerIndex: 0,
+            correctAnswerIndex: 2,
             explanation: "アジャイル開発は計画の変更が容易で、柔軟に対応できます。"
         ),
         QuizQuestion(
             question: "システムの可用性を高めるために用いられる手法はどれですか？",
             choices: [
-                "負荷分散",
+                "ユーザー認証",
                 "暗号化",
-                "データベース設計",
-                "ユーザー認証"
+                "負荷分散",
+                "データベース設計"
             ],
-            correctAnswerIndex: 0,
+            correctAnswerIndex: 2,
             explanation: "負荷分散は、システムの可用性を高めるために用いられる手法の一つです。"
         ),
         QuizQuestion(
             question: "システム運用における障害対応の最初のステップは何ですか？",
             choices: [
+                "再発防止策の検討",
                 "問題の分析",
-                "問題の特定",
                 "解決策の実施",
-                "再発防止策の検討"
+                "問題の特定"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 3,
             explanation: "障害対応の最初のステップは、問題の特定です。"
         ),
         QuizQuestion(
             question: "プロジェクトのスコープを管理するために用いるべき手法はどれですか？",
             choices: [
-                "ガントチャート",
                 "EVM",
+                "ガントチャート",
                 "スコープクリープ",
                 "PERT図"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 0,
             explanation: "EVM（Earned Value Management）は、プロジェクトのスコープ、コスト、スケジュールを管理するための手法です。"
         ),
         QuizQuestion(
             question: "システムのパフォーマンスを向上させるために行うべき最適化の対象はどれですか？",
             choices: [
+                "ハードウェア構成",
                 "ユーザーインターフェース",
                 "データベースクエリ",
-                "ネットワークトポロジー",
-                "ハードウェア構成"
+                "ネットワークトポロジー"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 2,
             explanation: "データベースクエリの最適化は、システムのパフォーマンス向上に効果的です。"
         ),
         QuizQuestion(
             question: "プロジェクトマネジメントにおいて、リスクを管理するためのプロセスはどれですか？",
             choices: [
-                "リスク特定",
-                "リスク回避",
+                "リスク評価",
                 "リスク移転",
-                "リスク評価"
+                "リスク特定",
+                "リスク回避"
             ],
-            correctAnswerIndex: 0,
+            correctAnswerIndex: 2,
             explanation: "リスク特定は、プロジェクトマネジメントにおいてリスクを管理するための最初のプロセスです。"
         ),
         QuizQuestion(
             question: "ITガバナンスにおいて、情報システムのリスクを評価するために用いるフレームワークはどれですか？",
             choices: [
-                "COBIT",
                 "ITIL",
-                "PMBOK",
-                "PRINCE2"
+                "COBIT",
+                "PRINCE2",
+                "PMBOK"
             ],
-            correctAnswerIndex: 0,
+            correctAnswerIndex: 1,
             explanation: "COBITは、情報システムのリスクを評価するために用いるフレームワークです。"
         ),
         QuizQuestion(
             question: "システム導入後のユーザーサポートにおける最初のポイントはどれですか？",
             choices: [
                 "問題解決のためのFAQ提供",
+                "ユーザーフィードバックの収集",
                 "トレーニングの実施",
-                "システムのバグ修正",
-                "ユーザーフィードバックの収集"
+                "システムのバグ修正"
             ],
-            correctAnswerIndex: 1,
+            correctAnswerIndex: 2,
             explanation: "システム導入後のユーザーサポートでは、まずユーザーに対するトレーニングを実施することが重要です。"
         )
 

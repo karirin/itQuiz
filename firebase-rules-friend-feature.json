@@ -1,0 +1,64 @@
+{
+  "_comment": "フレンド機能で新規に使うノードの追加ルール案です。既存のルールはFirebaseコンソール側でのみ管理されており(リポジトリ内に元ファイルが存在しない)、このファイルはそのまま `firebase deploy` はしていません。既存ルールのJSONに、対応するパス配下だけをこの内容で上書き/マージしてから適用してください。",
+
+  "rules": {
+    "friendCodes": {
+      "_comment": "コード -> uid の逆引き。本人のuid以外への書き込み・他人のコードの上書きを禁止",
+      "$code": {
+        ".read": "auth != null",
+        ".write": "auth != null && (!data.exists() || data.val() === auth.uid) && newData.val() === auth.uid"
+      }
+    },
+
+    "friends": {
+      "_comment": "friends/{uid}/{friendUid} = {since}。自分の配下のみ書き込み可",
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        "$friendUid": {
+          ".write": "auth != null && auth.uid === $uid"
+        }
+      }
+    },
+
+    "friendRequests": {
+      "_comment": "friendRequests/{toUid}/{fromUid}。宛先本人は読み取り・削除(承認/拒否)、送信者本人は新規作成のみ可能",
+      "$toUid": {
+        ".read": "auth != null && auth.uid === $toUid",
+        "$fromUid": {
+          ".write": "auth != null && (auth.uid === $toUid || (auth.uid === $fromUid && !data.exists()))"
+        }
+      }
+    },
+
+    "helperUsage": {
+      "_comment": "helperUsage/{borrowerUid}/{yyyyMMdd}/{friendUid} = true。借りた本人のみ読み書き可、後から取り消し不可(一度trueにしたら削除不可)",
+      "$borrowerUid": {
+        ".read": "auth != null && auth.uid === $borrowerUid",
+        "$dayKey": {
+          "$friendUid": {
+            ".write": "auth != null && auth.uid === $borrowerUid && !data.exists() && newData.val() === true"
+          }
+        }
+      }
+    },
+
+    "helperThanks": {
+      "_comment": "helperThanks/{ownerUid} = {pendingCoins, pendingCount}。本人は読み取り・受け取り時のリセットのみ可能。加算(助っ人を貸した側への付与)はCloud Functions化するか、クライアントからの加算のみ許可する場合はここを緩める必要あり",
+      "$ownerUid": {
+        ".read": "auth != null && auth.uid === $ownerUid",
+        ".write": "auth != null"
+      }
+    },
+
+    "users": {
+      "$uid": {
+        "friendCode": {
+          ".write": "auth != null && auth.uid === $uid"
+        },
+        "featuredAvatar": {
+          ".write": "auth != null && auth.uid === $uid"
+        }
+      }
+    }
+  }
+}

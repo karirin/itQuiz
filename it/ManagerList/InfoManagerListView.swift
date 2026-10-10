@@ -38,9 +38,11 @@ struct InfoManagerListView: View {
     @State private var showAlert: Bool = false
     @State private var preFlag: Bool = false
     @EnvironmentObject var appState: AppState
+    @EnvironmentObject private var connectivity: ConnectivityMonitor
     @State private var isLoading: Bool = true
     @State private var animateCards: Bool = false
     @State private var incorrectCount: Int = 0
+    @StateObject private var accuracyStore = LearningModeAccuracyStore()
 
     init(isPresenting: Binding<Bool>) {
         _isPresenting = isPresenting
@@ -71,25 +73,62 @@ struct InfoManagerListView: View {
                 tutorialOverlay
             }
         }
-        .onAppear(perform: setupView)
+        .onAppear {
+            setupView()
+            if !connectivity.isConnected {
+                isLoading = false
+                animateCards = true
+            }
+        }
+        .task(id: accuracyRefreshID) {
+            await accuracyStore.refresh(
+                userID: authManager.currentUserId,
+                isConnected: connectivity.isConnected,
+                isShowingQuiz: isShowingQuiz
+            )
+        }
+        .onChange(of: connectivity.isConnected) { isConnected in
+            if isConnected {
+                setupView()
+            } else {
+                isLoading = false
+                incorrectCount = 0
+                isIncorrectAnswersEmpty = true
+            }
+        }
         .gesture(swipeBackGesture)
         .fullScreenCover(isPresented: $preFlag) {
-            PreView(audioManager: audioManager)
+            PreView(
+                audioManager: audioManager,
+                source: .review(incorrectCount: incorrectCount)
+            )
         }
         .fullScreenCover(isPresented: $isPresentingQuizIncorrectAnswer) {
             QuizInfoIncorrectAnswerListView(isPresenting: $isPresentingQuizIncorrectAnswer)
         }
         .fullScreenCover(isPresented: $isPresentingQuizIntermediate) {
-            QuizInfoBasicListView(isPresenting: $isPresentingQuizIntermediate)
+            QuizInfoBasicListView(
+                isPresenting: $isPresentingQuizIntermediate,
+                isInfiniteMode: false
+            )
         }
         .fullScreenCover(isPresented: $isPresentingQuizNetwork) {
-            QuizInfoStrategyListView(isPresenting: $isPresentingQuizNetwork)
+            QuizInfoStrategyListView(
+                isPresenting: $isPresentingQuizNetwork,
+                isInfiniteMode: false
+            )
         }
         .fullScreenCover(isPresented: $isPresentingQuizGod) {
-            QuizInfoTechnologyListView(isPresenting: $isPresentingQuizGod)
+            QuizInfoTechnologyListView(
+                isPresenting: $isPresentingQuizGod,
+                isInfiniteMode: false
+            )
         }
         .fullScreenCover(isPresented: $isPresentingQuizAdvanced) {
-            QuizInfoManagementListView(isPresenting: $isPresentingQuizAdvanced)
+            QuizInfoManagementListView(
+                isPresenting: $isPresentingQuizAdvanced,
+                isInfiniteMode: false
+            )
         }
         .alert(isPresented: $showAlert) {
             Alert(
@@ -103,6 +142,7 @@ struct InfoManagerListView: View {
         }
         .navigationBarHidden(true)
     }
+
     
     private var floatingRewardButton: some View {
         VStack {
@@ -197,70 +237,28 @@ struct InfoManagerListView: View {
     }
     
     private var tutorialOverlay: some View {
-        ZStack {
-            GeometryReader { _ in
-                Color.black.opacity(0.6)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 20, style: .continuous)
-                            .frame(width: buttonRect.width - 20, height: buttonRect.height)
-                            .position(x: buttonRect.midX, y: buttonRect.midY)
-                            .blendMode(.destinationOut)
-                    )
-                    .ignoresSafeArea()
-                    .compositingGroup()
+        TutorialSpotlight(
+            spotlight: buttonRect,
+            cornerRadius: 20,
+            step: 3,
+            icon: "hand.tap.fill",
+            title: "「基礎理解」をタップ",
+            message: "まずは基礎から始めてみましょう",
+            accent: [Color(hex: "4facfe"), Color(hex: "00f2fe")],
+            placement: .auto,
+            onSkip: {
+                generateHapticFeedback()
+                tutorialNum = 0
+                authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { _ in }
             }
-
-            VStack {
-                Spacer().frame(height: buttonRect.minY + bubbleHeight)
-
-                VStack(spacing: 12) {
-                    Text("「基礎理解」をタップしてください")
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundColor(.primary)
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 16)
-                        .background(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 16))
-                        .shadow(color: .black.opacity(0.15), radius: 10)
-                }
-                .background(GeometryReader { g in
-                    Color.clear.onAppear { bubbleHeight = g.size.height }
-                })
-
-                Spacer()
-            }
-            .padding(.horizontal, 20)
-
-            VStack {
-                HStack {
-                    Button(action: {
-                        generateHapticFeedback()
-                        tutorialNum = 0
-                        authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 0) { _ in }
-                    }) {
-                        Text("スキップ")
-                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 20)
-                            .padding(.vertical, 10)
-                            .background(Color.white.opacity(0.2))
-                            .clipShape(Capsule())
-                    }
-                    .padding(.leading, 20)
-                    .padding(.top, 60)
-
-                    Spacer()
-                }
-                Spacer()
-            }
-        }
+        )
         .onTapGesture {
             audioManager.playSound()
             tutorialNum = 0
             authManager.updateTutorialNum(userId: authManager.currentUserId ?? "", tutorialNum: 3) { _ in }
         }
     }
-    
+
     private var swipeBackGesture: some Gesture {
         DragGesture()
             .onEnded { value in
@@ -271,6 +269,7 @@ struct InfoManagerListView: View {
     }
 
     private func setupView() {
+        guard connectivity.isConnected else { return }
         reward.LoadReward()
 
         if let uid = authManager.currentUserId {
@@ -297,13 +296,25 @@ struct InfoManagerListView: View {
     }
 
 
+    private var isShowingQuiz: Bool {
+        isPresentingQuizIntermediate || isPresentingQuizAdvanced || isPresentingQuizNetwork
+            || isPresentingQuizDatabase || isPresentingQuizGod || isPresentingQuizIncorrectAnswer || preFlag
+    }
+
+    private var accuracyRefreshID: String {
+        "\(authManager.currentUserId ?? "")-\(connectivity.isConnected)-\(isShowingQuiz)"
+    }
+
+    private var accuracyStatus: String? {
+        accuracyStore.status(userID: authManager.currentUserId, isConnected: connectivity.isConnected)
+    }
+
+    private var showsPreviousAccuracy: Bool {
+        accuracyStore.showsPreviousAccuracy(userID: authManager.currentUserId, isConnected: connectivity.isConnected)
+    }
+
     private var backgroundView: some View {
-        LinearGradient(
-            colors: [Color(hex: "f8fafc"), Color(hex: "e2e8f0")],
-            startPoint: .top,
-            endPoint: .bottom
-        )
-        .ignoresSafeArea()
+        LearningModeGlassBackground()
     }
 
     private var navigationBar: some View {
@@ -382,78 +393,22 @@ struct InfoManagerListView: View {
                 }
             }
         }) {
-            HStack(spacing: 16) {
-                ZStack {
-                    Circle()
-                        .fill(.white.opacity(0.2))
-                        .frame(width: 50, height: 50)
-
-                    if isLoading {
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                    } else {
-                        Image(systemName: "arrow.counterclockwise")
-                            .font(.system(size: 24, weight: .semibold))
-                            .foregroundColor(.white)
-                    }
-                }
-
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("復習問題")
-                        .font(.system(size: 18, weight: .bold))
-                        .foregroundColor(.white)
-
-                    if !isLoading {
-                        Text(!isIncorrectAnswersEmpty ? "\(incorrectCount)問の復習問題" : "復習問題なし")
-                            .font(.system(size: 12, weight: .medium))
-                            .foregroundColor(.white.opacity(0.8))
-                    }
-                }
-
-                Spacer()
-
-                if appState.isBannerVisible {
-                    VStack(spacing: 2) {
-                        Image(systemName: "crown.fill")
-                            .font(.system(size: 16))
-                            .foregroundColor(.yellow)
-                        Text("Premium")
-                            .font(.system(size: 8, weight: .bold))
-                            .foregroundColor(.white.opacity(0.9))
-                    }
-                } else if !isIncorrectAnswersEmpty {
-                    Text("\(incorrectCount)")
-                        .font(.system(size: 14, weight: .bold))
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(.white.opacity(0.2))
-                        .clipShape(Capsule())
-                }
-            }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 18)
-            .background(
-                ZStack {
-                    LinearGradient(
-                        colors: [Color(hex: "f093fb"), Color(hex: "f5576c")],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-
-                    if isIncorrectAnswersEmpty && !appState.isBannerVisible && !isLoading {
-                        Color.black.opacity(0.4)
-                    }
-                    if appState.isBannerVisible {
-                        Color.black.opacity(0.2)
-                    }
-                }
+            LearningModeGlassCard(
+                title: "復習問題",
+                subtitle: isLoading ? "復習問題を読み込み中" : (!isIncorrectAnswersEmpty ? "\(incorrectCount)問の復習問題" : "復習問題なし"),
+                count: accuracyStore.count(for: .incorrectInfoAnswer, userID: authManager.currentUserId),
+                status: accuracyStatus,
+                showsPreviousAccuracy: showsPreviousAccuracy,
+                icon: "arrow.counterclockwise",
+                badge: appState.isBannerVisible ? "Premium" : (!isIncorrectAnswersEmpty ? "\(incorrectCount)問" : nil),
+                isCompact: true,
+                gradient: QuizColors.review
             )
-            .clipShape(RoundedRectangle(cornerRadius: 16))
-            .shadow(color: Color(hex: "f093fb").opacity(0.3), radius: 8, x: 0, y: 4)
+            .opacity(isIncorrectAnswersEmpty && !appState.isBannerVisible && !isLoading ? 0.6 : 1)
         }
         .buttonStyle(.plain)
         .disabled(isIncorrectAnswersEmpty && !appState.isBannerVisible)
+        .accessibilityIdentifier("learning.info.review")
     }
 
     private var categorySection: some View {
@@ -484,6 +439,7 @@ struct InfoManagerListView: View {
                     title: "基礎理解",
                     subtitle: "基礎理解",
                     icon: "book.fill",
+                    quizLevel: .infoBasic,
                     gradient: LinearGradient(
                         colors: [Color(hex: "11998e"), Color(hex: "38ef7d")],
                         startPoint: .topLeading,
@@ -499,6 +455,7 @@ struct InfoManagerListView: View {
                     title: "ストラテジ",
                     subtitle: "ストラテジ",
                     icon: "chart.line.uptrend.xyaxis",
+                    quizLevel: .infoStrategy,
                     gradient: LinearGradient(
                         colors: [Color(hex: "4facfe"), Color(hex: "00f2fe")],
                         startPoint: .topLeading,
@@ -511,6 +468,7 @@ struct InfoManagerListView: View {
                     title: "テクノロジ",
                     subtitle: "テクノロジ",
                     icon: "cpu.fill",
+                    quizLevel: .infoTechnology,
                     gradient: LinearGradient(
                         colors: [Color(hex: "667eea"), Color(hex: "764ba2")],
                         startPoint: .topLeading,
@@ -523,6 +481,7 @@ struct InfoManagerListView: View {
                     title: "マネジメント",
                     subtitle: "マネジメント",
                     icon: "person.3.fill",
+                    quizLevel: .infoManagement,
                     gradient: LinearGradient(
                         colors: [Color(hex: "fa709a"), Color(hex: "fee140")],
                         startPoint: .topLeading,
@@ -535,10 +494,12 @@ struct InfoManagerListView: View {
         }
     }
 
+
     private func categoryButton(
         title: String,
         subtitle: String,
         icon: String,
+        quizLevel: QuizLevel,
         gradient: LinearGradient,
         delay: Double,
         action: @escaping () -> Void
@@ -548,31 +509,19 @@ struct InfoManagerListView: View {
             audioManager.playKetteiSound()
             action()
         }) {
-            HStack(spacing: 16) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(title)
-                        .font(.system(size: 18, weight: .bold))
-                        .foregroundColor(.white)
-
-                    Text(subtitle)
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundColor(.white.opacity(0.8))
-                        .lineLimit(1)
-                }
-
-                Spacer()
-
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 16, weight: .bold))
-                    .foregroundColor(.white.opacity(0.8))
-            }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 18)
-            .background(gradient)
-            .clipShape(RoundedRectangle(cornerRadius: 16))
-            .shadow(color: .black.opacity(0.15), radius: 8, x: 0, y: 4)
+            LearningModeGlassCard(
+                title: title,
+                subtitle: subtitle,
+                count: accuracyStore.count(for: quizLevel, userID: authManager.currentUserId),
+                status: accuracyStatus,
+                showsPreviousAccuracy: showsPreviousAccuracy,
+                icon: icon,
+                isCompact: true,
+                gradient: gradient
+            )
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier("learning.info.\(quizLevel.description)")
         .opacity(animateCards ? 1 : 0)
         .offset(y: animateCards ? 0 : 20)
         .animation(.spring(response: 0.5, dampingFraction: 0.8).delay(delay), value: animateCards)
@@ -599,4 +548,6 @@ struct InfoManagerListView: View {
 
 #Preview {
     InfoManagerListView(isPresenting: .constant(false))
+        .environmentObject(AppState())
+        .environmentObject(ConnectivityMonitor.shared)
 }

@@ -8,100 +8,181 @@
 import GoogleMobileAds
 import SwiftUI
 
-struct BannerAdView: UIViewRepresentable {
-    private let adUnitID = "ca-app-pub-4898800212808837/2438633524"
-    @State private var adHeight: CGFloat = 50
-    
-    func makeUIView(context: Context) -> BannerView {
-        let bannerView = BannerView(adSize: AdSizeBanner)
-        bannerView.adUnitID = adUnitID
-        bannerView.delegate = context.coordinator
-        bannerView.rootViewController = getRootViewController()
-        
-        let request = Request()
-        bannerView.load(request)
-        
-        return bannerView
+struct BannerAdView: View {
+    var body: some View {
+        AdaptiveBannerAdView(
+            productionAdUnitID: "ca-app-pub-4898800212808837/2438633524",
+            placementName: "ホーム",
+            format: .compact
+        )
     }
-    
-    func updateUIView(_ uiView: BannerView, context: Context) {}
-    
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
+}
+
+struct BannerStortyView: View {
+    var body: some View {
+        AdaptiveBannerAdView(
+            productionAdUnitID: "ca-app-pub-4898800212808837/5549995178",
+            placementName: "ストーリー",
+            format: .large
+        )
     }
-    
-    private func getRootViewController() -> UIViewController? {
-        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-              let window = windowScene.windows.first else {
-            return nil
-        }
-        return window.rootViewController
-    }
-    
-    class Coordinator: NSObject, BannerViewDelegate {
-        let parent: BannerAdView
-        
-        init(_ parent: BannerAdView) {
-            self.parent = parent
-        }
-        
-        func bannerViewDidReceiveAd(_ bannerView: BannerView) {
-            print("広告の読み込み成功")
-        }
-        
-        func bannerView(_ bannerView: BannerView, didFailToReceiveAdWithError error: Error) {
-            print("広告の読み込み失敗: \(error.localizedDescription)")
+}
+
+private enum AnchoredBannerFormat {
+    case compact
+    case large
+
+    func adSize(for width: CGFloat) -> AdSize {
+        switch self {
+        case .compact:
+            return currentOrientationAnchoredAdaptiveBanner(width: width)
+        case .large:
+            return largeAnchoredAdaptiveBanner(width: width)
         }
     }
 }
 
-struct BannerStortyView: UIViewRepresentable {
-//    private let adUnitID = "ca-app-pub-3940256099942544/2934735716"
-//    class GADBannerViewController: UIViewController, GADBannerViewDelegate {
-//        var bannerView: GADBannerView!
-//        let adUnitID = "ca-app-pub-4898800212808837/2438633524"
-    private let adUnitID = "ca-app-pub-4898800212808837/5549995178"
-    @State private var adHeight: CGFloat = 50
-    
+private struct AdaptiveBannerAdView: View {
+    let productionAdUnitID: String
+    let placementName: String
+    let format: AnchoredBannerFormat
+
+    @State private var availableWidth: CGFloat = 0
+    @State private var adHeight: CGFloat = 0
+
+    private var adUnitID: String {
+#if DEBUG
+        return "ca-app-pub-3940256099942544/2435281174"
+#else
+        return productionAdUnitID
+#endif
+    }
+
+    var body: some View {
+        Group {
+            if availableWidth > 0 {
+                AdaptiveBannerContainer(
+                    adUnitID: adUnitID,
+                    placementName: placementName,
+                    width: availableWidth,
+                    format: format
+                ) { newHeight in
+                    guard abs(adHeight - newHeight) > 0.5 else { return }
+                    adHeight = newHeight
+                }
+                .frame(width: availableWidth, height: adHeight)
+            } else {
+                Color.clear
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: adHeight)
+        .background {
+            GeometryReader { geometry in
+                Color.clear
+                    .onAppear {
+                        updateWidth(geometry.size.width)
+                    }
+                    .onChange(of: geometry.size.width) { newWidth in
+                        updateWidth(newWidth)
+                    }
+            }
+        }
+    }
+
+    private func updateWidth(_ width: CGFloat) {
+        let roundedWidth = floor(width)
+        guard roundedWidth > 0, abs(availableWidth - roundedWidth) > 0.5 else { return }
+        availableWidth = roundedWidth
+    }
+}
+
+private struct AdaptiveBannerContainer: UIViewRepresentable {
+    let adUnitID: String
+    let placementName: String
+    let width: CGFloat
+    let format: AnchoredBannerFormat
+    let onHeightChange: (CGFloat) -> Void
+
     func makeUIView(context: Context) -> BannerView {
-        let bannerView = BannerView(adSize: AdSizeBanner)
+        let adSize = format.adSize(for: width)
+        let bannerView = BannerView(adSize: adSize)
         bannerView.adUnitID = adUnitID
         bannerView.delegate = context.coordinator
-        bannerView.rootViewController = getRootViewController()
-        
-        let request = Request()
-        bannerView.load(request)
-        
+        bannerView.rootViewController = rootViewController()
+
+        context.coordinator.loadedWidth = width
+        notifyHeight(for: adSize)
+        context.coordinator.loadWhenReady(bannerView)
+
         return bannerView
     }
-    
-    func updateUIView(_ uiView: BannerView, context: Context) {}
-    
+
+    func updateUIView(_ bannerView: BannerView, context: Context) {
+        bannerView.rootViewController = rootViewController()
+
+        guard abs(context.coordinator.loadedWidth - width) > 0.5 else { return }
+
+        let adSize = format.adSize(for: width)
+        context.coordinator.loadedWidth = width
+        bannerView.adSize = adSize
+        notifyHeight(for: adSize)
+        context.coordinator.loadWhenReady(bannerView)
+    }
+
     func makeCoordinator() -> Coordinator {
-        Coordinator(self)
+        Coordinator(placementName: placementName)
     }
-    
-    private func getRootViewController() -> UIViewController? {
-        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-              let window = windowScene.windows.first else {
-            return nil
+
+    private func notifyHeight(for adSize: AdSize) {
+        let height = cgSize(for: adSize).height
+        DispatchQueue.main.async {
+            onHeightChange(height)
         }
-        return window.rootViewController
     }
-    
-    class Coordinator: NSObject, BannerViewDelegate {
-        let parent: BannerStortyView
-        
-        init(_ parent: BannerStortyView) {
-            self.parent = parent
+
+    private func rootViewController() -> UIViewController? {
+        let activeScene = UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .first { $0.activationState == .foregroundActive }
+
+        let window = activeScene?.windows.first { $0.isKeyWindow }
+            ?? activeScene?.windows.first
+
+        return window?.rootViewController
+    }
+
+    final class Coordinator: NSObject, BannerViewDelegate {
+        let placementName: String
+        var loadedWidth: CGFloat = 0
+        private weak var pendingBannerView: BannerView?
+        private var isWaitingForPrivacyAuthorization = false
+
+        init(placementName: String) {
+            self.placementName = placementName
         }
-        
+
+        func loadWhenReady(_ bannerView: BannerView) {
+            pendingBannerView = bannerView
+
+            guard !isWaitingForPrivacyAuthorization else { return }
+            isWaitingForPrivacyAuthorization = true
+
+            AdvertisingPrivacyCoordinator.shared.performWhenReady { [weak self] in
+                guard let self else { return }
+
+                self.isWaitingForPrivacyAuthorization = false
+                self.pendingBannerView?.load(Request())
+                self.pendingBannerView = nil
+            }
+        }
+
         func bannerViewDidReceiveAd(_ bannerView: BannerView) {
-            print("広告の読み込み成功")
+            print("\(placementName)アダプティブ広告の読み込み成功")
         }
-        
+
         func bannerView(_ bannerView: BannerView, didFailToReceiveAdWithError error: Error) {
-            print("広告の読み込み失敗: \(error.localizedDescription)")
+            print("\(placementName)アダプティブ広告の読み込み失敗: \(error.localizedDescription)")
         }
     }
 }

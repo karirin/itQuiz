@@ -51,9 +51,7 @@ struct MissionView: View {
             .ignoresSafeArea()
 
             if isLoading {
-                VStack {
-                    CustomSpinner5()
-                }
+                SlimeFullScreenLoadingView()
             } else {
                 VStack(spacing: 0) {
                     // カテゴリタブ
@@ -88,7 +86,7 @@ struct MissionView: View {
                         .padding(.top, 12)
                         .padding(.bottom, 100)
                     }
-                    .gesture(
+                    .simultaneousGesture(
                         DragGesture(minimumDistance: 40)
                             .onEnded { value in
                                 let categories = MissionCategory.allCases
@@ -98,7 +96,9 @@ struct MissionView: View {
                                         selectedCategory = categories[currentIndex + 1]
                                     }
                                     generateHapticFeedback()
-                                } else if value.translation.width > 0, currentIndex > 0 {
+                                } else if value.translation.width > 0,
+                                          value.startLocation.x > 28,
+                                          currentIndex > 0 {
                                     withAnimation(.easeInOut(duration: 0.2)) {
                                         selectedCategory = categories[currentIndex - 1]
                                     }
@@ -138,7 +138,10 @@ struct MissionView: View {
                 .transition(.scale(scale: 0.9).combined(with: .opacity))
             }
         }
-        .navigationBarBackButtonHidden(true)
+        .navigationTitle("ミッション")
+        .navigationBarTitleDisplayMode(.inline)
+        .appNavigationBackButton()
+        .interactiveSwipeBackEnabled()
         .onAppear {
             loadMissions()
             startTimer()

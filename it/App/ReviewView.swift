@@ -6,7 +6,103 @@
 //
 
 import SwiftUI
-import StoreKit
+import FirebaseAnalytics
+
+enum ReviewPromptSource: String {
+    case normalClear = "normal_clear"
+    case storyVictory = "story_victory"
+}
+
+final class ReviewRequestManager {
+    static let shared = ReviewRequestManager()
+
+    private enum Key {
+        static let firstEligibleUseDate = "review.firstEligibleUseDate"
+        static let completedQuizCount = "review.completedQuizCount"
+        static let lastRequestedVersion = "review.lastRequestedVersion"
+        static let requestDates = "review.requestDates"
+    }
+
+    private let defaults: UserDefaults
+    private let minimumUseInterval: TimeInterval = 7 * 24 * 60 * 60
+    private let requestCooldown: TimeInterval = 120 * 24 * 60 * 60
+    private let yearlyInterval: TimeInterval = 365 * 24 * 60 * 60
+
+    private init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
+
+        if defaults.object(forKey: Key.firstEligibleUseDate) == nil {
+            defaults.set(Date(), forKey: Key.firstEligibleUseDate)
+        }
+    }
+
+    func recordQuizCompletion(satisfactionEvent: Bool, now: Date = Date()) -> Bool {
+        let completedCount = defaults.integer(forKey: Key.completedQuizCount) + 1
+        defaults.set(completedCount, forKey: Key.completedQuizCount)
+
+        guard satisfactionEvent,
+              completedCount >= 3,
+              hasUsedAppLongEnough(at: now),
+              hasNotRequestedCurrentVersion,
+              hasPassedCooldown(at: now),
+              recentRequestDates(at: now).count < 3 else {
+            return false
+        }
+
+        return true
+    }
+
+    func markReviewRequested(source: ReviewPromptSource, now: Date = Date()) {
+        var requestDates = recentRequestDates(at: now)
+        requestDates.append(now)
+        defaults.set(requestDates, forKey: Key.requestDates)
+        defaults.set(currentVersion, forKey: Key.lastRequestedVersion)
+
+        Analytics.logEvent("review_prompt_requested", parameters: [
+            "source": source.rawValue,
+            "app_version": currentVersion,
+            "completed_quiz_count": defaults.integer(forKey: Key.completedQuizCount),
+            "days_since_first_use": daysSinceFirstUse(at: now)
+        ])
+    }
+
+    private func hasUsedAppLongEnough(at date: Date) -> Bool {
+        guard let firstUseDate = defaults.object(forKey: Key.firstEligibleUseDate) as? Date else {
+            return false
+        }
+
+        return date.timeIntervalSince(firstUseDate) >= minimumUseInterval
+    }
+
+    private var hasNotRequestedCurrentVersion: Bool {
+        defaults.string(forKey: Key.lastRequestedVersion) != currentVersion
+    }
+
+    private func hasPassedCooldown(at date: Date) -> Bool {
+        guard let lastRequestDate = recentRequestDates(at: date).max() else {
+            return true
+        }
+
+        return date.timeIntervalSince(lastRequestDate) >= requestCooldown
+    }
+
+    private func recentRequestDates(at date: Date) -> [Date] {
+        let dates = defaults.array(forKey: Key.requestDates) as? [Date] ?? []
+        return dates.filter { date.timeIntervalSince($0) < yearlyInterval }
+    }
+
+    private func daysSinceFirstUse(at date: Date) -> Int {
+        guard let firstUseDate = defaults.object(forKey: Key.firstEligibleUseDate) as? Date else {
+            return 0
+        }
+
+        return max(0, Calendar.current.dateComponents([.day], from: firstUseDate, to: date).day ?? 0)
+    }
+
+    private var currentVersion: String {
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "unknown"
+    }
+}
 
 struct ReviewView: View {
     @ObservedObject var authManager = AuthManager.shared
@@ -17,7 +113,6 @@ struct ReviewView: View {
     @State private var showAlert = false
     @State private var activeAlert: ActiveAlert?
     @State private var animateIn = false
-    @Environment(\.requestReview) var requestReview
     
     enum ActiveAlert: Identifiable {
         case satisfied, dissatisfied
@@ -78,9 +173,7 @@ struct ReviewView: View {
                     // 満足ボタン
                     Button(action: {
                         generateHapticFeedback()
-                        if toggle == true {
-                            authManager.updateUserCsFlag(userId: authManager.currentUserId!, userCsFlag: 1) { success in }
-                        }
+                        optOutIfRequested()
                         activeAlert = .satisfied
                     }) {
                         HStack(spacing: 16) {
@@ -126,7 +219,7 @@ struct ReviewView: View {
                     // 不満ボタン
                     Button(action: {
                         generateHapticFeedback()
-                        authManager.updateUserCsFlag(userId: authManager.currentUserId!, userCsFlag: 1) { success in }
+                        optOutIfRequested()
                         activeAlert = .dissatisfied
                     }) {
                         HStack(spacing: 16) {
@@ -234,10 +327,8 @@ struct ReviewView: View {
             case .satisfied:
                 return Alert(
                     title: Text("ありがとうございます！！"),
-                    message: Text("サービス向上の励みになりますので、よろしければレビューお願いします🙇‍♂️"),
+                    message: Text("いただいた回答を今後のサービス改善に活用します🙇‍♂️"),
                     dismissButton: .default(Text("OK")) {
-                        requestReview()
-                        authManager.updateUserCsFlag(userId: authManager.currentUserId!, userCsFlag: 1) { success in }
                         isPresented = false
                     }
                 )
@@ -265,10 +356,7 @@ struct ReviewView: View {
     
     private func closeModal() {
         generateHapticFeedback()
-        
-        if toggle == true {
-            authManager.updateUserCsFlag(userId: authManager.currentUserId!, userCsFlag: 1) { success in }
-        }
+        optOutIfRequested()
         
         withAnimation(.easeInOut(duration: 0.3)) {
             animateIn = false
@@ -277,6 +365,11 @@ struct ReviewView: View {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             isPresented = false
         }
+    }
+
+    private func optOutIfRequested() {
+        guard toggle else { return }
+        authManager.optOutOfCurrentFeedbackPrompts()
     }
     
     func isSmallDevice() -> Bool {

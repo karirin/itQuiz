@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import StoreKit
 
 struct StoryQuizResultView: View {
     let quizLevel: QuizLevel
@@ -25,7 +26,6 @@ struct StoryQuizResultView: View {
     @State var results: [QuizResult]
     @State private var isShow: Bool = true
     @State private var flag: Bool = false
-    @State private var preFlag: Bool = false
     @State private var showSubFlag: Bool = false
     @State private var level3flag: Bool = false
     @State private var level5flag: Bool = false
@@ -36,23 +36,37 @@ struct StoryQuizResultView: View {
     @State private var rankUpFlag: Bool = false
     @State private var rankDownFlag: Bool = false
     @EnvironmentObject var appState: AppState
+    @EnvironmentObject private var connectivity: ConnectivityMonitor
     @Binding var isPresenting: Bool
     @Binding var navigateToQuizResultView: Bool
     @State private var isHidden = false
     @State private var selectedTab = 0 // 0: 結果, 1: 統計
-    private let interstitial = Interstitial()
+    @ObservedObject var interstitial: Interstitial
+    @StateObject private var quizResultRewardAd = QuizResultRewardAd()
+    @State private var hasClaimedRewardedCoinBonus = false
+    @State private var showRewardedCoinAlert = false
+    @State private var shouldRequestReviewAfterCelebration = false
+    @State private var hasRecordedReviewCompletion = false
+    @State private var hasShownExperienceModal = false
+    @State private var isReviewRequestScheduled = false
+    @Environment(\.requestReview) private var requestReview
     @Environment(\.presentationMode) var presentationMode
     private let adViewControllerRepresentable = AdViewControllerRepresentable()
     @Binding var victoryFlag: Bool
     @Binding var isUserStoryFlag: Bool
     @ObservedObject var viewModel: PositionViewModel
-    @State private var hasRequestedInterstitial = false
-    @State private var hasPresentedInterstitial = false
     @State private var hasRecordedDungeonSummary = false
+    @State private var reviewPaywallRequested = false
+    @State private var hasRecordedAdLearningSet = false
+    @State private var hasRequestedInterstitial = false
+    @State private var isHandlingResultExit = false
+    @State private var hasSettledBattle = false
+    @State private var showAdFreeUpsellToast = false
 
-    init(results: [QuizResult], authManager: AuthManager, isPresenting: Binding<Bool>, navigateToQuizResultView: Binding<Bool>, playerExperience: Int, playerMoney: Int, itemRewards: [InventoryReward], elapsedTime: TimeInterval, quizLevel: QuizLevel, victoryFlag: Binding<Bool>, isUserStoryFlag: Binding<Bool>, viewModel: PositionViewModel) {
+    init(results: [QuizResult], authManager: AuthManager, isPresenting: Binding<Bool>, navigateToQuizResultView: Binding<Bool>, playerExperience: Int, playerMoney: Int, itemRewards: [InventoryReward], elapsedTime: TimeInterval, quizLevel: QuizLevel, victoryFlag: Binding<Bool>, isUserStoryFlag: Binding<Bool>, viewModel: PositionViewModel, interstitial: Interstitial) {
         _results = State(initialValue: results)
         self.authManager = authManager
+        self.interstitial = interstitial
         _isPresenting = isPresenting
         _navigateToQuizResultView = navigateToQuizResultView
         _playerExperience = State(initialValue: playerExperience)
@@ -98,6 +112,19 @@ struct StoryQuizResultView: View {
                         // 結果サマリーカード
                         resultSummaryCard
                             .padding(.horizontal).padding(.top,5)
+                        if shouldShowReviewUpsell {
+                            ResultReviewUpsellCard(
+                                incorrectCount: incorrectAnswersCount,
+                                action: presentReviewPaywall
+                            )
+                            .padding(.horizontal)
+                            .padding(.top, 12)
+                        }
+                        if appState.shouldShowAds && !isUserStoryFlag {
+                            rewardedCoinBonusCard
+                                .padding(.horizontal)
+                                .padding(.top, 12)
+                        }
                         // タブ選択
                         tabSelector
                         
@@ -123,17 +150,34 @@ struct StoryQuizResultView: View {
             
             // モーダル類
             modalOverlays
+
+            if showAdFreeUpsellToast {
+                VStack {
+                    Spacer()
+                    AdFreeUpsellToast()
+                        .padding(.horizontal, 20)
+                        .padding(.bottom, 28)
+                }
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+                .zIndex(100)
+            }
         }
         .gesture(
             DragGesture()
                 .onEnded { value in
                     if value.translation.width > 80 {
-                        isPresenting = false
+                        handleResultExit(action: "swipe_back")
                     }
                 }
         )
-        .fullScreenCover(isPresented: $preFlag) {
-            PreView(audioManager: audioManager)
+        .fullScreenCover(isPresented: $showSubFlag, onDismiss: handleSubscriptionDismiss) {
+            PreView(
+                audioManager: audioManager,
+                source: reviewPaywallRequested
+                    ? .review(incorrectCount: reviewPaywallIncorrectCount)
+                    : .result,
+                onPurchaseSuccess: reviewPaywallRequested ? {} : nil
+            )
         }
         .onChange(of: authManager.didLevelUp) { newValue in
             if newValue {
@@ -160,7 +204,12 @@ struct StoryQuizResultView: View {
             }
         }
         .onAppear {
+            prepareReviewRequestIfNeeded()
+            prepareInterstitialOpportunity()
             setupOnAppear()
+            if appState.shouldShowAds && !isUserStoryFlag {
+                quizResultRewardAd.preloadIfNeeded()
+            }
             if !hasRecordedDungeonSummary {
                 viewModel.recordBattleSession(
                     accuracy: accuracyPercentage,
@@ -169,29 +218,32 @@ struct StoryQuizResultView: View {
                     totalCount: results.count,
                     victory: victoryFlag
                 )
+                if victoryFlag {
+                    authManager.recordStoryCompleted(isBoss: viewModel.monsterName.hasPrefix("ボス"))
+                }
                 hasRecordedDungeonSummary = true
-            }
-            // ストーリークリア時のミッション進捗
-            if victoryFlag {
-                authManager.recordStoryCompleted()
             }
             // モーダルを少し遅れて表示
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 showModal = true
             }
         }
-        .onDisappear {
-            if victoryFlag {
-                if isUserStoryFlag {
-                    viewModel.incrementUserPosition()
-                } else {
-                    viewModel.incrementPosition()
-                }
-            } else {
-                if !viewModel.consumeDefeatShield() {
-                    viewModel.decreaseStamina(by: 10)
-                }
+        .onChange(of: showModal) { isShowing in
+            if isShowing {
+                hasShownExperienceModal = true
+            } else if hasShownExperienceModal {
+                scheduleReviewRequestIfNeeded()
             }
+        }
+        .onChange(of: canPresentReviewRequest) { canPresent in
+            if canPresent && hasShownExperienceModal {
+                scheduleReviewRequestIfNeeded()
+            }
+        }
+        .alert("コイン獲得！", isPresented: $showRewardedCoinAlert) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("追加で\(rewardedCoinBonusAmount)コインを獲得しました。")
         }
     }
     
@@ -203,22 +255,21 @@ struct StoryQuizResultView: View {
                 Spacer()
                 Button(action: {
                     generateHapticFeedback()
-                    preFlag = true
+                    reviewPaywallRequested = false
+                    showSubFlag = true
                     audioManager.playSound()
                 }) {
                     Image("プレミアムプランボタン")
                         .resizable()
-                        .frame(width: 240, height: 70)
+                        .scaledToFit()
+                        .frame(maxWidth: 360)
                 }
+                .accessibilityLabel("プレミアムプランを見る")
                 .shadow(color: .black.opacity(0.2), radius: 5, x: 0, y: 2)
-                .fullScreenCover(isPresented: $showSubFlag) {
-                    SubscriptionView(audioManager: audioManager)
-                }
                 Spacer()
             }
         }
         .padding(.horizontal)
-        .padding(.top, 10)
     }
     
     // MARK: - Result Summary Card
@@ -238,6 +289,144 @@ struct StoryQuizResultView: View {
                 .fill(Color(.systemBackground))
                 .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 4)
         )
+    }
+
+    private var incorrectAnswersCount: Int {
+        results.filter { !$0.isCorrect }.count
+    }
+
+    private var isReviewQuiz: Bool {
+        switch quizLevel {
+        case .incorrectAnswer, .incorrectITAnswer, .incorrectInfoAnswer,
+             .incorrectAppliedAnswer, .incorrectESAnswer, .incorrectITStrategyAnswer:
+            return true
+        default:
+            return false
+        }
+    }
+
+    private var shouldShowReviewUpsell: Bool {
+        appState.shouldShowAds && !isReviewQuiz && incorrectAnswersCount > 0
+    }
+
+    private var reviewPaywallIncorrectCount: Int {
+        guard let userId = authManager.currentUserId else {
+            return incorrectAnswersCount
+        }
+        return max(
+            incorrectAnswersCount,
+            LocalIncorrectAnswerStore.count(
+                userId: userId,
+                category: quizLevel.localReviewCategory
+            )
+        )
+    }
+
+    private func presentReviewPaywall() {
+        generateHapticFeedback()
+        audioManager.playSound()
+        reviewPaywallRequested = true
+        showSubFlag = true
+    }
+
+    private func handleSubscriptionDismiss() {
+        reviewPaywallRequested = false
+        Task { @MainActor in
+            await appState.refreshSubscriptionState()
+        }
+    }
+
+    private var rewardedCoinBonusAmount: Int {
+        playerMoney * authManager.rewardFlag
+    }
+
+    private var rewardedCoinBonusCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 12) {
+                Image(systemName: "play.rectangle.fill")
+                    .font(.system(size: 28))
+                    .foregroundColor(.orange)
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("広告を見てコイン2倍")
+                        .font(.headline)
+                    Text("今回の獲得コインと同額を追加します")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+
+                Spacer()
+
+                Text("+\(rewardedCoinBonusAmount)")
+                    .font(.title3)
+                    .fontWeight(.bold)
+                    .foregroundColor(.orange)
+            }
+
+            Button(action: handleRewardedCoinBonus) {
+                HStack(spacing: 8) {
+                    if quizResultRewardAd.isLoading {
+                        ProgressView()
+                            .tint(.white)
+                    } else {
+                        Image(systemName: hasClaimedRewardedCoinBonus ? "checkmark.circle.fill" : "play.fill")
+                    }
+
+                    Text(rewardedCoinBonusButtonTitle)
+                        .fontWeight(.semibold)
+                }
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(hasClaimedRewardedCoinBonus ? Color.green : Color.orange)
+                )
+            }
+            .disabled(
+                hasClaimedRewardedCoinBonus
+                || quizResultRewardAd.isPresenting
+                || (!quizResultRewardAd.isLoaded && !quizResultRewardAd.loadFailed)
+            )
+        }
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color(.systemBackground))
+                .shadow(color: .black.opacity(0.08), radius: 6, x: 0, y: 3)
+        )
+    }
+
+    private var rewardedCoinBonusButtonTitle: String {
+        if hasClaimedRewardedCoinBonus {
+            return "獲得済み"
+        }
+        if quizResultRewardAd.loadFailed {
+            return "広告を再読み込み"
+        }
+        if quizResultRewardAd.isLoaded {
+            return "広告を見て +\(rewardedCoinBonusAmount)コイン"
+        }
+        return "広告を準備中"
+    }
+
+    private func handleRewardedCoinBonus() {
+        generateHapticFeedback()
+
+        if quizResultRewardAd.loadFailed {
+            quizResultRewardAd.preloadIfNeeded()
+            return
+        }
+
+        quizResultRewardAd.present(from: adViewControllerRepresentable.viewController) {
+            DispatchQueue.main.async {
+                guard !self.hasClaimedRewardedCoinBonus else { return }
+
+                self.hasClaimedRewardedCoinBonus = true
+                self.authManager.addMoney(amount: self.rewardedCoinBonusAmount)
+                self.showRewardedCoinAlert = true
+            }
+        }
     }
     
     private var timeAttackSummary: some View {
@@ -631,8 +820,7 @@ struct StoryQuizResultView: View {
     private var backButton: some View {
         Button(action: {
             generateHapticFeedback()
-            isPresenting = false
-            audioManager.playCancelSound()
+            handleResultExit(action: "back_button")
         }) {
             HStack(spacing: 4) {
                 Image(systemName: "chevron.left")
@@ -706,30 +894,127 @@ struct StoryQuizResultView: View {
         formatter.zeroFormattingBehavior = .pad
         return formatter.string(from: duration) ?? ""
     }
-    
-    private func setupOnAppear() {
-        authManager.fetchUserStory()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            if appState.shouldShowAds {
-                executeProcessEveryFortyTimes()
-            }
+
+    private func prepareInterstitialOpportunity() {
+        if !hasRecordedAdLearningSet {
+            InterstitialOpportunityCoordinator.shared.recordLearningSetCompleted()
+            hasRecordedAdLearningSet = true
         }
 
-        if appState.shouldShowAds && !hasRequestedInterstitial {
-            hasRequestedInterstitial = true
+        guard !hasRequestedInterstitial else { return }
+        hasRequestedInterstitial = true
 
-            interstitial.loadInterstitial { isLoaded in
-                DispatchQueue.main.async {
-                    guard isLoaded,
-                          !self.hasPresentedInterstitial,
-                          !self.interstitial.wasAdDismissed
-                    else { return }
+        let coordinator = InterstitialOpportunityCoordinator.shared
+        let exclusionReason = showSubFlag ? "paywall_presented" : nil
+        let eligibilityDecision = coordinator.decision(
+            subscriptionStateResolved: appState.hasResolvedSubscriptionState,
+            isSubscribed: appState.isSubscribed,
+            isConnected: connectivity.isConnected,
+            isAdReady: true,
+            exclusionReason: exclusionReason
+        )
 
-                    self.hasPresentedInterstitial = true
-                    self.interstitial.presentInterstitial(from: adViewControllerRepresentable.viewController)
+        guard eligibilityDecision.shouldShow else {
+            coordinator.recordOpportunity(
+                eligibilityDecision,
+                surface: "story_result",
+                action: "result_appear",
+                didShow: false
+            )
+            return
+        }
+
+        interstitial.preloadIfNeeded { isLoaded in
+            DispatchQueue.main.async {
+                let decision = coordinator.decision(
+                    subscriptionStateResolved: appState.hasResolvedSubscriptionState,
+                    isSubscribed: appState.isSubscribed,
+                    isConnected: connectivity.isConnected,
+                    isAdReady: isLoaded && interstitial.isReady,
+                    exclusionReason: showSubFlag ? "paywall_presented" : nil
+                )
+
+                guard decision.shouldShow else {
+                    coordinator.recordOpportunity(
+                        decision,
+                        surface: "story_result",
+                        action: "result_appear",
+                        didShow: false
+                    )
+                    return
+                }
+
+                let didPresent = interstitial.presentInterstitial(
+                    from: adViewControllerRepresentable.viewController
+                ) { didShow in
+                    DispatchQueue.main.async {
+                        coordinator.recordOpportunity(
+                            decision,
+                            surface: "story_result",
+                            action: "result_appear",
+                            didShow: didShow
+                        )
+                        if didShow {
+                            showAdFreeMessage()
+                        }
+                    }
+                }
+
+                if !didPresent {
+                    coordinator.recordOpportunity(
+                        decision,
+                        surface: "story_result",
+                        action: "result_appear",
+                        didShow: false
+                    )
                 }
             }
         }
+    }
+
+    private func handleResultExit(action _: String) {
+        guard !isHandlingResultExit else { return }
+        isHandlingResultExit = true
+        shouldRequestReviewAfterCelebration = false
+        finishResultExit()
+    }
+
+    private func showAdFreeMessage() {
+        withAnimation(.easeOut(duration: 0.2)) {
+            showAdFreeUpsellToast = true
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.25) {
+            withAnimation(.easeOut(duration: 0.2)) {
+                showAdFreeUpsellToast = false
+            }
+        }
+    }
+
+    private func finishResultExit() {
+        audioManager.playCancelSound()
+        settleBattleIfNeeded()
+        isPresenting = false
+    }
+
+    private func settleBattleIfNeeded() {
+        guard !hasSettledBattle else { return }
+        hasSettledBattle = true
+        if victoryFlag {
+            if isUserStoryFlag {
+                viewModel.incrementUserPosition()
+            } else {
+                viewModel.incrementPosition()
+            }
+        } else {
+            if !viewModel.consumeDefeatShield() {
+                viewModel.decreaseStamina(by: 10)
+            }
+        }
+    }
+
+    private func setupOnAppear() {
+        authManager.fetchUserStory()
         
         // レベルとタイトル処理
         authManager.fetchUserExperienceAndLevel()
@@ -737,6 +1022,56 @@ struct StoryQuizResultView: View {
             checkLevelTitles()
             checkAnswerTitles()
         }
+    }
+
+    private func prepareReviewRequestIfNeeded() {
+        guard !hasRecordedReviewCompletion else { return }
+
+        hasRecordedReviewCompletion = true
+        shouldRequestReviewAfterCelebration = ReviewRequestManager.shared.recordQuizCompletion(
+            satisfactionEvent: victoryFlag
+        )
+    }
+
+    private func scheduleReviewRequestIfNeeded(attempt: Int = 0) {
+        guard shouldRequestReviewAfterCelebration, !isReviewRequestScheduled else { return }
+
+        isReviewRequestScheduled = true
+
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 2_000_000_000)
+            self.isReviewRequestScheduled = false
+
+            guard self.shouldRequestReviewAfterCelebration else { return }
+
+            if self.canPresentReviewRequest {
+                ReviewRequestManager.shared.markReviewRequested(source: .storyVictory)
+                self.shouldRequestReviewAfterCelebration = false
+                self.requestReview()
+            } else if attempt < 3 {
+                self.scheduleReviewRequestIfNeeded(attempt: attempt + 1)
+            }
+        }
+    }
+
+    private var canPresentReviewRequest: Bool {
+        !showModal
+        && !showLevelUpModal
+        && !showTittleModal
+        && !showMemoView
+        && !showSubFlag
+        && !level3flag
+        && !level5flag
+        && !level10flag
+        && !answer30flag
+        && !answer50flag
+        && !answer100flag
+        && !rankUpFlag
+        && !rankDownFlag
+        && !showRewardedCoinAlert
+        && !quizResultRewardAd.isPresenting
+        && !interstitial.isLoading
+        && !interstitial.isPresenting
     }
     
     private func checkLevelTitles() {
@@ -795,13 +1130,6 @@ struct StoryQuizResultView: View {
         }
     }
     
-    func executeProcessEveryFortyTimes() {
-        let count = UserDefaults.standard.integer(forKey: "launchPreCount") + 1
-        UserDefaults.standard.set(count, forKey: "launchPreCount")
-        if count % 3 == 0 {
-            preFlag = true
-        }
-    }
 }
 
 // MARK: - Preview
@@ -829,7 +1157,8 @@ struct StoryQuizResultView_Previews: PreviewProvider {
             quizLevel: .beginner,
             victoryFlag: .constant(true),
             isUserStoryFlag: .constant(false),
-            viewModel: PositionViewModel.shared
+            viewModel: PositionViewModel.shared,
+            interstitial: Interstitial()
         )
     }
 }

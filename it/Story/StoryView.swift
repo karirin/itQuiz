@@ -43,6 +43,21 @@ struct DungeonChapterInfo: Identifiable, Equatable {
             range: 101...150,
             symbolName: "sparkles",
             accentColors: [Color(hex: "667eea"), Color(hex: "764ba2")]
+        ),
+        DungeonChapterInfo(
+            id: 4, title: "蒼穹の防衛要塞", subtitle: "通信・認証・運用の力で要塞を奪還する",
+            range: 151...200, symbolName: "shield.lefthalf.filled",
+            accentColors: [Color(hex: "2575fc"), Color(hex: "6a11cb")]
+        ),
+        DungeonChapterInfo(
+            id: 5, title: "創造の機巧遺跡", subtitle: "データ・設計・開発をつなぎ、遺跡を再起動する",
+            range: 201...250, symbolName: "gearshape.2.fill",
+            accentColors: [Color(hex: "f7971e"), Color(hex: "c65d35")]
+        ),
+        DungeonChapterInfo(
+            id: 6, title: "天空の総合試練", subtitle: "技術・管理・戦略を結集し、知恵の頂へ",
+            range: 251...300, symbolName: "crown.fill",
+            accentColors: [Color(hex: "11998e"), Color(hex: "38ef7d")]
         )
     ]
 
@@ -147,134 +162,6 @@ struct DungeonBattleSnapshot: Codable, Hashable {
     let recordedAt: TimeInterval
 }
 
-enum DungeonBoardEventKind: String, Codable {
-    case rest
-    case routeChoice
-    case lore
-    case study
-
-    var title: String {
-        switch self {
-        case .rest:
-            return "休憩マス"
-        case .routeChoice:
-            return "分岐イベント"
-        case .lore:
-            return "ストーリー会話"
-        case .study:
-            return "学習イベント"
-        }
-    }
-
-    var iconName: String {
-        switch self {
-        case .rest:
-            return "bed.double.fill"
-        case .routeChoice:
-            return "point.topleft.down.curvedto.point.bottomright.up.fill"
-        case .lore:
-            return "text.bubble.fill"
-        case .study:
-            return "book.fill"
-        }
-    }
-
-    var accentColors: [Color] {
-        switch self {
-        case .rest:
-            return [Color(hex: "43cea2"), Color(hex: "185a9d")]
-        case .routeChoice:
-            return [Color(hex: "f093fb"), Color(hex: "f5576c")]
-        case .lore:
-            return [Color(hex: "4facfe"), Color(hex: "00f2fe")]
-        case .study:
-            return [Color(hex: "667eea"), Color(hex: "764ba2")]
-        }
-    }
-}
-
-struct DungeonBoardEvent: Identifiable, Hashable {
-    let position: Int
-    let kind: DungeonBoardEventKind
-    let title: String
-    let subtitle: String
-    let rewardText: String
-
-    var id: Int { position }
-
-    static let all: [DungeonBoardEvent] = [
-        DungeonBoardEvent(position: 17, kind: .rest, title: "焚き火の休憩所", subtitle: "深呼吸して次の戦いに備えよう", rewardText: "スタミナ回復 or 次戦ブースト"),
-        DungeonBoardEvent(position: 26, kind: .routeChoice, title: "三叉路", subtitle: "安全・報酬・挑戦のどれで進む？", rewardText: "進み方を選んで一時効果を獲得"),
-        DungeonBoardEvent(position: 33, kind: .lore, title: "旅人のメモ", subtitle: "学習のコツが見つかる小さな会話", rewardText: "励ましとヒントを獲得"),
-        DungeonBoardEvent(position: 41, kind: .study, title: "復習の祭壇", subtitle: "要点を思い出して集中力アップ", rewardText: "スタミナ+5 & 戦闘ブースト"),
-        DungeonBoardEvent(position: 67, kind: .rest, title: "薬草の泉", subtitle: "疲れを流してテンポを戻そう", rewardText: "スタミナ回復 or 次戦ブースト"),
-        DungeonBoardEvent(position: 84, kind: .routeChoice, title: "採掘ルート", subtitle: "欲しいごほうびに合わせて道を決めよう", rewardText: "進み方を選んで一時効果を獲得"),
-        DungeonBoardEvent(position: 72, kind: .lore, title: "先人のアドバイス", subtitle: "苦手分野との向き合い方を知る", rewardText: "励ましとヒントを獲得"),
-        DungeonBoardEvent(position: 92, kind: .study, title: "ひらめきの図書室", subtitle: "短い復習で集中力を高めよう", rewardText: "スタミナ+5 & 戦闘ブースト"),
-        DungeonBoardEvent(position: 104, kind: .rest, title: "深層キャンプ", subtitle: "高難度前の一休み", rewardText: "スタミナ回復 or 次戦ブースト"),
-        DungeonBoardEvent(position: 125, kind: .routeChoice, title: "深淵の分岐", subtitle: "最後の追い込み方を選ぼう", rewardText: "進み方を選んで一時効果を獲得"),
-        DungeonBoardEvent(position: 135, kind: .lore, title: "古代端末の記録", subtitle: "最後のボスに向けた助言", rewardText: "励ましとヒントを獲得"),
-        DungeonBoardEvent(position: 121, kind: .study, title: "最終復習エリア", subtitle: "締めの復習で勝率を上げよう", rewardText: "スタミナ+5 & 戦闘ブースト"),
-        DungeonBoardEvent(position: 145, kind: .rest, title: "夜営地", subtitle: "決戦前に整えていこう", rewardText: "スタミナ回復 or 次戦ブースト")
-    ]
-
-    static func event(at position: Int) -> DungeonBoardEvent? {
-        all.first(where: { $0.position == position })
-    }
-}
-
-enum DungeonRouteChoice: String, CaseIterable, Identifiable {
-    case safe
-    case reward
-    case challenge
-
-    var id: String { rawValue }
-
-    var title: String {
-        switch self {
-        case .safe:
-            return "安全ルート"
-        case .reward:
-            return "報酬ルート"
-        case .challenge:
-            return "強敵ルート"
-        }
-    }
-
-    var subtitle: String {
-        switch self {
-        case .safe:
-            return "スタミナを少し回復しつつ、負け保険を得る"
-        case .reward:
-            return "次の宝箱コインを大きく伸ばす"
-        case .challenge:
-            return "次の戦闘で火力アップ"
-        }
-    }
-
-    var iconName: String {
-        switch self {
-        case .safe:
-            return "shield.fill"
-        case .reward:
-            return "sparkles.square.filled.on.square"
-        case .challenge:
-            return "flame.fill"
-        }
-    }
-
-    var accentColors: [Color] {
-        switch self {
-        case .safe:
-            return [Color(hex: "11998e"), Color(hex: "38ef7d")]
-        case .reward:
-            return [Color(hex: "f7971e"), Color(hex: "ffd200")]
-        case .challenge:
-            return [Color(hex: "ff9a44"), Color(hex: "fc6076")]
-        }
-    }
-}
-
 struct QuizStoryData: Identifiable {
     let id = UUID()
     let monsterName: String
@@ -318,7 +205,19 @@ class PositionViewModel: ObservableObject {
         static let maxStamina: Int = 100
         static let staminaRecoveryInterval: TimeInterval = 60 // 60秒 = 1分
         static let staminaRecoveryAmount: Int = 1
-        static let finalFloor: Int = 150
+        static let finalFloor: Int = DungeonExpansion.finalFloor
+    }
+
+    var dungeonStaminaCost: Int {
+#if DEBUG
+        return 0
+#else
+        return 10
+#endif
+    }
+
+    var canEnterDungeon: Bool {
+        stamina >= dungeonStaminaCost
     }
 
     private let dungeonBoostsKey = "story.dungeon.boosts"
@@ -386,10 +285,10 @@ class PositionViewModel: ObservableObject {
             if self.stamina > Constants.maxStamina {
                 self.stamina = Constants.maxStamina
             }
+            // 加算後の値を保存する（非同期ブロックの外で保存すると1つ前の値が書き込まれる）
+            self.updateStaminaInFirebase()
+            self.refreshRecoveryCountdown()
         }
-        
-        updateStaminaInFirebase()
-        refreshRecoveryCountdown()
     }
     
     // スタミナ回復のためのメソッド
@@ -400,46 +299,71 @@ class PositionViewModel: ObservableObject {
                 completion(false)
                 return
             }
+            // 起動直後は stamina が初期値(100)のままのことがあり、そのまま計算すると回復分が失われる。
+            // 保存済みの値を読み込んでから回復量を計算する。
+            self.fetchLatestStamina {
+                self.applyOfflineRecovery(lastActiveTimestamp: lastActiveTimestamp, completion: completion)
+            }
+        }
+    }
 
-            let currentTime = Date().timeIntervalSince1970
-
-            if let lastActive = lastActiveTimestamp {
-                let elapsedTime = currentTime - lastActive
-                let minutesPassed = Int(elapsedTime / Constants.staminaRecoveryInterval)
-
-                guard minutesPassed > 0 else {
-                    print("スタミナ回復の必要なし。経過時間: \(elapsedTime)秒")
-                    completion(true)
-                    self.refreshRecoveryCountdown(elapsedSinceLastActive: elapsedTime)
-                    self.startStaminaRecoveryTimer()
-                    return
+    private func fetchLatestStamina(completion: @escaping () -> Void) {
+        guard let userId = authManager.currentUserId else {
+            DispatchQueue.main.async { completion() }
+            return
+        }
+        dbRef.child("storys").child(userId).child("stamina").observeSingleEvent(of: .value, with: { snapshot in
+            DispatchQueue.main.async {
+                if let staminaValue = snapshot.value as? Int {
+                    self.stamina = staminaValue
                 }
+                completion()
+            }
+        }, withCancel: { error in
+            print("スタミナの取得に失敗しました: \(error.localizedDescription)")
+            DispatchQueue.main.async { completion() }
+        })
+    }
 
-                let staminaToRecover = minutesPassed * Constants.staminaRecoveryAmount
-                let newStamina = min(self.stamina + staminaToRecover, Constants.maxStamina)
-                let actualRecovered = newStamina - self.stamina
+    private func applyOfflineRecovery(lastActiveTimestamp: TimeInterval?, completion: @escaping (Bool) -> Void) {
+        let currentTime = Date().timeIntervalSince1970
 
-                if actualRecovered > 0 {
-                    DispatchQueue.main.async {
-                        self.stamina = newStamina
-                        self.updateStaminaInFirebase()
-                    }
-                    print("\(actualRecovered)スタミナを回復しました。")
-                } else {
-                    print("スタミナの回復が必要ありません。")
-                }
+        if let lastActive = lastActiveTimestamp {
+            let elapsedTime = currentTime - lastActive
+            let minutesPassed = Int(elapsedTime / Constants.staminaRecoveryInterval)
 
+            guard minutesPassed > 0 else {
+                print("スタミナ回復の必要なし。経過時間: \(elapsedTime)秒")
+                completion(true)
                 self.refreshRecoveryCountdown(elapsedSinceLastActive: elapsedTime)
-            } else {
-                print("lastActiveTimeが存在しないため、スタミナ回復をスキップします。")
-                self.refreshRecoveryCountdown()
+                self.startStaminaRecoveryTimer()
+                return
             }
 
-            // 最後のアクティブ時刻を現在時刻に更新
-            self.authManager.saveLastActiveTimeToFirebase { success in
-                completion(success)
-                self.startStaminaRecoveryTimer()
+            let staminaToRecover = minutesPassed * Constants.staminaRecoveryAmount
+            let newStamina = min(self.stamina + staminaToRecover, Constants.maxStamina)
+            let actualRecovered = newStamina - self.stamina
+
+            if actualRecovered > 0 {
+                DispatchQueue.main.async {
+                    self.stamina = newStamina
+                    self.updateStaminaInFirebase()
+                }
+                print("\(actualRecovered)スタミナを回復しました。")
+            } else {
+                print("スタミナの回復が必要ありません。")
             }
+
+            self.refreshRecoveryCountdown(elapsedSinceLastActive: elapsedTime)
+        } else {
+            print("lastActiveTimeが存在しないため、スタミナ回復をスキップします。")
+            self.refreshRecoveryCountdown()
+        }
+
+        // 最後のアクティブ時刻を現在時刻に更新
+        self.authManager.saveLastActiveTimeToFirebase { success in
+            completion(success)
+            self.startStaminaRecoveryTimer()
         }
     }
     
@@ -462,9 +386,9 @@ class PositionViewModel: ObservableObject {
         guard amount > 0 else { return }
         DispatchQueue.main.async {
             self.stamina = min(self.stamina + amount, Constants.maxStamina)
+            self.updateStaminaInFirebase()
+            self.refreshRecoveryCountdown()
         }
-        updateStaminaInFirebase()
-        refreshRecoveryCountdown()
     }
     
     // スタミナを更新するメソッド
@@ -558,25 +482,57 @@ class PositionViewModel: ObservableObject {
         }
     }
     
+#if DEBUG
+    /// Changes only the dungeon position, without spending stamina or recording steps.
+    func setPositionForDebug(_ position: Int, completion: @escaping (Result<Void, Error>) -> Void) {
+        guard (1...Constants.finalFloor).contains(position),
+              let userId = authManager.currentUserId else {
+            completion(.failure(NSError(domain: "DungeonDebug", code: 1,
+                                        userInfo: [NSLocalizedDescriptionKey: "ログイン状態とコマ数を確認してください。"])))
+            return
+        }
+
+        dbRef.child("storys").child(userId).child("position").setValue(position) { [weak self] error, _ in
+            DispatchQueue.main.async {
+                guard let self, self.authManager.currentUserId == userId else {
+                    completion(.failure(NSError(domain: "DungeonDebug", code: 2,
+                                                userInfo: [NSLocalizedDescriptionKey: "ユーザーが変更されました。もう一度お試しください。"])))
+                    return
+                }
+                if let error {
+                    completion(.failure(error))
+                } else {
+                    self.userPosition = position
+                    self.isPositionFetched = true
+                    completion(.success(()))
+                }
+            }
+        }
+    }
+#endif
+
     func fetchAvatars(for userId: String) {
         authManager.fetchAvatars() {}
     }
     
     /// ユーザーのポジションを増加させる
     func incrementPosition() {
+        guard userPosition < Constants.finalFloor else { return }
         guard let userId = AuthManager.shared.currentUserId else {
             print("User is not logged in.")
             return
         }
         
         // スタミナが十分か確認
-        guard self.stamina >= 10 else {
+        guard canEnterDungeon else {
             showStaminaAlert = true
             return
         }
         
         let newPosition = min(userPosition + 1, Constants.finalFloor)
-        let newStamina = self.stamina - 10
+        let previousPosition = userPosition
+        let previousStamina = stamina
+        let newStamina = self.stamina - dungeonStaminaCost
         
         // ローカルの状態を即時に更新し、アニメーションをトリガー
         DispatchQueue.main.async {
@@ -601,26 +557,28 @@ class PositionViewModel: ObservableObject {
                 // 必要に応じてローカルの状態を元に戻す処理を追加
                 DispatchQueue.main.async {
                     withAnimation {
-                        self.userPosition = newPosition - 1
-                        self.stamina = newStamina + 10
+                        self.userPosition = previousPosition
+                        self.stamina = previousStamina
                     }
                 }
             } else {
                 print("position と stamina が更新されました: position=\(newPosition), stamina=\(newStamina)")
                 AuthManager.shared.recordDungeonStep(position: newPosition)
+                GuildManager.shared.recordDungeonStep()
             }
         }
         refreshRecoveryCountdown()
     }
 
     func incrementUserPosition() {
+        guard userPosition < Constants.finalFloor else { return }
         guard let userId = AuthManager.shared.currentUserId else {
             print("User is not logged in.")
             return
         }
         
         // スタミナが十分か確認
-        guard self.stamina >= 10 else {
+        guard canEnterDungeon else {
             showStaminaAlert = true
             return
         }
@@ -658,6 +616,7 @@ class PositionViewModel: ObservableObject {
             } else {
                 print("position と stamina が更新されました: position=\(newPosition), stamina=\(newStamina)")
                 AuthManager.shared.recordDungeonStep(position: newPosition)
+                GuildManager.shared.recordDungeonStep()
             }
         }
         refreshRecoveryCountdown()
@@ -665,6 +624,7 @@ class PositionViewModel: ObservableObject {
 
     /// スタミナを減少させる関数
     func decreaseStamina(by amount: Int = 10) {
+        guard dungeonStaminaCost > 0 else { return }
         guard let userId = authManager.currentUserId else {
             print("ユーザーがログインしていません。")
             return
@@ -775,23 +735,6 @@ class PositionViewModel: ObservableObject {
 
     var battleWinStreak: Int {
         latestBattleSnapshot?.winStreak ?? 0
-    }
-
-    func applyRouteChoice(_ choice: DungeonRouteChoice) {
-        switch choice {
-        case .safe:
-            recoverStamina(by: 12)
-            addDungeonBoost(type: .safeShield, charges: 1)
-        case .reward:
-            addDungeonBoost(type: .coinBonus, charges: 1)
-        case .challenge:
-            addDungeonBoost(type: .attackSurge, charges: 3)
-        }
-    }
-
-    func applyStudyEventReward() {
-        recoverStamina(by: 5)
-        addDungeonBoost(type: .attackSurge, charges: 1)
     }
 
     func addDungeonBoost(type: DungeonBoostType, charges: Int = 1, magnitude: Double? = nil) {
@@ -1076,6 +1019,14 @@ struct StoryBoundaryOffsetKey: PreferenceKey {
     }
 }
 
+private struct StoryMapContentHeightKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = max(value, nextValue())
+    }
+}
+
 // TestView の定義
 struct StoryView: View {
     @StateObject var viewModel = PositionViewModel.shared
@@ -1089,7 +1040,6 @@ struct StoryView: View {
     @State private var position: Int = 1
     @State private var index: Int = 1
     @State private var currentVisiblePosition: Int = 1
-    @State private var isSoundOn: Bool = true
     @Environment(\.scenePhase) var scenePhase
     @EnvironmentObject var appState: AppState
     @State private var isStoryFlag: Bool = false
@@ -1101,9 +1051,16 @@ struct StoryView: View {
     @Binding var isReturnActive: Bool
     @Binding var isPresented: Bool
     @State private var hasAppeared = false
-    @State private var lastObservedUserPosition: Int? = nil
-    @State private var chapterAnnouncement: DungeonChapterInfo? = nil
-    @State private var activeBoardEvent: DungeonBoardEvent? = nil
+    @State private var mapZoom: CGFloat = 1
+    @State private var mapContentHeight: CGFloat = 0
+    @GestureState private var pinchMagnification: CGFloat = 1
+
+    private let minimumMapZoom: CGFloat = 0.4
+    private let maximumMapZoom: CGFloat = 2.0
+
+    private var displayedMapZoom: CGFloat {
+        min(max(mapZoom * pinchMagnification, minimumMapZoom), maximumMapZoom)
+    }
 
     var body: some View {
         NavigationStack {
@@ -1111,34 +1068,47 @@ struct StoryView: View {
                 ZStack {
                     Image(backgroundImageName(for: currentVisiblePosition))
                         .resizable()
+                        .overlay(Color.white.opacity(0.24))
                         .edgesIgnoringSafeArea(.all)
                         .transition(.opacity)
                         .animation(.easeInOut(duration: 0.5), value: currentVisiblePosition)
 
                     VStack(spacing: 0) {
-                        if appState.shouldShowAds && authManager.currentUserId != "dzarHuAdiXXLtDjtwIRvIfVhA1A2" {
+                        if appState.shouldShowAds {
                             BannerStortyView()
-                                .frame(height: 60)
                         }
                         adventureHUD
-                            .padding(.horizontal, 16)
+                            .padding(.horizontal, 24)
                             .padding(.top, 8)
                             .padding(.bottom, 8)
                         // スクロールビュー
                         ScrollView {
-                            VStack(spacing: 18) {
-                                DungeonSegmentTrackView(progress: CGFloat(viewModel.userPosition - 1) / CGFloat(PositionViewModel.Constants.finalFloor - 1), chapter: viewModel.currentChapter)
-                                    .padding(.horizontal, 16)
-                                    .padding(.top, 8)
-
-                                adventureInsightsPanel
-                                    .padding(.horizontal, 16)
-
-                                PlatformsContainer(viewModel: viewModel, namespace: animationNamespace)
-
-                                Color.clear
-                                    .frame(height: 126)
-                            }
+                            PlatformsContainer(viewModel: viewModel, namespace: animationNamespace)
+                                // The floor 300 boss rises above its platform. Include that
+                                // overhang in the scrollable content so its head stays visible.
+                                .padding(.top, 160)
+                                .background(
+                                    GeometryReader { geometry in
+                                        Color.clear.preference(
+                                            key: StoryMapContentHeightKey.self,
+                                            value: geometry.size.height
+                                        )
+                                    }
+                                )
+                                .scaleEffect(displayedMapZoom, anchor: .top)
+                                .frame(
+                                    height: mapContentHeight > 0
+                                        ? mapContentHeight * displayedMapZoom
+                                        : nil,
+                                    alignment: .top
+                                )
+                        }
+                        .simultaneousGesture(mapZoomGesture)
+                        .accessibilityLabel("ストーリーマップ")
+                        .accessibilityValue("拡大率 \(Int((displayedMapZoom * 100).rounded()))パーセント")
+                        .accessibilityHint("2本の指を広げると拡大、つまむと縮小します")
+                        .onPreferenceChange(StoryMapContentHeightKey.self) { height in
+                            mapContentHeight = height
                         }
                         .onPreferenceChange(StoryBoundaryOffsetKey.self) { offsets in
                             updateBackgroundImage(using: offsets)
@@ -1186,40 +1156,6 @@ struct StoryView: View {
                         HelpStoryModalView(audioManager: audioManager, isPresented: $csFlag)
                     }
 
-                    if let chapterAnnouncement {
-                        DungeonChapterAnnouncementView(chapter: chapterAnnouncement)
-                            .transition(.move(edge: .top).combined(with: .opacity))
-                            .zIndex(20)
-                    }
-
-                    if let activeBoardEvent {
-                        switch activeBoardEvent.kind {
-                        case .routeChoice:
-                            DungeonRouteChoiceModalView(event: activeBoardEvent) { choice in
-                                viewModel.applyRouteChoice(choice)
-                                dismissBoardEvent()
-                            } onClose: {
-                                dismissBoardEvent()
-                            }
-                            .zIndex(21)
-                        case .rest:
-                            DungeonRestEventModalView(event: activeBoardEvent, viewModel: viewModel) {
-                                dismissBoardEvent()
-                            }
-                            .zIndex(21)
-                        case .lore:
-                            DungeonLoreEventModalView(event: activeBoardEvent, chapter: viewModel.currentChapter) {
-                                dismissBoardEvent()
-                            }
-                            .zIndex(21)
-                        case .study:
-                            DungeonStudyEventModalView(event: activeBoardEvent, viewModel: viewModel) {
-                                dismissBoardEvent()
-                            }
-                            .zIndex(21)
-                        }
-                    }
-                    
                     if isTutorialStart {
                        if let position = downArrowPosition {
                            Color.black.opacity(0.5)
@@ -1267,11 +1203,7 @@ struct StoryView: View {
                        }
                     
                     if isLoading {
-                        VStack {
-                            ActivityIndicator()
-                        }
-                        .background(Color("Color2"))
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        SlimeFullScreenLoadingView()
                     }
                 }
                 .fullScreenCover(isPresented: $viewModel.showUserStoryQuiz) {
@@ -1287,35 +1219,42 @@ struct StoryView: View {
                     }
                 }
                 .fullScreenCover(isPresented: $viewModel.showMonsterQuizList) {
-                    switch viewModel.userPosition {
-                    case 1...51:
-                        StoryITListView(
+                    if let area = DungeonExpansion.area(at: nextFloor) {
+                        DungeonExpansionQuizView(
                             isPresenting: $viewModel.showMonsterQuizList,
-                            monsterName: viewModel.monsterName,
-                            backgroundName: "ダンジョン背景1",
-                            viewModel: viewModel
+                            viewModel: viewModel, monsterName: viewModel.monsterName, area: area
                         )
-                    case 52...100:
-                        StoryInfoListView(
-                            isPresenting: $viewModel.showMonsterQuizList,
-                            monsterName: viewModel.monsterName,
-                            backgroundName: "ダンジョン背景2",
-                            viewModel: viewModel
-                        )
-                    case 101...150:
-                        StoryAppliedListView(
-                            isPresenting: $viewModel.showMonsterQuizList,
-                            monsterName: viewModel.monsterName,
-                            backgroundName: "ダンジョン背景3",
-                            viewModel: viewModel
-                        )
-                    default:
-                        StoryInfoListView(
-                            isPresenting: $viewModel.showMonsterQuizList,
-                            monsterName: viewModel.monsterName,
-                            backgroundName: "ダンジョン背景1",
-                            viewModel: viewModel
-                        )
+                    } else {
+                        switch viewModel.userPosition {
+                        case 1...51:
+                            StoryITListView(
+                                isPresenting: $viewModel.showMonsterQuizList,
+                                monsterName: viewModel.monsterName,
+                                backgroundName: "DungeonStorybookForestBackground",
+                                viewModel: viewModel
+                            )
+                        case 52...100:
+                            StoryInfoListView(
+                                isPresenting: $viewModel.showMonsterQuizList,
+                                monsterName: viewModel.monsterName,
+                                backgroundName: "DungeonStorybookLavenderCaveBackground",
+                                viewModel: viewModel
+                            )
+                        case 101...150:
+                            StoryAppliedListView(
+                                isPresenting: $viewModel.showMonsterQuizList,
+                                monsterName: viewModel.monsterName,
+                                backgroundName: "DungeonStorybookTerracottaDepthBackground",
+                                viewModel: viewModel
+                            )
+                        default:
+                            StoryInfoListView(
+                                isPresenting: $viewModel.showMonsterQuizList,
+                                monsterName: viewModel.monsterName,
+                                backgroundName: "DungeonStorybookForestBackground",
+                                viewModel: viewModel
+                            )
+                        }
                     }
                 }
                 .coordinateSpace(name: "StoryViewCoordinateSpace") // 名前付き座標空間を設定
@@ -1356,7 +1295,6 @@ struct StoryView: View {
                     }
                     position = viewModel.userPosition
                     index = viewModel.userPosition
-                    lastObservedUserPosition = viewModel.userPosition
                     
                     // Firebase関連の処理
                     if let userId = AuthManager.shared.currentUserId {
@@ -1395,12 +1333,10 @@ struct StoryView: View {
                     if fetched && !initialScrollDone {
                         scrollToPosition(proxy: proxy, animated: false)
                         initialScrollDone = true
-                        lastObservedUserPosition = viewModel.userPosition
                     }
                 }
                 // userPosition が変更されたときにスクロール
                 .onChange(of: viewModel.userPosition) { newPosition in
-                    let previousPosition = lastObservedUserPosition ?? newPosition
                     currentVisiblePosition = newPosition
                     if let userId = AuthManager.shared.currentUserId {
                         viewModel.fetchUserStamina(for: userId)
@@ -1408,10 +1344,6 @@ struct StoryView: View {
                     if initialScrollDone {
                         scrollToPosition(proxy: proxy, animated: false)
                     }
-                    if initialScrollDone && newPosition > previousPosition {
-                        handleArrival(at: newPosition, previousPosition: previousPosition)
-                    }
-                    lastObservedUserPosition = newPosition
                 }
             }
         }
@@ -1455,16 +1387,22 @@ struct StoryView: View {
         PlatformsContainer(viewModel: viewModel, namespace: animationNamespace).platformDatas.flatMap { $0 }
     }
 
+    private var mapZoomGesture: some Gesture {
+        MagnificationGesture(minimumScaleDelta: 0.01)
+            .updating($pinchMagnification) { value, state, _ in
+                state = value
+            }
+            .onEnded { value in
+                mapZoom = min(max(mapZoom * value, minimumMapZoom), maximumMapZoom)
+            }
+    }
+
     private var nextFloor: Int {
         min(viewModel.userPosition + 1, PositionViewModel.Constants.finalFloor)
     }
 
     private var nextPlatform: PlatformData? {
         boardPlatforms.first(where: { $0.position == nextFloor })
-    }
-
-    private var nextBoardEvent: DungeonBoardEvent? {
-        DungeonBoardEvent.event(at: nextFloor)
     }
 
     private var nextRival: RankedUser? {
@@ -1475,206 +1413,33 @@ struct StoryView: View {
         })
     }
 
-    private var featuredMission: Mission? {
-        missionManager.dailyMissions.first(where: { !$0.isCompleted }) ??
-        missionManager.weeklyMissions.first(where: { !$0.isCompleted }) ??
-        missionManager.normalMissions.first(where: { !$0.isCompleted }) ??
-        missionManager.missions.first(where: { $0.isCompleted && !$0.isClaimed })
-    }
-
-    private var upcomingBossFloor: Int? {
-        [52, 101, 150].first(where: { $0 > viewModel.userPosition })
-    }
-
     private var adventureHUD: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(spacing: 12) {
-                if isReturnActive {
-                    StoryHudActionButton(
-                        title: "戻る",
-                        systemImage: "chevron.left",
-                        action: {
-                            generateHapticFeedback()
-                            isPresented = false
-                            audioManager.playCancelSound()
-                        }
-                    )
-                }
-
-                Spacer(minLength: 0)
-
-                HStack(spacing: 8) {
-                    Image(systemName: viewModel.currentChapter.symbolName)
-                        .foregroundColor(.white)
-                    Text(viewModel.currentChapter.title)
-                        .font(.system(size: 14, weight: .bold))
-                        .foregroundColor(.white)
-                        .lineLimit(1)
-                }
-                .padding(.horizontal, 14)
-                .padding(.vertical, 10)
-                .background(
-                    Capsule()
-                        .fill(Color.black.opacity(0.22))
-                        .overlay(
-                            Capsule()
-                                .stroke(Color.white.opacity(0.12), lineWidth: 1)
-                        )
-                )
-
-                Spacer(minLength: 0)
-
-                StoryHudIconButton(
-                    imageName: isSoundOn ? "音声オン" : "音声オフ",
+        HStack(spacing: 12) {
+            if isReturnActive {
+                StoryHudActionButton(
+                    title: "戻る",
+                    systemImage: "chevron.left",
                     action: {
                         generateHapticFeedback()
-                        audioManager.toggleSound()
-                        audioManager.playSound()
-                        isSoundOn.toggle()
+                        isPresented = false
+                        audioManager.playCancelSound()
                     }
                 )
             }
 
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
-                    StoryInlineStatusChip(
-                        iconName: "bolt.fill",
-                        title: "スタミナ",
-                        value: "\(viewModel.stamina)/100",
-                        colors: [Color(hex: "f7971e"), Color(hex: "ffd200")]
-                    )
-                    StoryInlineStatusChip(
-                        iconName: "flag.checkered.2.crossed",
-                        title: "階層",
-                        value: "\(viewModel.userPosition)/\(PositionViewModel.Constants.finalFloor)",
-                        colors: [Color(hex: "4facfe"), Color(hex: "00f2fe")]
-                    )
-                    StoryInlineStatusChip(
-                        iconName: "clock.arrow.circlepath",
-                        title: "回復",
-                        value: viewModel.nextRecoveryText,
-                        colors: [Color(hex: "43cea2"), Color(hex: "185a9d")]
-                    )
-                    StoryInlineStatusChip(
-                        iconName: "crown.fill",
-                        title: "ボス",
-                        value: upcomingBossFloor.map { "\($0)F" } ?? "制覇済み",
-                        colors: [Color(hex: "fa709a"), Color(hex: "fee140")]
-                    )
-                }
-                .padding(.horizontal, 1)
-            }
-        }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 9)
-        .background(
-            RoundedRectangle(cornerRadius: 20)
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            Color.black.opacity(0.18),
-                            Color.black.opacity(0.08)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 20)
-                        .stroke(Color.white.opacity(0.1), lineWidth: 1)
-                )
-        )
-    }
 
-    @ViewBuilder
-    private var adventureInsightsPanel: some View {
-        if featuredMission != nil || viewModel.latestBattleSnapshot != nil || !viewModel.activeBoosts.isEmpty {
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
-                    if let featuredMission {
-                        StoryCompactInfoChip(
-                            iconName: "checkmark.circle.fill",
-                            text: "ミッション \(featuredMission.currentCount)/\(featuredMission.targetCount)",
-                            highlight: claimableCountText
-                        )
-                    }
+            Spacer(minLength: 0)
 
-                    if let snapshot = viewModel.latestBattleSnapshot {
-                        StoryCompactInfoChip(
-                            iconName: "target",
-                            text: "正答率 \(Int(snapshot.accuracy.rounded()))%"
-                        )
-                        StoryCompactInfoChip(
-                            iconName: "flame.fill",
-                            text: "連勝 \(snapshot.winStreak)"
-                        )
-                    }
-
-                    ForEach(viewModel.activeBoosts) { boost in
-                        DungeonBoostChipView(boost: boost)
-                    }
-                }
-                .padding(.horizontal, 1)
-            }
+            StoryInlineStatusChip(
+                iconName: "bolt.fill",
+                title: "スタミナ",
+                value: "\(viewModel.stamina)/\(PositionViewModel.Constants.maxStamina)",
+                colors: [Color(hex: "f7971e"), Color(hex: "ffd200")],
+                progress: Double(viewModel.stamina) / Double(PositionViewModel.Constants.maxStamina)
+            )
         }
     }
 
-    private var nextEncounterPanel: some View {
-        let preview = nextEncounterPreview()
-
-        return HStack(spacing: 12) {
-            Image(systemName: preview.rewardIcon)
-                .font(.system(size: 16, weight: .bold))
-                .foregroundColor(.white)
-                .frame(width: 38, height: 38)
-                .background(Color.white.opacity(0.14))
-                .clipShape(Circle())
-
-            VStack(alignment: .leading, spacing: 6) {
-                HStack(spacing: 8) {
-                    Text(preview.title)
-                        .font(.system(size: 16, weight: .bold))
-                        .foregroundColor(.white)
-                        .lineLimit(1)
-                    Spacer(minLength: 0)
-                    Text("F\(nextFloor)")
-                        .font(.system(size: 11, weight: .bold))
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 9)
-                        .padding(.vertical, 5)
-                        .background(Color.white.opacity(0.14))
-                        .clipShape(Capsule())
-                }
-
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 6) {
-                        StoryCompactInfoChip(iconName: "bolt.fill", text: "消費 \(preview.staminaCostText)")
-                        StoryCompactInfoChip(iconName: preview.rewardIcon, text: preview.rewardText)
-                        if let event = nextBoardEvent {
-                            StoryCompactInfoChip(iconName: event.kind.iconName, text: event.kind.title)
-                        }
-                    }
-                }
-            }
-        }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 10)
-        .background(
-            RoundedRectangle(cornerRadius: 20)
-                .fill(
-                    LinearGradient(
-                        colors: preview.colors.map { $0.opacity(0.56) },
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 20)
-                        .stroke(Color.white.opacity(0.12), lineWidth: 1)
-                )
-        )
-        .shadow(color: preview.colors.first?.opacity(0.18) ?? .clear, radius: 10, y: 6)
-    }
 
     private var claimableCountText: String? {
         missionManager.totalClaimableCount > 0 ? "受取 \(missionManager.totalClaimableCount)" : nil
@@ -1692,17 +1457,6 @@ struct StoryView: View {
             )
         }
 
-        if let event = nextBoardEvent {
-            return (
-                title: event.title,
-                subtitle: event.subtitle,
-                rewardText: event.rewardText,
-                rewardIcon: event.kind.iconName,
-                colors: event.kind.accentColors,
-                staminaCostText: "10"
-            )
-        }
-
         if let rival = nextRival {
             return (
                 title: "ライバル遭遇: \(rival.user.userName)",
@@ -1717,7 +1471,7 @@ struct StoryView: View {
         if let boss = nextPlatform?.boss, boss != 0 {
             let rewardSummary = InventoryReward.summaryText(for: DungeonRewardPlanner.battleRewards(for: "ボス\(boss)"), useShortNames: true)
             return (
-                title: "ボス\(boss)が待ち受ける",
+                title: "\(DungeonExpansion.displayName(for: "ボス\(boss)"))が待ち受ける",
                 subtitle: "章の節目。集中して挑めば大きな成長チャンス",
                 rewardText: rewardSummary.isEmpty ? "大量XP" : rewardSummary,
                 rewardIcon: "crown.fill",
@@ -1789,54 +1543,15 @@ struct StoryView: View {
             return "1500コイン"
         case 30:
             return "2000コイン"
+        case 31...60:
+            return "\(DungeonExpansion.treasure(for: treasure)?.reward ?? 0)コイン"
         default:
             return "コイン"
         }
     }
 
-    private func handleArrival(at newPosition: Int, previousPosition: Int) {
-        let previousChapter = DungeonChapterInfo.current(for: previousPosition)
-        let nextChapter = DungeonChapterInfo.current(for: newPosition)
-
-        if previousChapter.id != nextChapter.id {
-            withAnimation(.spring(response: 0.55, dampingFraction: 0.78)) {
-                chapterAnnouncement = nextChapter
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.2) {
-                withAnimation(.easeInOut(duration: 0.25)) {
-                    if chapterAnnouncement?.id == nextChapter.id {
-                        chapterAnnouncement = nil
-                    }
-                }
-            }
-        }
-
-        if let boardEvent = DungeonBoardEvent.event(at: newPosition) {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.55) {
-                withAnimation(.spring(response: 0.45, dampingFraction: 0.88)) {
-                    activeBoardEvent = boardEvent
-                }
-            }
-        }
-    }
-
-    private func dismissBoardEvent() {
-        withAnimation(.easeInOut(duration: 0.2)) {
-            activeBoardEvent = nil
-        }
-    }
-
     private var currentStoryBackgroundName: String {
-        switch viewModel.userPosition {
-        case 1...51:
-            return "ダンジョン背景1"
-        case 52...100:
-            return "ダンジョン背景2"
-        case 101...150:
-            return "ダンジョン背景3"
-        default:
-            return "ダンジョン背景1"
-        }
+        DungeonExpansion.background(at: nextFloor)
     }
     func executeProcessEveryfifTimes() {
         // UserDefaultsからカウンターを取得
@@ -1853,102 +1568,20 @@ struct StoryView: View {
     
     private func updateBackgroundImage(using offsets: [Int: CGFloat]) {
         let switchLine = UIScreen.main.bounds.height * 0.45
-
-        if let section51Y = offsets[51], section51Y <= switchLine {
-            currentVisiblePosition = 1
-        } else if let section101Y = offsets[101], section101Y <= switchLine {
-            currentVisiblePosition = 51
-        } else {
-            currentVisiblePosition = 101
-        }
+        let boundaries = [(51, 1), (101, 52), (151, 101), (201, 151), (251, 201)]
+        currentVisiblePosition = boundaries.first(where: { boundary in
+            offsets[boundary.0].map { $0 <= switchLine } ?? false
+        })?.1 ?? 251
     }
-    
+
     func backgroundImageName(for position: Int) -> String {
-        switch position {
-        case 1...50:
-            return "背景1ダンジョン"
-        case 51...100:
-            return "背景2ダンジョン"
-        case 101...150:
-            return "背景3ダンジョン"
-        default:
-            return "背景1ダンジョン"
-        }
-    }
-    
-    struct PositionMapping {
-        let range: ClosedRange<Int>
-        let target: Int
+        DungeonExpansion.background(at: position)
     }
 
-    let positionMappings: [PositionMapping] = [
-        PositionMapping(range: 1...3, target: 51),
-        PositionMapping(range: 4...6, target: 50),
-        PositionMapping(range: 7...9, target: 49),
-        PositionMapping(range: 10...12, target: 48),
-        PositionMapping(range: 13...15, target: 47),
-        PositionMapping(range: 16...18, target: 46),
-        PositionMapping(range: 19...21, target: 45),
-        PositionMapping(range: 22...24, target: 44),
-        PositionMapping(range: 25...27, target: 43),
-        PositionMapping(range: 28...30, target: 42),
-        PositionMapping(range: 31...33, target: 41),
-        PositionMapping(range: 34...36, target: 40),
-        PositionMapping(range: 37...39, target: 39),
-        PositionMapping(range: 40...42, target: 38),
-        PositionMapping(range: 43...45, target: 37),
-        PositionMapping(range: 46...48, target: 36),
-        PositionMapping(range: 49...51, target: 35),
-        PositionMapping(range: 52...52, target: 34),
-        PositionMapping(range: 53...55, target: 33),
-        PositionMapping(range: 56...58, target: 32),
-        PositionMapping(range: 59...61, target: 31),
-        PositionMapping(range: 62...64, target: 30),
-        PositionMapping(range: 65...67, target: 29),
-        PositionMapping(range: 68...70, target: 28),
-        PositionMapping(range: 71...73, target: 27),
-        PositionMapping(range: 74...76, target: 26),
-        PositionMapping(range: 77...79, target: 25),
-        PositionMapping(range: 80...82, target: 24),
-        PositionMapping(range: 83...85, target: 23),
-        PositionMapping(range: 86...88, target: 22),
-        PositionMapping(range: 89...91, target: 21),
-        PositionMapping(range: 92...94, target: 20),
-        PositionMapping(range: 95...97, target: 19),
-        PositionMapping(range: 98...100, target: 18),
-        PositionMapping(range: 101...101, target: 17),
-        PositionMapping(range: 102...104, target: 16),
-        PositionMapping(range: 105...107, target: 15),
-        PositionMapping(range: 108...110, target: 14),
-        PositionMapping(range: 111...113, target: 13),
-        PositionMapping(range: 114...116, target: 12),
-        PositionMapping(range: 117...119, target: 11),
-        PositionMapping(range: 120...122, target: 10),
-        PositionMapping(range: 123...125, target: 9),
-        PositionMapping(range: 126...128, target: 8),
-        PositionMapping(range: 129...131, target: 7),
-        PositionMapping(range: 132...134, target: 6),
-        PositionMapping(range: 135...137, target: 5),
-        PositionMapping(range: 138...140, target: 4),
-        PositionMapping(range: 141...143, target: 3),
-        PositionMapping(range: 144...146, target: 2),
-        PositionMapping(range: 147...150, target: 1)
-    ]
-    
     private func scrollToPosition(proxy: ScrollViewProxy, animated: Bool) {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             let scrollAction = {
-                let userPos = viewModel.userPosition
-                print("userPos      :\(userPos)")
-                if let mapping = positionMappings.first(where: { $0.range.contains(userPos) }) {
-                    print("Scroll to position: \(mapping.target)")
-                    proxy.scrollTo(mapping.target, anchor: .bottom)
-                } else {
-                    // デフォルトのスクロール先を設定
-                    let defaultTarget = 33
-                    print("Default scroll to position: \(defaultTarget)")
-                    proxy.scrollTo(defaultTarget, anchor: .bottom)
-                }
+                proxy.scrollTo("dungeon.floor.\(viewModel.userPosition)", anchor: .bottom)
             }
             if animated {
                 withAnimation {
@@ -2089,21 +1722,59 @@ struct StoryInlineStatusChip: View {
     let title: String
     let value: String
     let colors: [Color]
+    let progress: Double?
+
+    init(
+        iconName: String,
+        title: String,
+        value: String,
+        colors: [Color],
+        progress: Double? = nil
+    ) {
+        self.iconName = iconName
+        self.title = title
+        self.value = value
+        self.colors = colors
+        self.progress = progress
+    }
 
     var body: some View {
-        HStack(spacing: 6) {
-            Image(systemName: iconName)
-                .font(.system(size: 11, weight: .bold))
-                .foregroundColor(.white)
+        VStack(spacing: 6) {
+            HStack(spacing: 6) {
+                Image(systemName: iconName)
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundColor(.white)
 
-            Text(title)
-                .font(.system(size: 11, weight: .semibold))
-                .foregroundColor(.white.opacity(0.74))
+                Text(title)
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundColor(.white.opacity(0.74))
 
-            Text(value)
-                .font(.system(size: 14, weight: .bold, design: .rounded))
-                .foregroundColor(.white)
+                Text(value)
+                    .font(.system(size: 14, weight: .bold, design: .rounded))
+                    .foregroundColor(.white)
+            }
+
+            if let progress {
+                GeometryReader { geometry in
+                    ZStack(alignment: .leading) {
+                        Capsule()
+                            .fill(Color.white.opacity(0.22))
+
+                        Capsule()
+                            .fill(
+                                LinearGradient(
+                                    colors: colors,
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                            .frame(width: geometry.size.width * min(max(progress, 0), 1))
+                    }
+                }
+                .frame(height: 5)
+            }
         }
+        .frame(minWidth: progress == nil ? nil : 132)
         .padding(.horizontal, 10)
         .padding(.vertical, 8)
         .background(
@@ -2123,6 +1794,8 @@ struct StoryInlineStatusChip: View {
                         .stroke(Color.white.opacity(0.1), lineWidth: 1)
                 )
         )
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(title) \(value)")
     }
 }
 
@@ -2212,18 +1885,6 @@ struct MissionProgressStripView: View {
     }
 }
 
-struct RecentBattleSummaryView: View {
-    let snapshot: DungeonBattleSnapshot
-
-    var body: some View {
-        HStack(spacing: 8) {
-            EncounterPreviewPill(label: "正答率", value: "\(Int(snapshot.accuracy.rounded()))%", systemImage: "target")
-            EncounterPreviewPill(label: "最高連続", value: "\(snapshot.maxConsecutive)問", systemImage: "flame.fill")
-            EncounterPreviewPill(label: "連勝", value: "\(snapshot.winStreak)", systemImage: snapshot.didWin ? "sparkles" : "moon.stars.fill")
-        }
-    }
-}
-
 struct DungeonBoostChipView: View {
     let boost: DungeonBoost
 
@@ -2252,33 +1913,6 @@ struct DungeonBoostChipView: View {
     }
 }
 
-struct EncounterPreviewPill: View {
-    let label: String
-    let value: String
-    let systemImage: String
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack(spacing: 6) {
-                Image(systemName: systemImage)
-                Text(label)
-            }
-            .font(.system(size: 11, weight: .semibold))
-            .foregroundColor(.white.opacity(0.68))
-
-            Text(value)
-                .font(.system(size: 13, weight: .bold))
-                .foregroundColor(.white)
-                .lineLimit(1)
-        }
-        .frame(minWidth: 96, alignment: .leading)
-        .padding(.horizontal, 10)
-        .padding(.vertical, 9)
-        .background(Color.black.opacity(0.14))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-    }
-}
-
 struct DungeonSegmentTrackView: View {
     let progress: CGFloat
     let chapter: DungeonChapterInfo
@@ -2287,7 +1921,10 @@ struct DungeonSegmentTrackView: View {
         ("Start", 1),
         ("Boss 1", 52),
         ("Boss 2", 101),
-        ("Boss 3", 150)
+        ("Boss 3", 150),
+        ("Boss 4", 200),
+        ("Boss 5", 250),
+        ("Final", 300)
     ]
 
     var body: some View {
@@ -2357,74 +1994,7 @@ struct DungeonSegmentTrackView: View {
     }
 
     private func checkpointProgress(index: Int) -> CGFloat {
-        CGFloat(index) / CGFloat(max(checkpoints.count - 1, 1))
-    }
-}
-
-struct DungeonChapterAnnouncementView: View {
-    let chapter: DungeonChapterInfo
-
-    var body: some View {
-        VStack {
-            VStack(spacing: 10) {
-                Image(systemName: chapter.symbolName)
-                    .font(.system(size: 34, weight: .bold))
-                    .foregroundColor(.white)
-                Text(chapter.title)
-                    .font(.system(size: 26, weight: .bold))
-                    .foregroundColor(.white)
-                Text(chapter.subtitle)
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(.white.opacity(0.84))
-                    .multilineTextAlignment(.center)
-            }
-            .padding(.horizontal, 24)
-            .padding(.vertical, 22)
-            .background(
-                RoundedRectangle(cornerRadius: 28)
-                    .fill(
-                        LinearGradient(
-                            colors: chapter.accentColors,
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 28)
-                            .stroke(Color.white.opacity(0.2), lineWidth: 1)
-                    )
-            )
-            .shadow(color: chapter.accentColors.first?.opacity(0.34) ?? .clear, radius: 18, y: 8)
-            .padding(.horizontal, 20)
-            .padding(.top, 70)
-
-            Spacer()
-        }
-    }
-}
-
-struct SpecialTileMarkerView: View {
-    let event: DungeonBoardEvent
-
-    var body: some View {
-        HStack(spacing: 6) {
-            Image(systemName: event.kind.iconName)
-            Text(event.kind.title)
-                .font(.system(size: 10, weight: .bold))
-        }
-        .foregroundColor(.white)
-        .padding(.horizontal, 10)
-        .padding(.vertical, 6)
-        .background(
-            Capsule()
-                .fill(
-                    LinearGradient(
-                        colors: event.kind.accentColors,
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    )
-                )
-        )
+        CGFloat(checkpoints[index].floor - 1) / CGFloat(PositionViewModel.Constants.finalFloor - 1)
     }
 }
 
@@ -2458,263 +2028,6 @@ struct TileStatusBadgeView: View {
     }
 }
 
-struct DungeonEventModalContainer<Content: View>: View {
-    let title: String
-    let subtitle: String
-    let colors: [Color]
-    let onClose: () -> Void
-    let content: Content
-
-    init(
-        title: String,
-        subtitle: String,
-        colors: [Color],
-        onClose: @escaping () -> Void,
-        @ViewBuilder content: () -> Content
-    ) {
-        self.title = title
-        self.subtitle = subtitle
-        self.colors = colors
-        self.onClose = onClose
-        self.content = content()
-    }
-
-    var body: some View {
-        ZStack {
-            Color.black.opacity(0.72)
-                .ignoresSafeArea()
-                .onTapGesture {
-                    onClose()
-                }
-
-            VStack(spacing: 16) {
-                VStack(spacing: 8) {
-                    Text(title)
-                        .font(.system(size: 24, weight: .bold))
-                        .foregroundColor(.white)
-                    Text(subtitle)
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(.white.opacity(0.84))
-                        .multilineTextAlignment(.center)
-                }
-
-                content
-
-                Button(action: onClose) {
-                    Text("閉じる")
-                        .font(.system(size: 15, weight: .bold))
-                        .foregroundColor(.white.opacity(0.85))
-                        .padding(.horizontal, 18)
-                        .padding(.vertical, 10)
-                        .background(Color.white.opacity(0.1))
-                        .clipShape(Capsule())
-                }
-            }
-            .padding(24)
-            .frame(maxWidth: 360)
-            .background(
-                RoundedRectangle(cornerRadius: 28)
-                    .fill(
-                        LinearGradient(
-                            colors: [
-                                colors.first?.opacity(0.96) ?? Color.black,
-                                colors.last?.opacity(0.92) ?? Color.black
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 28)
-                            .stroke(Color.white.opacity(0.18), lineWidth: 1)
-                    )
-            )
-            .padding(24)
-        }
-    }
-}
-
-struct DungeonRouteChoiceModalView: View {
-    let event: DungeonBoardEvent
-    let onSelect: (DungeonRouteChoice) -> Void
-    let onClose: () -> Void
-
-    var body: some View {
-        DungeonEventModalContainer(
-            title: event.title,
-            subtitle: event.subtitle,
-            colors: event.kind.accentColors,
-            onClose: onClose
-        ) {
-            VStack(spacing: 12) {
-                ForEach(DungeonRouteChoice.allCases) { choice in
-                    Button(action: {
-                        onSelect(choice)
-                    }) {
-                        HStack(spacing: 12) {
-                            Image(systemName: choice.iconName)
-                                .font(.system(size: 20, weight: .bold))
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(choice.title)
-                                    .font(.system(size: 17, weight: .bold))
-                                Text(choice.subtitle)
-                                    .font(.system(size: 13, weight: .medium))
-                                    .opacity(0.82)
-                            }
-                            Spacer()
-                        }
-                        .foregroundColor(.white)
-                        .padding(16)
-                        .background(
-                            RoundedRectangle(cornerRadius: 20)
-                                .fill(
-                                    LinearGradient(
-                                        colors: choice.accentColors.map { $0.opacity(0.88) },
-                                        startPoint: .leading,
-                                        endPoint: .trailing
-                                    )
-                                )
-                        )
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-        }
-    }
-}
-
-struct DungeonRestEventModalView: View {
-    let event: DungeonBoardEvent
-    @ObservedObject var viewModel: PositionViewModel
-    let onComplete: () -> Void
-
-    var body: some View {
-        DungeonEventModalContainer(
-            title: event.title,
-            subtitle: event.subtitle,
-            colors: event.kind.accentColors,
-            onClose: onComplete
-        ) {
-            VStack(spacing: 12) {
-                Button(action: {
-                    viewModel.recoverStamina(by: 15)
-                    onComplete()
-                }) {
-                    restActionCard(
-                        icon: "bed.double.fill",
-                        title: "しっかり休む",
-                        subtitle: "スタミナを15回復"
-                    )
-                }
-                .buttonStyle(.plain)
-
-                Button(action: {
-                    viewModel.recoverStamina(by: 5)
-                    viewModel.addDungeonBoost(type: .attackSurge, charges: 1)
-                    onComplete()
-                }) {
-                    restActionCard(
-                        icon: "brain.head.profile",
-                        title: "短く復習する",
-                        subtitle: "スタミナ+5 と 次戦ダメージアップ"
-                    )
-                }
-                .buttonStyle(.plain)
-            }
-        }
-    }
-
-    private func restActionCard(icon: String, title: String, subtitle: String) -> some View {
-        HStack(spacing: 12) {
-            Image(systemName: icon)
-                .font(.system(size: 20, weight: .bold))
-            VStack(alignment: .leading, spacing: 4) {
-                Text(title)
-                    .font(.system(size: 17, weight: .bold))
-                Text(subtitle)
-                    .font(.system(size: 13, weight: .medium))
-                    .opacity(0.82)
-            }
-            Spacer()
-        }
-        .foregroundColor(.white)
-        .padding(16)
-        .background(Color.white.opacity(0.12))
-        .clipShape(RoundedRectangle(cornerRadius: 20))
-    }
-}
-
-struct DungeonLoreEventModalView: View {
-    let event: DungeonBoardEvent
-    let chapter: DungeonChapterInfo
-    let onComplete: () -> Void
-
-    var body: some View {
-        DungeonEventModalContainer(
-            title: event.title,
-            subtitle: event.subtitle,
-            colors: event.kind.accentColors,
-            onClose: onComplete
-        ) {
-            VStack(alignment: .leading, spacing: 12) {
-                Text("このエリアの学習テーマ")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundColor(.white.opacity(0.76))
-
-                Text(chapter.title)
-                    .font(.system(size: 21, weight: .bold))
-                    .foregroundColor(.white)
-
-                Text(chapter.subtitle + "\n\n焦って全部取ろうとせず、次の1マスで何を得たいかを見ながら進むと、学習も攻略も安定します。")
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(.white.opacity(0.86))
-                    .lineSpacing(4)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-        }
-    }
-}
-
-struct DungeonStudyEventModalView: View {
-    let event: DungeonBoardEvent
-    @ObservedObject var viewModel: PositionViewModel
-    let onComplete: () -> Void
-
-    var body: some View {
-        DungeonEventModalContainer(
-            title: event.title,
-            subtitle: event.subtitle,
-            colors: event.kind.accentColors,
-            onClose: onComplete
-        ) {
-            VStack(spacing: 14) {
-                if let snapshot = viewModel.latestBattleSnapshot {
-                    RecentBattleSummaryView(snapshot: snapshot)
-                }
-
-                Text("短い復習で集中を整えました。次の戦闘に向けて小さなブーストを受け取れます。")
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(.white.opacity(0.84))
-                    .multilineTextAlignment(.center)
-
-                Button(action: {
-                    viewModel.applyStudyEventReward()
-                    onComplete()
-                }) {
-                    Text("ごほうびを受け取る")
-                        .font(.system(size: 17, weight: .bold))
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 14)
-                        .background(Color.white.opacity(0.14))
-                        .clipShape(RoundedRectangle(cornerRadius: 18))
-                }
-                .buttonStyle(.plain)
-            }
-        }
-    }
-}
-
 // PlatformsContainer の定義
 struct PlatformsContainer: View {
     let platformImageName: String
@@ -2726,8 +2039,8 @@ struct PlatformsContainer: View {
     init(viewModel: PositionViewModel, namespace: Namespace.ID) {
         self.viewModel = viewModel
         self.namespace = namespace
-        self.platformImageName = "足場1"
-        self.platformDatas = [
+        self.platformImageName = "DungeonStorybookMossPlatform"
+        self.platformDatas = DungeonExpansion.platformRows + [
             [
                 PlatformData(
                     imageName: self.platformImageName,
@@ -3885,12 +3198,51 @@ struct PlatformsContainer: View {
                                     boss: platformData.boss ?? 0,
                                     viewModel: viewModel
                                 )
+                                .id("dungeon.floor.\(platformData.position)")
                             }
                         }
                     }
                 }
             }
         }
+    }
+}
+
+private enum DungeonCharacterFootprint {
+    private static let bottoms = NSCache<NSString, NSNumber>()
+
+    static func height(of name: String, width: CGFloat) -> CGFloat {
+        guard let image = UIImage(named: name), image.size.width > 0 else { return width }
+        return width * image.size.height / image.size.width
+    }
+
+    static func bottom(of name: String, width: CGFloat) -> CGFloat {
+        if let cached = bottoms.object(forKey: name as NSString) {
+            return width * CGFloat(cached.doubleValue)
+        }
+        guard let image = UIImage(named: name)?.cgImage else { return width / 2 }
+        let maskWidth = 128
+        let maskHeight = max(1, Int((CGFloat(maskWidth) * CGFloat(image.height) / CGFloat(image.width)).rounded()))
+        var rgba = [UInt8](repeating: 0, count: maskWidth * maskHeight * 4)
+        let bottom = rgba.withUnsafeMutableBytes { bytes -> CGFloat in
+            guard let context = CGContext(
+                data: bytes.baseAddress, width: maskWidth, height: maskHeight,
+                bitsPerComponent: 8, bytesPerRow: maskWidth * 4, space: CGColorSpaceCreateDeviceRGB(),
+                bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue | CGBitmapInfo.byteOrder32Big.rawValue
+            ) else { return CGFloat(image.height) / CGFloat(image.width) / 2 }
+            context.draw(image, in: CGRect(x: 0, y: 0, width: maskWidth, height: maskHeight))
+            let pixels = bytes.bindMemory(to: UInt8.self)
+            for row in stride(from: maskHeight - 1, through: 0, by: -1) {
+                // Ignore faint edge pixels when locating the visible feet.
+                if (0..<maskWidth).contains(where: { pixels[(row * maskWidth + $0) * 4 + 3] > 32 }) {
+                    return (CGFloat(row + 1) / CGFloat(maskHeight) - 0.5)
+                        * CGFloat(image.height) / CGFloat(image.width)
+                }
+            }
+            return CGFloat(image.height) / CGFloat(image.width) / 2
+        }
+        bottoms.setObject(NSNumber(value: Double(bottom)), forKey: name as NSString)
+        return width * bottom
     }
 }
 
@@ -3919,53 +3271,24 @@ struct PlatformView: View {
     @State private var coin: Int = 1
     private var audioManager = AudioManager.shared
     @State private var isPresentingStoryUserQuiz = false
+#if DEBUG
+    @State private var isSettingDebugPosition = false
+    @State private var debugPositionError: String?
+#endif
     var otherUser: RankedUser? {
         viewModel.storyUsers.first(where: { $0.position == position && $0.user.id != AuthManager.shared.currentUserId &&  $0.position != 2 })
     }
     
     var imageName: String {
-        if position > 101 {
-            if position == 150 {
-                return "ボス足場3"
-            } else {
-                return "足場3"
-            }
-        } else if position >= 53 {
-            if position == 101 {
-                return "ボス足場2"
-            } else {
-                return "足場2"
-            }
-        } else {
-            if position == 52 {
-                return "ボス足場1"
-            } else {
-                return "足場1"
-            }
-        }
-    }
-    
-    var backgroundName: String {
-        get {
-            switch viewModel.userPosition {
-            case 1...51:
-                return "ダンジョン背景1"
-            case 52...100:
-                return "ダンジョン背景2"
-            case 101...150:
-                return "ダンジョン背景3"
-            default:
-                return "ダンジョン背景1" // デフォルトの背景
-            }
-        }
-        set {
-            // 必要に応じてsetterを実装。今回は動的置き換えのため空でも可。
-            // 例: 何もしない場合
-        }
+        DungeonExpansion.platformArtwork(at: position)
     }
 
-    var specialEvent: DungeonBoardEvent? {
-        DungeonBoardEvent.event(at: position)
+    var backgroundName: String {
+        DungeonExpansion.background(at: min(userPosition + 1, PositionViewModel.Constants.finalFloor))
+    }
+
+    private var isWidePlatform: Bool {
+        [52, 101, 150].contains(position) || DungeonExpansion.isBossFloor(position)
     }
 
     var tileFocusDistance: Int {
@@ -3990,20 +3313,17 @@ struct PlatformView: View {
     }
 
     var tileLayoutWidth: CGFloat {
-        [52, 101, 150].contains(position) ? 420 : 100
+        isWidePlatform ? 420 : 100
     }
 
     var tileLayoutHeight: CGFloat {
-        [52, 101, 150].contains(position) ? 250 : 190
+        isWidePlatform ? 250 : 190
     }
 
-    var shouldShowSpecialMarker: Bool {
-        guard let specialEvent else { return false }
-        guard userPosition < position else { return false }
-        return specialEvent.kind == .rest || specialEvent.kind == .routeChoice || specialEvent.kind == .lore || specialEvent.kind == .study
+    var platformArtworkWidth: CGFloat {
+        isWidePlatform ? 400 : 80
     }
 
-    
     init(imageName: String, position: Int, padding: EdgeInsets = EdgeInsets(), padding1: EdgeInsets? = nil, paddingMonster: EdgeInsets? = nil, paddingTreasure: EdgeInsets? = nil, userPosition: Int, onArrowTap: (() -> Void)? = nil, namespace: Namespace.ID, treasure: Int? = 0, monster: Int? = 0, boss: Int? = 0, viewModel: PositionViewModel) {
 //        self.imageName = imageName
         self.position = position
@@ -4043,11 +3363,11 @@ struct PlatformView: View {
             Image(imageName)
                 .resizable()
                 .scaledToFit()
-                .frame(width: position == 52 ? 400 : position == 101 ? 400 :  position == 150 ? 400 : 80)
+                .frame(width: platformArtworkWidth)
                 .padding(padding)
                 .background(
                     Group {
-                        if [51, 101].contains(position) {
+                        if [51, 101, 151, 201, 251].contains(position) {
                             GeometryReader { geometry in
                                 Color.clear.preference(
                                     key: StoryBoundaryOffsetKey.self,
@@ -4057,11 +3377,13 @@ struct PlatformView: View {
                         }
                     }
                 )
-
-            if shouldShowSpecialMarker, let specialEvent {
-                SpecialTileMarkerView(event: specialEvent)
-                    .padding(.top, -82)
-            }
+#if DEBUG
+                .contentShape(Rectangle())
+                .onTapGesture { moveToPositionForDebug() }
+                .accessibilityLabel("開発者モード：\(position)コマへ移動")
+                .accessibilityAddTraits(.isButton)
+                .accessibilityIdentifier("dungeon.debug.move.\(position)")
+#endif
 
             if let otherUser = otherUser {
                 if let treasure = treasure, treasure == 0 {
@@ -4074,31 +3396,37 @@ struct PlatformView: View {
                                             if let name = avatarData["name"] as? String,
                                                let usedFlag = avatarData["usedFlag"] as? Int,
                                                usedFlag == 1 {
-                                                VStack(spacing: -20){
-                                                    HStack() {
-                                                        Text("\(otherUser.user.userName)")
-                                                            .font(.system(size: fontSize(for: otherUser.user.userName, isIPad: true)))
-                                                            .padding(5)
-                                                            .foregroundColor(.white)
-                                                            .fontWeight(.bold)
-                                                            .background(Color.black.opacity(position == userPosition + 1 ? 0.72 : 0.45))
-                                                            .cornerRadius(10)
-                                                    }
-                                                    .zIndex(1)
-                                                    HStack(spacing: 10) {
-                                                        Image(name)
-                                                            .resizable()
-                                                            .scaledToFit()
-                                                            .frame(width: 80)
-                                                            .padding(padding1 ?? EdgeInsets())
+                                                Group {
+                                                    if imageName.hasPrefix("DungeonStorybook") {
+                                                        groundedCharacter(name, userName: otherUser.user.userName)
+                                                    } else {
+                                                        VStack(spacing: -20){
+                                                            HStack() {
+                                                                Text("\(otherUser.user.userName)")
+                                                                    .font(.system(size: fontSize(for: otherUser.user.userName, isIPad: true)))
+                                                                    .padding(5)
+                                                                    .foregroundColor(.white)
+                                                                    .fontWeight(.bold)
+                                                                    .background(Color.black.opacity(position == userPosition + 1 ? 0.72 : 0.45))
+                                                                    .cornerRadius(10)
+                                                            }
+                                                            .zIndex(1)
+                                                            HStack(spacing: 10) {
+                                                                Image(name)
+                                                                    .resizable()
+                                                                    .scaledToFit()
+                                                                    .frame(width: 80)
+                                                                    .padding(padding1 ?? EdgeInsets())
+                                                            }
+                                                        }
+                                                        .padding(.top, -60)
                                                     }
                                                 }
-                                                .padding(.top, -60)
                                                 .onTapGesture {
                                                     if position == userPosition + 1 {
                                                         self.triggerHaptic()
                                                         audioManager.playSound()
-                                                        if viewModel.stamina >= 10 {
+                                                        if viewModel.canEnterDungeon {
                                                             viewModel.selectedUser = otherUser.user
                                                             viewModel.showUserStoryAlert = true
                                                         } else {
@@ -4117,28 +3445,46 @@ struct PlatformView: View {
             
             // アバター表示
             if position == userPosition {
-                AvatarView(avatarName: viewModel.avatarName, padding1: padding1)
+                if imageName.hasPrefix("DungeonStorybook") {
+                    groundedCharacter(viewModel.avatarName)
+                } else {
+                    AvatarView(avatarName: viewModel.avatarName, padding1: padding1)
+                }
             }
 
             // 宝箱表示
             if let treasure = treasure, treasure != 0 && userPosition < position {
-                TreasureView(treasure: treasure, paddingTreasure: paddingTreasure) {
-                    handleTreasureTap(treasure: treasure)
+                if position >= DungeonExpansion.firstFloor {
+                    groundedCharacter(DungeonExpansion.treasureArtwork(for: treasure))
+                        .onTapGesture { handleTreasureTap(treasure: treasure) }
+                } else {
+                    TreasureView(treasure: treasure, paddingTreasure: paddingTreasure) {
+                        handleTreasureTap(treasure: treasure)
+                    }
                 }
             }
             
             // モンスター表示
             if let monster = monster, monster != 0 && userPosition < position {
-                MonsterView(monster: monster, paddingMonster: paddingMonster, backgroundName: backgroundName) {
-                    handleMonsterTap(monster: monster)
+                if imageName.hasPrefix("DungeonStorybook") {
+                    groundedCharacter(DungeonExpansion.artworkName(for: "モンスター\(monster)"))
+                        .onTapGesture { handleMonsterTap(monster: monster) }
+                } else {
+                    MonsterView(monster: monster, paddingMonster: paddingMonster, backgroundName: backgroundName) {
+                        handleMonsterTap(monster: monster)
+                    }
                 }
-                }
+            }
             
             // ボス表示
             if let boss = boss, boss != 0 && userPosition < position {
-                BossView(boss: boss, paddingTop: paddingTop(for: boss)) {
-                    handleBossTap(boss: boss)
-                }
+                groundedCharacter(
+                    DungeonExpansion.artworkName(for: "ボス\(boss)"),
+                    userName: DungeonExpansion.area(at: position)?.guardian,
+                    width: boss == 16 ? 200 : 250, surfaceDepth: 0.40
+                )
+                    .shadow(radius: 10)
+                    .onTapGesture { handleBossTap(boss: boss) }
             }
             
             // 下矢印表示
@@ -4154,7 +3500,58 @@ struct PlatformView: View {
         .frame(width: tileLayoutWidth, height: tileLayoutHeight)
         .scaleEffect(tileScale)
         .opacity(tileOpacity)
+#if DEBUG
+        .alert("現在地を変更できませんでした", isPresented: Binding(
+            get: { debugPositionError != nil },
+            set: { if !$0 { debugPositionError = nil } }
+        )) {
+            Button("OK", role: .cancel) { debugPositionError = nil }
+        } message: {
+            Text(debugPositionError ?? "")
+        }
+#endif
     }
+
+    private func groundedCharacter(_ name: String, userName: String? = nil, width: CGFloat = 80, surfaceDepth: CGFloat = 0.22) -> some View {
+        // Match the visible feet to the platform surface, independent of PNG padding
+        // and the legacy per-tile character padding.
+        let platformHeight = DungeonCharacterFootprint.height(of: imageName, width: platformArtworkWidth)
+        let surfaceY = (padding.top - padding.bottom) / 2 + platformHeight * (surfaceDepth - 0.5)
+
+        return Image(name)
+            .resizable()
+            .scaledToFit()
+            .frame(width: width)
+            .overlay(alignment: .top) {
+                if let userName = userName {
+                    Text(userName)
+                        .font(.system(size: fontSize(for: userName, isIPad: true), weight: .bold))
+                        .padding(5)
+                        .foregroundColor(.white)
+                        .background(Color.black.opacity(position == userPosition + 1 ? 0.72 : 0.45))
+                        .cornerRadius(10)
+                        .fixedSize()
+                        .offset(y: -12)
+                }
+            }
+            .offset(
+                x: (padding.leading - padding.trailing) / 2,
+                y: surfaceY - DungeonCharacterFootprint.bottom(of: name, width: width)
+            )
+    }
+
+#if DEBUG
+    private func moveToPositionForDebug() {
+        guard position != userPosition, !isSettingDebugPosition, viewModel.isPositionFetched else { return }
+        isSettingDebugPosition = true
+        viewModel.setPositionForDebug(position) { result in
+            isSettingDebugPosition = false
+            if case .failure(let error) = result {
+                debugPositionError = error.localizedDescription
+            }
+        }
+    }
+#endif
     
     func paddingTop(for boss: Int) -> CGFloat {
         switch boss {
@@ -4193,7 +3590,7 @@ struct PlatformView: View {
     
     // モンスタータップ時の処理
     func handleMonsterTap(monster: Int) {
-        if viewModel.stamina >= 10 {
+        if viewModel.canEnterDungeon {
             if position == userPosition + 1 {
                 viewModel.monsterName = "モンスター\(monster)"
                 viewModel.monster = monster
@@ -4206,7 +3603,7 @@ struct PlatformView: View {
     
     // ボスタップ時の処理
     func handleBossTap(boss: Int) {
-        if viewModel.stamina >= 10 {
+        if viewModel.canEnterDungeon {
             if position == userPosition + 1 {
                 viewModel.monsterName = "ボス\(boss)"
                 viewModel.monster = boss
@@ -4219,12 +3616,13 @@ struct PlatformView: View {
     
     // 下矢印タップ時の処理
     func handleDownArrowTap() {
-        if viewModel.stamina >= 10 {
+        if viewModel.canEnterDungeon {
             if let treasure = treasure, treasure != 0 {
                 audioManager.playTittleSound()
                 viewModel.coin = treasure
                 viewModel.showCoinAlert = true
                 onArrowTap?()
+                return
             }
             if let boss = boss, boss != 0 {
                 audioManager.playSound()
@@ -4256,7 +3654,7 @@ struct PlatformView: View {
     }
     
     func handleTreasureTap(treasure: Int) {
-        if viewModel.stamina >= 10 {
+        if viewModel.canEnterDungeon {
             if position == userPosition + 1 {
                 audioManager.playTittleSound()
                 viewModel.coin = treasure
@@ -4352,7 +3750,7 @@ struct TreasureView: View {
     let onTap: () -> Void
     
     var body: some View {
-        Image("宝箱\(treasure)")
+        Image(DungeonExpansion.treasureArtwork(for: treasure))
             .resizable()
             .frame(width: 80, height: 80)
             .padding(paddingTreasure ?? EdgeInsets())

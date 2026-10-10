@@ -122,7 +122,7 @@ struct GuerrillaBattleView: View {
                                         multiplier: MonsterComboSystem.multiplier(for: comboCount),
                                         isPulsing: comboPulse
                                     )
-                                    .offset(x: isSmallDevice() ? 90 : 120, y: 40)
+                                    .offset(x: isSmallDevice() ? 65 : 90, y: 32)
                                     .transition(.scale.combined(with: .opacity))
                                     .animation(.spring(response: 0.3, dampingFraction: 0.6), value: comboCount)
                                 }
@@ -215,7 +215,7 @@ struct GuerrillaBattleView: View {
                 }
                 .background(showIncorrectBackground ? Color(.red).opacity(0.1) : Color(.white).opacity(0))
 
-                // ホームモーダル（RankModalViewと同じデザイン）
+                // ホームモーダル（学習モードと同じデザイン）
                 if showHomeModal {
                     ZStack {
                         Color.black.opacity(0.7)
@@ -445,7 +445,7 @@ struct GuerrillaBattleView: View {
     }
 }
 
-// MARK: - ゲリラ用ホームモーダル（RankModalViewと同じデザイン）
+// MARK: - ゲリラ用ホームモーダル（学習モードと同じデザイン）
 
 struct GuerrillaHomeModalView: View {
     @Binding var isSoundOn: Bool
@@ -453,47 +453,106 @@ struct GuerrillaHomeModalView: View {
     @Binding var isPresenting: Bool
     @ObservedObject var audioManager: AudioManager
 
+    @State private var showContent = false
+    @State private var showMenuButton = false
+
     var body: some View {
         ZStack {
-            VStack(spacing: 10) {
-                Button(action: {
-                    generateHapticFeedback()
-                    audioManager.playCancelSound()
-                    isPresented = false
-                    isPresenting = false
-                }) {
-                    HStack {
-                        Image(systemName: "house")
-                        Text("ホームに戻る　")
+            Color.black.opacity(0.5)
+                .ignoresSafeArea()
+                .onTapGesture(perform: dismissModal)
+
+            VStack(spacing: 0) {
+                ZStack {
+                    LinearGradient(
+                        colors: [Color(hex: "667eea"), Color(hex: "764ba2")],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+
+                    VStack(spacing: 8) {
+                        Image(systemName: "pause.circle.fill")
+                            .font(.system(size: 40))
+                            .foregroundColor(.white)
+                            .shadow(color: .black.opacity(0.2), radius: 4, y: 2)
+
+                        Text("一時停止")
+                            .font(.system(size: 20, weight: .bold, design: .rounded))
+                            .foregroundColor(.white)
                     }
-                    .padding(20)
-                    .foregroundColor(.black)
-                    .background(Color.white)
-                    .cornerRadius(8)
-                    .shadow(radius: 1)
+                    .padding(.vertical, 24)
+                }
+                .frame(height: 120)
+
+                VStack(spacing: 12) {
+                    MenuButton(
+                        icon: "house.fill",
+                        title: "ホームに戻る",
+                        iconColor: Color(hex: "FF6B6B"),
+                        action: {
+                            generateHapticFeedback()
+                            audioManager.playReturnSound()
+                            isPresented = false
+                            isPresenting = false
+                        }
+                    )
+                    .scaleEffect(showMenuButton ? 1 : 0.8)
+                    .opacity(showMenuButton ? 1 : 0)
+                }
+                .padding(.horizontal, 20)
+                .padding(.vertical, 24)
+
+                Button(action: dismissModal) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "play.fill")
+                            .font(.system(size: 14, weight: .bold))
+                        Text("クイズに戻る")
+                            .font(.system(size: 16, weight: .bold, design: .rounded))
+                    }
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
+                    .background(
+                        LinearGradient(
+                            colors: [Color(hex: "667eea"), Color(hex: "764ba2")],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .cornerRadius(12)
+                    .shadow(color: Color(hex: "667eea").opacity(0.4), radius: 8, y: 4)
+                }
+                .buttonStyle(ScaleButtonStyle())
+                .padding(.horizontal, 20)
+                .padding(.bottom, 24)
+            }
+            .background(Color.white)
+            .cornerRadius(24)
+            .shadow(color: .black.opacity(0.25), radius: 20, y: 10)
+            .padding(.horizontal, 32)
+            .scaleEffect(showContent ? 1 : 0.9)
+            .opacity(showContent ? 1 : 0)
+        }
+        .onAppear {
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                showContent = true
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+                    showMenuButton = true
                 }
             }
-            .padding(50)
-            .background(Color.white)
-            .cornerRadius(20)
-            .shadow(radius: 10)
-            .overlay(
-                Button(action: {
-                    generateHapticFeedback()
-                    isPresented = false
-                    audioManager.playCancelSound()
-                }) {
-                    Image(systemName: "xmark.circle.fill")
-                        .resizable()
-                        .frame(width: 50, height: 50)
-                        .foregroundColor(.gray)
-                        .background(.white)
-                        .cornerRadius(30)
-                        .padding()
-                }
-                .offset(x: 35, y: -35),
-                alignment: .topTrailing
-            )
+        }
+    }
+
+    private func dismissModal() {
+        generateHapticFeedback()
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+            showContent = false
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            isPresented = false
+            audioManager.playCancelSound()
         }
     }
 }

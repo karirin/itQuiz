@@ -16,6 +16,13 @@ class InterstitialStory: NSObject, FullScreenContentDelegate, ObservableObject {
     var interstitialAd: InterstitialAd?
     
     func loadInterstitial(completion: ((Bool) -> Void)? = nil) {
+        guard AdvertisingPrivacyCoordinator.shared.isReady else {
+            AdvertisingPrivacyCoordinator.shared.performWhenReady { [weak self] in
+                self?.loadInterstitial(completion: completion)
+            }
+            return
+        }
+
 //      GADInterstitialAd.load(withAdUnitID: "ca-app-pub-3940256099942544/4411468910", request: GADRequest()) { (ad, error) in //テスト
         InterstitialAd.load(with: "ca-app-pub-4898800212808837/6252239732", request: Request()) { (ad, error) in
         if let _ = error {
@@ -38,7 +45,8 @@ class InterstitialStory: NSObject, FullScreenContentDelegate, ObservableObject {
         return print("Ad wasn't ready　ストーリー")
       }
 
-        fullScreenAd.present(from: viewController)
+        guard let presenter = AdPresenterResolver.resolve(preferred: viewController) else { return }
+        fullScreenAd.present(from: presenter)
     }
     
     func adDidRecordImpression(_ ad: FullScreenPresentingAd) {
@@ -84,7 +92,7 @@ struct AdViewControllerRepresentableStory: UIViewControllerRepresentable {
 
 struct Interstitial1Story: View {
     private let adViewControllerRepresentable = AdViewControllerRepresentableStory()
-        @ObservedObject var interstitial = Interstitial()
+    @StateObject private var interstitial = Interstitial()
     var body: some View {
         VStack{
             Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)

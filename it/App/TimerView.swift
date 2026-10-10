@@ -9,7 +9,12 @@ import SwiftUI
 
 struct TimerView: View {
     @Binding var remainingSeconds: Int
-    private let totalSeconds: Int = 30
+    private let totalSeconds: Int
+
+    init(remainingSeconds: Binding<Int>, totalSeconds: Int = 30) {
+        self._remainingSeconds = remainingSeconds
+        self.totalSeconds = max(1, totalSeconds)
+    }
     
     private var progress: Double {
         Double(remainingSeconds) / Double(totalSeconds)

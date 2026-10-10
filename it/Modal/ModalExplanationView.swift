@@ -24,21 +24,38 @@ struct ModalExplanationView: View {
         @Binding var userFlag: Int
         var pauseTimer: () -> Void
         var startTimer: () -> Void
+        var reviewQuestionCount: Int? = nil
+        var allowsHidingExplanation = true
+        var continueTitle = "次の問題へ"
+        var onContinue: (() -> Void)? = nil
+        var onHideExplanation: (() -> Void)? = nil
         
         var body: some View {
             ZStack {
                     VStack(spacing: 15) {
+                        if allowsHidingExplanation {
                             HStack{
                               Spacer()
                               VStack{
                                   
                                   Button(action: {
                         generateHapticFeedback()
+                                      if let onHideExplanation {
+                                          userFlag = 1
+                                          authManager.userFlag = 1
+                                          if let userId = authManager.currentUserId {
+                                              authManager.updateUserFlag(userId: userId, userFlag: 1)
+                                          }
+                                          audioManager.playCancelSound()
+                                          onHideExplanation()
+                                          return
+                                      }
                                       currentQuizIndex += 1
                                       selectedAnswerIndex = nil
                                       startTimer()
                                       audioManager.playCancelSound()
                                       userFlag = 1
+                                      authManager.userFlag = 1
                                       if let userId = authManager.currentUserId {
                                           authManager.updateUserFlag(userId: userId, userFlag: 1)
                                       }
@@ -60,7 +77,14 @@ struct ModalExplanationView: View {
                               .padding(.trailing,15)
       //                        .padding(5)
                           }
+                        }
                       VStack{
+                        if let reviewQuestionCount {
+                            ReviewQuestionProgressView(
+                                questionIndex: currentQuizIndex,
+                                questionCount: reviewQuestionCount
+                            )
+                        }
                         HStack{
                             if userAnswer == correctAnswer {
                                 Circle()
@@ -82,6 +106,8 @@ struct ModalExplanationView: View {
                                     .foregroundColor(Color("fontGray"))
                             }
                         }
+                        ScrollView {
+                          VStack(spacing: 10) {
                         HStack{
                             Text(" ")
                                 .background(.gray)
@@ -93,6 +119,7 @@ struct ModalExplanationView: View {
                         HStack {
                             Text(question)
                                 .foregroundColor(Color("fontGray"))
+                                .fixedSize(horizontal: false, vertical: true)
                             Spacer()
                         }
                         Spacer()
@@ -108,6 +135,7 @@ struct ModalExplanationView: View {
                         HStack {
                             Text("\(userAnswer)")
                                 .foregroundColor(Color("fontGray"))
+                                .fixedSize(horizontal: false, vertical: true)
                             Spacer()
                         }
                         HStack{
@@ -121,6 +149,7 @@ struct ModalExplanationView: View {
                         HStack {
                             Text("\(correctAnswer)")
                                 .foregroundColor(Color("fontGray"))
+                                .fixedSize(horizontal: false, vertical: true)
                             Spacer()
                         }
                         HStack{
@@ -132,17 +161,23 @@ struct ModalExplanationView: View {
                             Spacer()
                         }
                         HStack {
-                            ScrollView{
                                 Text("\(explanation)")
                                     .foregroundColor(Color("fontGray"))
-                            }
+                                    .fixedSize(horizontal: false, vertical: true)
                             Spacer()
+                        }
+                          }
                         }
                         
                         HStack{
                             Spacer()
                             Button(action: { 
                         generateHapticFeedback()
+                                if let onContinue {
+                                    audioManager.playCancelSound()
+                                    onContinue()
+                                    return
+                                }
                                 currentQuizIndex += 1
                                 isPresented = false
                                 selectedAnswerIndex = nil
@@ -150,7 +185,7 @@ struct ModalExplanationView: View {
                                 audioManager.playCancelSound()
                             }) {
                                 HStack{
-                                    Text("次の問題へ")
+                                    Text(continueTitle)
                                     
                                 }
                                 .padding()
@@ -159,6 +194,7 @@ struct ModalExplanationView: View {
                                 .cornerRadius(8)
                                 .shadow(radius: 5)
                             }
+                            .accessibilityIdentifier("quiz.explanation.continue")
                         }
                         //                    NavigationLink("", destination: QuizManagerView(isPresenting: .constant(false)).navigationBarBackButtonHidden(true), isActive: $isContentView)
                         

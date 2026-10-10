@@ -22,6 +22,7 @@ final class AppState: ObservableObject {
     }
 
     init() {
+        // 開発者モードでも実際の購入状態に基づいてプランを判定する。
         transactionListenerTask = observeTransactionUpdates()
         Task {
             await refreshSubscriptionState()
@@ -37,10 +38,12 @@ final class AppState: ObservableObject {
             let subscribed = try await isSubscribed()
             isSubscribed = subscribed
             isBannerVisible = !subscribed
+            hasResolvedSubscriptionState = true
         } catch {
+            // 確認に失敗したときに「未加入」と決めつけると、課金ユーザーに広告や課金画面が出てしまう。
+            // 直前の状態を維持し、未確定のままなら広告を出さない。
             print("サブスクリプションの確認中にエラー: \(error)")
         }
-        hasResolvedSubscriptionState = true
     }
 
     func checkCurrentSubscription() async {
@@ -90,16 +93,30 @@ final class AppState: ObservableObject {
     }
       
     func isSubscribed() async throws -> Bool {
+        // currentEntitlements には有効期間中と猶予期間中のサブスクリプションが含まれる。
+        // 端末内で検証できるため、通信エラーで判定が揺れる Product.SubscriptionInfo.status には依存しない。
         var subscriptionGroupIds: [String] = []
         for await result in Transaction.currentEntitlements {
-            let transaction = try self.checkVerified(result)
-            guard let groupId = transaction.subscriptionGroupID else { continue }
-            subscriptionGroupIds.append(groupId)
+            guard case .verified(let transaction) = result,
+                  transaction.productType == .autoRenewable else { continue }
+
+            SubscriptionLifecycleAnalytics.record(
+                transaction: transaction,
+                source: "entitlement_refresh"
+            )
+
+            if transaction.revocationDate == nil,
+               (transaction.expirationDate ?? .distantFuture) > Date() {
+                return true
+            }
+            if let groupId = transaction.subscriptionGroupID {
+                subscriptionGroupIds.append(groupId)
+            }
         }
 
+        // 期限切れ直後の請求リトライ中（猶予期間）も加入中として扱う。
         for groupId in subscriptionGroupIds {
             let renewalStates = try await getSubscriptionRenewalState(groupID: groupId)
-//            print("renewalStates:\(renewalStates)")
             for state in renewalStates {
                 switch state {
                 case .subscribed, .inGracePeriod:
@@ -109,8 +126,8 @@ final class AppState: ObservableObject {
                 }
             }
         }
-        
-        return false // サブスクリプションがない、または有効でない場合に false を返す
+
+        return false
     }
 }
 
@@ -121,30 +138,111 @@ enum SubscribeError: LocalizedError {
     case purchaseNotAllowed // OSの支払い機能が無効化されている
     case failedVerification // トランザクションデータの署名が不正
     case otherError // その他のエラー
+
+    var errorDescription: String? {
+        switch self {
+        case .userCancelled:
+            return "購入をキャンセルしました"
+        case .pending:
+            return "購入は保留中です。お支払い方法や承認状況をご確認ください"
+        case .productUnavailable:
+            return "現在このプランを購入できません。時間をおいてもう一度お試しください"
+        case .purchaseNotAllowed:
+            return "この端末では購入が許可されていません"
+        case .failedVerification:
+            return "購入情報を確認できませんでした。時間をおいてもう一度お試しください"
+        case .otherError:
+            return "購入処理中にエラーが発生しました。もう一度お試しください"
+        }
+    }
 }
 
+enum StoreProductLoadState: Equatable {
+    case idle
+    case loading
+    case loaded
+    case empty
+    case failed
+}
+
+@MainActor
 class SubscriptionViewModel: ObservableObject {
     @Published var products: [Product] = []
+    @Published var introEligibleProductIds: Set<String> = []
+    @Published private(set) var productLoadState: StoreProductLoadState = .idle
+    @Published private(set) var productLoadErrorMessage: String?
+    @Published private(set) var productLoadAttemptCount = 0
     @Published var isPrivilegeEnabled: Bool = false
     @ObservedObject var authManager = AuthManager.shared
 
     let productIdList = [
-        "it_premium_weekly_480",
         "it_premium_monthly_980",
         "it_premium_yearly_9800",
+        "it_premium_weekly_480",
     ]
 
+    var missingProductCount: Int {
+        max(0, productIdList.count - products.count)
+    }
+
+    /// 初回は一度だけ自動再試行し、それでも取得できない場合はUIから再試行できる状態にする。
     func loadProducts() async {
-        do {
-            let products = try await Product.products(for: productIdList)
-            DispatchQueue.main.async {
-                self.products = products
-                print("self.products")
-//                print(self.products)
+        guard productLoadState != .loading, productLoadState != .loaded else { return }
+
+        productLoadState = .loading
+        productLoadErrorMessage = nil
+        products = []
+        introEligibleProductIds = []
+
+        for automaticAttempt in 0..<2 {
+            productLoadAttemptCount += 1
+
+            do {
+                let fetchedProducts = try await Product.products(for: productIdList)
+
+                guard !fetchedProducts.isEmpty else {
+                    if automaticAttempt == 0 {
+                        try? await Task.sleep(nanoseconds: 700_000_000)
+                        continue
+                    }
+
+                    productLoadState = .empty
+                    productLoadErrorMessage = "購入プランを取得できませんでした。通信状態を確認して再試行してください。"
+                    return
+                }
+
+                // App Store Connectのオファー設定と、このユーザーの対象可否の両方を満たす商品だけ表示する。
+                var eligibleIds: Set<String> = []
+                for product in fetchedProducts {
+                    if await product.subscription?.isEligibleForIntroOffer == true {
+                        eligibleIds.insert(product.id)
+                    }
+                }
+
+                products = fetchedProducts
+                introEligibleProductIds = eligibleIds
+                productLoadState = .loaded
+                return
+            } catch {
+                print("Failed to load products: \(error)")
+                if automaticAttempt == 0 {
+                    try? await Task.sleep(nanoseconds: 700_000_000)
+                    continue
+                }
+
+                productLoadState = .failed
+                productLoadErrorMessage = "購入プランの読み込みに失敗しました。時間をおいて再試行してください。"
+                return
             }
-        } catch {
-            print("Failed to load products: \(error)")
         }
+    }
+
+    /// プランに表示すべき無料トライアル情報。
+    /// オファー未設定・対象外・未知のオファー種別ではすべて nil を返すため、
+    /// 呼び出し側はトライアル導入前とまったく同じ表示になる。
+    func introOffer(for product: Product) -> IntroOfferInfo? {
+        guard introEligibleProductIds.contains(product.id) else { return nil }
+        return IntroOfferInfo(product: product)
     }
     
     func enablePrivilege(productId: String) {
@@ -163,11 +261,19 @@ class SubscriptionViewModel: ObservableObject {
         }
     }
     
-    func purchaseProduct(_ product: Product, showAlert: Binding<Bool>) async throws {
+    func purchaseProduct(_ product: Product) async throws -> StoreKit.Transaction {
         let transaction = try await purchase(product: product)
-        await AppState.shared.refreshSubscriptionState()
-        showAlert.wrappedValue = true
+        // refreshSubscriptionState()はcurrentEntitlementsを読み、その時点でライフサイクルイベントを
+        // 消費してしまう。購入画面側が正しい流入元を記録できるよう状態だけ先に反映する。
+        AppState.shared.updateSubscriptionState(transaction: transaction)
+        await transaction.finish()
         print("購入が完了しました: \(transaction)")
+        return transaction
+    }
+
+    func purchaseProduct(_ product: Product, showAlert: Binding<Bool>) async throws {
+        _ = try await purchaseProduct(product)
+        showAlert.wrappedValue = true
     }
 }
 
@@ -232,7 +338,13 @@ func purchase(product: Product) async throws -> StoreKit.Transaction  {
     let purchaseResult: Product.PurchaseResult
     do {
         print("purchase2")
-        purchaseResult = try await product.purchase()
+        if let accountToken = SubscriptionLifecycleAnalytics.appAccountToken(
+            for: AuthManager.shared.currentUserId
+        ) {
+            purchaseResult = try await product.purchase(options: [.appAccountToken(accountToken)])
+        } else {
+            purchaseResult = try await product.purchase()
+        }
     } catch Product.PurchaseError.productUnavailable {
         print("purchase3")
         throw SubscribeError.productUnavailable
@@ -279,8 +391,20 @@ func observeTransactionUpdates() -> Task<Void, Never> {
                 continue
             }
 
-            await AppState.shared.refreshSubscriptionState()
-            await transaction.finish()
+            switch transaction.productType {
+            case .consumable:
+                guard await fulfillCoinPurchase(transaction) else { continue }
+                await transaction.finish()
+            case .autoRenewable:
+                SubscriptionLifecycleAnalytics.record(
+                    transaction: transaction,
+                    source: "transaction_update"
+                )
+                await AppState.shared.refreshSubscriptionState()
+                await transaction.finish()
+            default:
+                await transaction.finish()
+            }
         }
     }
 }
@@ -354,7 +478,6 @@ struct SubscriptionView: View {
                         generateHapticFeedback()
                                     Task {
                                         do {
-                                            try await AppStore.sync()
                                             try await viewModel.purchaseProduct(product, showAlert: $showAlert)
                                         } catch {
                                             print("購入処理中にエラーが発生しました: \(error)")
@@ -394,7 +517,7 @@ struct SubscriptionView: View {
             }
                 HStack{
                     Text("解約時は")
-                    NavigationLink(destination: WebView(urlString: "https://support.apple.com/ja-jp/HT202039")) {
+                    NavigationLink(destination: WebView(urlString: "https://support.apple.com/ja-jp/HT202039").appNavigationBackButton()) {
                         Text("こちら")
                             .foregroundStyle(Color.blue)
                     }
